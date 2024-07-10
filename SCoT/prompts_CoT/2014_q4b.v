@@ -22,3 +22,6 @@ endmodule
 module MUXDFF (...);
 
 endmodule
+
+
+//Please understand the requirement and write a rough solving process. It starts with a input-output structure, then defines intermediate signals. The thought process should be explained in pseudocode with no Verilog modules or syntax whatsoever. The necessary details should be written in natural languages.
