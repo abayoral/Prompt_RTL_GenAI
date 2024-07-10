@@ -76,10 +76,12 @@ def main():
     testbench = None
     model = None
     model_id = ""
-    num_candidates = 1
+    #num_candidates = 1
     outdir = ""
     log = None
     prompt_strategy = None
+
+    #parsing in arguments
 
     for opt, arg in opts:
         if opt in ("-h", "--help"):
