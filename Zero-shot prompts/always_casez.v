@@ -1,4 +1,4 @@
-// you're a senior hardware engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining the company's reputation in the industry.
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining the company's reputation in the industry.
 
 // Build a priority encoder for 8-bit inputs. Given an 8-bit vector, 
 // the output should report the first (least significant) bit in the vector that is 1. 

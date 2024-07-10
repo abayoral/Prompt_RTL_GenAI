@@ -1,4 +1,4 @@
-// you're a senior ASIC Designer Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining the company's reputation in the industry.
+// you're a senior Logic Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining the company's reputation in the industry.
 
 // The 7458 is a chip with four AND gates and two OR gates. 
 
