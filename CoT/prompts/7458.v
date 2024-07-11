@@ -1,5 +1,3 @@
-//Using Chain of Thought:
-
 // The 7458 is a chip with four AND gates and two OR gates. 
 
 // Create a module with the same functionality as the 7458 chip. 

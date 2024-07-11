@@ -15,10 +15,11 @@ def save_extracted_code(file_path, extracted_code):
         file.write(extracted_code)
 
 def main():
-    module_name = os.environ['module_name']  # Set the folder name to 'RCA' or replace with desired module name
-    base_path = os.path.join('Modules', module_name)
-    generated_code_path = os.path.join(base_path, 'generated_code.txt')
-    extracted_code_path = os.path.join(base_path, f'{module_name}_llm.v')
+    framework_name = os.environ.get('framework_name')  # Set default if not provided
+    module_name = os.environ.get('module_name', 'default_module')  # Set default if not provided
+    base_path = os.path.join(f'{framework_name}')
+    generated_code_path = os.path.join(base_path, "responses", f'{module_name}.txt')
+    extracted_code_path = os.path.join(base_path, 'modules', f'{module_name}.v')
 
     if not os.path.exists(generated_code_path):
         print(f"Error: {generated_code_path} does not exist.")
@@ -28,6 +29,7 @@ def main():
     verilog_code = extract_verilog_code(generated_code)
     
     if verilog_code:
+        os.makedirs(os.path.dirname(extracted_code_path), exist_ok=True)  # Ensure directory exists
         save_extracted_code(extracted_code_path, verilog_code)
         print(f"Extracted Verilog code has been written to {extracted_code_path}")
     else:
