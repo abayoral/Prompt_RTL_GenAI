@@ -3,8 +3,7 @@ module top_module(
     input [7:0] sel,
     output reg out );
 
-    // Whenever there's change in input or selection, evaluate and assign selected bit to output
-    always @ (in or sel) begin
+    always @(*) begin
         out = in[sel];
     end
 

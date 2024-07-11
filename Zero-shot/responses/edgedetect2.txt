@@ -3,11 +3,16 @@ module top_module (
     input [7:0] in,
     output reg [7:0] anyedge
 );
-	reg [7:0] in_previous;
-	
-	always @(posedge clk) begin
-		anyedge  <= (in ^ in_previous) & in; // XOR will detect any change, AND with current input will only output 1 for 0 to 1 change
-		in_previous <= in; // Update previous input value
-	end
 
+    // A register to hold the previous state of in
+    reg [7:0] prev_in;
+ 
+    always @(posedge clk) begin
+        // Detect any edge
+        anyedge = (in ^ prev_in) & in;
+ 
+        // Save the current state of in
+        prev_in = in;
+    end
+ 
 endmodule
