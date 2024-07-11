@@ -1,28 +1,28 @@
 Test 0 passed!
 Test 1 passed!
 Test 2 passed!
-Test 3 passed!
-Test 4 passed!
-Test 5 passed!
-Test 6 passed!
-Mismatch at index 7: Inputs = [0, 1, 1, 0, 0, 1, 0, 0, 1, 1], Generated = [0, 0], Reference = [0, 1]
-Mismatch at index 8: Inputs = [0, 1, 1, 0, 0, 1, 0, 0, 1, 1], Generated = [0, 0], Reference = [0, 1]
+Mismatch at index 3: Inputs = [0, 0, 1, 0, 0, 0, 0, 0, 0, 1], Generated = [0, 1], Reference = [0, 0]
+Mismatch at index 4: Inputs = [0, 0, 1, 0, 0, 0, 0, 0, 0, 1], Generated = [0, 1], Reference = [0, 0]
+Mismatch at index 5: Inputs = [0, 1, 0, 0, 0, 1, 0, 0, 1, 0], Generated = [0, 1], Reference = [0, 0]
+Mismatch at index 6: Inputs = [0, 1, 0, 0, 0, 1, 0, 0, 1, 0], Generated = [0, 1], Reference = [0, 0]
+Test 7 passed!
+Test 8 passed!
 Test 9 passed!
 Test 10 passed!
-Test 11 passed!
-Test 12 passed!
+Mismatch at index 11: Inputs = [1, 0, 1, 0, 1, 0, 0, 1, 0, 1], Generated = [0, 1], Reference = [0, 0]
+Mismatch at index 12: Inputs = [1, 0, 1, 0, 1, 0, 0, 1, 0, 1], Generated = [0, 1], Reference = [0, 0]
 Mismatch at index 13: Inputs = [1, 1, 0, 0, 1, 1, 0, 1, 1, 0], Generated = [1, 1], Reference = [0, 0]
 Mismatch at index 14: Inputs = [1, 1, 0, 0, 1, 1, 0, 1, 1, 0], Generated = [1, 1], Reference = [0, 0]
 Test 15 passed!
 Test 16 passed!
 Test 17 passed!
 Test 18 passed!
-Mismatch at index 19: Inputs = [0, 0, 1, 1, 0, 0, 1, 0, 0, 1], Generated = [1, 0], Reference = [0, 0]
-Mismatch at index 20: Inputs = [0, 0, 1, 1, 0, 0, 1, 0, 0, 1], Generated = [1, 0], Reference = [0, 0]
-Test 21 passed!
-Test 22 passed!
-Mismatch at index 23: Inputs = [0, 1, 1, 1, 0, 1, 1, 0, 1, 1], Generated = [1, 0], Reference = [0, 1]
-Mismatch at index 24: Inputs = [0, 1, 1, 1, 0, 1, 1, 0, 1, 1], Generated = [1, 0], Reference = [0, 1]
+Mismatch at index 19: Inputs = [0, 0, 1, 1, 0, 0, 1, 0, 0, 1], Generated = [1, 1], Reference = [0, 0]
+Mismatch at index 20: Inputs = [0, 0, 1, 1, 0, 0, 1, 0, 0, 1], Generated = [1, 1], Reference = [0, 0]
+Mismatch at index 21: Inputs = [0, 1, 0, 1, 0, 1, 1, 0, 1, 0], Generated = [0, 1], Reference = [0, 0]
+Mismatch at index 22: Inputs = [0, 1, 0, 1, 0, 1, 1, 0, 1, 0], Generated = [0, 1], Reference = [0, 0]
+Mismatch at index 23: Inputs = [0, 1, 1, 1, 0, 1, 1, 0, 1, 1], Generated = [1, 1], Reference = [0, 1]
+Mismatch at index 24: Inputs = [0, 1, 1, 1, 0, 1, 1, 0, 1, 1], Generated = [1, 1], Reference = [0, 1]
 Test 25 passed!
 Test 26 passed!
 Mismatch at index 27: Inputs = [1, 0, 1, 1, 1, 0, 1, 1, 0, 1], Generated = [1, 1], Reference = [0, 1]
@@ -33,12 +33,11 @@ Test 31 passed!
 Test 32 passed!
 Test 33 passed!
 Test 34 passed!
-Test 35 passed!
-Test 36 passed!
-Test 37 passed!
-Test 38 passed!
-10 mismatches out of 39 total tests.
-hdlbits_testbenches/7458_0_tb.v:502: $finish called at 78000 (10ps)
+Mismatch at index 35: Inputs = [0, 0, 1, 0, 0, 0, 0, 0, 0, 1], Generated = [0, 1], Reference = [0, 0]
+Mismatch at index 36: Inputs = [0, 0, 1, 0, 0, 0, 0, 0, 0, 1], Generated = [0, 1], Reference = [0, 0]
+Mismatch at index 37: Inputs = [0, 1, 0, 0, 0, 1, 0, 0, 1, 0], Generated = [0, 1], Reference = [0, 0]
+Mismatch at index 38: Inputs = [0, 1, 0, 0, 0, 1, 0, 0, 1, 0], Generated = [0, 1], Reference = [0, 0]
+20 mismatches out of 39 total tests.
 Module file path: Zero-shot/modules/7458.v
 Testbench file path: hdlbits_testbenches/7458_0_tb.v
 Compilation successful. Executable created at Zero-shot/simulations/7458_sim

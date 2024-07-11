@@ -1,5 +1,5 @@
-Zero-shot/modules/module_addsub.v:20: error: Unknown module type: add16
-Zero-shot/modules/module_addsub.v:21: error: Unknown module type: add16
+Zero-shot/modules/module_addsub.v:13: error: Unknown module type: add16
+Zero-shot/modules/module_addsub.v:14: error: Unknown module type: add16
 3 error(s) during elaboration.
 *** These modules were missing:
         add16 referenced 2 times.

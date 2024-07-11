@@ -18,20 +18,20 @@ Test 17 passed!
 Test 18 passed!
 Test 19 passed!
 Test 20 passed!
-Test 21 passed!
-Test 22 passed!
+Mismatch at index 21: Inputs = [00010010], Generated = [000], Reference = [001]
+Mismatch at index 22: Inputs = [00010010], Generated = [000], Reference = [001]
 Test 23 passed!
 Test 24 passed!
-Test 25 passed!
-Test 26 passed!
+Mismatch at index 25: Inputs = [00010100], Generated = [000], Reference = [010]
+Mismatch at index 26: Inputs = [00010100], Generated = [000], Reference = [010]
 Test 27 passed!
 Test 28 passed!
-Test 29 passed!
-Test 30 passed!
+Mismatch at index 29: Inputs = [00010110], Generated = [000], Reference = [001]
+Mismatch at index 30: Inputs = [00010110], Generated = [000], Reference = [001]
 Test 31 passed!
 Test 32 passed!
-Test 33 passed!
-All tests passed!
+Mismatch at index 33: Inputs = [00011000], Generated = [000], Reference = [011]
+7 mismatches out of 34 total tests.
 Module file path: Zero-shot/modules/always_casez.v
 Testbench file path: hdlbits_testbenches/Always_casez_0_tb.v
 Compilation successful. Executable created at Zero-shot/simulations/always_casez_sim

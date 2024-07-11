@@ -4,15 +4,11 @@ module top_module (
     output reg [7:0] anyedge
 );
 
-    // A register to hold the previous state of in
-    reg [7:0] prev_in;
- 
+    reg [7:0] last_in;
+
     always @(posedge clk) begin
-        // Detect any edge
-        anyedge = (in ^ prev_in) & in;
- 
-        // Save the current state of in
-        prev_in = in;
+        anyedge <= (in & ~last_in);
+        last_in <= in;
     end
- 
+
 endmodule

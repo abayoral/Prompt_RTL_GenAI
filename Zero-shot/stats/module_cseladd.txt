@@ -1,13 +1,12 @@
-Zero-shot/modules/module_cseladd.v:12: error: Unknown module type: add16
-Zero-shot/modules/module_cseladd.v:13: error: Unknown module type: add16
-Zero-shot/modules/module_cseladd.v:14: error: Unknown module type: add16
-Zero-shot/modules/module_cseladd.v:16: error: Unknown module type: mux2_1_16bit
-Zero-shot/modules/module_cseladd.v:17: error: Unknown module type: mux2_1_16bit
-6 error(s) during elaboration.
+Zero-shot/modules/module_cseladd.v:10: error: Unknown module type: add16
+Zero-shot/modules/module_cseladd.v:18: error: Unknown module type: add16
+Zero-shot/modules/module_cseladd.v:26: error: Unknown module type: add16
+Zero-shot/modules/module_cseladd.v:34: error: Unknown module type: mux2to1_16bit
+5 error(s) during elaboration.
 *** These modules were missing:
         add16 referenced 3 times.
-        mux2_1_16bit referenced 2 times.
+        mux2to1_16bit referenced 1 times.
 ***
 Module file path: Zero-shot/modules/module_cseladd.v
 Testbench file path: hdlbits_testbenches/Module_cseladd_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/module_cseladd_sim', 'Zero-shot/modules/module_cseladd.v', 'hdlbits_testbenches/Module_cseladd_0_tb.v']' returned non-zero exit status 6.
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/module_cseladd_sim', 'Zero-shot/modules/module_cseladd.v', 'hdlbits_testbenches/Module_cseladd_0_tb.v']' returned non-zero exit status 5.

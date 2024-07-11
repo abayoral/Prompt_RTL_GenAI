@@ -1,11 +1,7 @@
 import subprocess
 import os
 import glob
-import argparse
 import sys
-
-# to execute from command line: python stats.py <name of framework>
-
 
 def check_test_results(file_path):
     with open(file_path, 'r') as file:
@@ -36,7 +32,6 @@ if len(sys.argv) != 2:
 # Get the framework name from the command line arguments
 framework_name = sys.argv[1]
 
-
 succ_counter = {}
 os.environ['framework_name'] = framework_name
 for i in range(5):
@@ -57,11 +52,15 @@ for i in range(5):
         else:
             succ_counter[stats_file_name].append(results[1]/results[2])
 
+# Ensure the framework directory exists
+metrics_dir = framework_name
+if not os.path.exists(metrics_dir):
+    os.makedirs(metrics_dir)
 
-for key, value in succ_counter.items():
-    print(f"{key}: {value[0]}/5")
-           
+# Write the results to metrics.txt
+metrics_file_path = os.path.join(metrics_dir, 'metrics.txt')
+with open(metrics_file_path, 'w') as metrics_file:
+    for key, value in succ_counter.items():
+        metrics_file.write(f"{key}: {value[0]}/5\n")
 
-
-
-
+print(f"Metrics saved to {metrics_file_path}")
