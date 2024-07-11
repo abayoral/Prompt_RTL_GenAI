@@ -1,14 +1,29 @@
 import os
 import subprocess
 import glob
+import sys
+
+# to execute from command line: python main.py <name of framework>
+
+# Ensure the script is called with exactly one argument
+if len(sys.argv) != 2:
+    print("Usage: python script_name.py <framework_name>")
+    sys.exit(1)
+
+# Get the framework name from the command line arguments
+framework_name = sys.argv[1]
 
 # Set the environment variable
-os.environ['framework_name'] = 'Zero-shot prompts'
+os.environ['framework_name'] = framework_name
 print(f"framework_name environment variable set to: {os.environ['framework_name']}")
 
-framework_name = os.environ['framework_name']
 prompts_dir = os.path.join(framework_name, 'prompts')
 testbench_dir = 'hdlbits_testbenches'
+
+# Create a directory for logs within the framework directory
+stats_dir = os.path.join(framework_name, 'stats')
+os.makedirs(stats_dir, exist_ok=True)
+print(f"Logs will be stored in: {stats_dir}")
 
 # Get all .v files in the prompts directory
 v_files = glob.glob(os.path.join(prompts_dir, '*.v'))
@@ -46,8 +61,10 @@ for v_file in v_files:
     # Execute each command in sequence
     for command in commands:
         try:
-            result = subprocess.run(command, check=True)
-            print(f"Command {' '.join(command)} executed successfully.")
+            stat_file_path = os.path.join(stats_dir, f"{base_name}.txt")
+            with open(stat_file_path, "w") as statfile:
+                result = subprocess.run(command, check=True, stdout=statfile, stderr=statfile)
+                print(f"Command {' '.join(command)} executed successfully.")
         except subprocess.CalledProcessError as e:
             print(f"Error executing command {' '.join(command)}: {e}")
             break
