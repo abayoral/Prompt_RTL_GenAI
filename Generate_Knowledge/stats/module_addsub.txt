@@ -1,0 +1,9 @@
+Generate_Knowledge/modules/module_addsub.v:20: error: Unknown module type: add16
+Generate_Knowledge/modules/module_addsub.v:23: error: Unknown module type: add16
+3 error(s) during elaboration.
+*** These modules were missing:
+        add16 referenced 2 times.
+***
+Module file path: Generate_Knowledge/modules/module_addsub.v
+Testbench file path: hdlbits_testbenches/Module_addsub_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Generate_Knowledge/simulations/module_addsub_sim', 'Generate_Knowledge/modules/module_addsub.v', 'hdlbits_testbenches/Module_addsub_0_tb.v']' returned non-zero exit status 3.

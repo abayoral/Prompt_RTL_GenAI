@@ -1,0 +1,13 @@
+Generate_Knowledge/modules/module_cseladd.v:14: error: Unknown module type: add16
+Generate_Knowledge/modules/module_cseladd.v:15: error: Unknown module type: add16
+Generate_Knowledge/modules/module_cseladd.v:16: error: Unknown module type: mux16to1
+Generate_Knowledge/modules/module_cseladd.v:18: error: Unknown module type: add16
+Generate_Knowledge/modules/module_cseladd.v:19: error: Unknown module type: mux16to1
+6 error(s) during elaboration.
+*** These modules were missing:
+        add16 referenced 3 times.
+        mux16to1 referenced 2 times.
+***
+Module file path: Generate_Knowledge/modules/module_cseladd.v
+Testbench file path: hdlbits_testbenches/Module_cseladd_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Generate_Knowledge/simulations/module_cseladd_sim', 'Generate_Knowledge/modules/module_cseladd.v', 'hdlbits_testbenches/Module_cseladd_0_tb.v']' returned non-zero exit status 6.

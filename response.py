@@ -10,6 +10,42 @@ import sys
 import getopt
 from time import time
 
+
+
+def generate_response(system_prompt, design_prompt, model_type, prompt_strategy=None):
+    """
+    Generates a response from the language model based on the design prompt.
+    
+    Parameters:
+    design_prompt (str): The prompt to input into the LLM.
+    model_type (str): The type of LLM to use.
+    prompt_strategy (str): The strategy for the system prompt.
+    system_prompt (str): Custom system prompt to use.
+    
+    Returns:
+    str: The generated response from the LLM.
+    """
+    conv = cv.Conversation()
+
+    # Set system prompt based on the strategy
+    if system_prompt:
+        conv.add_message("system", system_prompt)
+    else:
+        conv.add_message("system", get_sys_prompt(prompt_strategy))
+    
+    conv.add_message("user", design_prompt)
+
+    # Generate the response
+    response = generate_verilog(conv, model_type)
+
+    return response
+
+
+
+
+
+
+
 # function to get the system prompt according to the prompt strategy (need to modify according to the different prompts)
 def get_sys_prompt(prompt_strategy=None):
     return "You are an autocomplete engine for Verilog code. \

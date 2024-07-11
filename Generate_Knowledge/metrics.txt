@@ -1,0 +1,9 @@
+always_casez: 2/5
+adder3: 0/5
+module_addsub: 0/5
+edgedetect2: 0/5
+mux256to1: 5/5
+countbcd: 0/5
+gates: 5/5
+module_cseladd: 0/5
+7458: 0/5
