@@ -4,43 +4,31 @@ module top_module (
     output [3:1] ena,
     output [15:0] q);
 
-    // Define 4-digit BCD (Binary-Coded-Decimal) Counter
-    reg [3:0] digit [3:0];
+    // One-digit decade counter
+    reg [3:0] digit;
+    always @(posedge clk or posedge reset)
+      if (reset)
+        digit <= 0;
+      else if (digit == 4'd9)
+        digit <= 0;
+      else
+        digit <= digit + 1;
 
-    // For next digit enable
-    assign ena = {digit[2][3], digit[1][3], digit[0][3]};
+    // Four digit BCD counter
+    reg [15:0] bcd;
+    always @(posedge clk or posedge reset)
+      if (reset)
+        bcd <= 0;
+      else if (bcd == 16'd9999)
+        bcd <= 0;
+      else
+        bcd <= bcd + 1;
 
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            digit[0] <= 4'b0000;
-            digit[1] <= 4'b0000;
-            digit[2] <= 4'b0000;
-            digit[3] <= 4'b0000;
-        end else begin
-            if (digit[0] == 4'd9) begin
-                digit[0] <= 4'b0000;
-                if (digit[1] == 4'd9) begin
-                    digit[1] <= 4'b0000;
-                    if (digit[2] == 4'd9) begin
-                        digit[2] <= 4'b0000;
-                        if (digit[3] == 4'd9) begin
-                            digit[3] <= 4'b0000;
-                        end else begin
-                            digit[3] <= digit[3] + 4'b0001;
-                        end
-                    end else begin
-                        digit[2] <= digit[2] + 4'b0001;
-                    end
-                end else begin
-                    digit[1] <= digit[1] + 4'b0001;
-                end
-            end else begin
-                digit[0] <= digit[0] + 4'b0001;
-            end
-        end
-    end
+    assign q = bcd;
 
-    // Form 16-bit BCD number
-    assign q = {digit[3], digit[2], digit[1], digit[0]};
+    // Enable signals for upper three digits
+    assign ena[3] = (digit == 4'd9) && ((bcd[7:4] & 4'd9) == 4'd9) && ((bcd[11:8] & 4'd9) == 4'd9);
+    assign ena[2] = (digit == 4'd9) && ((bcd[7:4] & 4'd9) == 4'd9);
+    assign ena[1] = (digit == 4'd9);
 
 endmodule

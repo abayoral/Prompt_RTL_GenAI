@@ -3,7 +3,7 @@ import subprocess
 import glob
 
 # Set the environment variable
-os.environ['framework_name'] = 'Zero-shot prompts'
+os.environ['framework_name'] = 'Zero-shot'
 print(f"framework_name environment variable set to: {os.environ['framework_name']}")
 
 framework_name = os.environ['framework_name']

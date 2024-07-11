@@ -1,18 +1,27 @@
 module top_module (
     input [7:0] in,
-    output reg [2:0] pos );
+    output reg [2:0] pos 
+);
 
     always @(*) begin
-
-        // Start with position set as zero
-        pos[2:0] = 3'd0;
-
-        // Check each bit to find first 1
-        for (index=0; index < 8; index=index+1) begin
-            if(in[index] == 1) begin
-                pos[2:0] = index;
-                break;
-            end
-        end
+        if (in[0])
+            pos = 3'b001;
+        else if (in[1])
+            pos = 3'b010;
+        else if (in[2])
+            pos = 3'b011;
+        else if (in[3])
+            pos = 3'b100;
+        else if (in[4])
+            pos = 3'b101;
+        else if (in[5])
+            pos = 3'b110;
+        else if (in[6])
+            pos = 3'b111;
+        else if (in[7])
+            pos = 3'b000;
+        else 
+            pos = 3'b000;
     end
+   
 endmodule

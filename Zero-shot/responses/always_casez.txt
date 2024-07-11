@@ -1,18 +1,30 @@
+```verilog
 module top_module (
     input [7:0] in,
-    output reg [2:0] pos );
+    output reg [2:0] pos 
+);
 
     always @(*) begin
-
-        // Start with position set as zero
-        pos[2:0] = 3'd0;
-
-        // Check each bit to find first 1
-        for (index=0; index < 8; index=index+1) begin
-            if(in[index] == 1) begin
-                pos[2:0] = index;
-                break;
-            end
-        end
+        if (in[0])
+            pos = 3'b001;
+        else if (in[1])
+            pos = 3'b010;
+        else if (in[2])
+            pos = 3'b011;
+        else if (in[3])
+            pos = 3'b100;
+        else if (in[4])
+            pos = 3'b101;
+        else if (in[5])
+            pos = 3'b110;
+        else if (in[6])
+            pos = 3'b111;
+        else if (in[7])
+            pos = 3'b000;
+        else 
+            pos = 3'b000;
     end
+   
 endmodule
+```
+In the above code, we check each bit from least significant (in[0]) to the most significant (in[7]). And assign the position of the bit to `pos` if it's high. The bit positions start from 1, hence the position for in[0] is 1 (3'b001), for in[1] is 2 (3'b010), and so on. The most significant bit has a position 0 (3'b000). If no inputs are high, default is also 0 (3'b000).

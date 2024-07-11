@@ -3,17 +3,11 @@ module top_module (
     input [7:0] in,
     output reg [7:0] anyedge
 );
-
-    // Declare an internal register to store the previous values of the input signal
-    reg [7:0] prev_in;
-
-    always @(posedge clk) begin
-        // If there's an edge (change) in the input signal from the previous cycle,
-        // set the corresponding output bit high.
-        anyedge <= (in ^ prev_in);
-
-        // Store the current state of the input signal for comparison in the next cycle.
-        prev_in <= in;
-    end 
+	reg [7:0] in_previous;
+	
+	always @(posedge clk) begin
+		anyedge  <= (in ^ in_previous) & in; // XOR will detect any change, AND with current input will only output 1 for 0 to 1 change
+		in_previous <= in; // Update previous input value
+	end
 
 endmodule
