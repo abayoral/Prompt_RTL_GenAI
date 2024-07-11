@@ -41,11 +41,6 @@ def generate_response(system_prompt, design_prompt, model_type, prompt_strategy=
     return response
 
 
-
-
-
-
-
 # function to get the system prompt according to the prompt strategy (need to modify according to the different prompts)
 def get_sys_prompt(prompt_strategy=None):
     return "You are an autocomplete engine for Verilog code. \

@@ -49,14 +49,21 @@ for i in range(5):
         results = check_test_results(stats_file)
         if results[0]:
             succ_counter[stats_file_name][0] += 1
-        else:
-            succ_counter[stats_file_name].append(results[1]/results[2])
+        succ_counter[stats_file_name].append(results[1]/results[2])
 
+# Ensure the framework directory exists
+metrics_dir = framework_name
+if not os.path.exists(metrics_dir):
+    os.makedirs(metrics_dir)
 
 # Write the results to metrics.txt
 metrics_file_path = os.path.join(metrics_dir, 'metrics.txt')
 with open(metrics_file_path, 'w') as metrics_file:
+    # Writing header
+    metrics_file.write(f"Name | Total Success | Success Ratio Iteration 1 | Success Ratio Iteration 2 | Success Ratio Iteration 3 | Success Ratio Iteration 4 | Success Ratio Iteration 5\n")
     for key, value in succ_counter.items():
-        metrics_file.write(f"{key}: {value[0]}/5\n")
+        # Formatting the output for Total Success with "/5"
+        total_success = f"{value[0]}/5"
+        metrics_file.write(f"{key.ljust(17)} | {total_success.ljust(13)} | " + ' | '.join(f"{ratio:.2f}".ljust(24) for ratio in value[1:]) + "\n")
 
 print(f"Metrics saved to {metrics_file_path}")
