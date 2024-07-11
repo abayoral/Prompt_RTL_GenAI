@@ -52,10 +52,6 @@ for i in range(5):
         else:
             succ_counter[stats_file_name].append(results[1]/results[2])
 
-# Ensure the framework directory exists
-metrics_dir = framework_name
-if not os.path.exists(metrics_dir):
-    os.makedirs(metrics_dir)
 
 # Write the results to metrics.txt
 metrics_file_path = os.path.join(metrics_dir, 'metrics.txt')
