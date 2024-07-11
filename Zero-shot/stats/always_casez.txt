@@ -1,0 +1,6 @@
+Zero-shot/modules/always_casez.v:11: register ``index'' unknown in top_module_tb.UUT.
+Zero-shot/modules/always_casez.v:5: warning: @* found no sensitivities so it will never trigger.
+1 error(s) during elaboration.
+Module file path: Zero-shot/modules/always_casez.v
+Testbench file path: hdlbits_testbenches/Always_casez_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/always_casez_sim', 'Zero-shot/modules/always_casez.v', 'hdlbits_testbenches/Always_casez_0_tb.v']' returned non-zero exit status 1.

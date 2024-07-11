@@ -1,0 +1,84 @@
+Response written to Zero-shot/responses/adder3.txt
+Extracted Verilog code has been written to Zero-shot/modules/adder3.v
+Zero-shot/modules/adder3.v:9: error: Unknown module type: full_adder
+Zero-shot/modules/adder3.v:17: error: Unknown module type: full_adder
+Zero-shot/modules/adder3.v:25: error: Unknown module type: full_adder
+4 error(s) during elaboration.
+*** These modules were missing:
+        full_adder referenced 3 times.
+***
+Module file path: Zero-shot/modules/adder3.v
+Testbench file path: hdlbits_testbenches/Adder3_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/adder3_sim', 'Zero-shot/modules/adder3.v', 'hdlbits_testbenches/Adder3_0_tb.v']' returned non-zero exit status 4.
+Response written to Zero-shot/responses/adder3.txt
+Extracted Verilog code has been written to Zero-shot/modules/adder3.v
+Zero-shot/modules/adder3.v:10: error: Unknown module type: full_adder
+Zero-shot/modules/adder3.v:11: error: Unknown module type: full_adder
+Zero-shot/modules/adder3.v:12: error: Unknown module type: full_adder
+4 error(s) during elaboration.
+*** These modules were missing:
+        full_adder referenced 3 times.
+***
+Module file path: Zero-shot/modules/adder3.v
+Testbench file path: hdlbits_testbenches/Adder3_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/adder3_sim', 'Zero-shot/modules/adder3.v', 'hdlbits_testbenches/Adder3_0_tb.v']' returned non-zero exit status 4.
+Response written to Zero-shot/responses/adder3.txt
+Extracted Verilog code has been written to Zero-shot/modules/adder3.v
+Zero-shot/modules/adder3.v:9: error: Unknown module type: full_adder
+Zero-shot/modules/adder3.v:10: error: Unknown module type: full_adder
+Zero-shot/modules/adder3.v:11: error: Unknown module type: full_adder
+4 error(s) during elaboration.
+*** These modules were missing:
+        full_adder referenced 3 times.
+***
+Module file path: Zero-shot/modules/adder3.v
+Testbench file path: hdlbits_testbenches/Adder3_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/adder3_sim', 'Zero-shot/modules/adder3.v', 'hdlbits_testbenches/Adder3_0_tb.v']' returned non-zero exit status 4.
+Response written to Zero-shot/responses/adder3.txt
+Extracted Verilog code has been written to Zero-shot/modules/adder3.v
+Zero-shot/modules/adder3.v:10: error: Unknown module type: full_adder
+Zero-shot/modules/adder3.v:18: error: Unknown module type: full_adder
+Zero-shot/modules/adder3.v:26: error: Unknown module type: full_adder
+4 error(s) during elaboration.
+*** These modules were missing:
+        full_adder referenced 3 times.
+***
+Module file path: Zero-shot/modules/adder3.v
+Testbench file path: hdlbits_testbenches/Adder3_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/adder3_sim', 'Zero-shot/modules/adder3.v', 'hdlbits_testbenches/Adder3_0_tb.v']' returned non-zero exit status 4.
+Response written to Zero-shot/responses/adder3.txt
+Extracted Verilog code has been written to Zero-shot/modules/adder3.v
+Zero-shot/modules/adder3.v:9: error: Unknown module type: FullAdder
+Zero-shot/modules/adder3.v:17: error: Unknown module type: FullAdder
+Zero-shot/modules/adder3.v:25: error: Unknown module type: FullAdder
+4 error(s) during elaboration.
+*** These modules were missing:
+        FullAdder referenced 3 times.
+***
+Module file path: Zero-shot/modules/adder3.v
+Testbench file path: hdlbits_testbenches/Adder3_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/adder3_sim', 'Zero-shot/modules/adder3.v', 'hdlbits_testbenches/Adder3_0_tb.v']' returned non-zero exit status 4.
+Response written to Zero-shot/responses/adder3.txt
+Extracted Verilog code has been written to Zero-shot/modules/adder3.v
+Zero-shot/modules/adder3.v:10: error: Unknown module type: full_adder
+Zero-shot/modules/adder3.v:11: error: Unknown module type: full_adder
+Zero-shot/modules/adder3.v:12: error: Unknown module type: full_adder
+4 error(s) during elaboration.
+*** These modules were missing:
+        full_adder referenced 3 times.
+***
+Module file path: Zero-shot/modules/adder3.v
+Testbench file path: hdlbits_testbenches/Adder3_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/adder3_sim', 'Zero-shot/modules/adder3.v', 'hdlbits_testbenches/Adder3_0_tb.v']' returned non-zero exit status 4.
+Response written to Zero-shot/responses/adder3.txt
+Extracted Verilog code has been written to Zero-shot/modules/adder3.v
+Zero-shot/modules/adder3.v:8: error: Unknown module type: FullAdder
+Zero-shot/modules/adder3.v:9: error: Unknown module type: FullAdder
+Zero-shot/modules/adder3.v:10: error: Unknown module type: FullAdder
+4 error(s) during elaboration.
+*** These modules were missing:
+        FullAdder referenced 3 times.
+***
+Module file path: Zero-shot/modules/adder3.v
+Testbench file path: hdlbits_testbenches/Adder3_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/adder3_sim', 'Zero-shot/modules/adder3.v', 'hdlbits_testbenches/Adder3_0_tb.v']' returned non-zero exit status 4.

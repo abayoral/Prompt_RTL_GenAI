@@ -1,0 +1,229 @@
+Response written to Zero-shot/responses/countbcd.txt
+Extracted Verilog code has been written to Zero-shot/modules/countbcd.v
+Zero-shot/modules/countbcd.v:28: error: ena['sd3] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:4:      : ena['sd3] is declared here as wire.
+Zero-shot/modules/countbcd.v:34: error: ena['sd2] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:4:      : ena['sd2] is declared here as wire.
+Zero-shot/modules/countbcd.v:40: error: ena['sd1] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:4:      : ena['sd1] is declared here as wire.
+Zero-shot/modules/countbcd.v:49: error: ena['sd0] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:4:      : ena['sd0] is declared here as wire.
+Zero-shot/modules/countbcd.v:51: error: ena['sd1] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:4:      : ena['sd1] is declared here as wire.
+Zero-shot/modules/countbcd.v:53: error: ena['sd2] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:4:      : ena['sd2] is declared here as wire.
+Zero-shot/modules/countbcd.v:46: error: Array cnt needs an array index here.
+Zero-shot/modules/countbcd.v:46: error: Failed to evaluate event expression 'cnt'.
+8 error(s) during elaboration.
+Module file path: Zero-shot/modules/countbcd.v
+Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/countbcd_sim', 'Zero-shot/modules/countbcd.v', 'hdlbits_testbenches/Countbcd_0_tb.v']' returned non-zero exit status 8.
+Response written to Zero-shot/responses/countbcd.txt
+Extracted Verilog code has been written to Zero-shot/modules/countbcd.v
+Mismatch at index 0: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000101]
+Mismatch at index 1: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000110]
+Mismatch at index 2: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000110]
+Mismatch at index 3: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000111]
+Mismatch at index 4: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000111]
+Mismatch at index 5: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010001000]
+Mismatch at index 6: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010001000]
+Mismatch at index 7: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [001, 0000000010001001]
+Mismatch at index 8: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [001, 0000000010001001]
+Mismatch at index 9: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010000]
+Mismatch at index 10: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010000]
+Mismatch at index 11: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010001]
+Mismatch at index 12: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010001]
+Mismatch at index 13: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010010]
+Mismatch at index 14: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010010]
+Mismatch at index 15: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010011]
+Mismatch at index 16: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010011]
+Mismatch at index 17: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010100]
+Mismatch at index 18: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010100]
+Mismatch at index 19: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010101]
+Mismatch at index 20: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010101]
+Mismatch at index 21: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010110]
+Mismatch at index 22: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010110]
+Mismatch at index 23: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010111]
+Mismatch at index 24: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010111]
+Mismatch at index 25: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010011000]
+Mismatch at index 26: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010011000]
+Mismatch at index 27: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [011, 0000000010011001]
+Mismatch at index 28: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [011, 0000000010011001]
+Mismatch at index 29: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000000]
+Mismatch at index 30: Inputs = [0, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000000]
+Mismatch at index 31: Inputs = [1, 0], Generated = [xx0, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000001]
+32 mismatches out of 32 total tests.
+hdlbits_testbenches/Countbcd_0_tb.v:419: $finish called at 64000 (10ps)
+Module file path: Zero-shot/modules/countbcd.v
+Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
+Compilation successful. Executable created at Zero-shot/simulations/countbcd_sim
+Simulation completed successfully.
+Response written to Zero-shot/responses/countbcd.txt
+Extracted Verilog code has been written to Zero-shot/modules/countbcd.v
+Mismatch at index 0: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000101]
+Mismatch at index 1: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000110]
+Mismatch at index 2: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000110]
+Mismatch at index 3: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000111]
+Mismatch at index 4: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000111]
+Mismatch at index 5: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010001000]
+Mismatch at index 6: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010001000]
+Mismatch at index 7: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [001, 0000000010001001]
+Mismatch at index 8: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [001, 0000000010001001]
+Mismatch at index 9: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010000]
+Mismatch at index 10: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010000]
+Mismatch at index 11: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010001]
+Mismatch at index 12: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010001]
+Mismatch at index 13: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010010]
+Mismatch at index 14: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010010]
+Mismatch at index 15: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010011]
+Mismatch at index 16: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010011]
+Mismatch at index 17: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010100]
+Mismatch at index 18: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010100]
+Mismatch at index 19: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010101]
+Mismatch at index 20: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010101]
+Mismatch at index 21: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010110]
+Mismatch at index 22: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010110]
+Mismatch at index 23: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010111]
+Mismatch at index 24: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010111]
+Mismatch at index 25: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010011000]
+Mismatch at index 26: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010011000]
+Mismatch at index 27: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [011, 0000000010011001]
+Mismatch at index 28: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [011, 0000000010011001]
+Mismatch at index 29: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000000]
+Mismatch at index 30: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000000]
+Mismatch at index 31: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000001]
+32 mismatches out of 32 total tests.
+hdlbits_testbenches/Countbcd_0_tb.v:419: $finish called at 64000 (10ps)
+Module file path: Zero-shot/modules/countbcd.v
+Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
+Compilation successful. Executable created at Zero-shot/simulations/countbcd_sim
+Simulation completed successfully.
+Response written to Zero-shot/responses/countbcd.txt
+Extracted Verilog code has been written to Zero-shot/modules/countbcd.v
+Mismatch at index 0: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000101]
+Mismatch at index 1: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000110]
+Mismatch at index 2: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000110]
+Mismatch at index 3: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000111]
+Mismatch at index 4: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000111]
+Mismatch at index 5: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010001000]
+Mismatch at index 6: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010001000]
+Mismatch at index 7: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [001, 0000000010001001]
+Mismatch at index 8: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [001, 0000000010001001]
+Mismatch at index 9: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010000]
+Mismatch at index 10: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010000]
+Mismatch at index 11: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010001]
+Mismatch at index 12: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010001]
+Mismatch at index 13: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010010]
+Mismatch at index 14: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010010]
+Mismatch at index 15: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010011]
+Mismatch at index 16: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010011]
+Mismatch at index 17: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010100]
+Mismatch at index 18: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010100]
+Mismatch at index 19: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010101]
+Mismatch at index 20: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010101]
+Mismatch at index 21: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010110]
+Mismatch at index 22: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010110]
+Mismatch at index 23: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010111]
+Mismatch at index 24: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010111]
+Mismatch at index 25: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010011000]
+Mismatch at index 26: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010011000]
+Mismatch at index 27: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [011, 0000000010011001]
+Mismatch at index 28: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [011, 0000000010011001]
+Mismatch at index 29: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000000]
+Mismatch at index 30: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000000]
+Mismatch at index 31: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000001]
+32 mismatches out of 32 total tests.
+hdlbits_testbenches/Countbcd_0_tb.v:419: $finish called at 64000 (10ps)
+Module file path: Zero-shot/modules/countbcd.v
+Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
+Compilation successful. Executable created at Zero-shot/simulations/countbcd_sim
+Simulation completed successfully.
+Response written to Zero-shot/responses/countbcd.txt
+Extracted Verilog code has been written to Zero-shot/modules/countbcd.v
+Zero-shot/modules/countbcd.v:11: error: Unknown module type: BCD_CNT
+Zero-shot/modules/countbcd.v:14: error: Unknown module type: BCD_CNT
+Zero-shot/modules/countbcd.v:17: error: Unknown module type: BCD_CNT
+Zero-shot/modules/countbcd.v:20: error: Unknown module type: BCD_CNT
+5 error(s) during elaboration.
+*** These modules were missing:
+        BCD_CNT referenced 4 times.
+***
+Module file path: Zero-shot/modules/countbcd.v
+Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/countbcd_sim', 'Zero-shot/modules/countbcd.v', 'hdlbits_testbenches/Countbcd_0_tb.v']' returned non-zero exit status 5.
+Response written to Zero-shot/responses/countbcd.txt
+Extracted Verilog code has been written to Zero-shot/modules/countbcd.v
+hdlbits_testbenches/Countbcd_0_tb.v:17: warning: Port 3 (ena) of top_module expects 4 bits, got 3.
+hdlbits_testbenches/Countbcd_0_tb.v:17:        : Padding 1 high bits of the port.
+Mismatch at index 0: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000101]
+Mismatch at index 1: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000110]
+Mismatch at index 2: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000110]
+Mismatch at index 3: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000111]
+Mismatch at index 4: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000111]
+Mismatch at index 5: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010001000]
+Mismatch at index 6: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010001000]
+Mismatch at index 7: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [001, 0000000010001001]
+Mismatch at index 8: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [001, 0000000010001001]
+Mismatch at index 9: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010000]
+Mismatch at index 10: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010000]
+Mismatch at index 11: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010001]
+Mismatch at index 12: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010001]
+Mismatch at index 13: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010010]
+Mismatch at index 14: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010010]
+Mismatch at index 15: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010011]
+Mismatch at index 16: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010011]
+Mismatch at index 17: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010100]
+Mismatch at index 18: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010100]
+Mismatch at index 19: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010101]
+Mismatch at index 20: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010101]
+Mismatch at index 21: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010110]
+Mismatch at index 22: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010110]
+Mismatch at index 23: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010111]
+Mismatch at index 24: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010111]
+Mismatch at index 25: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010011000]
+Mismatch at index 26: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010011000]
+Mismatch at index 27: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [011, 0000000010011001]
+Mismatch at index 28: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [011, 0000000010011001]
+Mismatch at index 29: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000000]
+Mismatch at index 30: Inputs = [0, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000000]
+Mismatch at index 31: Inputs = [1, 0], Generated = [00x, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000001]
+32 mismatches out of 32 total tests.
+hdlbits_testbenches/Countbcd_0_tb.v:419: $finish called at 64000 (10ps)
+Module file path: Zero-shot/modules/countbcd.v
+Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
+Compilation successful. Executable created at Zero-shot/simulations/countbcd_sim
+Simulation completed successfully.
+Response written to Zero-shot/responses/countbcd.txt
+Extracted Verilog code has been written to Zero-shot/modules/countbcd.v
+Zero-shot/modules/countbcd.v:9: error: q is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:5:      : q is declared here as wire.
+Zero-shot/modules/countbcd.v:10: error: ena is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:4:      : ena is declared here as wire.
+Zero-shot/modules/countbcd.v:13: error: q['sd3:'sd0] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:5:      : q['sd3:'sd0] is declared here as wire.
+Zero-shot/modules/countbcd.v:14: error: ena['sd1] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:4:      : ena['sd1] is declared here as wire.
+Zero-shot/modules/countbcd.v:16: error: q['sd3:'sd0] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:5:      : q['sd3:'sd0] is declared here as wire.
+Zero-shot/modules/countbcd.v:17: error: ena['sd1] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:4:      : ena['sd1] is declared here as wire.
+Zero-shot/modules/countbcd.v:21: error: q['sd7:'sd4] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:5:      : q['sd7:'sd4] is declared here as wire.
+Zero-shot/modules/countbcd.v:22: error: ena['sd2] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:4:      : ena['sd2] is declared here as wire.
+Zero-shot/modules/countbcd.v:24: error: q['sd7:'sd4] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:5:      : q['sd7:'sd4] is declared here as wire.
+Zero-shot/modules/countbcd.v:28: error: q['sd11:'sd8] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:5:      : q['sd11:'sd8] is declared here as wire.
+Zero-shot/modules/countbcd.v:29: error: ena['sd3] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:4:      : ena['sd3] is declared here as wire.
+Zero-shot/modules/countbcd.v:31: error: q['sd11:'sd8] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:5:      : q['sd11:'sd8] is declared here as wire.
+Zero-shot/modules/countbcd.v:35: error: q['sd15:'sd12] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:5:      : q['sd15:'sd12] is declared here as wire.
+Zero-shot/modules/countbcd.v:37: error: q['sd15:'sd12] is not a valid l-value in top_module_tb.UUT.
+Zero-shot/modules/countbcd.v:5:      : q['sd15:'sd12] is declared here as wire.
+14 error(s) during elaboration.
+Module file path: Zero-shot/modules/countbcd.v
+Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/countbcd_sim', 'Zero-shot/modules/countbcd.v', 'hdlbits_testbenches/Countbcd_0_tb.v']' returned non-zero exit status 14.
