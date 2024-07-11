@@ -3,12 +3,12 @@ module top_module (
     input [7:0] in,
     output reg [7:0] anyedge
 );
-
-    reg [7:0] last_in;
-
+    
+    reg [7:0] in_prev = 0;
+    
     always @(posedge clk) begin
-        anyedge <= (in & ~last_in);
-        last_in <= in;
+        anyedge <= (in & ~in_prev); 
+        in_prev <= in; 
     end
-
+    
 endmodule

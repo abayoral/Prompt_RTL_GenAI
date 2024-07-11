@@ -7,6 +7,7 @@ Test 5 passed!
 Test 6 passed!
 Test 7 passed!
 All tests passed!
+hdlbits_testbenches/Mux256to1_0_tb.v:121: $finish called at 16000 (10ps)
 Module file path: Zero-shot/modules/mux256to1.v
 Testbench file path: hdlbits_testbenches/Mux256to1_0_tb.v
 Compilation successful. Executable created at Zero-shot/simulations/mux256to1_sim

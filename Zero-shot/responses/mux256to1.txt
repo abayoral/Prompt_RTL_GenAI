@@ -3,7 +3,8 @@ module top_module(
     input [7:0] sel,
     output reg out );
 
-    always @* begin
+    always @* 
+    begin
         out = in[sel];
     end
 

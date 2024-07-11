@@ -1,24 +1,11 @@
-module add16 ( 
-    input[15:0] a, 
-    input[15:0] b, 
-    input cin, 
-    output[15:0] sum, 
-    output cout 
-);
+module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );
 
-    assign {cout, sum} = a + b + cin;
+// Insert add16 implementation here
 
 endmodule
 
-module mux2to1_16bit (
-    input [15:0] a, 
-    input [15:0] b, 
-    input sel, 
-    output [15:0] y
-);
-
-    assign y = sel ? b : a; 
-
+module mux2to1_16(input [15:0] a, input [15:0] b, input sel, output [15:0] y);
+    assign y = sel ? b : a;
 endmodule
 
 module top_module(
@@ -26,41 +13,17 @@ module top_module(
     input [31:0] b,
     output [31:0] sum
 );
+    wire [15:0] sum1, sum2, sum3, c1, c2, c3;
+    assign c1 = sum1[15];
+    assign c2 = sum2[15];
+    assign c3 = sum3[15];
 
-wire [15:0] lowerSum1, lowerSum2, upperSum1, upperSum2;
-wire lowerCarry, upperCarry1, upperCarry2;
+    add16 adder1(.a(a[15:0]), .b(b[15:0]), .cin(0), .sum(sum1), .cout(c1));
+    mux2to1_16 mux1(.a(sum1), .b(sum2), .sel(c1), .y(sum[15:0]));
 
-add16 lowerAdder (
-    .a(a[15:0]), 
-    .b(b[15:0]), 
-    .cin(1'b0), 
-    .sum(lowerSum1), 
-    .cout(lowerCarry)
-);
+    add16 adder2(.a(a[31:16]), .b(b[31:16]), .cin(0), .sum(sum2), .cout(c2));
+    mux2to1_16 mux2(.a(sum1[15:0] + sum2), .b(sum1[15:0] + sum3), .sel(c2), .y(sum[31:16]));
 
-add16 upperAdder1 (
-    .a(a[31:16]), 
-    .b(b[31:16]), 
-    .cin(1'b0), 
-    .sum(upperSum1), 
-    .cout(upperCarry1)
-);
-
-add16 upperAdder2 (
-    .a(a[31:16]), 
-    .b(b[31:16]), 
-    .cin(lowerCarry), 
-    .sum(upperSum2), 
-    .cout(upperCarry2)
-);
-
-mux2to1_16bit upperMux (
-    .a(upperSum1), 
-    .b(upperSum2), 
-    .sel(lowerCarry), 
-    .y(sum[31:16])
-);
-
-assign sum[15:0] = lowerSum1;
+    add16 adder3(.a(a[31:16]), .b(b[31:16]), .cin(1), .sum(sum3), .cout(c3)); 
 
 endmodule
