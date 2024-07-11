@@ -1,0 +1,11 @@
+Generate_Knowledge/modules/countbcd.v:11: error: Unknown module type: decade_counter
+Generate_Knowledge/modules/countbcd.v:12: error: Unknown module type: decade_counter
+Generate_Knowledge/modules/countbcd.v:13: error: Unknown module type: decade_counter
+Generate_Knowledge/modules/countbcd.v:14: error: Unknown module type: decade_counter
+5 error(s) during elaboration.
+*** These modules were missing:
+        decade_counter referenced 4 times.
+***
+Module file path: Generate_Knowledge/modules/countbcd.v
+Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Generate_Knowledge/simulations/countbcd_sim', 'Generate_Knowledge/modules/countbcd.v', 'hdlbits_testbenches/Countbcd_0_tb.v']' returned non-zero exit status 5.
