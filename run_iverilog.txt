@@ -1,0 +1,4 @@
+export framework_name=CoT
+./response.py --prompt="CoT/prompts/7458.v" --name="7458" --testbench="hdlbits_testbenches/7458_0_tb.v" --model="ChatGPT4"
+python regex.py
+python iverilog.py

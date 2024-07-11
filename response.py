@@ -17,6 +17,7 @@ def get_sys_prompt(prompt_strategy=None):
             You will provide completed Verilog modules for all specifications, and will not create any supplementary modules. \
             Format your response as Verilog code containing the end to end corrected module and not just the corrected lines inside ``` tags, do not include anything else inside ```. \
     "
+    # return "Using the following prompt, you will generate relevant background knowledge, principles, and structured information that can enhance the performance of another language model tasked with generating Verilog modules. The generated knowledge should be general, applicable to various Verilog design tasks, and should not be specific to any particular module. The aim is to create a comprehensive knowledge base that includes concepts, best practices, and common patterns in Verilog design. Remember not to generate any code, just generate the Knowledgebase."
 
 def generate_verilog(conv, model_type, model_id=""):
     if model_type == "ChatGPT4":
@@ -34,7 +35,7 @@ def generate_verilog(conv, model_type, model_id=""):
 
     return(model.generate(conv))
 
-def get_response(design_prompt, module, model_type, outdir="", log=None, prompt_strategy=None, dirname="responses"):
+def get_response(design_prompt, module, model_type, outdir="", log=None, prompt_strategy=os.environ['framework_name'], dirname="responses"):
     if outdir != "":
         outdir = outdir + "/"
 
@@ -44,7 +45,7 @@ def get_response(design_prompt, module, model_type, outdir="", log=None, prompt_
     conv.add_message("user", design_prompt)
 
     # Generate the directory path
-    dir_path = os.path.join(outdir, dirname)
+    dir_path = os.path.join(outdir, prompt_strategy, dirname)
 
     # Create the directory if it doesn't exist
     os.makedirs(dir_path, exist_ok=True)
@@ -58,6 +59,7 @@ def get_response(design_prompt, module, model_type, outdir="", log=None, prompt_
         file.write(response)
 
     print(f"Response written to {filename}")
+    return response
 
 def main():
     #module_name = os.environ.get('module_name', 'RCA')  # Set the folder name to 'RCA' or replace with desired module name
@@ -79,7 +81,7 @@ def main():
     num_candidates = 1
     outdir = ""
     log = None
-    prompt_strategy = None
+    prompt_strategy = os.environ['framework_name']
 
     for opt, arg in opts:
         if opt in ("-h", "--help"):
@@ -134,8 +136,12 @@ def main():
         logfile = os.path.join(outdir, log)
     else:
         logfile = None
-
+    
+    os.environ['module_name'] = module
+    os.environ['testbench'] = testbench
     get_response(prompt, module, model, outdir, logfile, prompt_strategy)
+   
+    # print(os.environ['testbench'])
 
 if __name__ == "__main__":
     main()
