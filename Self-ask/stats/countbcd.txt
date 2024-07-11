@@ -1,0 +1,36 @@
+Traceback (most recent call last):
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 6, in <module>
+    import languagemodels as lm
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/languagemodels.py", line 13, in <module>
+    from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/transformers/__init__.py", line 26, in <module>
+    from . import dependency_versions_check
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/transformers/dependency_versions_check.py", line 16, in <module>
+    from .utils.versions import require_version, require_version_core
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/transformers/utils/__init__.py", line 34, in <module>
+    from .generic import (
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/transformers/utils/generic.py", line 462, in <module>
+    import torch.utils._pytree as _torch_pytree
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/__init__.py", line 1854, in <module>
+    from . import _meta_registrations
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_meta_registrations.py", line 9, in <module>
+    from torch._decomp import (
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_decomp/__init__.py", line 244, in <module>
+    import torch._refs
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_refs/__init__.py", line 3871, in <module>
+    @register_decomposition(aten.index_fill_)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_decomp/__init__.py", line 185, in decomposition_decorator
+    pytree.tree_map_(register, aten_op)
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/utils/_pytree.py", line 607, in tree_map_
+    deque(map(func, flat_args), maxlen=0)  # consume and exhaust the iterable
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_decomp/__init__.py", line 182, in register
+    _add_op_to_registry(registry, op, fn)
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_decomp/__init__.py", line 51, in _add_op_to_registry
+    overloads.append(getattr(op, ol))
+                     ^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_ops.py", line 737, in __getattr__
+    overload = OpOverload(self, op_, op_dk_, schema, tags)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

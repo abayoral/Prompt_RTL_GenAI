@@ -20,5 +20,3 @@ endmodule
 module MUXDFF (...);
 
 endmodule
-
-//Are any follow up questions required? Respond with only "Yes" or "No"

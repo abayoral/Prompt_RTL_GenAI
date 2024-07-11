@@ -19,5 +19,3 @@ module top_module(
 	// INsert your code here
 
 endmodule
-
-//Are any follow up questions required? Respond with only "Yes" or "No"

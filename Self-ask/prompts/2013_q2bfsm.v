@@ -19,5 +19,3 @@ module top_module (
 
 endmodule
 
-//Are any follow up questions required? Respond with only "Yes" or "No"
-
