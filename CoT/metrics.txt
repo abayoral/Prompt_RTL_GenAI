@@ -1,0 +1,10 @@
+Name | Total Success | Success Ratio Iteration 1 | Success Ratio Iteration 2 | Success Ratio Iteration 3 | Success Ratio Iteration 4 | Success Ratio Iteration 5
+always_casez      | 1/5           | 0.00                     | 0.00                     | 0.00                     | 0.00                     | 1.00                    
+adder3            | 0/5           | 0.00                     | 0.00                     | 0.00                     | 0.00                     | 0.00                    
+module_addsub     | 0/5           | 0.00                     | 0.00                     | 0.00                     | 0.00                     | 0.00                    
+edgedetect2       | 0/5           | 0.93                     | 0.94                     | 0.94                     | 0.93                     | 0.94                    
+mux256to1         | 3/5           | 1.00                     | 1.00                     | 0.00                     | 0.00                     | 1.00                    
+countbcd          | 0/5           | 0.00                     | 0.00                     | 0.00                     | 0.00                     | 0.00                    
+gates             | 5/5           | 1.00                     | 1.00                     | 1.00                     | 1.00                     | 1.00                    
+module_cseladd    | 0/5           | 0.00                     | 0.00                     | 0.00                     | 0.00                     | 0.00                    
+7458              | 0/5           | 0.97                     | 0.00                     | 0.97                     | 0.96                     | 0.97                    

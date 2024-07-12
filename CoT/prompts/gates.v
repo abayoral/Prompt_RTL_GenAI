@@ -1,3 +1,5 @@
+// you're a Digital Logic Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining the company's reputation in the industry.
+
 //Build a combinational circuit with two inputs, a and b.
 
 //There are 7 outputs, each with a logic gate driving it:

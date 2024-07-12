@@ -38,7 +38,6 @@ Test 36 passed!
 Mismatch at index 37: Inputs = [0, 1, 0, 0, 0, 1, 0, 0, 1, 0], Generated = [1, 0], Reference = [0, 0]
 Mismatch at index 38: Inputs = [0, 1, 0, 0, 0, 1, 0, 0, 1, 0], Generated = [1, 0], Reference = [0, 0]
 20 mismatches out of 39 total tests.
-hdlbits_testbenches/7458_0_tb.v:502: $finish called at 78000 (10ps)
 Module file path: Zero-shot/modules/7458.v
 Testbench file path: hdlbits_testbenches/7458_0_tb.v
 Compilation successful. Executable created at Zero-shot/simulations/7458_sim

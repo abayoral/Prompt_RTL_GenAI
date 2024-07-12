@@ -4,27 +4,59 @@ module top_module (
     output [3:1] ena,
     output [15:0] q);
 
-  // Each decade counter, composed of D Flip-Flops with reset
-  // There are four digit counters d3, d2, d1, d0 which corresponds to thousands, hundreds, tens and ones respectively
-  wire [3:0] d3, d2, d1, d0; 
+    // One's digit counter
+    reg [3:0] ones;
+    always @(posedge clk or posedge reset) begin
+        if (reset)
+            ones <= 0;
+            else if (ones == 4'b1001)
+                ones <= 0;
+            else
+                ones <= ones + 1;
+    end
+   
+    // Ten's digit counter
+    reg [3:0] tens;
+    always @(posedge clk or posedge reset) begin
+        if (reset)
+            tens <= 0;
+        else if (ones == 4'b1001)  // Increment tens when ones reach 9
+            if (tens == 4'b1001)
+                tens <= 0;
+            else
+                tens <= tens + 1;
+    end
+   
+    // Hundred's digit counter
+    reg [3:0] hundreds;
+    always @(posedge clk or posedge reset) begin
+        if (reset)
+            hundreds <= 0;
+        else if (tens == 4'b1001)  // Increment hundreds when tens reach 9
+            if (hundreds == 4'b1001)
+                hundreds <= 0;
+            else
+                hundreds <= hundreds + 1;
+    end
+   
+    // Thousand's digit counter
+    reg [3:0] thousands;
+    always @(posedge clk or posedge reset) begin
+        if (reset)
+            thousands <= 0;
+        else if (hundreds == 4'b1001)  // Increment thousands when hundreds reach 9
+            if (thousands == 4'b1001)
+                thousands <= 0;
+            else
+                thousands <= thousands + 1;
+    end
+   
+    // Enable signals
+    assign ena[1] = (ones == 4'b1001);
+    assign ena[2] = (tens == 4'b1001);
+    assign ena[3] = (hundreds == 4'b1001);
 
-  // Trigger signals for the counters. `ena` or "enable" signals will be high when corresponding digit needs to increment
-  wire [3:1] en;
-
-  // Connecting the enable signals
-  assign ena = en;
-
-  decade_counter c3 (.q(d3), .clk(ena[3]), .reset(reset));
-  decade_counter c2 (.q(d2), .clk(ena[2]), .reset(reset));
-  decade_counter c1 (.q(d1), .clk(ena[1]), .reset(reset));
-  decade_counter c0 (.q(d0), .clk(clk), .reset(reset));
-  
-  // Concatenating all the q's in the form of q = d3d2d1d0 to give the BCD count
-  assign q = {d3, d2, d1, d0}; 
-
-  // Connecting the enable signals
-  assign en[3] = (d0 == 4'b1001) && (d1 == 4'b1001) && (d2 == 4'b1001);
-  assign en[2] = (d0 == 4'b1001) && (d1 == 4'b1001);
-  assign en[1] = (d0 == 4'b1001);
-
+    // Output
+    assign q = {thousands, hundreds, tens, ones};
+   
 endmodule

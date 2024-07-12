@@ -41,15 +41,21 @@ def generate_response(system_prompt, design_prompt, model_type, prompt_strategy=
     return response
 
 
-# function to get the system prompt according to the prompt strategy (need to modify according to the different prompts)
+# Function to get the system prompt from a file
 def get_sys_prompt(prompt_strategy=None):
-    return "You are an autocomplete engine for Verilog code. \
-            Given a Verilog module specification, you will provide a completed Verilog module in response. \
-            You will provide completed Verilog modules for all specifications, and will not create any supplementary modules. \
-            Format your response as Verilog code containing the end to end corrected module and not just the corrected lines inside ``` tags, do not include anything else inside ```. \
-    "
-    # return "Using the following prompt, you will generate relevant background knowledge, principles, and structured information that can enhance the performance of another language model tasked with generating Verilog modules. The generated knowledge should be general, applicable to various Verilog design tasks, and should not be specific to any particular module. The aim is to create a comprehensive knowledge base that includes concepts, best practices, and common patterns in Verilog design. Remember not to generate any code, just generate the Knowledgebase."
-
+    framework_name = os.environ.get('framework_name', 'default_framework')
+    sys_prompt_file = os.path.join(framework_name, 'sys_prompt.txt')
+    
+    if os.path.isfile(sys_prompt_file):
+        with open(sys_prompt_file, 'r') as file:
+            return file.read()
+    else:
+        return "You are an autocomplete engine for Verilog code. \
+                Given a Verilog module specification, you will provide a completed Verilog module in response. \
+                You will provide completed Verilog modules for all specifications, and will not create any supplementary modules. \
+                Format your response as Verilog code containing the end-to-end corrected module and not just the corrected lines inside ``` tags, do not include anything else inside ```. \
+        "
+    
 def generate_verilog(conv, model_type, model_id=""):
     if model_type == "ChatGPT4":
         model = lm.ChatGPT4()

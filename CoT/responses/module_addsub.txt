@@ -1,0 +1,63 @@
+Chain of Thought:
+
+    Understand the Requirements:
+        The task is to build a subtractor using an adder by following the logic that subtraction is addition with a complement.
+        The 32-bit subtractor, implemented as an adder-subtractor, uses a 16-bit adder instantiated twice.
+        The subtractor takes two 32-bit inputs (a, b) and a control signal (sub), and produces a 32-bit result (sum).
+        When sub is 1, the subtractor performs a - b,
+        When sub is 0, the subtractor performs a + b.
+
+    Determine the Inputs and Outputs:
+        Inputs: a, b, sub
+        Output: sum
+
+    Define Intermediate Signals:
+        Complement of b (b_complement), carry of first adder (carry1), intermediate sum (sum1), and carry of second adder (carry2).
+
+    Structuring the Module:
+        Start with the module declaration, specifying the inputs and outputs.
+        Instantiate a 32-bit wide XOR gate to compute the complement of b.
+        Instantiate the first 16-bit adder with a, the lower 16 bits of b_complement, and sub.
+        Instantiate the second 16-bit adder with sum1, the upper 16 bits of b_complement, and carry1.
+        The resultant sum is the concatenation of carry2 and sum2.
+
+    Writing the Verilog Code:
+
+    verilog
+    module top_module(
+        input [31:0] a,
+        input [31:0] b,
+        input sub,
+        output [31:0] sum
+    );
+        wire[15:0] sum1, sum2;
+        wire carry1, carry2;
+        wire[31:0] b_complement;
+
+        // Compute the complement of b when sub is 1
+        assign {b_complement[31:16], b_complement[15:0]} = b ^ {(sub?32'hFFFFFFFF:32'h00000000)};
+
+        // Instantiate the first 16-bit adder
+        add16 adder1(
+            .a(a[15:0]),
+            .b(b_complement[15:0]),
+            .cin(sub),
+            .sum(sum1),
+            .cout(carry1)
+        );
+
+        // Instantiate the second 16-bit adder
+        add16 adder2(
+            .a(a[31:16]),
+            .b(b_complement[31:16]),
+            .cin(carry1),
+            .sum(sum2),
+            .cout(carry2)
+        );
+
+        // Concatenate the outputs of the two adders to form the final result
+        assign sum = {carry2, sum2, sum1};
+    endmodule
+
+    
+    Please check the module add16 that you will use if it's already implemented or not, the add16 module is assumed to be implemented already in the provided excercise. If not, kindly implement the add16 module.

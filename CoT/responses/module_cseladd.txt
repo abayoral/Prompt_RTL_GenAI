@@ -1,0 +1,47 @@
+Chain of Thought:
+
+    Understand the Requirements:
+        We are tasked to build a 32-bit carry-select adder from three 16-bit adders (add16).
+        The inputs are two 32-bit numbers (a, b) and the output is a 32-bit result (sum).
+        To achieve this, two add16 modules compute the sum of the lower and upper 16 bits of a and b with a carry-in of 0 and 1 respectively.
+        Then depending on the carry-out of the lower 16 bits, a 3rd add16 module selects the correct sum of the upper 16-bits.
+
+    Determine the Inputs and Outputs:
+        Inputs: a[31:0], b[31:0]
+        Output: sum[31:0]
+
+    Define Intermediate Signals:
+        We need intermediates to store the summed results of the lower and upper 16-bits depending on the carry-in value.
+        We also need an intermediate for the carry-out of the lower 16-bits adders.
+
+    Structuring the Module:
+        Start with the module declaration and instantiation of the 16-bit adder modules.
+        Use wire declarations to handle the intermediate signals.
+        Use the selected output of the 16-bit adder modules for the final 32-bit sum.
+
+    Writing the Verilog Code:
+
+verilog
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+    wire [15:0] lower_sum_0, lower_sum_1, upper_sum_0, upper_sum_1;
+    wire lower_cout_0, lower_cout_1, upper_cout_0, upper_cout_1;
+    wire [15:0] upper_sum;
+
+    // Compute the sum of lower and upper 16 bits with carry-in 0
+    add16 add_lower_0 (.a(a[15:0]), .b(b[15:0]), .cin(1'b0), .sum(lower_sum_0), .cout(lower_cout_0));
+    add16 add_upper_0 (.a(a[31:16]), .b(b[31:16]), .cin(lower_cout_0), .sum(upper_sum_0), .cout(upper_cout_0));
+
+    // Compute the sum of lower and upper 16 bits with carry-in 1
+    add16 add_lower_1 (.a(a[15:0]), .b(b[15:0]), .cin(1'b1), .sum(lower_sum_1), .cout(lower_cout_1));
+    add16 add_upper_1 (.a(a[31:16]), .b(b[31:16]), .cin(lower_cout_1), .sum(upper_sum_1), .cout(upper_cout_1));
+
+    // Select the correct upper sum based on carry of lower
+    assign upper_sum = lower_cout_0 ? upper_sum_1 : upper_sum_0;
+
+    // Concatenate the lower and upper 16 bits to get 32-bit sum
+    assign sum = {upper_sum, lower_sum_0};
+endmodule

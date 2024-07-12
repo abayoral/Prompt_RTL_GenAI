@@ -1,0 +1,53 @@
+Chain of Thought:
+
+    Understand the Requirements:
+        A Ripple-Carry Adder is a kind of binary parallel adder. Here, A and B are the binary numbers being added together and cin is the carry input. 
+        The numbers being added are A = A[2:0] and B = B[2:0].
+        Like with any other adder, the result of the addition is the sum = sum[2:0], and the output carry is cout = cout[2:0].
+
+    Determine the Inputs and Outputs:
+        Inputs: A, B, Cin
+        Outputs: Sum, Cout
+    
+    Define Intermediate Signals:
+        The intermediate signals are the carries between the Full Adder stages
+        
+    Defining Full_Adder Module:
+        Before designing the main module, you need to define the full_adder module which is the basic building block used to construct 3-bit Ripple-Carry Adder.
+        Full adder is a digital circuit to perform arithmetic sum of three bits.
+
+    Structuring the Module:
+        Start with the module declaration, specifying the inputs and outputs.
+        Instantiate three Full Adders to make 3-bit Ripple-Carry Adder.
+        The output of every adder is connected with the input of the next adder.
+
+    Writing the Verilog Code:
+
+    verilog
+
+    // Full Adder module
+    module full_adder (
+        input a, b, cin,
+        output sum, cout
+    );
+        assign {cout, sum} = a + b + cin;
+    endmodule
+
+    // 3-bit Ripple-Carry Adder
+    module top_module( 
+        input [2:0] a, b,
+        input cin,
+        output [2:0] cout,
+        output [2:0] sum
+    );
+        wire c1, c2;
+
+        full_adder fa1 (.a(a[0]), .b(b[0]), .cin(cin), .sum(sum[0]), .cout(c1));
+        full_adder fa2 (.a(a[1]), .b(b[1]), .cin(c1), .sum(sum[1]), .cout(c2));
+        full_adder fa3 (.a(a[2]), .b(b[2]), .cin(c2), .sum(sum[2]), .cout(cout[2]));
+
+        assign cout = {c2, c1, cout[2]};
+
+    endmodule
+
+    This code should work to create a 3-bit Ripple-Carry Adder.

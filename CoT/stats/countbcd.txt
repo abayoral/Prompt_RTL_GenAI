@@ -1,0 +1,8 @@
+CoT/modules/countbcd.v:19: error: reg q; cannot be driven by primitives or continuous assignment.
+CoT/modules/countbcd.v:20: error: reg q; cannot be driven by primitives or continuous assignment.
+CoT/modules/countbcd.v:21: error: reg q; cannot be driven by primitives or continuous assignment.
+CoT/modules/countbcd.v:22: error: reg q; cannot be driven by primitives or continuous assignment.
+4 error(s) during elaboration.
+Module file path: CoT/modules/countbcd.v
+Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/countbcd_sim', 'CoT/modules/countbcd.v', 'hdlbits_testbenches/Countbcd_0_tb.v']' returned non-zero exit status 4.

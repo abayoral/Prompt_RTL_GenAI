@@ -1,0 +1,54 @@
+Chain of Thought:
+
+Understand the Requirements:
+A 4-digit BCD counter counts from 0000 to 9999 (in decimal) where each BCD digit is encoded using 4 bits. The BCD counter increments its value on each rising edge of the clock (clk).
+The counter resets to 0000 when the reset (reset) signal is high.
+The enable signals ena[3] to ena[1] are asserted high when the respective BCD digit should be incremented.
+Inputs: clk, reset
+Outputs: ena[3:1], q[15:0]
+
+Determine the Inputs and Outputs:
+Inputs: clk, reset
+Output: ena[3:1], q[15:0]
+
+Define Intermediate Signals:
+Intermediate signals count[3:0] are used to hold the value of each BCD digit.
+
+Structuring the Module:
+
+Start with the module declaration, specifying the inputs and outputs.
+Define four instances of a single BCD counter for each digit.
+Use an always block triggered on the rising edge of the clock or the rising edge of the reset signal.
+Inside the always block, if the reset signal is high, assign zero to all BCD digits.
+If the reset signal is low, increment the value of each BCD digit when its corresponding enable signal is asserted.
+Assign the value of each BCD digit to the corresponding part of the output q[15:0].
+
+Writing the Verilog Code:
+
+verilog
+
+module top_module (
+    input wire clk,
+    input wire reset,
+    output wire [3:1] ena,
+    output reg [15:0] q
+);
+    reg [3:0] count [0:3];
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset)
+            q <= 16'b0000000000000000;
+        else begin
+            if (ena[1]) count[1] <= count[1] + 1;
+            if (ena[2]) count[2] <= count[2] + 1;
+            if (ena[3]) count[3] <= count[3] + 1;
+        end
+    end
+    
+    assign q[3:0] = count[0];
+    assign q[7:4] = count[1];
+    assign q[11:8] = count[2];
+    assign q[15:12] = count[3];
+endmodule
+
+Please note that you need to be careful with 4-bit BCD digit, because it must not exceed 9. The increment logic should be built properly, if the count value is 9, next increment should make it 0 and carry to the next digit.

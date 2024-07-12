@@ -1,0 +1,41 @@
+Chain of Thought:
+
+    Understand the Requirements:
+        An 8-bit priority encoder reports the position of the first '1' bit in the 8-bit input vector. If no bits are '1', the output should be 0.
+        Example: For 8'b10010000, the output should be 3'd4 as the first '1' is at the 4th bit.
+
+    Determine the Inputs and Outputs:
+        Inputs: in[7:0]
+        Output: pos[2:0]
+
+    Define Intermediate Signals:
+        No intermediate signals are needed here.
+
+    Structuring the Module:
+        Start with the module declaration, specifying the inputs and outputs.
+        Use an always block, as the position value needs to be updated every time the input vector (in) changes.
+        Inside the always block, calculate the position of the first '1' bit in the vector starting from bit[0] to bit[7].
+        If none of the bits are '1', assign zero to the output.
+ 
+Writing the Verilog Code:
+
+    verilog
+
+    module top_module (
+        input [7:0] in,
+        output reg [2:0] pos
+    );
+    
+        always @* begin
+            if (in[0]) pos = 3'b000;
+            else if (in[1]) pos = 3'b001;
+            else if (in[2]) pos = 3'b010;
+            else if (in[3]) pos = 3'b011;
+            else if (in[4]) pos = 3'b100;
+            else if (in[5]) pos = 3'b101;
+            else if (in[6]) pos = 3'b110;
+            else if (in[7]) pos = 3'b111;
+            else pos = 3'b000;
+        end
+        
+    endmodule

@@ -1,0 +1,47 @@
+Chain of Thought:
+
+    Understand the Requirements:
+        A 7458 chip has four AND gates and two OR gates.
+        For each of the two sets of inputs, the AND gates are connected to the OR gate.
+        The OR gate outputs the final result.
+        Eight inputs are associated with the first set: p1a, p1b, p1c, p1d (first AND gate), p1e and p1f (second AND gate).
+        Four inputs are associated with the second set: p2a, p2b (first AND gate), p2c and p2d (second AND gate).
+        p1y is the output of the first OR gate and p2y is the output of the second OR gate.
+
+    Determine the Inputs and Outputs:
+        Inputs: p1a, p1b, p1c, p1d, p1e, p1f, p2a, p2b, p2c, p2d
+        Outputs: p1y, p2y
+
+    Define Intermediate Signals:
+        Forming two AND gates for each OR gate requires intermediate signals.
+        Use wires p1_and1, p1_and2 to represent the outputs of the first AND gates and 
+        wires p2_and1, p2_and2 to represent the outputs of the second AND gates.
+
+    Structuring the Module:
+        Start with the module declaration, specifying the inputs and outputs.
+        Declare the intermediate signals.
+        Use assign statements to construct the AND and OR gates.
+        Using '&' for the AND operation and '|' for the OR operation.
+        Each OR gate takes the outputs of two AND gates.
+
+Writing the Verilog Code:
+
+verilog
+
+module top_module (
+    input p1a, p1b, p1c, p1d, p1e, p1f,
+    output p1y,
+    input p2a, p2b, p2c, p2d,
+    output p2y
+);
+    // Intermediate signals for AND gate outputs
+    wire p1_and1, p1_and2, p2_and1, p2_and2;
+    // AND gates logic
+    assign p1_and1 = p1a & p1b & p1c & p1d;
+    assign p1_and2 = p1e & p1f;
+    assign p2_and1 = p2a & p2b;
+    assign p2_and2 = p2c & p2d;
+    // OR gates logic
+    assign p1y = p1_and1 | p1_and2;
+    assign p2y = p2_and1 | p2_and2;
+endmodule

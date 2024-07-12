@@ -24,7 +24,6 @@ Mismatch at index 23: Inputs = [1, 00000000], Generated = [00000000], Reference 
 Mismatch at index 24: Inputs = [0, 00000000], Generated = [00000000], Reference = [00000110]
 Test 25 passed!
 10 mismatches out of 26 total tests.
-hdlbits_testbenches/Edgedetect2_0_tb.v:337: $finish called at 52000 (10ps)
 Module file path: Zero-shot/modules/edgedetect2.v
 Testbench file path: hdlbits_testbenches/Edgedetect2_0_tb.v
 Compilation successful. Executable created at Zero-shot/simulations/edgedetect2_sim
