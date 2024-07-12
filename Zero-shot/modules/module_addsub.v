@@ -4,13 +4,29 @@ module top_module(
     input sub,
     output [31:0] sum
 );
-    wire [15:0] adder1_out, adder2_out;
+
     wire [31:0] bxor;
+    wire [15:0] add16_lower_sum, add16_upper_sum;
+    wire add16_lower_cout;
     
-    assign bxor = b ^ {32{sub}};
+    assign bxor = b ^ ({32{sub}});
     
-    add16 add1 ( .a(a[15:0]), .b(bxor[15:0]), .cin(sub), .sum(adder1_out),.cout());
-    add16 add2 ( .a(a[31:16]), .b(bxor[31:16]), .cin(sub), .sum(adder2_out),.cout());
-    
-    assign sum = {adder2_out, adder1_out};
+    add16 add16_lower(
+        .a(a[15:0]),
+        .b(bxor[15:0]),
+        .cin(sub),
+        .sum(add16_lower_sum),
+        .cout(add16_lower_cout)
+    );
+
+    add16 add16_upper(
+        .a(a[31:16]),
+        .b(bxor[31:16]),
+        .cin(add16_lower_cout),
+        .sum(add16_upper_sum),
+        .cout()
+    );
+
+    assign sum = {add16_upper_sum, add16_lower_sum};
+
 endmodule

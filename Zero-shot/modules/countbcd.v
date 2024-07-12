@@ -4,59 +4,40 @@ module top_module (
     output [3:1] ena,
     output [15:0] q);
 
-    // One's digit counter
-    reg [3:0] ones;
-    always @(posedge clk or posedge reset) begin
-        if (reset)
-            ones <= 0;
-            else if (ones == 4'b1001)
-                ones <= 0;
-            else
-                ones <= ones + 1;
-    end
-   
-    // Ten's digit counter
-    reg [3:0] tens;
-    always @(posedge clk or posedge reset) begin
-        if (reset)
-            tens <= 0;
-        else if (ones == 4'b1001)  // Increment tens when ones reach 9
-            if (tens == 4'b1001)
-                tens <= 0;
-            else
-                tens <= tens + 1;
-    end
-   
-    // Hundred's digit counter
-    reg [3:0] hundreds;
-    always @(posedge clk or posedge reset) begin
-        if (reset)
-            hundreds <= 0;
-        else if (tens == 4'b1001)  // Increment hundreds when tens reach 9
-            if (hundreds == 4'b1001)
-                hundreds <= 0;
-            else
-                hundreds <= hundreds + 1;
-    end
-   
-    // Thousand's digit counter
-    reg [3:0] thousands;
-    always @(posedge clk or posedge reset) begin
-        if (reset)
-            thousands <= 0;
-        else if (hundreds == 4'b1001)  // Increment thousands when hundreds reach 9
-            if (thousands == 4'b1001)
-                thousands <= 0;
-            else
-                thousands <= thousands + 1;
-    end
-   
-    // Enable signals
-    assign ena[1] = (ones == 4'b1001);
-    assign ena[2] = (tens == 4'b1001);
-    assign ena[3] = (hundreds == 4'b1001);
+    // Define internal wire and reg variables
+    wire [3:0] counter[3:0];
+    wire [3:1] carry;
+    reg [3:0] q_temp [3:0];
+    reg [3:1] ena_temp;
+    
+    // Loop to create the 4 decade counters 
+    generate
+        genvar i;
+        for(i=0; i<4; i=i+1)
+        begin: decade_counter
+            always @(posedge clk or posedge reset)
+            begin
+                if (reset)
+                    q_temp[i] <= 4'b0000;
+                else if ((i == 0) || (ena_temp[i]))
+                begin
+                    if (q_temp[i] == 4'b1001)
+                    begin
+                        q_temp[i] <= 4'b0000;
+                        ena_temp[i+1] <= 1'b1;
+                    end
+                    else
+                    begin
+                        q_temp[i] <= q_temp[i] + 1'b1;
+                        ena_temp[i+1] <= 1'b0;
+                    end
+                end
+            end
+        end
+    endgenerate
 
-    // Output
-    assign q = {thousands, hundreds, tens, ones};
-   
+    // Assign output signals to the internal signals
+    assign q = {q_temp[3], q_temp[2], q_temp[1], q_temp[0]};
+    assign ena = ena_temp[3:1];
+
 endmodule

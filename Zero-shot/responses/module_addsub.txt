@@ -1,1 +1,40 @@
-Return to Monkey
+```verilog
+module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );
+    // Inner implementation of add16 is not given, assuming it is correct.
+endmodule
+
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    input sub,
+    output [31:0] sum
+);
+
+    wire [31:0] bxor;
+    wire [15:0] add16_lower_sum, add16_upper_sum;
+    wire add16_lower_cout;
+    
+    assign bxor = b ^ ({32{sub}});
+    
+    add16 add16_lower(
+        .a(a[15:0]),
+        .b(bxor[15:0]),
+        .cin(sub),
+        .sum(add16_lower_sum),
+        .cout(add16_lower_cout)
+    );
+
+    add16 add16_upper(
+        .a(a[31:16]),
+        .b(bxor[31:16]),
+        .cin(add16_lower_cout),
+        .sum(add16_upper_sum),
+        .cout()
+    );
+
+    assign sum = {add16_upper_sum, add16_lower_sum};
+
+endmodule
+```
+
+In the provided code, we use two 16-bit adders to perform a 32-bit addition-subtraction operation. The lower 16 bits of `a` and `b` are fed to one adder, and the higher 16 bits are fed to the other. We make use of Verilog's bit-slice syntax to accurately pluck out the bits we need. The `sub` input is used as the carry-in for the lower bit addition and also as a control signal for the XOR operation. According to whether `sub` is 1 (subtract mode) or 0 (add mode), the `b` input is accordingly inverted or not. The XORed/inverted `b` is then used as the input for both adders. The carry-out of the lower bit adder is used as the carry-in for the higher bit adder, ensuring that any overflow from the lower bit addition is properly accounted for in the higher bit addition.
