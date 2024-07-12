@@ -1,4 +1,4 @@
-//Using Chain of Thought:
+// you're a senior Digital Circuit Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining the company's reputation in the industry.
 
 // Create a 1-bit wide, 256-to-1 multiplexer. The 256 inputs are all packed into a 
 // single 256-bit input vector. sel=0 should select in[0], sel=1 selects bits in[1], 
@@ -18,5 +18,3 @@ module top_module(
     //Insert your code here
 
 endmodule
-
-//Please understand the requirement and write a rough solving process. It starts with a input-output structure, then defines intermediate signals. The thought process should be explained in pseudocode with no Verilog modules or syntax whatsoever. The necessary details should be written in natural languages.

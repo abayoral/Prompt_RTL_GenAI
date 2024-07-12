@@ -1,0 +1,39 @@
+hdlbits_testbenches/Countbcd_0_tb.v:17: warning: Port 3 (ena) of top_module expects 4 bits, got 3.
+hdlbits_testbenches/Countbcd_0_tb.v:17:        : Padding 1 high bits of the port.
+Mismatch at index 0: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010000101]
+Mismatch at index 1: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010000110]
+Mismatch at index 2: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010000110]
+Mismatch at index 3: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010000111]
+Mismatch at index 4: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010000111]
+Mismatch at index 5: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010001000]
+Mismatch at index 6: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010001000]
+Mismatch at index 7: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [001, 0000000010001001]
+Mismatch at index 8: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [001, 0000000010001001]
+Mismatch at index 9: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010000]
+Mismatch at index 10: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010000]
+Mismatch at index 11: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010001]
+Mismatch at index 12: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010001]
+Mismatch at index 13: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010010]
+Mismatch at index 14: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010010]
+Mismatch at index 15: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010011]
+Mismatch at index 16: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010011]
+Mismatch at index 17: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010100]
+Mismatch at index 18: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010100]
+Mismatch at index 19: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010101]
+Mismatch at index 20: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010101]
+Mismatch at index 21: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010110]
+Mismatch at index 22: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010110]
+Mismatch at index 23: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010111]
+Mismatch at index 24: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010010111]
+Mismatch at index 25: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010011000]
+Mismatch at index 26: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000010011000]
+Mismatch at index 27: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [011, 0000000010011001]
+Mismatch at index 28: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [011, 0000000010011001]
+Mismatch at index 29: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000100000000]
+Mismatch at index 30: Inputs = [0, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000100000000]
+Mismatch at index 31: Inputs = [1, 0], Generated = [000, 0000000000000000], Reference = [000, 0000000100000001]
+32 mismatches out of 32 total tests.
+Module file path: SCoT/modules/countbcd.v
+Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
+Compilation successful. Executable created at SCoT/simulations/countbcd_sim
+Simulation completed successfully.

@@ -1,4 +1,4 @@
-//Using Chain of Thought:
+// you're a senior FPGA Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining the company's reputation in the industry.
 
 // Write a top-level Verilog module (named top_module) for the shift register, assuming that n = 4. Instantiate four copies of your MUXDFF subcircuit in your top-level module. Assume that you are going to implement the circuit on the DE2 board.
 
@@ -22,6 +22,3 @@ endmodule
 module MUXDFF (...);
 
 endmodule
-
-
-//Please understand the requirement and write a rough solving process. It starts with a input-output structure, then defines intermediate signals. The thought process should be explained in pseudocode with no Verilog modules or syntax whatsoever. The necessary details should be written in natural languages.

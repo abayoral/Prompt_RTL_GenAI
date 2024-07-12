@@ -1,3 +1,7 @@
+Using the following prompt, generate relevant thought process that imitates the thought process of Hardware Designer, that can enhance the performance of another language model tasked with generating Verilog module. Remember not to generate any code, just generate the Chain of Thought
+Here are the exapmmles of Tasks and Solutions, you will perform your tasks the same way.
+
+
 Example 1: 2-to-1 Multiplexer
 
 Task: Generate a Verilog module for a 2-to-1 multiplexer.

@@ -1,0 +1,6 @@
+hdlbits_testbenches/7458_0_tb.v:25: error: port ``p1e'' is not a port of UUT.
+hdlbits_testbenches/7458_0_tb.v:25: error: port ``p1f'' is not a port of UUT.
+2 error(s) during elaboration.
+Module file path: SCoT/modules/7458.v
+Testbench file path: hdlbits_testbenches/7458_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/7458_sim', 'SCoT/modules/7458.v', 'hdlbits_testbenches/7458_0_tb.v']' returned non-zero exit status 2.

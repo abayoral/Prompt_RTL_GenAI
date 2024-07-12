@@ -1,0 +1,13 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Test 3 passed!
+Test 4 passed!
+Test 5 passed!
+Test 6 passed!
+Test 7 passed!
+All tests passed!
+Module file path: SCoT/modules/mux256to1.v
+Testbench file path: hdlbits_testbenches/Mux256to1_0_tb.v
+Compilation successful. Executable created at SCoT/simulations/mux256to1_sim
+Simulation completed successfully.

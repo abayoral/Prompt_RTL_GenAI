@@ -1,4 +1,4 @@
-//Using Chain of Thought:
+// you're a senior  Microarchitecture Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining the company's reputation in the industry.
 
 // Make 3 instances of full-adder to create a 3-bit binary ripple-carry adder. 
 // The adder adds two 3-bit numbers and a carry-in to produce a 3-bit sum and carry out. 
@@ -17,5 +17,3 @@ module top_module(
 endmodule
 
 
-
-//Please understand the requirement and write a rough solving process. It starts with a input-output structure, then defines intermediate signals. The thought process should be explained in pseudocode with no Verilog modules or syntax whatsoever. The necessary details should be written in natural languages.

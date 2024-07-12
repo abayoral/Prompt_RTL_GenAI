@@ -1,4 +1,4 @@
-//Using Chain of Thought:
+// you're a senior Computer Architecture Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining the company's reputation in the industry.
 
 // Build the adder-subtractor below.
 // You are provided with a 16-bit adder module, which you need to instantiate twice:
@@ -21,5 +21,3 @@ module top_module(
 	// INsert your code here
 
 endmodule
-
-//Please understand the requirement and write a rough solving process. It starts with a input-output structure, then defines intermediate signals. The thought process should be explained in pseudocode with no Verilog modules or syntax whatsoever. The necessary details should be written in natural languages.

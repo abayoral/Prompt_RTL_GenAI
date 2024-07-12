@@ -1,0 +1,9 @@
+SCoT/modules/module_addsub.v:13: error: Unknown module type: add16
+SCoT/modules/module_addsub.v:25: error: Unknown module type: add16
+3 error(s) during elaboration.
+*** These modules were missing:
+        add16 referenced 2 times.
+***
+Module file path: SCoT/modules/module_addsub.v
+Testbench file path: hdlbits_testbenches/Module_addsub_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/module_addsub_sim', 'SCoT/modules/module_addsub.v', 'hdlbits_testbenches/Module_addsub_0_tb.v']' returned non-zero exit status 3.

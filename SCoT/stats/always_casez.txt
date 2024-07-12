@@ -1,0 +1,5 @@
+SCoT/modules/always_casez.v:12: error: Enable of unknown task ``break''.
+1 error(s) during elaboration.
+Module file path: SCoT/modules/always_casez.v
+Testbench file path: hdlbits_testbenches/Always_casez_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/always_casez_sim', 'SCoT/modules/always_casez.v', 'hdlbits_testbenches/Always_casez_0_tb.v']' returned non-zero exit status 1.

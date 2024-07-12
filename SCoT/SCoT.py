@@ -1,5 +1,3 @@
-# gk.py
-
 import sys
 import os
 
@@ -24,15 +22,14 @@ def read_user_prompt(file_path):
         return file.read()
 
 # Function to save the result to a file
-def save_result(file_path, response, original_prompt):
+def save_result(file_path, response):
     with open(file_path, 'w') as file:
-        file.write(f"\n{response}\n\n")
-        file.write(f"Task:\n{original_prompt}")
+        file.write(response)
 
 # Use the imported function
 if __name__ == "__main__":
     # Path to the generate_knowledge.txt file
-    generate_knowledge_path = os.path.join(current_dir, 'generate_knowledge.txt')
+    generate_knowledge_path = os.path.join(current_dir, 'Exemplars_CoT.txt')
     
     # Read the system prompt from the file
     system_prompt = read_system_prompt(generate_knowledge_path)
@@ -61,7 +58,7 @@ if __name__ == "__main__":
         # Path to save the result
         result_file_path = os.path.join(gk_prompts_dir, prompt_file)
         
-        # Save the response and original prompt to the result file
-        save_result(result_file_path, response, user_prompt)
+        # Save the response to the result file (excluding the original prompt)
+        save_result(result_file_path, response)
         
         print(f"Processed and saved response for {prompt_file}")
