@@ -66,13 +66,15 @@ for i in range(5):
 
         # Initialize the dictionary entry to 0 if it doesn't exist
         if stats_file_name not in succ_counter:
-            succ_counter[stats_file_name] = [0]
+            succ_counter[stats_file_name] = [0,0,0]
 
         results = check_test_results(stats_file)
 
         if results[0]:
             succ_counter[stats_file_name][0] += 1
-
+        
+        succ_counter[stats_file_name][1] += results[1]
+        succ_counter[stats_file_name][2] += results[2]
         succ_counter[stats_file_name].append(results[1]/results[2])
 
 # Ensure the metrics directory exists
@@ -85,10 +87,13 @@ metrics_file_path = os.path.join(metrics_dir, 'metrics.txt')
 
 with open(metrics_file_path, 'w') as metrics_file:
     # Writing header
-    metrics_file.write(f"Name | Total Success | Success Ratio Iteration 1 | Success Ratio Iteration 2 | Success Ratio Iteration 3 | Success Ratio Iteration 4 | Success Ratio Iteration 5\n")
+    metrics_file.write(f"Name | Overall Success | Success Ratio Iteration 1 | Success Ratio Iteration 2 | Success Ratio Iteration 3 | Success Ratio Iteration 4 | Success Ratio Iteration 5 | Total success | Sum of ratios\n")
     for key, value in succ_counter.items():
         # Formatting the output for Total Success with "/5"
         total_success = f"{value[0]}/5"
-        metrics_file.write(f"{key.ljust(17)} | {total_success.ljust(13)} | " + ' | '.join(f"{ratio:.2f}".ljust(24) for ratio in value[1:]) + "\n")
+        success_ratios = ' | '.join(f"{ratio:.2f}".ljust(24) for ratio in value[1:])
+        overall_success_ratio = value[1] / value[2] if value[2] != 0 else 0.0  # Prevent division by zero
+        sum_of_ratios = sum(value[3:])  # Calculate the sum of success ratios from value[3:]
+        metrics_file.write(f"{key.ljust(17)} | {total_success.ljust(13)} | {success_ratios} | {overall_success_ratio:.2f} | {sum_of_ratios:.2f}\n")
 
 print(f"Metrics saved to {metrics_file_path}")
