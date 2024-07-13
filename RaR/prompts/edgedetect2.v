@@ -1,0 +1,11 @@
+This task concerns itself with the creation and design of a specific module within the realm of digital logic design, using Verilog or a comparable hardware description language. The particular module that you will need to construct is identified as the 'top_module'. Your aim, in this case, will be to craft this module in a manner that enables it to scrutinize each individual bit within an eight-bit vector thoroughly.
+
+The 'top_module's primary role will revolve around detecting any modifications or adjustments that may be made to an incoming signal over a sequential chain of clock cycles. This would consist of identifying any shifts or transitions, especially those where a bit switches from being a logical zero to a logical one.
+
+In instances where such a transition from zero to one occurs, it is mandatory that the respective output bit is activated or 'set'. Importantly, this action needs to be carried out in the subsequent clock cycle immediately following the transition event.
+
+More specifically, the overall structure of the 'top_module' will comprise several key elements. The first of these is an input coined as 'clk' which stands for the clock signal that will be used. Secondly, there is another input, designed as an array ranging from 7 to 0, which is identified as 'in'. Additionally, there is an output that is designed similar to the previous input, as an array stretching from 7 to 0, known as 'anyedge'.
+
+As for your assignment, you are required to implement your custom-designed code within the specific area provided within this 'top_module'. The core aim of this exercise is to develop and script a code that will successfully support and accommodate the architecture of the needed module design. This exercise is not about developing a working solution for the 'top_module' per se, nor about its operational functionality.
+
+In essence, this task calls upon you to design and script the blueprint and schematic of the aforementioned module using the appropriate code in the designated area. It is important to note that this task does not expect you to propose a solution or answer related to how the 'top_module' will carry out its functions or operations.

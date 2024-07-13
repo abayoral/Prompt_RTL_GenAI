@@ -1,0 +1,41 @@
+Given your task, the best approach is to first define the 16-bit 2-to-1 multiplexer. This will be used to select the appropriate values depending on the generated carry-out from the first add16 instance. 
+
+Next, create three instances of add16 using your inputs. The least significant 16 bits from each of 'a' and 'b' are fed to the first instance. The carry output from this instance will be used to select the sum from either the second or third add16 compiler.
+
+Please note the definition of add16 module or the carry_select_adder must be included in the same file where add16 is instantiated.
+
+Here is the code based on your instructions:
+
+```verilog
+// Define the 16 bit 2-to-1 multiplexer module
+module mux16 (
+    input [15:0] a,
+    input [15:0] b,
+    input sel,
+    output [15:0] y
+);
+    assign y = sel ? b : a;
+endmodule
+
+// Top module using Add16
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+    wire [15:0] sum1, sum2, sum3;
+    wire c1, c2, c3;
+    
+    // Instantiate the add16 modules
+    add16 u1 (a[15:0], b[15:0], 0, sum1, c1); // Least significant 16 bits
+    add16 u2 (a[31:16], b[31:16], 0, sum2, c2);
+    add16 u3 (a[31:16], b[31:16], 1, sum3, c3);
+    
+    // Instantiate the 2-to-1 multiplexer module
+    mux16 mux1 (.a(sum2), .b(sum3), .sel(c1), .y(sum[31:16]));
+    
+    assign sum[15:0] = sum1;
+endmodule
+```
+
+Please replace the 'add16' blocks with the 'add16' module code that you have available (the module code for `add16` needs to be in the same file). That declaration is missing from this script. It is presumed that declaration will be made before using the `add16` module in this script.

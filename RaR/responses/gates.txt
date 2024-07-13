@@ -1,0 +1,17 @@
+```verilog
+module combinational_circuit(input a, b, output out_and, out_or, out_xor, out_nand, out_nor, out_xnor, out_anotb);
+
+   // Logic gates implementation
+  assign out_and = a & b;         // AND operation on a and b 
+  assign out_or = a | b;          // OR operation on a and b
+  
+  assign out_xor = a ^ b;         // XOR operation on a and b
+  assign out_nand = ~(a & b);     // NAND operation on a and b
+  
+  assign out_nor = ~(a | b);      // NOR operation on a and b
+  assign out_xnor = ~(a ^ b);     // XNOR operation on a and b
+  
+  assign out_anotb = a & ~b;      // A AND NOT B operation on a and b
+endmodule
+```
+This Verilog module implements seven different logic gates for two inputs: a and b. The output for each gate is driven separately, respecting the logical operation each gate performs on the inputs.

@@ -1,0 +1,9 @@
+You are requested to design and assemble a priority encoder capable of processing 8-bit input commands. When the encoder is furnished with an 8-bit input vector, it should be engineered in such a way that it yields an output detailing the least significant 'high' bit, or a bit with the value of 1 in the input vector. 
+
+To identify the 'high' bit, the encoder should return the placement index of this bit within the vector, with the numbering commencing from zero for the least significant bit. In circumstances where the input vector does not encompass any 'high' bits i.e., it contains no 1s, the encoder should provide an output of zero. 
+
+The working of the designed priority encoder can be demonstrated through an example where the 8-bit input vector is '8'b10010000'; the anticipated output would be '3'd4'. This output signifies that, when assessed from the least significant to the most significant bit, the first 'high' bit is positioned at location 4 of the input vector.
+
+The task specifically necessitates the deployment of Verilog hardware description language, with emphasis on the 2001 edition, to devise a module identified as 'top_module'. This module would include an 8-bit input labeled as 'in' and a 3-bit output known as 'pos'. It's important to remember that in the context of this design, 'pos' assumes the role of a register.
+
+Consider it critical to understand that the question does not demand actual programming codes or solutions for this assignment. It rather calls for a careful and precise rephrase of the question, amplifying its clarity and specificity without diving into the answer or solution.

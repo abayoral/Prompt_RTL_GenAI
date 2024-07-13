@@ -1,0 +1,69 @@
+```verilog
+module top_module(
+    input wire clk,
+    input wire reset,
+    input wire en,
+    output wire [15:0] q
+);
+
+    wire [3:0] cnt1, cnt10, cnt100, cnt1000;
+    wire c1, c10, c100, cna;
+
+    bcd_counter U1 (
+        .clk(clk), .reset(reset), .en(en), .q(cnt1), .c(c1)
+    );
+
+    bcd_counter U2 (
+        .clk(clk), .reset(reset), .en(c1 & ena), .q(cnt10), .c(c10)
+    );
+
+    bcd_counter U3 (
+        .clk(clk), .reset(reset), .en(c10 & ena), .q(cnt100), .c(c100)
+    );
+
+    bcd_counter U4 (
+        .clk(clk), .reset(reset), .en(c100 & ena), .q(cnt1000), .c(cna)
+    );
+
+    assign q = {cnt1000, cnt100, cnt10, cnt1};
+
+endmodule
+
+module bcd_counter(
+    input wire clk,
+    input wire reset,
+    input wire en,
+    output reg [3:0] q,
+    output reg c
+);
+
+    always @(posedge clk or posedge reset)
+    begin
+        if (reset)
+        begin
+            q <= 4'b0000;
+            c <= 1'b0;
+        end
+        else if (en)
+        begin
+            if (q == 4'b1001)
+            begin
+                q <= 4'b0000;
+                c <= 1'b1;
+            end
+            else
+            begin
+                q <= q + 1'b1;
+                c <= 1'b0;
+            end
+        end
+        else
+        begin
+            // No change in state
+            q <= q;
+            c <= c;
+        end
+    end
+endmodule
+```
+The top module 'top_module' consists of 4 instances of a base module 'bcd_counter', each of which are individual 4-bit BCD counters. The counters are chained with their output 'carry' serving as 'enable' signals for the next counter, in a typical cascading style. Each counter counts from 0 to 9 and, on reaching 9, resets itself and asserts the 'carry' output to enable the next counter to increment, simulating a decades place increment in a standard decimal counting system. The 'reset' signal when asserted, resets all counters to 0. The final 16-bit output 'q' concatenates the counters' output in order: thousands, hundreds, tens, and ones.

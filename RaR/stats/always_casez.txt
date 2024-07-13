@@ -1,0 +1,3 @@
+Module file path: RaR/modules/always_casez.v
+Testbench file path: hdlbits_testbenches/Always_casez_0_tb.v
+Error: RaR/modules/always_casez.v does not exist.

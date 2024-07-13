@@ -1,0 +1,14 @@
+```verilog
+module top_module(
+    input wire p1a, p1b, p1c, p1d, p1e, p1f,
+    output wire p1y,
+    input wire p2a, p2b, p2c, p2d,
+    output wire p2y
+);
+
+    assign p1y = ((p1a & p1b) | (p1c & p1d)) & (p1e | p1f); 
+    assign p2y = (p2a & p2b) | (p2c & p2d);
+    
+endmodule
+```
+This module represents a Verilog implementation of the 7458 integrated circuit chip comprising of four AND gates and two OR gates. It has ten inputs that have been divided into two sections p1 and p2 each with their outputs as p1y and p2y respectively. Here, I've used the assign directive to represent the logic for each output directly using the inputs. For each output, the '&' operator represents the AND gates and the '|' operator represents the OR gates.Applications of brackets '()' help maintain operator precedence. The code ends with an 'endmodule' directive to signify the end of this Verilog module.

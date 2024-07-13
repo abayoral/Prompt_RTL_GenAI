@@ -1,0 +1,3 @@
+Module file path: RaR/modules/module_addsub.v
+Testbench file path: hdlbits_testbenches/Module_addsub_0_tb.v
+Error: RaR/modules/module_addsub.v does not exist.

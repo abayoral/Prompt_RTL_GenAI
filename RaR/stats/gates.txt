@@ -1,0 +1,3 @@
+Module file path: RaR/modules/gates.v
+Testbench file path: hdlbits_testbenches/Gates_0_tb.v
+Error: RaR/modules/gates.v does not exist.
