@@ -42,12 +42,6 @@ if framework_name == "Self-ask":
     # Update prompts and stats directory for Self-ask framework
     prompts_dir = os.path.join(framework_directory, 'prompts')
     stats_dir = os.path.join(framework_directory, 'stats')
-elif framework_name == "Step-back":
-    framework_directory = os.path.join(os.getcwd(), "Step-back")
-    script_path = os.path.join(framework_directory, "step-back.py")
-    # Update prompts and stats directory for Self-ask framework
-    prompts_dir = os.path.join(framework_directory, 'prompts')
-    stats_dir = os.path.join(framework_directory, 'stats')
 else:
     # For other frameworks, use the framework_name directly
     prompts_dir = os.path.join(framework_name, 'prompts')
@@ -57,14 +51,6 @@ else:
 for i in range(5):
     if framework_name == "Self-ask":
         print(f"Executing self-ask.py for framework {framework_name} (iteration {i + 1})...")
-        try:
-            subprocess.run(['python', script_path], check=True)
-            print(f"Execution of {script_path} completed successfully.")
-        except subprocess.CalledProcessError as e:
-            print(f"Error executing {script_path}: {e}")
-            continue
-    elif framework_name == "Step-back":
-        print(f"Executing step-back.py for framework {framework_name} (iteration {i + 1})...")
         try:
             subprocess.run(['python', script_path], check=True)
             print(f"Execution of {script_path} completed successfully.")

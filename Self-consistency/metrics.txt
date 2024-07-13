@@ -1,0 +1,10 @@
+Name              | Overall Success | Success Ratio Iteration 1 | Success Ratio Iteration 2 | Success Ratio Iteration 3 | Success Ratio Iteration 4 | Success Ratio Iteration 5 | Total Success | Sum of Ratios
+gates             | 5/5           |                     1.00 |                     1.00 |                     1.00 |                     1.00 |                     1.00 |                     1.00 |    5.00
+adder3            | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00
+module_addsub     | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00
+module_cseladd    | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00
+edgedetect2       | 0/5           |                     0.94 |                     0.94 |                     0.94 |                     0.94 |                     0.94 |                     0.94 |    4.69
+7458              | 0/5           |                     0.97 |                     0.97 |                     0.95 |                     0.95 |                     0.97 |                     0.96 |    4.80
+countbcd          | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00
+always_casez      | 5/5           |                     1.00 |                     1.00 |                     1.00 |                     1.00 |                     1.00 |                     1.00 |    5.00
+mux256to1         | 5/5           |                     1.00 |                     1.00 |                     1.00 |                     1.00 |                     1.00 |                     1.00 |    5.00
