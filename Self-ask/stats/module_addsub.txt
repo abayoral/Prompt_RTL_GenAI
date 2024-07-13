@@ -1,0 +1,9 @@
+Self-ask/modules/module_addsub.v:12: error: Unknown module type: add16
+Self-ask/modules/module_addsub.v:13: error: Unknown module type: add16
+3 error(s) during elaboration.
+*** These modules were missing:
+        add16 referenced 2 times.
+***
+Module file path: Self-ask/modules/module_addsub.v
+Testbench file path: hdlbits_testbenches/Module_addsub_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Self-ask/simulations/module_addsub_sim', 'Self-ask/modules/module_addsub.v', 'hdlbits_testbenches/Module_addsub_0_tb.v']' returned non-zero exit status 3.

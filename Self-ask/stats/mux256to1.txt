@@ -1,0 +1,14 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Test 3 passed!
+Test 4 passed!
+Test 5 passed!
+Test 6 passed!
+Test 7 passed!
+All tests passed!
+hdlbits_testbenches/Mux256to1_0_tb.v:121: $finish called at 16000 (10ps)
+Module file path: Self-ask/modules/mux256to1.v
+Testbench file path: hdlbits_testbenches/Mux256to1_0_tb.v
+Compilation successful. Executable created at Self-ask/simulations/mux256to1_sim
+Simulation completed successfully.

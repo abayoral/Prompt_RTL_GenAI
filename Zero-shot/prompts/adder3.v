@@ -1,5 +1,3 @@
-// you're a senior  Microarchitecture Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining the company's reputation in the industry.
-
 // Make 3 instances of full-adder to create a 3-bit binary ripple-carry adder. 
 // The adder adds two 3-bit numbers and a carry-in to produce a 3-bit sum and carry out. 
 // To encourage you to actually instantiate full adders, also output the carry-out from 
@@ -15,5 +13,4 @@ module top_module(
     // Insert your code here
 
 endmodule
-
 

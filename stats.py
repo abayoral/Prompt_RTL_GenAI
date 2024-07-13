@@ -39,12 +39,12 @@ os.environ['framework_name'] = framework_name
 if framework_name == "Self-ask":
     framework_directory = os.path.join(os.getcwd(), "Self-ask")
     script_path = os.path.join(framework_directory, "self-ask.py")
-    print(f"Executing self-ask.py for framework {framework_name}...")
-    try:
-        subprocess.run(['python', script_path], check=True)
-        print(f"Execution of {script_path} completed successfully.")
-    except subprocess.CalledProcessError as e:
-        print(f"Error executing {script_path}: {e}")
+    # Update prompts and stats directory for Self-ask framework
+    prompts_dir = os.path.join(framework_directory, 'prompts')
+    stats_dir = os.path.join(framework_directory, 'stats')
+elif framework_name == "Step-back":
+    framework_directory = os.path.join(os.getcwd(), "Step-back")
+    script_path = os.path.join(framework_directory, "step-back.py")
     # Update prompts and stats directory for Self-ask framework
     prompts_dir = os.path.join(framework_directory, 'prompts')
     stats_dir = os.path.join(framework_directory, 'stats')
@@ -55,6 +55,22 @@ else:
 
 # Perform iterations
 for i in range(5):
+    if framework_name == "Self-ask":
+        print(f"Executing self-ask.py for framework {framework_name} (iteration {i + 1})...")
+        try:
+            subprocess.run(['python', script_path], check=True)
+            print(f"Execution of {script_path} completed successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error executing {script_path}: {e}")
+            continue
+    elif framework_name == "Step-back":
+        print(f"Executing step-back.py for framework {framework_name} (iteration {i + 1})...")
+        try:
+            subprocess.run(['python', script_path], check=True)
+            print(f"Execution of {script_path} completed successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error executing {script_path}: {e}")
+            continue
     subprocess.run(['python', 'main.py', framework_name], check=True)
 
     # Get all log files in the stats directory
@@ -66,7 +82,7 @@ for i in range(5):
 
         # Initialize the dictionary entry to 0 if it doesn't exist
         if stats_file_name not in succ_counter:
-            succ_counter[stats_file_name] = [0,0,0]
+            succ_counter[stats_file_name] = [0, 0, 0]
 
         results = check_test_results(stats_file)
 
@@ -75,7 +91,7 @@ for i in range(5):
         
         succ_counter[stats_file_name][1] += results[1]
         succ_counter[stats_file_name][2] += results[2]
-        succ_counter[stats_file_name].append(results[1]/results[2])
+        succ_counter[stats_file_name].append(results[1] / results[2] if results[2] != 0 else 0)
 
 # Ensure the metrics directory exists
 metrics_dir = framework_name
@@ -86,14 +102,29 @@ if not os.path.exists(metrics_dir):
 metrics_file_path = os.path.join(metrics_dir, 'metrics.txt')
 
 with open(metrics_file_path, 'w') as metrics_file:
+    # Define the column widths
+    name_width = 17
+    success_width = 13
+    ratio_width = 24
+    total_success_width = 10
+    overall_success_width = 7
+
     # Writing header
-    metrics_file.write(f"Name | Overall Success | Success Ratio Iteration 1 | Success Ratio Iteration 2 | Success Ratio Iteration 3 | Success Ratio Iteration 4 | Success Ratio Iteration 5 | Total success | Sum of ratios\n")
+    metrics_file.write(f"{'Name'.ljust(name_width)} | {'Overall Success'.ljust(success_width)} | "
+                       f"{'Success Ratio Iteration 1'.ljust(ratio_width)} | "
+                       f"{'Success Ratio Iteration 2'.ljust(ratio_width)} | "
+                       f"{'Success Ratio Iteration 3'.ljust(ratio_width)} | "
+                       f"{'Success Ratio Iteration 4'.ljust(ratio_width)} | "
+                       f"{'Success Ratio Iteration 5'.ljust(ratio_width)} | "
+                       f"{'Total Success'.ljust(total_success_width)} | "
+                       f"{'Sum of Ratios'.ljust(overall_success_width)}\n")
     for key, value in succ_counter.items():
         # Formatting the output for Total Success with "/5"
-        total_success = f"{value[0]}/5"
-        success_ratios = ' | '.join(f"{ratio:.2f}".ljust(24) for ratio in value[1:])
+        total_success = f"{value[0]}/5".ljust(success_width)
+        success_ratios = ' | '.join(f"{ratio:24.2f}" for ratio in value[3:])
         overall_success_ratio = value[1] / value[2] if value[2] != 0 else 0.0  # Prevent division by zero
         sum_of_ratios = sum(value[3:])  # Calculate the sum of success ratios from value[3:]
-        metrics_file.write(f"{key.ljust(17)} | {total_success.ljust(13)} | {success_ratios} | {overall_success_ratio:.2f} | {sum_of_ratios:.2f}\n")
+        metrics_file.write(f"{key.ljust(name_width)} | {total_success} | {success_ratios} | "
+                           f"{overall_success_ratio:24.2f} | {sum_of_ratios:7.2f}\n")
 
 print(f"Metrics saved to {metrics_file_path}")

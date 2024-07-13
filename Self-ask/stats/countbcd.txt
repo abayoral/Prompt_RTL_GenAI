@@ -1,36 +1,38 @@
-Traceback (most recent call last):
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 6, in <module>
-    import languagemodels as lm
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/languagemodels.py", line 13, in <module>
-    from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/transformers/__init__.py", line 26, in <module>
-    from . import dependency_versions_check
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/transformers/dependency_versions_check.py", line 16, in <module>
-    from .utils.versions import require_version, require_version_core
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/transformers/utils/__init__.py", line 34, in <module>
-    from .generic import (
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/transformers/utils/generic.py", line 462, in <module>
-    import torch.utils._pytree as _torch_pytree
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/__init__.py", line 1854, in <module>
-    from . import _meta_registrations
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_meta_registrations.py", line 9, in <module>
-    from torch._decomp import (
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_decomp/__init__.py", line 244, in <module>
-    import torch._refs
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_refs/__init__.py", line 3871, in <module>
-    @register_decomposition(aten.index_fill_)
-     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_decomp/__init__.py", line 185, in decomposition_decorator
-    pytree.tree_map_(register, aten_op)
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/utils/_pytree.py", line 607, in tree_map_
-    deque(map(func, flat_args), maxlen=0)  # consume and exhaust the iterable
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_decomp/__init__.py", line 182, in register
-    _add_op_to_registry(registry, op, fn)
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_decomp/__init__.py", line 51, in _add_op_to_registry
-    overloads.append(getattr(op, ol))
-                     ^^^^^^^^^^^^^^^
-  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/torch/_ops.py", line 737, in __getattr__
-    overload = OpOverload(self, op_, op_dk_, schema, tags)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-KeyboardInterrupt
+Mismatch at index 0: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000101]
+Mismatch at index 1: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000110]
+Mismatch at index 2: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000110]
+Mismatch at index 3: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000111]
+Mismatch at index 4: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010000111]
+Mismatch at index 5: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010001000]
+Mismatch at index 6: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010001000]
+Mismatch at index 7: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [001, 0000000010001001]
+Mismatch at index 8: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [001, 0000000010001001]
+Mismatch at index 9: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010000]
+Mismatch at index 10: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010000]
+Mismatch at index 11: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010001]
+Mismatch at index 12: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010001]
+Mismatch at index 13: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010010]
+Mismatch at index 14: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010010]
+Mismatch at index 15: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010011]
+Mismatch at index 16: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010011]
+Mismatch at index 17: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010100]
+Mismatch at index 18: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010100]
+Mismatch at index 19: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010101]
+Mismatch at index 20: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010101]
+Mismatch at index 21: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010110]
+Mismatch at index 22: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010110]
+Mismatch at index 23: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010111]
+Mismatch at index 24: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010010111]
+Mismatch at index 25: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010011000]
+Mismatch at index 26: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000010011000]
+Mismatch at index 27: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [011, 0000000010011001]
+Mismatch at index 28: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [011, 0000000010011001]
+Mismatch at index 29: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000000]
+Mismatch at index 30: Inputs = [0, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000000]
+Mismatch at index 31: Inputs = [1, 0], Generated = [xxx, xxxxxxxxxxxxxxxx], Reference = [000, 0000000100000001]
+32 mismatches out of 32 total tests.
+hdlbits_testbenches/Countbcd_0_tb.v:419: $finish called at 64000 (10ps)
+Module file path: Self-ask/modules/countbcd.v
+Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
+Compilation successful. Executable created at Self-ask/simulations/countbcd_sim
+Simulation completed successfully.
