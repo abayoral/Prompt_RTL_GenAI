@@ -30,7 +30,7 @@ v_files = glob.glob(os.path.join(prompts_dir, '*.v'))
 
 # Define the commands template
 commands_template = [
-    ['./response.py', '--prompt={prompt}', '--name={name}', '--testbench={testbench}', '--model=ChatGPT4'],
+    ['./response.py', '--prompt={prompt}', '--name={name}', '--testbench={testbench}', '--model=ChatGPT4o'],
     ['python', 'regex.py'],
     ['python', 'iverilog.py']
 ]
