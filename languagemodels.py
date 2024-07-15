@@ -61,7 +61,7 @@ class ChatGPT4(AbstractLLM):
         )
 
         return response['choices'][0]['message']['content']
-class ChatGPT4Turbo(AbstractLLM):
+class ChatGPT4o(AbstractLLM):
     """ChatGPT Turbo Large Language Model."""
 
     def __init__(self):

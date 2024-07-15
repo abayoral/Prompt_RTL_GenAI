@@ -36,13 +36,7 @@ succ_counter = {}
 os.environ['framework_name'] = framework_name
 
 # Define the directory paths based on framework_name
-if framework_name == "Self-ask":
-    framework_directory = os.path.join(os.getcwd(), "Self-ask")
-    script_path = os.path.join(framework_directory, "self-ask.py")
-    # Update prompts and stats directory for Self-ask framework
-    prompts_dir = os.path.join(framework_directory, 'prompts')
-    stats_dir = os.path.join(framework_directory, 'stats')
-elif framework_name == "RaR":
+if framework_name == "RaR":
     framework_directory = os.path.join(os.getcwd(), "RaR")
     script_path = os.path.join(framework_directory, "rar.py")
     # Update prompts and stats directory for Self-ask framework
@@ -55,15 +49,7 @@ else:
 
 # Perform iterations
 for i in range(5):
-    if framework_name == "Self-ask":
-        print(f"Executing self-ask.py for framework {framework_name} (iteration {i + 1})...")
-        try:
-            subprocess.run(['python', script_path], check=True)
-            print(f"Execution of {script_path} completed successfully.")
-        except subprocess.CalledProcessError as e:
-            print(f"Error executing {script_path}: {e}")
-            continue
-    elif framework_name == "RaR":
+    if framework_name == "RaR":
         print(f"Executing rar.py for framework {framework_name} (iteration {i + 1})...")
         try:
             subprocess.run(['python', script_path], check=True)
