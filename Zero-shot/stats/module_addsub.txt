@@ -1,9 +1,21 @@
-Zero-shot/modules/module_addsub.v:13: error: Unknown module type: add16
-Zero-shot/modules/module_addsub.v:19: error: Unknown module type: add16
-3 error(s) during elaboration.
-*** These modules were missing:
-        add16 referenced 2 times.
-***
-Module file path: Zero-shot/modules/module_addsub.v
-Testbench file path: hdlbits_testbenches/Module_addsub_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/module_addsub_sim', 'Zero-shot/modules/module_addsub.v', 'hdlbits_testbenches/Module_addsub_0_tb.v']' returned non-zero exit status 3.
+Traceback (most recent call last):
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 8, in <module>
+    import languagemodels as lm
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/languagemodels.py", line 13, in <module>
+    from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+  File "<frozen importlib._bootstrap>", line 1412, in _handle_fromlist
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1557, in __getattr__
+    module = self._get_module(self._class_to_module[name])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/transformers/utils/import_utils.py", line 1567, in _get_module
+    return importlib.import_module("." + module_name, self.__name__)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/Cellar/python@3.12/3.12.4/Frameworks/Python.framework/Versions/3.12/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/transformers/models/__init__.py", line 15, in <module>
+    from . import (
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 946, in _load_unlocked
+KeyboardInterrupt

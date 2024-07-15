@@ -1,31 +1,28 @@
-Test 1 passed!
-Test 2 passed!
-Mismatch at index 3: Inputs = [1, 00000001], Generated = [00000001], Reference = [00000000]
-Test 4 passed!
-Mismatch at index 5: Inputs = [1, 00000001], Generated = [00000000], Reference = [00000001]
-Mismatch at index 6: Inputs = [0, 00000001], Generated = [00000000], Reference = [00000001]
-Test 7 passed!
-Test 8 passed!
-Test 9 passed!
-Test 10 passed!
-Test 11 passed!
-Test 12 passed!
-Mismatch at index 13: Inputs = [1, 00000000], Generated = [00000000], Reference = [00000001]
-Mismatch at index 14: Inputs = [0, 00000000], Generated = [00000000], Reference = [00000001]
-Test 15 passed!
-Test 16 passed!
-Test 17 passed!
-Mismatch at index 18: Inputs = [0, 00000110], Generated = [00000110], Reference = [00000000]
-Mismatch at index 19: Inputs = [1, 00000110], Generated = [00000000], Reference = [00000110]
-Mismatch at index 20: Inputs = [0, 00000110], Generated = [00000000], Reference = [00000110]
-Test 21 passed!
-Test 22 passed!
-Mismatch at index 23: Inputs = [1, 00000000], Generated = [00000000], Reference = [00000110]
-Mismatch at index 24: Inputs = [0, 00000000], Generated = [00000000], Reference = [00000110]
-Test 25 passed!
-10 mismatches out of 26 total tests.
-hdlbits_testbenches/Edgedetect2_0_tb.v:337: $finish called at 52000 (10ps)
-Module file path: Zero-shot/modules/edgedetect2.v
-Testbench file path: hdlbits_testbenches/Edgedetect2_0_tb.v
-Compilation successful. Executable created at Zero-shot/simulations/edgedetect2_sim
-Simulation completed successfully.
+Traceback (most recent call last):
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 184, in <module>
+    main()
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 181, in main
+    get_response(prompt, module, model, outdir, logfile, prompt_strategy)
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 115, in get_response
+    final_response = generate_verilog(conv, model_type)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 71, in generate_verilog
+    return(model.generate(conv))
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/languagemodels.py", line 58, in generate
+    response = openai.ChatCompletion.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_resources/chat_completion.py", line 25, in create
+    return super().create(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_resources/abstract/engine_api_resource.py", line 153, in create
+    response, _, api_key = requestor.request(
+                           ^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_requestor.py", line 298, in request
+    resp, got_stream = self._interpret_response(result, stream)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_requestor.py", line 700, in _interpret_response
+    self._interpret_response_line(
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_requestor.py", line 765, in _interpret_response_line
+    raise self.handle_error_response(
+openai.error.RateLimitError: You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.

@@ -1,12 +1,28 @@
-Zero-shot/modules/countbcd.v:12: error: ena is not a valid l-value in top_module_tb.UUT.
-Zero-shot/modules/countbcd.v:4:      : ena is declared here as wire.
-Zero-shot/modules/countbcd.v:17: error: ena['sd1] is not a valid l-value in top_module_tb.UUT.
-Zero-shot/modules/countbcd.v:4:      : ena['sd1] is declared here as wire.
-Zero-shot/modules/countbcd.v:22: error: ena['sd2] is not a valid l-value in top_module_tb.UUT.
-Zero-shot/modules/countbcd.v:4:      : ena['sd2] is declared here as wire.
-Zero-shot/modules/countbcd.v:27: error: ena['sd3] is not a valid l-value in top_module_tb.UUT.
-Zero-shot/modules/countbcd.v:4:      : ena['sd3] is declared here as wire.
-4 error(s) during elaboration.
-Module file path: Zero-shot/modules/countbcd.v
-Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/countbcd_sim', 'Zero-shot/modules/countbcd.v', 'hdlbits_testbenches/Countbcd_0_tb.v']' returned non-zero exit status 4.
+Traceback (most recent call last):
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 184, in <module>
+    main()
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 181, in main
+    get_response(prompt, module, model, outdir, logfile, prompt_strategy)
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 115, in get_response
+    final_response = generate_verilog(conv, model_type)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 71, in generate_verilog
+    return(model.generate(conv))
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/languagemodels.py", line 58, in generate
+    response = openai.ChatCompletion.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_resources/chat_completion.py", line 25, in create
+    return super().create(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_resources/abstract/engine_api_resource.py", line 153, in create
+    response, _, api_key = requestor.request(
+                           ^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_requestor.py", line 298, in request
+    resp, got_stream = self._interpret_response(result, stream)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_requestor.py", line 700, in _interpret_response
+    self._interpret_response_line(
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_requestor.py", line 765, in _interpret_response_line
+    raise self.handle_error_response(
+openai.error.RateLimitError: You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.

@@ -1,45 +1,28 @@
-Test 0 passed!
-Test 1 passed!
-Test 2 passed!
-Test 3 passed!
-Test 4 passed!
-Test 5 passed!
-Test 6 passed!
-Test 7 passed!
-Test 8 passed!
-Test 9 passed!
-Test 10 passed!
-Test 11 passed!
-Test 12 passed!
-Mismatch at index 13: Inputs = [1, 1, 0, 0, 1, 1, 0, 1, 1, 0], Generated = [1, 0], Reference = [0, 0]
-Mismatch at index 14: Inputs = [1, 1, 0, 0, 1, 1, 0, 1, 1, 0], Generated = [1, 0], Reference = [0, 0]
-Test 15 passed!
-Test 16 passed!
-Test 17 passed!
-Test 18 passed!
-Mismatch at index 19: Inputs = [0, 0, 1, 1, 0, 0, 1, 0, 0, 1], Generated = [1, 0], Reference = [0, 0]
-Mismatch at index 20: Inputs = [0, 0, 1, 1, 0, 0, 1, 0, 0, 1], Generated = [1, 0], Reference = [0, 0]
-Test 21 passed!
-Test 22 passed!
-Mismatch at index 23: Inputs = [0, 1, 1, 1, 0, 1, 1, 0, 1, 1], Generated = [1, 1], Reference = [0, 1]
-Mismatch at index 24: Inputs = [0, 1, 1, 1, 0, 1, 1, 0, 1, 1], Generated = [1, 1], Reference = [0, 1]
-Test 25 passed!
-Test 26 passed!
-Mismatch at index 27: Inputs = [1, 0, 1, 1, 1, 0, 1, 1, 0, 1], Generated = [1, 1], Reference = [0, 1]
-Mismatch at index 28: Inputs = [1, 0, 1, 1, 1, 0, 1, 1, 0, 1], Generated = [1, 1], Reference = [0, 1]
-Test 29 passed!
-Test 30 passed!
-Test 31 passed!
-Test 32 passed!
-Test 33 passed!
-Test 34 passed!
-Test 35 passed!
-Test 36 passed!
-Test 37 passed!
-Test 38 passed!
-8 mismatches out of 39 total tests.
-hdlbits_testbenches/7458_0_tb.v:502: $finish called at 78000 (10ps)
-Module file path: Zero-shot/modules/7458.v
-Testbench file path: hdlbits_testbenches/7458_0_tb.v
-Compilation successful. Executable created at Zero-shot/simulations/7458_sim
-Simulation completed successfully.
+Traceback (most recent call last):
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 184, in <module>
+    main()
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 181, in main
+    get_response(prompt, module, model, outdir, logfile, prompt_strategy)
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 115, in get_response
+    final_response = generate_verilog(conv, model_type)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 71, in generate_verilog
+    return(model.generate(conv))
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/languagemodels.py", line 58, in generate
+    response = openai.ChatCompletion.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_resources/chat_completion.py", line 25, in create
+    return super().create(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_resources/abstract/engine_api_resource.py", line 153, in create
+    response, _, api_key = requestor.request(
+                           ^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_requestor.py", line 298, in request
+    resp, got_stream = self._interpret_response(result, stream)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_requestor.py", line 700, in _interpret_response
+    self._interpret_response_line(
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_requestor.py", line 765, in _interpret_response_line
+    raise self.handle_error_response(
+openai.error.RateLimitError: You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.

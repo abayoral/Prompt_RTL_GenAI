@@ -1,10 +1,28 @@
-Zero-shot/modules/adder3.v:8: error: Unknown module type: full_adder
-Zero-shot/modules/adder3.v:9: error: Unknown module type: full_adder
-Zero-shot/modules/adder3.v:10: error: Unknown module type: full_adder
-4 error(s) during elaboration.
-*** These modules were missing:
-        full_adder referenced 3 times.
-***
-Module file path: Zero-shot/modules/adder3.v
-Testbench file path: hdlbits_testbenches/Adder3_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/adder3_sim', 'Zero-shot/modules/adder3.v', 'hdlbits_testbenches/Adder3_0_tb.v']' returned non-zero exit status 4.
+Traceback (most recent call last):
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 184, in <module>
+    main()
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 181, in main
+    get_response(prompt, module, model, outdir, logfile, prompt_strategy)
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 115, in get_response
+    final_response = generate_verilog(conv, model_type)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/./response.py", line 71, in generate_verilog
+    return(model.generate(conv))
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/languagemodels.py", line 58, in generate
+    response = openai.ChatCompletion.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_resources/chat_completion.py", line 25, in create
+    return super().create(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_resources/abstract/engine_api_resource.py", line 153, in create
+    response, _, api_key = requestor.request(
+                           ^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_requestor.py", line 298, in request
+    resp, got_stream = self._interpret_response(result, stream)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_requestor.py", line 700, in _interpret_response
+    self._interpret_response_line(
+  File "/Users/fatimafarooq/Desktop/llm_hardware_bench/venv/lib/python3.12/site-packages/openai/api_requestor.py", line 765, in _interpret_response_line
+    raise self.handle_error_response(
+openai.error.RateLimitError: You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.
