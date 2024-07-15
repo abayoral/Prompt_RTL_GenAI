@@ -55,6 +55,8 @@ def get_sys_prompt(prompt_strategy=None):
 def generate_verilog(conv, model_type, model_id=""):
     if model_type == "ChatGPT4":
         model = lm.ChatGPT4()
+    elif model_type == "ChatGPT4o":
+        model = lm.ChatGPT4Turbo()
     elif model_type == "Claude":
         model = lm.Claude()
     elif model_type == "ChatGPT3p5":
@@ -134,8 +136,9 @@ def main():
     model_id = ""
     outdir = ""
     log = None
-    prompt_strategy = os.environ['framework_name']
-
+    if 'framework' in os.environ:
+        if os.environ['framework_name']:
+            prompt_strategy = os.environ['framework_name']
 
     for opt, arg in opts:
         if opt in ("-h", "--help"):
@@ -159,6 +162,7 @@ def main():
             outdir = arg
         elif opt in ("--technique"):
             prompt_strategy = arg
+            os.environ['framework_name']=prompt_strategy
 
     if prompt is None or module is None or testbench is None or model is None:
         print("Missing required argument(s).")
