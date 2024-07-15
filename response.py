@@ -111,6 +111,18 @@ def get_response(design_prompt, module, model_type, outdir="", log=None, prompt_
         
         # Select the most consistent response
         final_response = get_most_consistent_response(responses)
+    elif prompt_strategy == 'Self-calibration':
+        response = generate_verilog(conv, model_type)
+        feedback_sys_prompt = 'You are an expert in Verilog code verification. Your task is to determine whether the provided Verilog code is correct. Respond with only "yes" if the code is correct or "no" if the code is incorrect. Do not provide any explanations, comments, or additional information. Simply answer "yes" or "no".'
+        verilog_code = reg.extract_verilog_code(response)
+        feedback_response = generate_response(feedback_sys_prompt,verilog_code,model_type).strip().lower()
+        if feedback_response == "no":
+            feedback_sys_prompt = 'You are an expert in Verilog coding and digital design. Your task is to review and correct the provided Verilog code. Identify and fix any syntax errors, logical errors, or common pitfalls in the code. Ensure that the corrected code is functional and meets the specifications provided. Respond with only the corrected Verilog code. Do not include any explanations or additional text.'
+            prompt = design_prompt + "/nsolution:/n" + verilog_code
+            final_response = generate_response(feedback_sys_prompt,prompt,model_type)
+        else:
+            final_response = response
+        
     else:
         final_response = generate_verilog(conv, model_type)
 
