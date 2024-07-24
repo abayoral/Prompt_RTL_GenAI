@@ -78,6 +78,23 @@ class ChatGPT4o(AbstractLLM):
 
         return response['choices'][0]['message']['content']
 
+class ChatGPT4omini(AbstractLLM):
+    """ChatGPT Turbo Large Language Model."""
+
+    def __init__(self):
+        super().__init__()
+        openai.api_key = os.environ['OPENAI_API_KEY']
+
+    def generate(self, conversation: Conversation):
+        messages = [{'role': msg['role'], 'content': msg['content']} for msg in conversation.get_messages()]
+
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
+            messages=messages,
+        )
+
+        return response['choices'][0]['message']['content']
+
 class Claude(AbstractLLM):
     """Claude Large Language Model."""
 

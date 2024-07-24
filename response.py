@@ -68,6 +68,8 @@ def generate_verilog(conv, model_type, model_id=""):
         model = lm.ChatGPT3p5()
     elif model_type == "ChatGPT4o":
         model = lm.ChatGPT4o()
+    elif model_type == "ChatGPT4o-mini":
+        model = lm.ChatGPT4omini()
     elif model_type == "PaLM":
         model = lm.PaLM()
     elif model_type == "CodeLlama":
