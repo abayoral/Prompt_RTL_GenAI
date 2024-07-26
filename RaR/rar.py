@@ -22,7 +22,7 @@ def main():
     # Get all .v files in the prompts directory
     v_files = glob.glob(os.path.join(prompts_dir, '*.v'))
 
-    model_type = "ChatGPT4"
+    model_type = "ChatGPT4o"
 
     for v_file in v_files:
         # Extract the base name (without extension) to use as the module name

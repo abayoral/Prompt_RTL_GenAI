@@ -49,7 +49,7 @@ if __name__ == "__main__":
         user_prompt = read_user_prompt(prompt_file_path)
         
         # Define the model type and prompt strategy
-        model_type = "ChatGPT4"
+        model_type = "ChatGPT4o"
         prompt_strategy = None  # or set your specific strategy if needed
         
         # Call the generate_response function
