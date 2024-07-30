@@ -1,0 +1,7 @@
+Generate_Knowledge/modules/Fsm_serial.v:8: syntax error
+Generate_Knowledge/modules/Fsm_serial.v:8: error: Invalid module instantiation
+Generate_Knowledge/modules/Fsm_serial.v:15: syntax error
+Generate_Knowledge/modules/Fsm_serial.v:15: error: Invalid module instantiation
+Module file path: Generate_Knowledge/modules/Fsm_serial.v
+Testbench file path: hdlbits_testbenches/Fsm_serial_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Generate_Knowledge/simulations/Fsm_serial_sim', 'Generate_Knowledge/modules/Fsm_serial.v', 'hdlbits_testbenches/Fsm_serial_0_tb.v']' returned non-zero exit status 4.

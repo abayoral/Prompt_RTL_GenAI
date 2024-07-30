@@ -1,0 +1,44 @@
+Chain of Thought:
+
+1. **Understand the Requirements:**
+    - A 4-bit priority encoder checks the input bits, starting from the highest bit (in[3]) to the lowest bit (in[0]).
+    - The output (pos) should represent the position of the most significant '1' bit in the input.
+    - If no bits are high (input is zero), the output should be zero.
+
+2. **Determine the Inputs and Outputs:**
+    - Input: `in` (4-bit)
+    - Output: `pos` (2-bit) 
+
+3. **Define Intermediate Signals:**
+    - No intermediate signals are needed because the logic is straightforward and can be implemented directly using an `always` block and conditional statements.
+
+4. **Structuring the Module:**
+    - Start with the module declaration, specifying the input and output.
+    - Use an `always` block to implement the priority encoder logic.
+    - Use a sequence of `if-else` statements to check each bit of the input, starting from the most significant bit.
+    - Assign the appropriate value to `pos` based on which bit is the first '1'.
+
+5. **Writing the Verilog Code:**
+
+```verilog
+module top_module (
+    input [3:0] in,
+    output reg [1:0] pos
+);
+    // Priority encoder logic: Determine the position of the highest '1' bit in the input
+    always @(*) begin
+        if (in[3]) 
+            pos = 2'd3;
+        else if (in[2])
+            pos = 2'd2;
+        else if (in[1])
+            pos = 2'd1;
+        else if (in[0])
+            pos = 2'd0;
+        else
+            pos = 2'd0; // Output zero if no bits are high
+    end
+endmodule
+```
+
+The `always` block is used to check each bit of the input, and the position of the most significant '1' bit is assigned to the output `pos`. If none of the bits are '1', the output is set to zero. This provides the required functionality of a 4-bit priority encoder.

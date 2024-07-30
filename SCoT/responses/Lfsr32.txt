@@ -1,0 +1,50 @@
+Sure! Let's turn the chain of thought into the actual Verilog code for a 32-bit Galois LFSR with the specified taps.
+
+```verilog
+module top_module (
+    input wire clk,       // Clock input
+    input wire reset,     // Synchronous reset input
+    output reg [31:0] q   // 32-bit LFSR output
+);
+    // Internal register to hold the state of the LFSR
+    reg [31:0] lfsr;
+
+    // Always block for sequential logic
+    always @(posedge clk) begin
+        if (reset) begin
+            // Initialize LFSR to 1 on reset
+            lfsr <= 32'h1;
+        end else begin
+            // Calculate feedback by XORing the tapped bits
+            // Taps: 32, 22, 2, 1 (these correspond to indices 31, 21, 1, and 0 in zero-based indexing)
+            wire feedback = lfsr[0] ^ lfsr[1] ^ lfsr[21] ^ lfsr[31];
+            
+            // Shift register left and insert feedback bit into LSB
+            lfsr <= {lfsr[30:0], feedback};
+        end
+    end
+
+    // Assign the internal LFSR state to the output
+    assign q = lfsr;
+
+endmodule
+```
+
+### Explanation:
+1. **Module Declaration**:
+    - Inputs: `clk` (clock), `reset` (synchronous reset).
+    - Output: `q` (32-bit output).
+
+2. **Register Declaration**:
+    - `lfsr`: A 32-bit register to hold the state of the LFSR.
+
+3. **Always Block**:
+    - Triggered on the rising edge of `clk`.
+    - If `reset` is high, set `lfsr` to `32'h1`.
+    - Otherwise, compute the feedback bit by XORing the bits at positions 0 (`lfsr[0]`), 1 (`lfsr[1]`), 21 (`lfsr[21]`), and 31 (`lfsr[31]`).
+    - Shift the register left by one bit and insert the feedback bit into the least significant bit (LSB).
+
+4. **Assign Output**:
+    - The value of the `lfsr` register is assigned to the output `q`.
+
+This provides the complete Verilog implementation of the 32-bit Galois LFSR with the specified tap positions.

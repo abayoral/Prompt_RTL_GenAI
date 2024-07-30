@@ -1,0 +1,9 @@
+Zero-shot/modules/Module_addsub.v:16: error: Unknown module type: add16
+Zero-shot/modules/Module_addsub.v:25: error: Unknown module type: add16
+3 error(s) during elaboration.
+*** These modules were missing:
+        add16 referenced 2 times.
+***
+Module file path: Zero-shot/modules/Module_addsub.v
+Testbench file path: hdlbits_testbenches/Module_addsub_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/Module_addsub_sim', 'Zero-shot/modules/Module_addsub.v', 'hdlbits_testbenches/Module_addsub_0_tb.v']' returned non-zero exit status 3.

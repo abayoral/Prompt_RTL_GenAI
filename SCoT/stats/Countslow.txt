@@ -1,0 +1,36 @@
+Test 0 passed!
+Mismatch at index 1: Inputs = [0, 1, 0], Generated = [0001], Reference = [0000]
+Mismatch at index 2: Inputs = [1, 1, 0], Generated = [0010], Reference = [0001]
+Mismatch at index 3: Inputs = [0, 1, 0], Generated = [0011], Reference = [0001]
+Mismatch at index 4: Inputs = [1, 0, 0], Generated = [0011], Reference = [0010]
+Mismatch at index 5: Inputs = [0, 0, 0], Generated = [0011], Reference = [0010]
+Mismatch at index 6: Inputs = [1, 0, 0], Generated = [0011], Reference = [0010]
+Mismatch at index 7: Inputs = [0, 0, 0], Generated = [0011], Reference = [0010]
+Mismatch at index 8: Inputs = [1, 0, 0], Generated = [0011], Reference = [0010]
+Mismatch at index 9: Inputs = [0, 0, 0], Generated = [0011], Reference = [0010]
+Mismatch at index 10: Inputs = [1, 0, 0], Generated = [0011], Reference = [0010]
+Mismatch at index 11: Inputs = [0, 0, 0], Generated = [0011], Reference = [0010]
+Mismatch at index 12: Inputs = [1, 0, 0], Generated = [0011], Reference = [0010]
+Mismatch at index 13: Inputs = [0, 0, 0], Generated = [0011], Reference = [0010]
+Mismatch at index 14: Inputs = [1, 0, 0], Generated = [0011], Reference = [0010]
+Mismatch at index 15: Inputs = [0, 0, 0], Generated = [0011], Reference = [0010]
+Mismatch at index 16: Inputs = [1, 1, 0], Generated = [0100], Reference = [0010]
+Mismatch at index 17: Inputs = [0, 1, 0], Generated = [0101], Reference = [0010]
+Mismatch at index 18: Inputs = [1, 0, 0], Generated = [0101], Reference = [0011]
+Mismatch at index 19: Inputs = [0, 0, 0], Generated = [0101], Reference = [0011]
+Mismatch at index 20: Inputs = [1, 0, 0], Generated = [0101], Reference = [0011]
+Mismatch at index 21: Inputs = [0, 0, 0], Generated = [0101], Reference = [0011]
+Mismatch at index 22: Inputs = [1, 1, 0], Generated = [0110], Reference = [0011]
+Mismatch at index 23: Inputs = [0, 1, 0], Generated = [0111], Reference = [0011]
+Mismatch at index 24: Inputs = [1, 0, 0], Generated = [0111], Reference = [0100]
+Mismatch at index 25: Inputs = [0, 0, 0], Generated = [0111], Reference = [0100]
+Mismatch at index 26: Inputs = [1, 0, 0], Generated = [0111], Reference = [0100]
+Mismatch at index 27: Inputs = [0, 0, 0], Generated = [0111], Reference = [0100]
+Mismatch at index 28: Inputs = [1, 1, 0], Generated = [1000], Reference = [0100]
+Mismatch at index 29: Inputs = [0, 1, 0], Generated = [1001], Reference = [0100]
+29 mismatches out of 30 total tests.
+hdlbits_testbenches/Countslow_0_tb.v:395: $finish called at 60000 (10ps)
+Module file path: SCoT/modules/Countslow.v
+Testbench file path: hdlbits_testbenches/Countslow_0_tb.v
+Compilation successful. Executable created at SCoT/simulations/Countslow_sim
+Simulation completed successfully.

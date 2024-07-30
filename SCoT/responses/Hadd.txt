@@ -1,0 +1,23 @@
+Here is the Verilog code for a half adder following the outlined thought process:
+
+```verilog
+module top_module (
+    input wire a,
+    input wire b,
+    output wire sum,
+    output wire cout
+);
+    // Half adder logic:
+    // sum is the XOR of a and b
+    // cout is the AND of a and b
+    assign sum = a ^ b;
+    assign cout = a & b;
+endmodule
+```
+
+Explanation:
+- **Inputs `a` and `b`:** Single-bit inputs representing the binary numbers to be added.
+- **Outputs `sum` and `cout`:** Single-bit outputs representing the sum and carry-out, respectively.
+- **Logic Implementation:**
+    - `assign sum = a ^ b;` computes the sum using the XOR operation.
+    - `assign cout = a & b;` computes the carry-out using the AND operation.

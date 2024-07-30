@@ -1,0 +1,10 @@
+SCoT/modules/Bugs_mux4.v:12: error: Unknown module type: mux2_1
+SCoT/modules/Bugs_mux4.v:19: error: Unknown module type: mux2_1
+SCoT/modules/Bugs_mux4.v:27: error: Unknown module type: mux2_1
+4 error(s) during elaboration.
+*** These modules were missing:
+        mux2_1 referenced 3 times.
+***
+Module file path: SCoT/modules/Bugs_mux4.v
+Testbench file path: hdlbits_testbenches/Bugs_mux4_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/Bugs_mux4_sim', 'SCoT/modules/Bugs_mux4.v', 'hdlbits_testbenches/Bugs_mux4_0_tb.v']' returned non-zero exit status 4.

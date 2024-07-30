@@ -1,0 +1,33 @@
+Based on the described requirements and steps, here's the Verilog code for a 4-bit binary counter with synchronous reset:
+
+```verilog
+module top_module (
+    input wire clk,
+    input wire reset,
+    output reg [3:0] q
+);
+    // Counter logic: Reset q when reset is high, otherwise increment q on each rising edge of clk
+    always @(posedge clk) begin
+        if (reset)
+            q <= 4'b0000;
+        else
+            q <= q + 1;
+    end
+endmodule
+```
+
+### Explanation:
+1. **Module Declaration:**
+   - The module is named `top_module` and includes input signals `clk` and `reset`, and the output signal `q` which is a 4-bit register.
+
+2. **Always Block for Clock Edge Detection:**
+   - The `always` block is sensitive to the rising edge of the `clk` signal (`@(posedge clk)`).
+
+3. **Check Reset Signal:**
+   - Inside the `always` block, there's an `if` conditional that checks if the `reset` signal is high (`if (reset)`).
+   - If `reset` is high, `q` is set to 4'b0000, resetting the counter to 0.
+
+4. **Increment Counter:**
+   - If `reset` is not high, `q` is incremented by 1 (`q <= q + 1;`).
+
+This counter will count from 0 to 15, and when the `reset` signal is high, it will reset the counter to 0 synchronously on the rising edge of the clock.

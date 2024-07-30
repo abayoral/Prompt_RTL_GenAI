@@ -1,0 +1,42 @@
+### Chain of Thought:
+
+**Understand the Requirements:**
+- The circuit needs to decide between turning on the ringer or the motor based on the inputs `ring` and `vibrate_mode`.
+- If an incoming call (input `ring`) occurs:
+  - If the phone is in vibrate mode (`vibrate_mode` = 1), turn on the motor (`motor` = 1, `ringer` = 0).
+  - If the phone is not in vibrate mode (`vibrate_mode` = 0), turn on the ringer (`ringer` = 1, `motor` = 0).
+- The outputs `ringer` and `motor` must never be 1 simultaneously.
+
+**Determine the Inputs and Outputs:**
+- Inputs: `ring`, `vibrate_mode`
+- Outputs: `ringer`, `motor`
+
+**Define Intermediate Signals:**
+- No intermediate signals are needed.
+
+**Structuring the Module:**
+- Begin with the module declaration specifying the inputs and outputs.
+- Use `assign` statements to define the output logic based on the conditions specified:
+  - The motor is on if there's an incoming call (`ring` = 1) and vibrate mode is enabled (`vibrate_mode` = 1).
+  - The ringer is on if there's an incoming call (`ring` = 1) and vibrate mode is disabled (`vibrate_mode` = 0).
+
+**Writing the Verilog Code:**
+
+```verilog
+module top_module (
+    input ring,
+    input vibrate_mode,
+    output ringer,       // Make sound
+    output motor         // Vibrate
+);
+
+    // The motor is on when ring is 1 and vibrate_mode is 1
+    assign motor = ring & vibrate_mode;
+
+    // The ringer is on when ring is 1 and vibrate_mode is 0
+    assign ringer = ring & ~vibrate_mode;
+
+endmodule
+```
+
+This module uses combinational logic to ensure that either the ringer or the motor is activated based on the given inputs, while never both at the same time. The circuit is designed by thinking backward from the outputs to the conditions that define them, just as a hardware designer would approach the problem.

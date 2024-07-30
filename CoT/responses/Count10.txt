@@ -1,0 +1,49 @@
+### Chain of Thought:
+1. **Understand the Requirements:**
+    - We need a decade counter which counts from 0 to 9.
+    - The counter is controlled by a clock signal (`clk`) and a synchronous active-high reset signal (`reset`).
+    - When `reset` is high, the counter should reset to 0.
+    - The counter should increment its value on each rising edge of the clock until it reaches 9, after which it should roll back to 0.
+
+2. **Determine the Inputs and Outputs:**
+    - Inputs: `clk`, `reset`
+    - Outputs: `q[3:0]` (4-bit output to represent values from 0 to 9)
+
+3. **Define Intermediate Signals:**
+    - No intermediate signals are needed as the operation is straightforward.
+
+4. **Structuring the Module:**
+    - Start with the module declaration, specifying the inputs and outputs.
+    - Use an `always` block triggered on the rising edge of the clock.
+    - Inside the `always` block:
+        - Check if `reset` is high. If so, assign 0 to `q`.
+        - Otherwise, increment the value of `q` if it is less than 9.
+        - If `q` is already 9, reset it to 0.
+
+5. **Writing the Verilog Code:**
+
+```verilog
+module top_module (
+    input clk,
+    input reset,        // Synchronous active-high reset
+    output reg [3:0] q
+);
+    // Counter logic: increment q on each rising edge of clk; reset q when reset is high
+    always @(posedge clk) begin
+        if (reset)
+            q <= 4'b0000;
+        else if (q == 4'b1001) // if q is 9, reset to 0
+            q <= 4'b0000;
+        else
+            q <= q + 1;       // otherwise, increment
+    end
+endmodule
+```
+
+### Explanation:
+- The always block is triggered by the rising edge of `clk`.
+- Inside the always block:
+  - If `reset` is high, then `q` is set to 0 (`4'b0000`).
+  - If `q` equals 9 (`4'b1001`), the counter resets to 0.
+  - Otherwise, the value of `q` is incremented by 1.
+- This implementation ensures that the counter rolls over from 9 to 0, making it a decade counter.

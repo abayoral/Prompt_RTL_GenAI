@@ -1,0 +1,34 @@
+## Chain of Thought:
+
+### Understand the Requirements:
+A half adder adds two single-bit binary numbers `a` and `b` and produces a `sum` and a `carry-out`. Specifically, the half adder results in:
+- `sum` = `a` XOR `b`
+- `carry-out` (`cout`) = `a` AND `b`
+
+### Determine the Inputs and Outputs:
+- Inputs: `a`, `b`
+- Outputs: `cout`, `sum`
+
+### Define Intermediate Signals:
+No intermediate signals are needed as the logic can be directly implemented using basic logic gates (XOR and AND).
+
+### Structuring the Module:
+Let's start with the module declaration. The `sum` can be derived from the XOR operation between `a` and `b`. The carry-out (`cout`) is the AND operation between `a` and `b`.
+
+### Writing the Verilog Code:
+
+```verilog
+module top_module( 
+    input wire a, 
+    input wire b,
+    output wire cout, 
+    output wire sum 
+);
+    // Sum is a XOR b
+    assign sum = a ^ b;
+    // Carry-out is a AND b
+    assign cout = a & b;
+endmodule
+```
+
+This module defines the half adder as required, with the correct logic to produce the `sum` and `cout` signals.

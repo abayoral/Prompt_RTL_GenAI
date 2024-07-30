@@ -1,0 +1,45 @@
+Zero-shot/modules/Fsm_ps2data.v:9: syntax error
+Zero-shot/modules/Fsm_ps2data.v:9: error: Invalid module instantiation
+Zero-shot/modules/Fsm_ps2data.v:16: syntax error
+Zero-shot/modules/Fsm_ps2data.v:16: error: Invalid module instantiation
+Zero-shot/modules/Fsm_ps2data.v:19: error: Invalid module instantiation
+Zero-shot/modules/Fsm_ps2data.v:22: error: Invalid module instantiation
+Zero-shot/modules/Fsm_ps2data.v:23: error: Invalid module instantiation
+Zero-shot/modules/Fsm_ps2data.v:25: error: Invalid module item.
+Zero-shot/modules/Fsm_ps2data.v:29: syntax error
+Zero-shot/modules/Fsm_ps2data.v:29: error: Invalid module instantiation
+Zero-shot/modules/Fsm_ps2data.v:31: syntax error
+Zero-shot/modules/Fsm_ps2data.v:31: error: Invalid module instantiation
+Zero-shot/modules/Fsm_ps2data.v:35: syntax error
+Zero-shot/modules/Fsm_ps2data.v:35: error: Invalid module instantiation
+Zero-shot/modules/Fsm_ps2data.v:38: syntax error
+Zero-shot/modules/Fsm_ps2data.v:38: error: Invalid module instantiation
+Zero-shot/modules/Fsm_ps2data.v:41: syntax error
+Zero-shot/modules/Fsm_ps2data.v:41: error: Invalid module instantiation
+Zero-shot/modules/Fsm_ps2data.v:44: syntax error
+Zero-shot/modules/Fsm_ps2data.v:52: error: Invalid module item.
+Zero-shot/modules/Fsm_ps2data.v:53: syntax error
+Zero-shot/modules/Fsm_ps2data.v:54: error: Invalid module item.
+Zero-shot/modules/Fsm_ps2data.v:55: syntax error
+Zero-shot/modules/Fsm_ps2data.v:56: error: Invalid module item.
+Zero-shot/modules/Fsm_ps2data.v:57: syntax error
+Zero-shot/modules/Fsm_ps2data.v:57: error: Invalid module item.
+Zero-shot/modules/Fsm_ps2data.v:58: syntax error
+Zero-shot/modules/Fsm_ps2data.v:58: error: Invalid module item.
+Zero-shot/modules/Fsm_ps2data.v:59: syntax error
+Zero-shot/modules/Fsm_ps2data.v:59: error: Invalid module item.
+Zero-shot/modules/Fsm_ps2data.v:60: syntax error
+hdlbits_testbenches/Fsm_ps2data_0_tb.v:3: error: Invalid module item.
+hdlbits_testbenches/Fsm_ps2data_0_tb.v:8: error: 'clk' has already been declared in this scope.
+Zero-shot/modules/Fsm_ps2data.v:2:      : It was declared here as a net.
+hdlbits_testbenches/Fsm_ps2data_0_tb.v:9: error: 'in' has already been declared in this scope.
+Zero-shot/modules/Fsm_ps2data.v:3:      : It was declared here as a net.
+hdlbits_testbenches/Fsm_ps2data_0_tb.v:10: error: 'reset' has already been declared in this scope.
+Zero-shot/modules/Fsm_ps2data.v:4:      : It was declared here as a net.
+hdlbits_testbenches/Fsm_ps2data_0_tb.v:12: error: 'out_bytes' has already been declared in this scope.
+Zero-shot/modules/Fsm_ps2data.v:5:      : It was declared here as a variable.
+hdlbits_testbenches/Fsm_ps2data_0_tb.v:13: error: 'done' has already been declared in this scope.
+Zero-shot/modules/Fsm_ps2data.v:6:      : It was declared here as a variable.
+Module file path: Zero-shot/modules/Fsm_ps2data.v
+Testbench file path: hdlbits_testbenches/Fsm_ps2data_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/Fsm_ps2data_sim', 'Zero-shot/modules/Fsm_ps2data.v', 'hdlbits_testbenches/Fsm_ps2data_0_tb.v']' returned non-zero exit status 37.

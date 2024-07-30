@@ -1,0 +1,5 @@
+Zero-shot/modules/Rule90.v:13: syntax error
+Zero-shot/modules/Rule90.v:13: error: Incomprehensible for loop.
+Module file path: Zero-shot/modules/Rule90.v
+Testbench file path: hdlbits_testbenches/Rule90_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/Rule90_sim', 'Zero-shot/modules/Rule90.v', 'hdlbits_testbenches/Rule90_0_tb.v']' returned non-zero exit status 2.

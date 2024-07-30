@@ -1,0 +1,33 @@
+Given the chain of thought, we can write the Verilog code for `top_module` that instantiates `mod_a` and properly connects its ports based on their positions.
+
+```verilog
+module top_module (
+    input wire a,
+    input wire b,
+    input wire c,
+    input wire d,
+    output wire out1,
+    output wire out2
+);
+    // Instance of mod_a with port mapping by position
+    mod_a instance_name (
+        .out1(out1), // 1st output of mod_a
+        .out2(out2), // 2nd output of mod_a
+        .in1(a),     // 1st input of mod_a
+        .in2(b),     // 2nd input of mod_a
+        .in3(c),     // 3rd input of mod_a
+        .in4(d)      // 4th input of mod_a
+    );
+endmodule
+```
+
+With this code:
+- The `top_module` takes four inputs (`a`, `b`, `c`, `d`) and produces two outputs (`out1`, `out2`).
+- An instance of `mod_a` named `instance_name` is created.
+- The positional ports of `mod_a` are connected as required:
+  - The first output of `mod_a` is connected to `top_module`'s `out1`.
+  - The second output of `mod_a` is connected to `top_module`'s `out2`.
+  - The first input of `mod_a` is connected to `top_module`'s `a`.
+  - The second input of `mod_a` is connected to `top_module`'s `b`.
+  - The third input of `mod_a` is connected to `top_module`'s `c`.
+  - The fourth input of `mod_a` is connected to `top_module`'s `d`.

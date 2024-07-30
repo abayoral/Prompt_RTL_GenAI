@@ -1,0 +1,5 @@
+CoT/modules/Rule110.v:40: error: reg q; cannot be driven by primitives or continuous assignment.
+1 error(s) during elaboration.
+Module file path: CoT/modules/Rule110.v
+Testbench file path: hdlbits_testbenches/Rule110_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/Rule110_sim', 'CoT/modules/Rule110.v', 'hdlbits_testbenches/Rule110_0_tb.v']' returned non-zero exit status 1.

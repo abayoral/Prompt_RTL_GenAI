@@ -1,0 +1,58 @@
+Sure, let's break down the task and implement the required Verilog module.
+
+### Chain of Thought:
+
+1. **Understand the Requirements:**
+    - We need 8 D flip-flops.
+    - The flip-flops must have an active high synchronous reset.
+    - On reset, the flip-flops should be set to `0x34` rather than zero.
+    - The flip-flops should trigger on the negative edge of the clock (`clk`).
+
+2. **Determine the Inputs and Outputs:**
+    - **Inputs:** `clk`, `reset`, and an 8-bit input `d`.
+    - **Outputs:** An 8-bit output `q`.
+
+3. **Define Intermediate Signals:**
+    - No intermediate signals are necessary as our logic will be directly implemented in the always block.
+
+4. **Structuring the Module:**
+    - Start with the module declaration, specifying the inputs and outputs.
+    - Use an always block triggered on the negative edge of the clock.
+    - Inside the always block, check if the reset signal is high.
+    - If reset is high, assign the value `0x34` to `q`.
+    - Otherwise, assign `d` to `q`.
+
+### Writing the Verilog Code:
+
+Here's the complete Verilog implementation:
+
+```verilog
+module top_module (
+    input wire clk,
+    input wire reset,
+    input wire [7:0] d,
+    output reg [7:0] q
+);
+    // D Flip-Flop logic with synchronous reset to 0x34 triggered on negative edge of clk
+    always @(negedge clk) begin
+        if (reset)
+            q <= 8'h34; // reset value 0x34 (hexadecimal)
+        else
+            q <= d;
+    end
+endmodule
+```
+
+### Explanation:
+
+- **Module Declaration:**
+    - The module is named `top_module`.
+    - It has three inputs: `clk`, `reset`, and an 8-bit `d`.
+    - It has one 8-bit output `q`.
+
+- **Always Block:**
+    - The block is triggered on the negative edge of the clock signal (`negedge clk`).
+    - If the `reset` signal is high, `q` is set to `0x34`.
+    - If the `reset` signal is low, `q` is set to `d`.
+
+This implementation ensures that all 8 D flip-flops are reset to `0x34` when the synchronous reset signal is active and the flip-flops are triggered by the negative edge of the clock.

@@ -1,18 +1,48 @@
-module top_module(
-        input wire [31:0] A,
-        input wire [31:0] B,
-        output wire [31:0] Sum
+module top_module (
+    input wire [31:0] a,
+    input wire [31:0] b,
+    output wire [31:0] sum
+);
+    // Intermediate signals
+    wire [15:0] sum_lower;
+    wire carry_lower;
+    wire [15:0] sum_upper_1, sum_upper_2;
+    wire carry_upper_1, carry_upper_2;
+    wire [15:0] sum_upper;
+
+    // Instantiate 16-bit adder for lower 16 bits
+    adder_16bit adder1 (
+        .A(a[15:0]),
+        .B(b[15:0]),
+        .Sum(sum_lower),
+        .Carry(carry_lower)
     );
-        wire [15:0] cin;
-        wire [15:0] add1_sum, add2_sum, add3_sum, add2_cout, add3_cout, out;
 
-        // declare adder instances
-        my_16bit_adder adder1 (.A(A[15:0]), .B(B[15:0]), .sum(add1_sum), .cout(cin));
-        my_16bit_adder adder2 (.A(A[31:16]), .B(B[31:16]), .sum(add2_sum), .cout(add2_cout));
-        my_16bit_adder adder3 (.A(A[31:16] + 16'b0000000000000001), .B(B[31:16]), .sum(add3_sum), .cout(add3_cout));
+    // Instantiate 16-bit adder for upper 16 bits without carry
+    adder_16bit adder2 (
+        .A(a[31:16]),
+        .B(b[31:16]),
+        .Sum(sum_upper_1),
+        .Carry(carry_upper_1)
+    );
 
-        // declare mux instance
-        mux mux1 (.A(add2_sum), .B(add3_sum), .sel(cin), .out(out));
+    // Instantiate 16-bit adder for upper 16 bits with carry
+    adder_16bit adder3 (
+        .A(a[31:16]),
+        .B(b[31:16]),
+        .Sum(sum_upper_2),
+        .Carry(carry_upper_2)
+    );
 
-        assign Sum = {out, add1_sum};
-    endmodule
+    // Instantiate 16-bit 2-to-1 multiplexer
+    mux_2to1_16bit mux (
+        .A({carry_upper_1, sum_upper_1[15:1]}), // Adjusted to handle carry propagation
+        .B(sum_upper_2),
+        .sel(carry_lower),
+        .Y(sum_upper)
+    );
+
+    // Combine lower and upper sums to form a 32-bit sum output
+    assign sum = {sum_upper, sum_lower};
+
+endmodule

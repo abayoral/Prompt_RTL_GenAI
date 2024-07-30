@@ -1,0 +1,49 @@
+Let's translate the proposed solution into a Verilog module. This module will monitor a 32-bit input vector (`in`) for each bit changing from 1 to 0 from one clock cycle to the next and capture this event by setting the corresponding bit in a 32-bit output register (`out`). The output bit will stay set until a synchronous reset occurs.
+
+### Verilog Module:
+
+```verilog
+module top_module (
+    input wire clk,
+    input wire reset,
+    input wire [31:0] in,
+    output reg [31:0] out
+);
+
+    reg [31:0] previous_state;
+
+    always @(posedge clk) begin
+        if (reset) begin
+            out <= 32'b0; // Reset all bits in the output register to 0
+        end else begin
+            for (integer i = 0; i < 32; i = i + 1) begin
+                if (previous_state[i] == 1'b1 && in[i] == 1'b0) begin
+                    out[i] <= 1'b1; // Set the corresponding output bit if a 1 to 0 transition is detected
+                end
+            end
+            previous_state <= in; // Update previous_state with the current input vector
+        end
+    end
+
+endmodule
+```
+
+### Explanation:
+
+1. **Module Declaration**:
+    - The module `top_module` is defined with inputs `clk`, `reset`, `in`, and output `out`.
+
+2. **Register Declaration**:
+    - `previous_state`: A 32-bit register to hold the state of the input vector from the previous clock cycle.
+    - `out`: A 32-bit output register that captures transitions from 1 to 0 on the input vector and retains its value until reset.
+
+3. **Always Block**:
+    - **Sensitivity list**: Triggered on the rising edge of the `clk`.
+    - **Reset Logic**: 
+      - If the `reset` signal is high, set all bits of the `out` register to 0.
+    - **Set Logic**:
+      - Iterate over each bit (from 0 to 31) of the input vector `in`.
+      - If a bit in `previous_state` is 1 and the corresponding bit in `in` becomes 0, set the corresponding bit in `out`.
+      - At the end of the block, update `previous_state` to store the current `in` value for use in the next clock cycle.
+
+This design ensures that each output bit behaves like an SR flip-flop, setting on detecting a 1 to 0 transition and resetting synchronously with the global reset signal.

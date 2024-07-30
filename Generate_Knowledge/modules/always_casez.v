@@ -3,19 +3,18 @@ module top_module (
     output reg [2:0] pos
 );
 
-    // Define combinational logic using "always @*"
-    always @* begin
-        // Default value (in case no high bit is found)
-        pos = 3'd0;
+always @(*) begin
+    casez (in)
+        8'b00000001: pos = 3'd0;
+        8'b0000001?: pos = 3'd1;
+        8'b000001??: pos = 3'd2;
+        8'b00001???: pos = 3'd3;
+        8'b0001????: pos = 3'd4;
+        8'b001?????: pos = 3'd5;
+        8'b01??????: pos = 3'd6;
+        8'b1???????: pos = 3'd7;
+        default: pos = 3'd0;
+    endcase
+end
 
-        // Check each bit in the vector
-        if      (in[0]) pos = 3'd0;
-        else if (in[1]) pos = 3'd1;
-        else if (in[2]) pos = 3'd2;
-        else if (in[3]) pos = 3'd3;
-        else if (in[4]) pos = 3'd4;
-        else if (in[5]) pos = 3'd5;
-        else if (in[6]) pos = 3'd6;
-        else if (in[7]) pos = 3'd7;
-    end 
 endmodule

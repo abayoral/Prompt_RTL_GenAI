@@ -1,0 +1,17 @@
+```verilog
+module top_module (
+    input wire [7:0] in,
+    output wire parity
+);
+    // Parity computation logic: Calculate even parity bit using reduction XOR
+    assign parity = ^in;
+endmodule
+```
+
+By following the chain of thought:
+1. We understood that the task is to create an even parity bit generator for an 8-bit data input.
+2. We identified the inputs (`in[7:0]`) and output (`parity`).
+3. We determined that no intermediate signals are needed.
+4. In structuring the module, we used the reduction XOR operator to compute the parity bit in a single assign statement. 
+
+The code above directly follows this logical process to achieve the required even parity computation.

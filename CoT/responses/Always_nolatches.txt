@@ -1,0 +1,58 @@
+## Chain of Thought
+
+1. **Understand the Requirements:**
+    - The circuit needs to decode a 16-bit scancode to determine if one of the four arrow keys on a keyboard has been pressed.
+    - Four specific scancodes map to the four arrow keys:
+        - `16'hE06B` → left arrow.
+        - `16'hE072` → down arrow.
+        - `16'hE074` → right arrow.
+        - `16'hE075` → up arrow.
+    - If none of these scancodes are detected, no arrow key is pressed.
+    - The module has one 16-bit input (`scancode`) and four 1-bit outputs (`left`, `down`, `right`, `up`).
+
+2. **Determine the Inputs and Outputs:**
+    - Input: `scancode` [15:0]
+    - Outputs: `left`, `down`, `right`, `up`
+
+3. **Intermediate Signals:**
+    - No intermediate signals are needed because the logic is straightforward; it can be implemented directly in a combinational always block.
+
+4. **Structuring the Module:**
+    - Start with the module declaration specifying the inputs and outputs.
+    - Use a combinational always block to evaluate the `scancode` and set the outputs accordingly.
+    - Before the case statement, initialize all outputs to zero to avoid creating latches.
+    - Use a case statement to decode the `scancode` and set the appropriate output to 1 based on the scancode value.
+
+5. **Writing the Verilog Code:**
+
+```verilog
+module top_module (
+    input [15:0] scancode,
+    output reg left,
+    output reg down,
+    output reg right,
+    output reg up
+);
+
+    // Combinational logic to decode the scancode and determine which arrow key is pressed
+    always @(*) begin
+        // Initialize all outputs to zero
+        left = 1'b0;
+        down = 1'b0;
+        right = 1'b0;
+        up = 1'b0;
+        
+        // Decode the scancode and assert the corresponding output
+        case (scancode)
+            16'hE06B: left = 1'b1;    // Left arrow
+            16'hE072: down = 1'b1;    // Down arrow
+            16'hE074: right = 1'b1;   // Right arrow
+            16'hE075: up = 1'b1;      // Up arrow
+            default: ; // Keep all output signals low
+        endcase
+    end
+
+endmodule
+```
+
+In this code, all four output signals are initialized to zero at the start of the always block. The case statement then checks the value of `scancode` and sets the appropriate one of the four outputs to 1 if the scancode matches any of the predefined values for the arrow keys. The default case is implicitly handled by the initial assignment to zero, ensuring no latches are created.

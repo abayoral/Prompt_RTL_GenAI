@@ -1,0 +1,29 @@
+Here's how you can implement the bit-reversal operation for a 100-bit vector in Verilog, following the specified steps:
+
+```verilog
+module top_module (
+    input wire [99:0] in,
+    output reg [99:0] out
+);
+    integer i;
+
+    // Combinational logic to reverse the bits of the input vector
+    always @* begin
+        for (i = 0; i < 100; i = i + 1) begin
+            out[i] = in[99 - i];
+        end
+    end
+endmodule
+```
+
+### Explanation:
+1. **Module Declaration:**
+   - The module is named `top_module` and has one 100-bit input `in` and one 100-bit output `out`.
+
+2. **Combinational Logic:**
+   - An always block with `@*` sensitivity list ensures combinational logic, meaning the output updates whenever the input changes.
+   - A for loop iterates over all 100 bits, reversing their positions:
+     - **Iteration:** The loop variable `i` runs from 0 to 99.
+     - **Reversal Logic:** The bit at position `i` in `out` is assigned the value of the bit at position `99 - i` in `in`.
+
+This Verilog code meets the requirements of reversing the bit order in a 100-bit vector using combinational logic, and it easily maps each bit from input to output in the reverse order using a straightforward for loop.

@@ -1,0 +1,23 @@
+```verilog
+module top_module (
+    input wire [7:0] a,
+    input wire [7:0] b,
+    input wire sel,
+    output wire [7:0] out
+);
+    // Multiplexer logic: out is b if sel is high, a if sel is low
+    assign out = (sel) ? b : a;
+endmodule
+```
+
+### Explanation:
+1. **Module Declaration**: The module is named `top_module`, with the inputs and outputs specified correctly.
+2. **Inputs**:
+    - `a` and `b` are 8-bit vectors.
+    - `sel` is a single-bit control signal.
+3. **Output**: `out` is an 8-bit vector.
+4. **Logic**:
+    - The `assign` statement sets `out` to `b` if `sel` is high (`1`), otherwise it sets `out` to `a`.
+    - This is achieved using the ternary conditional operator (`? :`).
+
+This implementation ensures that the 2-to-1 multiplexer correctly selects between two 8-bit inputs based on the control signal.

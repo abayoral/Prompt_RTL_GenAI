@@ -1,26 +1,23 @@
 module top_module (
-    input wire p1a,
-    input wire p1b,
-    input wire p1c,
-    input wire p1d,
-    input wire p2a,
-    input wire p2b,
-    input wire p2c,
-    input wire p2d,
-    output wire p1y,
-    output wire p2y
+    input wire p1a, p1b, p1c, p1d, p1e, p1f,
+    input wire p2a, p2b, p2c, p2d,
+    output wire p1y, p2y
 );
-    // Using Intermediate Signals
-    wire p1and1 = p1a & p1b; // First AND gate
-    wire p1and2 = p1c & p1d; // Second AND gate
-    wire p2and1 = p2a & p2b; // Third AND gate
-    wire p2and2 = p2c & p2d; // Fourth AND gate
+    // Define intermediate signals for AND gates
+    wire and1_out, and2_out, and3_out, and4_out;
 
-    // OR gates
-    assign p1y = p1and1 | p1and2;
-    assign p2y = p2and1 | p2and2;
+    // Implement AND gate logic for part 1
+    assign and1_out = p1a & p1b;
+    assign and2_out = p1c & p1d;
+    assign and3_out = p1e & p1f;
 
-    // Alternatively, without Intermediate Signals
-    // assign p1y = (p1a & p1b) | (p1c & p1d);
-    // assign p2y = (p2a & p2b) | (p2c & p2d);
+    // Implement OR gate logic for part 1
+    assign p1y = and1_out | and2_out | and3_out;
+
+    // Implement AND gate logic for part 2
+    assign and4_out = p2a & p2b & p2c & p2d;
+
+    // Implement OR gate logic for part 2 (single AND gate output directly drives p2y)
+    assign p2y = and4_out;
+
 endmodule

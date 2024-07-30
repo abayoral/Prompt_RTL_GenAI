@@ -1,0 +1,48 @@
+### Chain of Thought
+
+1. **Understand the Requirements**:
+    - Create 8 D flip-flops with an active high asynchronous reset and positive edge-triggered clock.
+    - Each flip-flop captures the corresponding bit of the input vector `d` at the positive edge of `clk`.
+    - If `areset` is high, the output `q` should be reset to 0 asynchronously.
+
+2. **Determine the Inputs and Outputs**:
+    - Inputs: `clk`, `areset`, `d[7:0]`
+    - Output: `q[7:0]`
+
+3. **Define Intermediate Signals**:
+    - No intermediate signals are needed since each flip-flop operates independently.
+
+4. **Structuring the Module**:
+    - Start with the module declaration, specifying the inputs and outputs.
+    - Use a behavioral `always` block for each D flip-flop, triggered on the rising edge of `clk` and `areset`.
+    - Inside each `always` block, implement the D flip-flop logic:
+        - If `areset` is high, set the corresponding bit in `q` to 0.
+        - Otherwise, capture the corresponding bit from `d` at each rising edge of `clk`.
+
+5. **Writing the Verilog Code**:
+
+```verilog
+module top_module (
+    input clk,
+    input areset,   // active high asynchronous reset
+    input [7:0] d,
+    output reg [7:0] q
+);
+
+    // 8 D flip-flops with active high asynchronous reset
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            q <= 8'b00000000;
+        else
+            q <= d;
+    end
+
+endmodule
+```
+
+### Explanation:
+- **Module Declaration**: Specifies the module `top_module` with inputs `clk`, `areset`, `d`, and output `q`.
+- **Always Block**: 
+    - Triggered on the rising edge of `clk` or `areset`.
+    - If `areset` is high, all bits in `q` are set to 0, asynchronously resetting the flip-flops.
+    - If `areset` is low, the value of `d` is captured into `q` at each rising edge of `clk`.

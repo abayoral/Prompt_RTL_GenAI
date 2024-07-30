@@ -1,0 +1,30 @@
+Based on the provided requirements and the structured solving process, here's the Verilog code for the module containing 8 D flip-flops with an active high synchronous reset:
+
+```verilog
+module top_module (
+    input wire clk,
+    input wire reset,
+    input wire [7:0] d,
+    output reg [7:0] q
+);
+    // Flip-flop logic with synchronous reset: Capture d at the rising edge of clk, reset to 0 if reset is high
+    always @(posedge clk) begin
+        if (reset)
+            q <= 8'b00000000; // If reset is high, reset q to 0
+        else
+            q <= d; // Otherwise, capture the value of d
+    end
+endmodule
+```
+
+### Explanation:
+1. **Module Declaration**: 
+   - The module is named `top_module`.
+   - Inputs: `clk`, `reset`, and `d[7:0]`.
+   - Outputs: `q[7:0]`.
+
+2. **Always Block**:
+   - Triggered on the rising edge of the clock (`clk`).
+   - Inside the always block, the first condition checks if the `reset` signal is high.
+     - If `reset` is high, all bits of `q` are assigned to 0.
+     - If `reset` is low, the value of `d` is assigned to `q`, capturing the value of `d` on the rising edge of `clk`.

@@ -1,0 +1,48 @@
+Here is the Verilog code for the given instructions fixed as described in the chain of thought:
+
+```verilog
+module top_module (
+    input wire cpu_overheated,
+    input wire arrived,
+    input wire gas_tank_empty,
+    output reg shut_off_computer,
+    output reg keep_driving
+);
+
+    always @* begin
+        // Shut off computer only if CPU is overheated
+        if (cpu_overheated)
+            shut_off_computer = 1;
+        else
+            shut_off_computer = 0;
+
+        // Continue driving if not arrived and gas tank is not empty
+        if (arrived)
+            keep_driving = 0;
+        else if (gas_tank_empty)
+            keep_driving = 0;
+        else
+            keep_driving = 1;
+    end
+    
+endmodule
+```
+
+Here is a step-by-step breakdown:
+
+1. **Inputs and Outputs:**
+    - The inputs are `cpu_overheated`, `arrived`, and `gas_tank_empty`.
+    - The outputs are `shut_off_computer` and `keep_driving`.
+
+2. **shut_off_computer Logic:**
+    - The `always` block evaluates the condition of `cpu_overheated`.
+    - If `cpu_overheated` is true, `shut_off_computer` is set to 1.
+    - If `cpu_overheated` is false, `shut_off_computer` is set to 0.
+  
+3. **keep_driving Logic:**
+    - The `always` block evaluates the conditions of `arrived` and `gas_tank_empty`.
+    - If `arrived` is true, `keep_driving` is set to 0.
+    - If `arrived` is false but `gas_tank_empty` is true, `keep_driving` is set to 0.
+    - If neither `arrived` is true nor `gas_tank_empty` is true, `keep_driving` is set to 1 to continue driving.
+
+By using conditional checks for both `shut_off_computer` and `keep_driving`, we ensure no intermediate undesirable states or latches are created, and the required behavior is correctly implemented.

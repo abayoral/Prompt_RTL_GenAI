@@ -1,0 +1,38 @@
+### Verilog Module for an 8-Bit Array of D Flip-Flops with Asynchronous Reset
+
+Given the detailed understanding of the requirements, inputs, outputs, and structural design, we can now proceed to write the Verilog code for the 8-bit array of D flip-flops. Each flip-flop has an active high asynchronous reset and is triggered by the positive edge of the clock. 
+
+Here's the Verilog code to implement the described functionality:
+
+```verilog
+module top_module (
+    input wire clk,
+    input wire areset,
+    input wire [7:0] d,
+    output reg [7:0] q
+);
+    // Always block sensitive to asynchronous reset and positive edge of the clock
+    always @(posedge clk or posedge areset) begin
+        if (areset) begin
+            q <= 8'b0; // When areset is high, set q to zero
+        end
+        else begin
+            q <= d; // On positive edge of clk, set q to d
+        end
+    end
+endmodule
+```
+
+### Explanation:
+1. **Module Declaration:**
+   - The module is named `top_module`.
+   - Inputs are declared: `clk` (clock signal), `areset` (active high asynchronous reset), and `d` (8-bit data input).
+   - The output is declared: `q` (8-bit data output).
+
+2. **Always Block:**
+   - The always block is triggered by either the rising edge of `clk` or any change in `areset`.
+   - Inside the always block:
+     - If `areset` is high, the output `q` is set to zero (`8'b0`).
+     - Otherwise, on each rising edge of `clk`, the output `q` takes the value of the input `d`.
+
+This code ensures that the array of D flip-flops correctly handles the asynchronous reset, setting the output to zero when the reset is high, and capturing the input data on the rising edge of the clock otherwise.

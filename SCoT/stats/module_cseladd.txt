@@ -1,11 +1,11 @@
-SCoT/modules/module_cseladd.v:10: error: Unknown module type: my_16bit_adder
-SCoT/modules/module_cseladd.v:11: error: Unknown module type: my_16bit_adder
-SCoT/modules/module_cseladd.v:12: error: Unknown module type: my_16bit_adder
-SCoT/modules/module_cseladd.v:15: error: Unknown module type: mux
+SCoT/modules/module_cseladd.v:14: error: Unknown module type: adder_16bit
+SCoT/modules/module_cseladd.v:22: error: Unknown module type: adder_16bit
+SCoT/modules/module_cseladd.v:30: error: Unknown module type: adder_16bit
+SCoT/modules/module_cseladd.v:38: error: Unknown module type: mux_2to1_16bit
 5 error(s) during elaboration.
 *** These modules were missing:
-        mux referenced 1 times.
-        my_16bit_adder referenced 3 times.
+        adder_16bit referenced 3 times.
+        mux_2to1_16bit referenced 1 times.
 ***
 Module file path: SCoT/modules/module_cseladd.v
 Testbench file path: hdlbits_testbenches/Module_cseladd_0_tb.v

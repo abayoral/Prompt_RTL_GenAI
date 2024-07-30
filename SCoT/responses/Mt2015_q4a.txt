@@ -1,0 +1,37 @@
+Given the chain of thought, let's implement the Verilog module following the structured approach.
+
+### Verilog Code:
+
+```verilog
+module top_module (
+    input wire x,
+    input wire y,
+    output wire z
+);
+    // Define intermediate signal
+    wire intermediate;
+
+    // Compute intermediate result: x XOR y
+    assign intermediate = x ^ y;
+
+    // Compute final output: intermediate AND x
+    assign z = intermediate & x;
+endmodule
+```
+
+### Explanation:
+
+1. **Module Declaration:**
+   - The module is named `top_module`.
+   - It has two inputs `x` and `y`, and one output `z`.
+
+2. **Intermediate Signal:**
+   - We define an intermediate signal called `intermediate` to store the result of the XOR operation between `x` and `y`.
+
+3. **Compute Intermediate Result:**
+   - We use an `assign` statement to compute the intermediate result, which is the result of the bitwise XOR operation between `x` and `y`.
+
+4. **Compute Final Output:**
+   - We use another `assign` statement to compute the final output `z` by performing a bitwise AND operation between the intermediate result and `x`.
+
+This implementation follows the given requirements and structured approach, ensuring the correct combinational logic function.

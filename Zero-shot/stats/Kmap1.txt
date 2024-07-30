@@ -1,0 +1,25 @@
+Mismatch at index 0: Inputs = [0, 0, 0], Generated = [1], Reference = [0]
+Mismatch at index 1: Inputs = [0, 0, 0], Generated = [1], Reference = [0]
+Mismatch at index 2: Inputs = [0, 0, 0], Generated = [1], Reference = [0]
+Test 3 passed!
+Test 4 passed!
+Test 5 passed!
+Test 6 passed!
+Test 7 passed!
+Test 8 passed!
+Test 9 passed!
+Test 10 passed!
+Test 11 passed!
+Test 12 passed!
+Test 13 passed!
+Test 14 passed!
+Test 15 passed!
+Test 16 passed!
+Mismatch at index 17: Inputs = [0, 0, 0], Generated = [1], Reference = [0]
+Mismatch at index 18: Inputs = [0, 0, 0], Generated = [1], Reference = [0]
+5 mismatches out of 19 total tests.
+hdlbits_testbenches/Kmap1_0_tb.v:254: $finish called at 38000 (10ps)
+Module file path: Zero-shot/modules/Kmap1.v
+Testbench file path: hdlbits_testbenches/Kmap1_0_tb.v
+Compilation successful. Executable created at Zero-shot/simulations/Kmap1_sim
+Simulation completed successfully.

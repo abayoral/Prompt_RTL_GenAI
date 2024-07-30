@@ -1,0 +1,22 @@
+Based on the provided chain of thought, below is the Verilog code for a 100-bit wide, 2-to-1 multiplexer:
+
+```verilog
+module top_module (
+    input wire [99:0] a,
+    input wire [99:0] b,
+    input wire sel,
+    output wire [99:0] out
+);
+    // Multiplexer logic: out is b if sel is high, a if sel is low
+    assign out = (sel) ? b : a;
+endmodule
+```
+
+Explanation:
+1. **Module Declaration**: The module is named `top_module`. It has three inputs (`a`, `b`, and `sel`) and one output (`out`).
+2. **Inputs and Outputs**:
+    - `a`: 100-bit input vector.
+    - `b`: 100-bit input vector.
+    - `sel`: 1-bit control signal.
+    - `out`: 100-bit output vector.
+3. **Assign Statement**: The `assign` statement uses a ternary operator to set the value of `out` based on the `sel` signal. If `sel` is `1`, `out` is assigned the value of `b`. If `sel` is `0`, `out` is assigned the value of `a`.

@@ -1,0 +1,11 @@
+CoT/modules/Bcdadd4.v:10: error: Unknown module type: bcd_fadd
+CoT/modules/Bcdadd4.v:19: error: Unknown module type: bcd_fadd
+CoT/modules/Bcdadd4.v:28: error: Unknown module type: bcd_fadd
+CoT/modules/Bcdadd4.v:37: error: Unknown module type: bcd_fadd
+5 error(s) during elaboration.
+*** These modules were missing:
+        bcd_fadd referenced 4 times.
+***
+Module file path: CoT/modules/Bcdadd4.v
+Testbench file path: hdlbits_testbenches/Bcdadd4_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/Bcdadd4_sim', 'CoT/modules/Bcdadd4.v', 'hdlbits_testbenches/Bcdadd4_0_tb.v']' returned non-zero exit status 5.

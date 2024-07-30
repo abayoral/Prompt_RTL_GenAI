@@ -1,0 +1,115 @@
+module top_module (
+    input wire clk,
+    input wire in,
+    input wire areset,
+    output reg out
+);
+```
+
+#### 2. **State Declaration:**
+
+In Verilog, we can use parameters to define the states.
+
+```verilog
+    // Define states using parameters
+    parameter A = 2'b00;
+    parameter B = 2'b01;
+    parameter C = 2'b10;
+    parameter D = 2'b11;
+```
+
+#### 3. **State Register with Asynchronous Reset:**
+
+We will use a `reg` to store the current state, and we will handle the asynchronous reset in this part.
+
+```verilog
+    reg [1:0] state, next_state;
+
+    // State register with asynchronous reset
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            state <= A;  // reset to state A
+        else
+            state <= next_state;
+    end
+```
+
+#### 4. **Next State Logic:**
+
+We will use a `case` statement to determine the next state based on the current state and the input `in`.
+
+```verilog
+    // Next state logic
+    always @(*) begin
+        case (state)
+            A: next_state = in ? B : A;
+            B: next_state = in ? B : C;
+            C: next_state = in ? D : A;
+            D: next_state = in ? B : C;
+            default: next_state = A; // default case to handle unexpected situations
+        endcase
+    end
+```
+
+#### 5. **Output Logic:**
+
+Output in a Moore machine depends only on the current state.
+
+```verilog
+    // Output logic
+    always @(*) begin
+        case (state)
+            A: out = 1'b0;
+            B: out = 1'b1;
+            C: out = 1'b0;
+            D: out = 1'b1;
+            default: out = 1'b0; // default case to handle unexpected situations
+        endcase
+    end
+endmodule
+
+module top_module (
+    input wire clk,
+    input wire in,
+    input wire areset,
+    output reg out
+);
+
+    // Define states using parameters
+    parameter A = 2'b00;
+    parameter B = 2'b01;
+    parameter C = 2'b10;
+    parameter D = 2'b11;
+
+    reg [1:0] state, next_state;
+
+    // State register with asynchronous reset
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            state <= A;  // reset to state A
+        else
+            state <= next_state;
+    end
+
+    // Next state logic
+    always @(*) begin
+        case (state)
+            A: next_state = in ? B : A;
+            B: next_state = in ? B : C;
+            C: next_state = in ? D : A;
+            D: next_state = in ? B : C;
+            default: next_state = A; // default case to handle unexpected situations
+        endcase
+    end
+
+    // Output logic
+    always @(*) begin
+        case (state)
+            A: out = 1'b0;
+            B: out = 1'b1;
+            C: out = 1'b0;
+            D: out = 1'b1;
+            default: out = 1'b0; // default case to handle unexpected situations
+        endcase
+    end
+endmodule

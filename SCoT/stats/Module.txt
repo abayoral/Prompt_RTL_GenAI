@@ -1,0 +1,8 @@
+SCoT/modules/Module.v:7: error: Unknown module type: mod_a
+2 error(s) during elaboration.
+*** These modules were missing:
+        mod_a referenced 1 times.
+***
+Module file path: SCoT/modules/Module.v
+Testbench file path: hdlbits_testbenches/Module_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/Module_sim', 'SCoT/modules/Module.v', 'hdlbits_testbenches/Module_0_tb.v']' returned non-zero exit status 2.

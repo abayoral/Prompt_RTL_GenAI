@@ -1,0 +1,46 @@
+Let's translate the structured thought process into a Verilog implementation for an 8-bit adder-subtractor module. The module will utilize basic combinational logic to perform either addition or subtraction depending on the control signal `do_sub`, and it will correctly handle the zero flag `result_is_zero`.
+
+Here’s the Verilog code based on the pseudocode steps provided:
+
+```verilog
+module top_module (
+    input wire do_sub,           // Control signal to determine operation
+    input wire [7:0] a,          // 8-bit input operand a
+    input wire [7:0] b,          // 8-bit input operand b
+    output reg [7:0] out,        // 8-bit result of the operation
+    output reg result_is_zero    // Flag indicating if the result is zero
+);
+
+    always @(*) begin
+        // Perform the addition or subtraction based on do_sub
+        if (do_sub)
+            out = a - b;
+        else
+            out = a + b;
+
+        // Set the result_is_zero flag
+        if (out == 8'b00000000)
+            result_is_zero = 1'b1;
+        else
+            result_is_zero = 1'b0;
+    end
+endmodule
+```
+
+### Explanation:
+1. **Module Declaration**: 
+   - Inputs: `do_sub`, `a`, `b`
+   - Outputs: `out`, `result_is_zero`
+
+2. **Always Block**:
+   - The `always @(*)` block ensures the logic within it is evaluated whenever there's a change in any of the inputs (`do_sub`, `a`, or `b`).
+   - Inside the always block, depending on the value of `do_sub`:
+     - If `do_sub` is `1`, it performs subtraction (`out = a - b`).
+     - If `do_sub` is `0`, it performs addition (`out = a + b`).
+
+3. **Zero Flag Handling**:
+   - After computing the value of `out`, it checks whether `out` is zero.
+   - If `out` is zero, `result_is_zero` is set to `1`.
+   - Otherwise, `result_is_zero` is set to `0`.
+
+This implementation ensures that both addition and subtraction operations are correctly executed based on the control signal, and the zero flag is accurately determined based on the result.

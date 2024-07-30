@@ -1,0 +1,35 @@
+Chain of Thought:
+
+- Understand the Requirements:
+    - We need to compute an even parity bit for an 8-bit byte.
+    - In even parity, the parity bit ensures that the total number of 1s in the 9-bit output (including the parity bit) is even.
+    - This means the parity bit should be the XOR of all 8 data bits.
+
+- Determine the Inputs and Outputs:
+    - Input: An 8-bit binary number (in)
+    - Output: The parity bit (parity)
+
+- Define Intermediate Signals:
+    - No intermediate signals are needed. We can directly assign the XOR of all 8 bits to the parity output.
+
+- Structuring the Module:
+    - Start with the module declaration, specifying the inputs and outputs.
+    - Use an assign statement to calculate the parity bit.
+    - Apply the reduction XOR operator to all bits of the input to get the parity bit.
+
+- Writing the Verilog Code:
+
+```verilog
+module top_module (
+    input [7:0] in,
+    output parity
+); 
+    // Parity logic: Calculate even parity bit using reduction XOR
+    assign parity = ^in;
+endmodule
+```
+
+Explanation:
+- The `assign` statement uses the reduction XOR operator (`^`) on the input `in` to compute the parity bit.
+- The reduction XOR operator computes the XOR of all bits of the input vector. For even parity, the result of this operation is used as the parity bit.
+- This ensures that the total number of 1s in the 9-bit output (8-bit data + 1 parity bit) is even.

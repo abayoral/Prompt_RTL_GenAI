@@ -1,0 +1,8 @@
+Zero-shot/modules/Module_name.v:11: error: Unknown module type: mod_a
+2 error(s) during elaboration.
+*** These modules were missing:
+        mod_a referenced 1 times.
+***
+Module file path: Zero-shot/modules/Module_name.v
+Testbench file path: hdlbits_testbenches/Module_name_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/Module_name_sim', 'Zero-shot/modules/Module_name.v', 'hdlbits_testbenches/Module_name_0_tb.v']' returned non-zero exit status 2.

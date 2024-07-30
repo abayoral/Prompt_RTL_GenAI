@@ -1,0 +1,98 @@
+Let's break down the requirements and implement the solution step-by-step:
+
+### Chain of Thought:
+
+1. **Understand the Requirements:**
+   - We need to create a 32-bit adder using two 16-bit adders.
+   - The `add16` module performs a 16-bit addition.
+   - We need to connect two `add16` modules such that one handles the lower 16 bits and the other handles the upper 16 bits of the 32-bit addition.
+   - Carry input to be `0` and carry-out to be ignored.
+
+2. **Determine the Inputs and Outputs:**
+   - Inputs for `top_module`: Two 32-bit input vectors (`a`, `b`), both of 32 bits.
+   - Output for `top_module`: One 32-bit output vector (`sum`).
+
+3. **Instantiating the `add16` Modules:**
+   - Instantiate one `add16` to handle the lower 16 bits addition.
+   - Instantiate another `add16` to handle the upper 16 bits addition, considering the carry-out from the lower 16 bits as the carry-in for the upper 16 bits.
+
+4. **Implementing the `add1` Module:**
+   - A simple 1-bit full adder computes the sum and carry-out of `a`, `b`, and `cin`.
+
+5. **Connecting Modules Together:**
+   - Connect the lower 16 bits of the inputs to the first `add16`.
+   - Connect the upper 16 bits of the inputs and the carry-out of the first `add16` to the second `add16`.
+
+### Verilog Implementation:
+
+1. **Full Adder (`add1`) Module:**
+
+```verilog
+module add1 (
+    input a,
+    input b,
+    input cin,
+    output sum,
+    output cout
+);
+    assign {cout, sum} = a + b + cin;
+endmodule
+```
+
+2. **16-bit Adder (`add16`) Module:**
+
+```verilog
+module add16 (
+    input [15:0] a,
+    input [15:0] b,
+    input cin,
+    output [15:0] sum,
+    output cout
+);
+    wire [15:0] carry;
+
+    // Instantiate 16 add1 modules
+    generate 
+        genvar i;
+        for (i = 0; i < 16; i = i + 1) begin: generate_add1
+            if (i == 0) 
+                add1 FA (.a(a[i]), .b(b[i]), .cin(cin), .sum(sum[i]), .cout(carry[i]));
+            else 
+                add1 FA (.a(a[i]), .b(b[i]), .cin(carry[i-1]), .sum(sum[i]), .cout(carry[i]));
+        end
+    endgenerate
+
+    assign cout = carry[15];
+endmodule
+```
+
+3. **Top Level 32-bit Adder Module (`top_module`):**
+
+```verilog
+module top_module (
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+    wire carry16;
+
+    // Instantiate two 16-bit adders
+    add16 lower_adder (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum[15:0]),
+        .cout(carry16)
+    );
+
+    add16 upper_adder (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(carry16),
+        .sum(sum[31:16]),
+        .cout() // Ignore carry-out
+    );
+endmodule
+```
+
+This structure ensures that the 32-bit addition is correctly partitioned into two 16-bit additions, with the carry out of the lower 16 bits correctly propagated to the carry in of the upper 16 bits.

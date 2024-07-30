@@ -1,0 +1,44 @@
+```verilog
+module mux2_1 (
+    input wire [7:0] a,
+    input wire [7:0] b,
+    input wire sel,
+    output wire [7:0] y
+);
+    assign y = sel ? b : a;
+endmodule
+
+module top_module (
+    input wire [1:0] sel,
+    input wire [7:0] a,
+    input wire [7:0] b,
+    input wire [7:0] c,
+    input wire [7:0] d,
+    output wire [7:0] out
+);
+    wire [7:0] mux0, mux1;
+
+    // 2-to-1 multiplexers
+    mux2_1 mux0_inst (
+        .a(a),
+        .b(b),
+        .sel(sel[0]),
+        .y(mux0)
+    );
+    
+    mux2_1 mux1_inst (
+        .a(c),
+        .b(d),
+        .sel(sel[0]),
+        .y(mux1)
+    );
+
+    // Final 2-to-1 multiplexer
+    mux2_1 mux2_inst (
+        .a(mux0),
+        .b(mux1),
+        .sel(sel[1]),
+        .y(out)
+    );
+endmodule
+```

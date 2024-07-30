@@ -1,0 +1,86 @@
+To create an adder-subtractor module using the 16-bit adder module provided (`add16`), we will instantiate this adder twice. The idea is to handle the 32-bit addition and subtraction by dividing it into two 16-bit operations. The `sub` input will control the inversion of the `b` input and also act as the initial carry-in for two cascaded 16-bit adders.
+
+Let's break down the task step by step:
+
+### Step-by-Step Chain of Thought:
+1. **Understand the Requirements**:
+    - We have a 16-bit adder module `add16` that we'll use to build a 32-bit adder-subtractor.
+    - The `sub` input is used to decide between addition and subtraction.
+    - We need to invert the `b` input for subtraction using an XOR operation.
+    - The `sub` input is connected to the carry-in of the first adder to handle 2's complement subtraction.
+
+2. **Determine the Inputs and Outputs**:
+    - Inputs: `a` and `b` (32-bit each), `sub` (1-bit)
+    - Output: `sum` (32-bit)
+
+3. **Define Intermediate Signals**:
+    - Intermediate inverted `b` signals for the adder.
+    - Carry-out signals between two cascaded adders.
+
+4. **Structuring the Module**:
+    - Instantiate two 16-bit adders.
+    - Use the `sub` signal to XOR with `b` to form the `b_inverted` input for the adder.
+    - Connect the carry output of the first adder to the carry input of the second adder.
+    - Combine both 16-bit results to form a 32-bit result.
+
+5. **Writing the Verilog Code**:
+    - Properly wire the XOR gates to conditionally invert `b`.
+    - Instantiate and connect the two 16-bit adders.
+    - Combine the outputs from the two 16-bit adders to form the final output.
+
+Here is the Verilog code implementing the above logic:
+
+```verilog
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    input sub,
+    output [31:0] sum
+);
+
+    // Intermediate 16-bit signals
+    wire [15:0] sum_lower, sum_upper;
+    wire cout_lower, cout_upper;
+    wire [15:0] b_lower, b_upper;
+
+    // XOR b with sub (1=add, 0=subtract) for inversion
+    assign b_lower = b[15:0] ^ {16{sub}};
+    assign b_upper = b[31:16] ^ {16{sub}};
+
+    // Instantiate two 16-bit adders
+    add16 adder_lower (
+        .a(a[15:0]),
+        .b(b_lower),
+        .cin(sub),
+        .sum(sum_lower),
+        .cout(cout_lower)
+    );
+
+    add16 adder_upper (
+        .a(a[31:16]),
+        .b(b_upper),
+        .cin(cout_lower),
+        .sum(sum_upper),
+        .cout(cout_upper)
+    );
+
+    // Combine the 16-bit sums into the 32-bit sum output
+    assign sum = {sum_upper, sum_lower};
+
+endmodule
+```
+
+### Explanation:
+- **XOR Operation**:
+  - Using `assign b_lower = b[15:0] ^ {16{sub}}` and `assign b_upper = b[31:16] ^ {16{sub}}`, we invert the bits of `b` based on the `sub` signal. If `sub` is 1, `b` is inverted (for subtraction); otherwise, it remains the same (for addition).
+
+- **16-bit Adder Instantiation**:
+  - Two 16-bit adders are instantiated. The first adder (`adder_lower`) processes the lower 16 bits and the second adder (`adder_upper`) processes the upper 16 bits.
+
+- **Carry Handling**:
+  - The carry-out from the lower 16-bit adder (`cout_lower`) is fed as the carry-in to the upper 16-bit adder (`adder_upper`).
+
+- **Combining Outputs**:
+  - The final 32-bit `sum` is formed by concatenating the 16-bit outputs from both adders.
+
+This Verilog module meets the specified requirements and correctly performs both addition and subtraction based on the `sub` signal.

@@ -1,52 +1,98 @@
-Here is how you would implement a 4-digit BCD counter in Verilog:
-
 ```verilog
 module top_module (
-    input wire clk,
-    input wire reset,   // Synchronous active-high reset
-    output wire [3:1] ena,
-    output wire [15:0] q);
+    input clk,
+    input reset,   // Synchronous active-high reset
+    output [3:1] ena,
+    output [15:0] q);
 
-    // Decade Counter for each digit
-    wire [3:0] ones, tens, hundreds, thousands;
+    reg [3:0] ones, tens, hundreds, thousands;
+    reg [3:1] enable;
 
-    // Instantiate 4-digit decades counters
-    decade_counter d0 (.clk(clk), .reset(reset), .q(ones), .en(ena[1]));
-    decade_counter d1 (.clk(clk), .reset(reset), .q(tens), .en(ena[2]));
-    decade_counter d2 (.clk(clk), .reset(reset), .q(hundreds), .en(ena[3]));
-    decade_counter d3 (.clk(clk), .reset(reset), .q(thousands), .en(1'b0));
-
-    // Gather all values
     assign q = {thousands, hundreds, tens, ones};
+    assign ena = enable;
 
-endmodule
-
-// Decade Counter to count from 0 to 9 
-module decade_counter (
-    input wire clk,
-    input wire reset,  
-    output wire [3:0] q,
-    output wire en
-);
-
-    reg [3:0] count;
-    always @(posedge clk or posedge reset)
-    begin
-        if (reset)
-            count <= 4'b0;
-        else if (count == 4'b1001)
-        begin
-            count <= 4'b0;
-            en <= 1'b1;   // Enable the next counter   
-        end
-        else
-        begin
-            count <= count + 1;
-            en <= 1'b0;
+    // Ones digit
+    always @(posedge clk) begin
+        if (reset) begin
+            ones <= 4'b0000;
+        end else if (ones == 4'd9) begin
+            ones <= 4'b0000;
+        end else begin
+            ones <= ones + 1'b1;
         end
     end
-    assign q = count;
+
+    // Debugging tens digit enable signal
+    always @(posedge clk) begin
+        if (reset) begin
+            enable[1] <= 1'b0;
+        end else if (ones == 4'd9) begin
+            enable[1] <= 1'b1;
+        end else begin
+            enable[1] <= 1'b0;
+        end
+    end
+
+    // Tens digit
+    always @(posedge clk) begin
+        if (reset) begin
+            tens <= 4'b0000;
+        end else if (enable[1] & ones == 4'd9) begin
+            if (tens == 4'd9) begin
+                tens <= 4'b0000;
+            end else begin
+                tens <= tens + 1'b1;
+            end
+        end
+    end
+
+    // Debugging hundreds digit enable signal
+    always @(posedge clk) begin
+        if (reset) begin
+            enable[2] <= 1'b0;
+        end else if (tens == 4'd9 & ones == 4'd9) begin
+            enable[2] <= 1'b1;
+        end else begin
+            enable[2] <= 1'b0;
+        end
+    end
+
+    // Hundreds digit
+    always @(posedge clk) begin
+        if (reset) begin
+            hundreds <= 4'b0000;
+        end else if (enable[2] & tens == 4'd9 & ones == 4'd9) begin
+            if (hundreds == 4'd9) begin
+                hundreds <= 4'b0000;
+            end else begin
+                hundreds <= hundreds + 1'b1;
+            end
+        end
+    end
+
+    // Debugging thousands digit enable signal
+    always @(posedge clk) begin
+        if (reset) begin
+            enable[3] <= 1'b0;
+        end else if (hundreds == 4'd9 & tens == 4'd9 & ones == 4'd9) begin
+            enable[3] <= 1'b1;
+        end else begin
+            enable[3] <= 1'b0;
+        end
+    end
+
+    // Thousands digit
+    always @(posedge clk) begin
+        if (reset) begin
+            thousands <= 4'b0000;
+        end else if (enable[3] & hundreds == 4'd9 & tens == 4'd9 & ones == 4'd9) begin
+            if (thousands == 4'd9) begin
+                thousands <= 4'b0000;
+            end else begin
+                thousands <= thousands + 1'b1;
+            end
+        end
+    end
 
 endmodule
 ```
-This Verilog code describes a 4-digit BCD counter composed of four one-decade counters (based on Chisel implementation of a counter). Each counter counts from 0 to 9, and once it reaches 9, it resets back to 0, and enables the next counter to increment. It is synchronous with the clock and can be reset using a high reset signal. The counter is composed of an "always" block that describes the behavior of the counter. In general, the chosen counter pattern in this task is a synchronous counter because every flip-flop is clocked at the same time.

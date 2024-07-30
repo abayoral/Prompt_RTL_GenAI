@@ -1,0 +1,70 @@
+To design the FSM for the PS/2 mouse protocol byte stream, we need to create an FSM with four states. The states will manage the process of identifying and signaling the reception of a complete 3-byte message. The states are:
+
+1. **IDLE**: The initial state that looks for the first byte of a message, which is indicated by `in[3] = 1`.
+2. **BYTE1**: Indicates that the first byte has been received.
+3. **BYTE2**: Indicates that the second byte has been received.
+4. **DONE**: Indicates that three bytes have been received and asserts the `done` signal.
+
+The key points to address are:
+- The FSM starts in the `IDLE` state.
+- Transition to the `BYTE1` state occurs when `in[3] = 1`.
+- Subsequent states (`BYTE2` and `DONE`) follow in order after receiving each byte.
+- The `DONE` state asserts the `done` signal and then transitions back to `IDLE` to look for the start of the next message.
+
+Here’s the Verilog implementation:
+
+```verilog
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output done
+);
+
+    // State definitions
+    typedef enum logic [1:0] {
+        IDLE = 2'b00,
+        BYTE1 = 2'b01,
+        BYTE2 = 2'b10,
+        DONE = 2'b11
+    } state_t;
+
+    state_t state, next_state;
+
+    // State transition logic (combinational)
+    always_comb begin
+        case (state)
+            IDLE: if (in[3] == 1'b1) next_state = BYTE1;
+                  else next_state = IDLE;
+            BYTE1: next_state = BYTE2;
+            BYTE2: next_state = DONE;
+            DONE: next_state = IDLE;
+            default: next_state = IDLE;
+        endcase
+    end
+
+    // State flip-flops (sequential)
+    always_ff @(posedge clk) begin
+        if (reset)
+            state <= IDLE;
+        else
+            state <= next_state;
+    end
+
+    // Output logic
+    assign done = (state == DONE);
+
+endmodule
+```
+
+### Explanation:
+1. **State Definitions**: We define the states using `typedef enum logic`.
+2. **State Transition Logic**: 
+   - From `IDLE`, we move to `BYTE1` if `in[3]` is `1`.
+   - From `BYTE1`, we move to `BYTE2`.
+   - From `BYTE2`, we move to `DONE`.
+   - From `DONE`, we move back to `IDLE`.
+3. **State Flip-Flops**: Sequential logic updates the current state based on the next state. If the reset signal is asserted, the state is reset to `IDLE`.
+4. **Output Logic**: The `done` signal is asserted when the FSM is in the `DONE` state. 
+
+This FSM handles the PS/2 mouse byte stream by identifying message boundaries and signaling the completion of message reception.

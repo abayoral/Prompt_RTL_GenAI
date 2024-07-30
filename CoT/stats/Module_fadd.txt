@@ -1,0 +1,9 @@
+CoT/modules/Module_fadd.v:9: error: Unknown module type: add16
+CoT/modules/Module_fadd.v:17: error: Unknown module type: add16
+3 error(s) during elaboration.
+*** These modules were missing:
+        add16 referenced 2 times.
+***
+Module file path: CoT/modules/Module_fadd.v
+Testbench file path: hdlbits_testbenches/Module_fadd_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/Module_fadd_sim', 'CoT/modules/Module_fadd.v', 'hdlbits_testbenches/Module_fadd_0_tb.v']' returned non-zero exit status 3.

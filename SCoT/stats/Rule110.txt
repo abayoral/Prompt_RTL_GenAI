@@ -1,0 +1,10 @@
+SCoT/modules/Rule110.v:1: error: Variable declaration in unnamed block requires SystemVerilog.
+SCoT/modules/Rule110.v:17: syntax error
+SCoT/modules/Rule110.v:17: Syntax in assignment statement l-value.
+SCoT/modules/Rule110.v:18: syntax error
+SCoT/modules/Rule110.v:18: Syntax in assignment statement l-value.
+SCoT/modules/Rule110.v:19: syntax error
+SCoT/modules/Rule110.v:19: Syntax in assignment statement l-value.
+Module file path: SCoT/modules/Rule110.v
+Testbench file path: hdlbits_testbenches/Rule110_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/Rule110_sim', 'SCoT/modules/Rule110.v', 'hdlbits_testbenches/Rule110_0_tb.v']' returned non-zero exit status 7.

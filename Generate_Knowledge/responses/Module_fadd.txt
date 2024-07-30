@@ -1,0 +1,72 @@
+```verilog
+module add1 (
+    input a,
+    input b,
+    input cin,
+    output sum,
+    output cout
+);
+    assign {cout, sum} = a + b + cin;
+endmodule
+
+module add16 (
+    input [15:0] a,
+    input [15:0] b,
+    input cin,
+    output [15:0] sum,
+    output cout
+);
+    wire [15:0] c;
+    wire [15:0] s;
+   
+    // Instantiate 16 add1 modules
+    add1 fa0  (a[0],  b[0],  cin,       s[0],  c[0]);
+    add1 fa1  (a[1],  b[1],  c[0],      s[1],  c[1]);
+    add1 fa2  (a[2],  b[2],  c[1],      s[2],  c[2]);
+    add1 fa3  (a[3],  b[3],  c[2],      s[3],  c[3]);
+    add1 fa4  (a[4],  b[4],  c[3],      s[4],  c[4]);
+    add1 fa5  (a[5],  b[5],  c[4],      s[5],  c[5]);
+    add1 fa6  (a[6],  b[6],  c[5],      s[6],  c[6]);
+    add1 fa7  (a[7],  b[7],  c[6],      s[7],  c[7]);
+    add1 fa8  (a[8],  b[8],  c[7],      s[8],  c[8]);
+    add1 fa9  (a[9],  b[9],  c[8],      s[9],  c[9]);
+    add1 fa10 (a[10], b[10], c[9],      s[10], c[10]);
+    add1 fa11 (a[11], b[11], c[10],     s[11], c[11]);
+    add1 fa12 (a[12], b[12], c[11],     s[12], c[12]);
+    add1 fa13 (a[13], b[13], c[12],     s[13], c[13]);
+    add1 fa14 (a[14], b[14], c[13],     s[14], c[14]);
+    add1 fa15 (a[15], b[15], c[14],     s[15], cout);
+
+    assign sum = s;
+endmodule
+
+module top_module (
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+    wire [15:0] lower_sum, upper_sum;
+    wire carry_out_lower;
+
+    // Instantiate the lower 16-bit adder
+    add16 lower_adder(
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(lower_sum),
+        .cout(carry_out_lower)
+    );
+
+    // Instantiate the upper 16-bit adder
+    add16 upper_adder(
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(carry_out_lower),
+        .sum(upper_sum),
+        .cout()
+    );
+
+    // Combine the results to form the 32-bit sum
+    assign sum = {upper_sum, lower_sum};
+endmodule
+```

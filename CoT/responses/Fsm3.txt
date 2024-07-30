@@ -1,0 +1,73 @@
+To implement the provided Moore state machine with an asynchronous reset, we need to follow these steps:
+
+1. **Understand the Requirements:**
+    - We have four states: A, B, C, and D.
+    - There is one input `in` and one output `out`.
+    - There is an asynchronous reset `areset` that resets the FSM to state A.
+    - The output is determined solely by the current state.
+2. **Define the States:**
+    - We can use a state encoding with three bits since we have four states.
+    - A = 2'b00
+    - B = 2'b01
+    - C = 2'b10
+    - D = 2'b11
+3. **Determine State Transition Logic:**
+    - Use a case statement to define transitions based on the input `in`.
+    - Use an always block triggered on clock edge for state transitions.
+4. **Use Asynchronous Reset:**
+    - If `areset` is high, set the state to A.
+    - Otherwise, update the state based on the current state and input `in`.
+5. **Define Output Logic:**
+    - Use an assign statement to set the output based on the current state.
+
+Following these steps, we can structure the Verilog module as follows:
+
+```verilog
+module top_module(
+    input wire clk,
+    input wire in,
+    input wire areset,
+    output reg out
+);
+    // State declaration
+    typedef enum reg [1:0] {
+        A = 2'b00,
+        B = 2'b01,
+        C = 2'b10,
+        D = 2'b11
+    } state_t;
+
+    // State register
+    reg [1:0] current_state, next_state;
+
+    // State transition logic
+    always @(*) begin
+        case (current_state)
+            A: next_state = in ? B : A;
+            B: next_state = in ? B : C;
+            C: next_state = in ? D : A;
+            D: next_state = in ? B : C;
+            default: next_state = A; // Default case for safety
+        endcase
+    end
+
+    // State flip-flops with asynchronous reset
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            current_state <= A;
+        else
+            current_state <= next_state;
+    end
+
+    // Output logic
+    always @(*) begin
+        case (current_state)
+            A, B, C: out = 1'b0;
+            D: out = 1'b1;
+            default: out = 1'b0; // Default case for safety
+        endcase
+    end
+endmodule
+```
+
+This Verilog module adheres to the state transition table provided and includes an asynchronous reset functionality. The state transitions are handled within an always block sensitive to the `clk` and `areset` signals, and the output is determined based on the current state using a combinational logic block.
