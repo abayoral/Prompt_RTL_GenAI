@@ -1,0 +1,10 @@
+SCoT/modules/Module_shift.v:10: error: Unknown module type: my_dff
+SCoT/modules/Module_shift.v:16: error: Unknown module type: my_dff
+SCoT/modules/Module_shift.v:22: error: Unknown module type: my_dff
+4 error(s) during elaboration.
+*** These modules were missing:
+        my_dff referenced 3 times.
+***
+Module file path: SCoT/modules/Module_shift.v
+Testbench file path: hdlbits_testbenches/Module_shift_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/Module_shift_sim', 'SCoT/modules/Module_shift.v', 'hdlbits_testbenches/Module_shift_0_tb.v']' returned non-zero exit status 4.

@@ -1,4 +1,4 @@
-SCoT/modules/module_addsub.v:13: error: Unknown module type: add16
+SCoT/modules/module_addsub.v:16: error: Unknown module type: add16
 SCoT/modules/module_addsub.v:25: error: Unknown module type: add16
 3 error(s) during elaboration.
 *** These modules were missing:

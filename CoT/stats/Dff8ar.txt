@@ -1,0 +1,38 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Mismatch at index 3: Inputs = [1, 00100100, 0], Generated = [00100100], Reference = [00000000]
+Mismatch at index 4: Inputs = [0, 00100100, 0], Generated = [00100100], Reference = [00000000]
+Test 5 passed!
+Test 6 passed!
+Test 7 passed!
+Test 8 passed!
+Test 9 passed!
+Test 10 passed!
+Test 11 passed!
+Test 12 passed!
+Mismatch at index 13: Inputs = [1, 00100100, 0], Generated = [00100100], Reference = [00000000]
+Mismatch at index 14: Inputs = [0, 10000001, 0], Generated = [10000001], Reference = [00000000]
+Test 15 passed!
+Mismatch at index 16: Inputs = [0, 00001001, 0], Generated = [00001001], Reference = [10000001]
+Test 17 passed!
+Mismatch at index 18: Inputs = [0, 01100011, 0], Generated = [01100011], Reference = [00001001]
+Test 19 passed!
+Mismatch at index 20: Inputs = [0, 00001101, 0], Generated = [00001101], Reference = [01100011]
+Test 21 passed!
+Mismatch at index 22: Inputs = [0, 10001101, 0], Generated = [10001101], Reference = [00001101]
+Test 23 passed!
+Mismatch at index 24: Inputs = [0, 01100101, 0], Generated = [01100101], Reference = [10001101]
+Test 25 passed!
+Mismatch at index 26: Inputs = [0, 00010010, 0], Generated = [00010010], Reference = [01100101]
+Test 27 passed!
+Mismatch at index 28: Inputs = [0, 00000001, 0], Generated = [00000001], Reference = [00000000]
+Test 29 passed!
+Mismatch at index 30: Inputs = [0, 00001101, 0], Generated = [00001101], Reference = [00000001]
+Test 31 passed!
+12 mismatches out of 32 total tests.
+hdlbits_testbenches/Dff8ar_0_tb.v:419: $finish called at 64000 (10ps)
+Module file path: CoT/modules/Dff8ar.v
+Testbench file path: hdlbits_testbenches/Dff8ar_0_tb.v
+Compilation successful. Executable created at CoT/simulations/Dff8ar_sim
+Simulation completed successfully.

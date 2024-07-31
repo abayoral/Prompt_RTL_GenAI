@@ -1,0 +1,7 @@
+SCoT/modules/Fsm_serialdp.v:10: syntax error
+SCoT/modules/Fsm_serialdp.v:10: error: Invalid module instantiation
+SCoT/modules/Fsm_serialdp.v:17: syntax error
+SCoT/modules/Fsm_serialdp.v:17: error: Invalid module instantiation
+Module file path: SCoT/modules/Fsm_serialdp.v
+Testbench file path: hdlbits_testbenches/Fsm_serialdp_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/Fsm_serialdp_sim', 'SCoT/modules/Fsm_serialdp.v', 'hdlbits_testbenches/Fsm_serialdp_0_tb.v']' returned non-zero exit status 4.

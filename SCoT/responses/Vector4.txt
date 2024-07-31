@@ -1,0 +1,17 @@
+Given this detailed chain of thought, let's generate the Verilog module to implement the 32-bit sign extension of the 8-bit input:
+
+```
+module top_module (
+    input wire [7:0] in,
+    output wire [31:0] out
+);
+    // Sign extension logic: replicate the sign bit (in[7]) 24 times and append the original 8-bit input
+    assign out = {{24{in[7]}}, in};
+endmodule
+```
+
+- **Explanation**:
+    - The module `top_module` is declared with an 8-bit input `in` and a 32-bit output `out`.
+    - The assign statement uses Verilog's replication operator `{}` to replicate the most significant bit of `in` (i.e., `in[7]`) 24 times.
+    - This replicated sign bit is then concatenated with the original 8 bits of `in` using the concatenation operator `{{}}`.
+    - The result is assigned to the 32-bit output `out`, achieving the desired sign extension.

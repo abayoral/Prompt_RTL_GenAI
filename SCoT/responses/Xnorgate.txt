@@ -1,0 +1,10 @@
+```verilog
+module top_module (
+    input wire a,
+    input wire b,
+    output wire out
+);
+    // XNOR logic: out is true if a and b are the same (both 0 or both 1)
+    assign out = ~(a ^ b);
+endmodule
+```

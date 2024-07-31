@@ -1,0 +1,39 @@
+Based on the chain of thought provided:
+
+1. Understand Inputs and Outputs:
+   - Inputs: `ring`, `vibrate_mode`
+   - Outputs: `ringer`, `motor`
+
+2. Define Logic:
+   - When `ring` is high:
+     - If `vibrate_mode` is high, `motor` should be high and `ringer` should be low.
+     - If `vibrate_mode` is low, `ringer` should be high and `motor` should be low.
+   - When `ring` is low, both `ringer` and `motor` should be low.
+
+3. Implement the logic using `assign` statements.
+
+Let's proceed to write the Verilog code for this.
+
+```verilog
+module top_module (
+    input wire ring,
+    input wire vibrate_mode,
+    output wire ringer,
+    output wire motor
+);
+    // Control logic for motor and ringer
+    assign motor = ring && vibrate_mode;
+    assign ringer = ring && ~vibrate_mode;
+
+endmodule
+```
+
+### Explanation:
+
+- `assign motor = ring && vibrate_mode;`
+  - The `motor` is turned on if there is an incoming call (`ring` is high) and the phone is in vibrate mode (`vibrate_mode` is high).
+
+- `assign ringer = ring && ~vibrate_mode;`
+  - The `ringer` is turned on if there is an incoming call (`ring` is high) and the phone is not in vibrate mode (`vibrate_mode` is low).
+
+This ensures that only one of the `motor` or `ringer` is active at any given time based on the value of `vibrate_mode`. If `ring` is low, both outputs will be low.

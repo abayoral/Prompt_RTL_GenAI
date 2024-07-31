@@ -1,41 +1,111 @@
-Your Response:
+Let's break down the implementation of the design given the requirements and step-by-step thought process.
 
-    ``
-    module top_module(
-        input wire [31:0] A,
-        input wire [31:0] B,
-        output wire [31:0] Sum
+### Sub-Modules
+
+1. **16-bit Adder Module**
+   - Adds two 16-bit numbers and produces a 16-bit sum and a carry-out.
+
+2. **16-bit 2-to-1 Multiplexer**
+   - Selects one of the two 16-bit inputs based on the control signal and passes it to the output.
+
+### Top-Level Module
+
+- Combines the sub-modules to realize a 32-bit adder.
+
+Let's start with the 16-bit adder and multiplexer modules first.
+
+#### 16-bit Adder Module
+
+```verilog
+module adder_16bit (
+    input wire [15:0] A,
+    input wire [15:0] B,
+    output wire [15:0] Sum,
+    output wire Carry
+);
+    assign {Carry, Sum} = A + B;
+endmodule
+```
+
+#### 16-bit 2-to-1 Multiplexer Module
+
+```verilog
+module mux_2to1_16bit (
+    input wire [15:0] A,
+    input wire [15:0] B,
+    input wire sel,
+    output wire [15:0] Y
+);
+    assign Y = (sel) ? B : A;
+endmodule
+```
+
+### Top-Level Module
+
+```verilog
+module top_module (
+    input wire [31:0] a,
+    input wire [31:0] b,
+    output wire [31:0] sum
+);
+    // Intermediate signals
+    wire [15:0] sum_lower;
+    wire carry_lower;
+    wire [15:0] sum_upper_1, sum_upper_2;
+    wire carry_upper_1, carry_upper_2;
+    wire [15:0] sum_upper;
+
+    // Instantiate 16-bit adder for lower 16 bits
+    adder_16bit adder1 (
+        .A(a[15:0]),
+        .B(b[15:0]),
+        .Sum(sum_lower),
+        .Carry(carry_lower)
     );
-        wire [15:0] cin;
-        wire [15:0] add1_sum, add2_sum, add3_sum, add2_cout, add3_cout, out;
 
-        // declare adder instances
-        my_16bit_adder adder1 (.A(A[15:0]), .B(B[15:0]), .sum(add1_sum), .cout(cin));
-        my_16bit_adder adder2 (.A(A[31:16]), .B(B[31:16]), .sum(add2_sum), .cout(add2_cout));
-        my_16bit_adder adder3 (.A(A[31:16] + 16'b0000000000000001), .B(B[31:16]), .sum(add3_sum), .cout(add3_cout));
-
-        // declare mux instance
-        mux mux1 (.A(add2_sum), .B(add3_sum), .sel(cin), .out(out));
-
-        assign Sum = {out, add1_sum};
-    endmodule
-
-    module my_16bit_adder(
-        input wire [15:0] A,
-        input wire [15:0] B,
-        output wire [15:0] sum,
-        output wire cout
+    // Instantiate 16-bit adder for upper 16 bits without carry
+    adder_16bit adder2 (
+        .A(a[31:16]),
+        .B(b[31:16]),
+        .Sum(sum_upper_1),
+        .Carry(carry_upper_1)
     );
-        // implement the details of the adder here
-    endmodule
 
-    module mux(
-        input wire [15:0] A,
-        input wire [15:0] B,
-        input wire sel,
-        output wire [15:0] out
+    // Instantiate 16-bit adder for upper 16 bits with carry
+    adder_16bit adder3 (
+        .A(a[31:16]),
+        .B(b[31:16]),
+        .Sum(sum_upper_2),
+        .Carry(carry_upper_2)
     );
-        // implement the details of the mux here
-        assign out = (sel) ? B : A;
-    endmodule
-    ``
+
+    // Instantiate 16-bit 2-to-1 multiplexer
+    mux_2to1_16bit mux (
+        .A({carry_upper_1, sum_upper_1[15:1]}), // Adjusted to handle carry propagation
+        .B(sum_upper_2),
+        .sel(carry_lower),
+        .Y(sum_upper)
+    );
+
+    // Combine lower and upper sums to form a 32-bit sum output
+    assign sum = {sum_upper, sum_lower};
+
+endmodule
+```
+
+### Explanation
+
+1. **16-bit Adder**:
+   - `adder_16bit` takes two 16-bit inputs, `A` and `B`, and produces a 16-bit sum and a carry-out.
+
+2. **16-bit 2-to-1 Multiplexer**:
+   - `mux_2to1_16bit` selects between the two sets of upper sums depending on the carry generated from the lower sum.
+
+3. **Top-Level Module**:
+   - Three instances of `adder_16bit` are created: 
+        - The first adder handles the least significant 16 bits.
+        - The second and third adders handle the most significant 16 bits with and without the carry from the least significant bits respectively.
+   - The multiplexer chooses between the sum outputs from the second and third adders based on the carry from the first adder.
+   - Finally, the sum from the multiplexer is concatenated with the sum from the first adder to form the final 32-bit sum.
+
+This modular approach ensures that the logic is clean and each sub-module can be separately tested and validated.

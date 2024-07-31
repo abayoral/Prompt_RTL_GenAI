@@ -1,0 +1,105 @@
+Chain of Thought:
+
+1. **Understand the Requirements:**
+    - We need to design a 12-hour clock with an AM/PM indicator.
+    - The clock should have three counters: hours (hh), minutes (mm), and seconds (ss), all in BCD format.
+    - The clock increments based on an enable signal (ena) that pulses once per second.
+    - A reset signal (reset) initializes the clock to 12:00 AM. Reset has higher priority over enable.
+
+2. **Determine the Inputs and Outputs:**
+    - Inputs: clk, reset, ena
+    - Outputs: pm, hh, mm, ss
+
+3. **Define Intermediate Signals:**
+    - Separate counters for seconds, minutes, and hours.
+    - Logic to handle the AM/PM toggle based on the hour counter.
+
+4. **Structuring the Module:**
+    - Implement counters for seconds and minutes, which roll over after 59 to 00.
+    - Implement a counter for hours, which rolls over from 12 to 01, and toggles the AM/PM indicator as needed.
+    - Handle the reset and enable logic to properly update the counters.
+
+5. **Considerations:**
+    - The seconds and minutes counters are straightforward BCD counters.
+    - The hours counter requires special handling due to the 12-hour cycle and AM/PM toggle.
+    - Reset logic must handle initializing the counters and the AM/PM indicator correctly.
+
+Writing the Verilog Code:
+
+```verilog
+module top_module(
+    input clk,
+    input reset,
+    input ena,
+    output reg pm,
+    output reg [7:0] hh,
+    output reg [7:0] mm,
+    output reg [7:0] ss
+);
+
+    // Counting logic for seconds
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            ss <= 8'b00000000; // Initialize seconds to 00
+        end else if (ena) begin
+            if (ss[3:0] == 4'b1001) begin
+                ss[3:0] <= 4'b0000;
+                if (ss[7:4] == 4'b0101) begin
+                    ss[7:4] <= 4'b0000;
+                end else begin
+                    ss[7:4] <= ss[7:4] + 1;
+                end
+            end else begin
+                ss[3:0] <= ss[3:0] + 1;
+            end
+        end
+    end
+
+    // Counting logic for minutes
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            mm <= 8'b00000000; // Initialize minutes to 00
+        end else if (ena && ss == 8'b00000000) begin
+            if (mm[3:0] == 4'b1001) begin
+                mm[3:0] <= 4'b0000;
+                if (mm[7:4] == 4'b0101) begin
+                    mm[7:4] <= 4'b0000;
+                end else begin
+                    mm[7:4] <= mm[7:4] + 1;
+                end
+            end else begin
+                mm[3:0] <= mm[3:0] + 1;
+            end
+        end
+    end
+
+    // Counting logic for hours and AM/PM
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            hh <= 8'b00010010; // Initialize hours to 12
+            pm <= 1'b0;        // Initialize to AM
+        end else if (ena && ss == 8'b00000000 && mm == 8'b00000000) begin
+            if (hh == 8'b00010010) begin // Special case for 12
+                if (pm) begin
+                    hh <= 8'b00000001;
+                end else begin
+                    hh <= 8'b00000001;
+                end
+                pm <= ~pm; // Toggle AM/PM
+            end else if (hh[3:0] == 4'b1001) begin
+                hh[3:0] <= 4'b0000;
+                hh[7:4] <= hh[7:4] + 1;
+            end else begin
+                hh[3:0] <= hh[3:0] + 1;
+            end
+        end
+    end
+
+endmodule
+```
+
+Explanation:
+- The counters for seconds and minutes increment their respective BCD digits and reset after reaching `59`.
+- The hours counter rolls from `12` to `01` and toggles the `pm` indicator.
+- The reset initialization sets the clock to `12:00 AM`.
+- Enable (`ena`) allows the clock to increment, with specific handling for rolling over the counters.

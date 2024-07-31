@@ -1,0 +1,6 @@
+module top_module (
+    output wire zero
+);
+    // Constantly output 0
+    assign zero = 0;
+endmodule

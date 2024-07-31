@@ -1,0 +1,38 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Test 3 passed!
+Test 4 passed!
+Mismatch at index 5: Inputs = [0, 0, 1, 0], Generated = [0], Reference = [1]
+Mismatch at index 6: Inputs = [0, 0, 1, 0], Generated = [0], Reference = [1]
+Mismatch at index 7: Inputs = [0, 0, 1, 1], Generated = [1], Reference = [0]
+Mismatch at index 8: Inputs = [0, 0, 1, 1], Generated = [1], Reference = [0]
+Test 9 passed!
+Test 10 passed!
+Mismatch at index 11: Inputs = [0, 1, 0, 1], Generated = [1], Reference = [0]
+Mismatch at index 12: Inputs = [0, 1, 0, 1], Generated = [1], Reference = [0]
+Mismatch at index 13: Inputs = [0, 1, 1, 0], Generated = [0], Reference = [1]
+Mismatch at index 14: Inputs = [0, 1, 1, 0], Generated = [0], Reference = [1]
+Test 15 passed!
+Test 16 passed!
+Test 17 passed!
+Test 18 passed!
+Mismatch at index 19: Inputs = [1, 0, 0, 1], Generated = [0], Reference = [1]
+Mismatch at index 20: Inputs = [1, 0, 0, 1], Generated = [0], Reference = [1]
+Mismatch at index 21: Inputs = [1, 0, 1, 0], Generated = [1], Reference = [0]
+Mismatch at index 22: Inputs = [1, 0, 1, 0], Generated = [1], Reference = [0]
+Mismatch at index 23: Inputs = [1, 0, 1, 1], Generated = [0], Reference = [1]
+Mismatch at index 24: Inputs = [1, 0, 1, 1], Generated = [0], Reference = [1]
+Test 25 passed!
+Test 26 passed!
+Test 27 passed!
+Test 28 passed!
+Mismatch at index 29: Inputs = [1, 1, 1, 0], Generated = [1], Reference = [0]
+Mismatch at index 30: Inputs = [1, 1, 1, 0], Generated = [1], Reference = [0]
+Test 31 passed!
+16 mismatches out of 32 total tests.
+hdlbits_testbenches/Kmap2_0_tb.v:411: $finish called at 64000 (10ps)
+Module file path: Generate_Knowledge/modules/Kmap2.v
+Testbench file path: hdlbits_testbenches/Kmap2_0_tb.v
+Compilation successful. Executable created at Generate_Knowledge/simulations/Kmap2_sim
+Simulation completed successfully.

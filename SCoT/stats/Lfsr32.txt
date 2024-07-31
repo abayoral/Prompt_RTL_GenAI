@@ -1,0 +1,5 @@
+SCoT/modules/Lfsr32.v:17: syntax error
+SCoT/modules/Lfsr32.v:17: Syntax in assignment statement l-value.
+Module file path: SCoT/modules/Lfsr32.v
+Testbench file path: hdlbits_testbenches/Lfsr32_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/Lfsr32_sim', 'SCoT/modules/Lfsr32.v', 'hdlbits_testbenches/Lfsr32_0_tb.v']' returned non-zero exit status 2.

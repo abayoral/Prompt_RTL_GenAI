@@ -1,0 +1,11 @@
+Generate_Knowledge/modules/Countbcd.v:10: error: Unknown module type: bcd_digit
+Generate_Knowledge/modules/Countbcd.v:18: error: Unknown module type: bcd_digit
+Generate_Knowledge/modules/Countbcd.v:26: error: Unknown module type: bcd_digit
+Generate_Knowledge/modules/Countbcd.v:34: error: Unknown module type: bcd_digit
+5 error(s) during elaboration.
+*** These modules were missing:
+        bcd_digit referenced 4 times.
+***
+Module file path: Generate_Knowledge/modules/Countbcd.v
+Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Generate_Knowledge/simulations/Countbcd_sim', 'Generate_Knowledge/modules/Countbcd.v', 'hdlbits_testbenches/Countbcd_0_tb.v']' returned non-zero exit status 5.

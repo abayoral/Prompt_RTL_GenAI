@@ -1,0 +1,46 @@
+Chain of Thought:
+
+1. **Understand the Requirements:**
+   - We need a 4-bit binary counter that counts from 0 to 15 inclusive.
+   - The counter has a period of 16, meaning it will rollover from 15 to 0.
+   - The reset input is synchronous and should reset the counter to 0 when active.
+
+2. **Determine the Inputs and Outputs:**
+   - Inputs: `clk`, `reset`
+   - Output: `q[3:0]` (4-bit output representing the counter value)
+
+3. **Define Intermediate Signals:**
+   - No intermediate signals are needed; the counter logic can be implemented directly.
+
+4. **Structuring the Module:**
+   - Start with the module declaration, specifying the inputs and outputs.
+   - Use an `always` block triggered on the rising edge of the clock (`clk`).
+   - Inside the `always` block:
+     - Check the `reset` signal. If it is high, set the counter `q` to 0.
+     - If `reset` is low, increment the counter `q`.
+     - The counter will automatically roll over from 15 to 0 because it is a 4-bit counter.
+     
+5. **Writing the Verilog Code:**
+
+```verilog
+module top_module (
+    input clk,
+    input reset,      // Synchronous active-high reset
+    output reg [3:0] q
+);
+    // Binary counter logic: Reset q when reset is high, otherwise increment q on each rising edge of clk
+    always @(posedge clk) begin
+        if (reset)
+            q <= 4'b0000;
+        else
+            q <= q + 1;
+    end
+endmodule
+```
+
+### Explanation:
+
+- The `always` block is sensitive to the rising edge of the clock.
+- When `reset` is high, the counter `q` is set to 0.
+- Otherwise, the counter `q` is incremented by 1 on each rising edge of the clock.
+- The 4-bit nature of `q` ensures that the counter rolls over from 15 to 0 automatically.

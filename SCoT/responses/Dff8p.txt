@@ -1,0 +1,41 @@
+Here is the Verilog module for 8 D flip-flops with an active high synchronous reset. The flip-flops are reset to 0x34 (which is 8'b00110100 in binary) and triggered by the negative edge of the clock (clk):
+
+```verilog
+module top_module (
+    input wire clk,
+    input wire reset,
+    input wire [7:0] d,
+    output reg [7:0] q
+);
+
+    // Flip-flop logic: Capture d at the negative edge of clk or reset to 0x34 when reset is high
+    always @(negedge clk) begin
+        if (reset)
+            q <= 8'b00110100;  // reset value to 0x34
+        else
+            q <= d;
+    end
+
+endmodule
+```
+
+### Explanation:
+
+1. **Module Declaration:**
+    - The module is named `top_module`.
+    - Inputs:
+        - `clk`: Clock signal.
+        - `reset`: Active high synchronous reset signal.
+        - `d`: 8-bit data input.
+    - Outputs:
+        - `q`: 8-bit data output.
+
+2. **Always Block:**
+    - The `always` block is triggered on the negative edge (`negedge`) of the clock signal (`clk`).
+    - Inside the block:
+        - **Reset Condition:**
+            - If `reset` is high, then `q` is assigned the value `8'b00110100` (0x34 in hexadecimal).
+        - **Regular Operation:**
+            - If `reset` is low, then `q` captures the value of `d` at the next negative edge of `clk`.
+
+This approach ensures that the 8 D flip-flops reset to 0x34 synchronously with the clock and capture data on the negative edge of the clock signal when the reset is not active.

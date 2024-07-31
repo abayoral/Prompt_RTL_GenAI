@@ -1,0 +1,43 @@
+Below is the Verilog module for the decade counter as described in your chain of thought:
+
+```verilog
+module top_module (
+    input wire clk,         // Clock input
+    input wire reset,       // Synchronous reset input
+    output reg [3:0] q      // 4-bit output to hold the current counter value
+);
+
+    // Always block triggered by the rising edge of the clock
+    always @(posedge clk) begin
+        if (reset) begin
+            // Reset condition: assign 1 to the counter
+            q <= 4'd1;
+        end else if (q == 4'd10) begin
+            // If the counter reaches 10, reset to 1
+            q <= 4'd1;
+        end else begin
+            // Otherwise, increment the counter
+            q <= q + 1;
+        end
+    end
+endmodule
+```
+
+### Explanation:
+
+1. **Module Declaration:**
+    - The module is named `top_module` and has inputs for `clk` (clock) and `reset` (synchronous reset), and a 4-bit output `q`.
+
+2. **Always Block:**
+    - An always block is used to handle the clock events.
+    - This block triggers on the rising edge of the clock (`posedge clk`).
+
+3. **Reset Logic:**
+    - Inside the always block, the first check is for the `reset` signal.
+    - If `reset` is high (`reset` is asserted), set `q` to `1` (`4'd1`). This resets the counter to 1.
+
+4. **Counter Logic:**
+    - If the counter value `q` equals 10 (`4'd10`), it will loop back and set `q` to 1.
+    - Otherwise, the counter `q` is incremented by 1 with every clock pulse.
+
+This module satisfies the requirements for a decade counter that counts from 1 to 10 and resets correctly when required.

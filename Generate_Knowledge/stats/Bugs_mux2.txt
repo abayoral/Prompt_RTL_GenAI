@@ -1,0 +1,18 @@
+Test 0 passed!
+Mismatch at index 1: Inputs = [0, 10101010, 10111011], Generated = [10101010], Reference = [10111011]
+Mismatch at index 2: Inputs = [0, 10101010, 10111011], Generated = [10101010], Reference = [10111011]
+Mismatch at index 3: Inputs = [1, 10101010, 10111011], Generated = [10111011], Reference = [10101010]
+Mismatch at index 4: Inputs = [0, 10101010, 10111011], Generated = [10101010], Reference = [10111011]
+Mismatch at index 5: Inputs = [1, 10101010, 10111011], Generated = [10111011], Reference = [10101010]
+Mismatch at index 6: Inputs = [1, 10101010, 10111011], Generated = [10111011], Reference = [10101010]
+Mismatch at index 7: Inputs = [0, 11111111, 00000000], Generated = [11111111], Reference = [00000000]
+Mismatch at index 8: Inputs = [0, 11111111, 00000000], Generated = [11111111], Reference = [00000000]
+Mismatch at index 9: Inputs = [1, 11111111, 00000000], Generated = [00000000], Reference = [11111111]
+Mismatch at index 10: Inputs = [0, 11111111, 00000000], Generated = [11111111], Reference = [00000000]
+Mismatch at index 11: Inputs = [1, 11111111, 00000000], Generated = [00000000], Reference = [11111111]
+11 mismatches out of 12 total tests.
+hdlbits_testbenches/Bugs_mux2_0_tb.v:170: $finish called at 24000 (10ps)
+Module file path: Generate_Knowledge/modules/Bugs_mux2.v
+Testbench file path: hdlbits_testbenches/Bugs_mux2_0_tb.v
+Compilation successful. Executable created at Generate_Knowledge/simulations/Bugs_mux2_sim
+Simulation completed successfully.

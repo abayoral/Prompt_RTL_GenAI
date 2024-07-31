@@ -1,57 +1,110 @@
-Your Response:
+Based on the provided chain of thought, let's create a Verilog module for a 4-digit BCD counter.
 
-"""
-    module top_module (
-        input wire clk,
-        input wire reset,
-        output wire [3:0] ena,
-        output wire [15:0] q
-    );
-        // Counter for each digit
-        reg [3:0] ones = 0, tens = 0, hundreds = 0, thousands = 0;
-        
-        // Carry flags for each digit
-        wire carry_ones, carry_tens, carry_hundreds;
+### Verilog Code:
 
-        // Increment or reset each digit
-        always @(posedge clk or posedge reset) begin
-            if (reset)
-                ones <= 0;
-            else if (carry_ones)
-                ones <= ones + 1;
+```verilog
+module top_module (
+    input wire clk,
+    input wire reset,
+    output reg [3:1] ena,
+    output reg [15:0] q
+);
+    // Define intermediate carry signals
+    wire carry0, carry1, carry2;
+
+    // Always block for the lowest 4 bits (ones digit)
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            q[3:0] <= 4'b0000;
+        end else if (q[3:0] == 4'b1001) begin
+            q[3:0] <= 4'b0000;
+            carry0 <= 1'b1;
+        end else begin
+            q[3:0] <= q[3:0] + 1;
+            carry0 <= 1'b0;
         end
+    end
 
-        assign carry_ones = (ones == 4'd9);
-
-        always @(posedge clk or posedge reset) begin
-            if (reset)
-                tens <= 0;
-            else if (ena[1])
-                tens <= tens + 1;
+    // Always block for the next 4 bits (tens digit)
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            q[7:4] <= 4'b0000;
+            ena[1] <= 1'b0;
+        end else if (carry0) begin
+            if (q[7:4] == 4'b1001) begin
+                q[7:4] <= 4'b0000;
+                ena[1] <= 1'b1;
+                carry1 <= 1'b1;
+            end else begin
+                q[7:4] <= q[7:4] + 1;
+                ena[1] <= 1'b1;
+                carry1 <= 1'b0;
+            end
+        end else begin
+            ena[1] <= 1'b0;
+            carry1 <= 1'b0;
         end
+    end
 
-        assign carry_tens = (tens == 4'd9);
-
-        always @(posedge clk or posedge reset) begin
-            if (reset)
-                hundreds <= 0;
-            else if (ena[2])
-                hundreds <= hundreds + 1;
+    // Always block for the next 4 bits (hundreds digit)
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            q[11:8] <= 4'b0000;
+            ena[2] <= 1'b0;
+        end else if (carry1) begin
+            if (q[11:8] == 4'b1001) begin
+                q[11:8] <= 4'b0000;
+                ena[2] <= 1'b1;
+                carry2 <= 1'b1;
+            end else begin
+                q[11:8] <= q[11:8] + 1;
+                ena[2] <= 1'b1;
+                carry2 <= 1'b0;
+            end
+        end else begin
+            ena[2] <= 1'b0;
+            carry2 <= 1'b0;
         end
+    end
 
-        assign carry_hundreds = (hundreds == 4'd9);
-
-        always @(posedge clk or posedge reset) begin
-            if (reset)
-                thousands <= 0;
-            else if (ena[3])
-                thousands <= thousands + 1;
+    // Always block for the next 4 bits (thousands digit)
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            q[15:12] <= 4'b0000;
+            ena[3] <= 1'b0;
+        end else if (carry2) begin
+            if (q[15:12] == 4'b1001) begin
+                q[15:12] <= 4'b0000;
+                ena[3] <= 1'b1;
+            end else begin
+                q[15:12] <= q[15:12] + 1;
+                ena[3] <= 1'b1;
+            end
+        end else begin
+            ena[3] <= 1'b0;
         end
+    end
+endmodule
+```
 
-        // Generate enable signals
-        assign ena = {carry_hundreds, carry_tens, carry_ones};
+### Explanation:
 
-        // Concatenate output counts
-        assign q = {thousands, hundreds, tens, ones};
-    endmodule
-"""
+1. **Inputs and Outputs**:
+   - The `clk` (clock) and `reset` signals are inputs.
+   - `q[15:0]` is the 16-bit BCD output representing the 4-digit decimal number.
+   - `ena[3:1]` are enable signals for each of the higher digit counters.
+
+2. **Intermediate Signals**:
+   - Carry signals `carry0`, `carry1`, and `carry2` are used to trigger incrementation of the next higher digit.
+
+3. **Counters**:
+   - Each always block handles one BCD digit (ones, tens, hundreds, thousands).
+   - Each block resets on a high `reset` signal and counts from 0 to 9.
+   - When a digit reaches 9, it resets to 0 and sets the corresponding carry signal high.
+   - The carry signal triggers the incrmentation of the next higher digit.
+
+4. **Enable Signals**:
+   - Enable signals indicate when the upper three digits should be incremented.
+   - They are set high when the corresponding lower digit rolls over from 9 to 0.
+
+This structure ensures a synchronous BCD counter with reset functionality.

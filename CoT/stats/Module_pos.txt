@@ -1,0 +1,10 @@
+CoT/modules/Module_pos.v:12: syntax error
+CoT/modules/Module_pos.v:11: error: Syntax error in instance port expression(s).
+CoT/modules/Module_pos.v:11: error: Invalid module instantiation
+CoT/modules/Module_pos.v:22: error: 'top_module' has already been declared in this scope.
+CoT/modules/Module_pos.v:1:      : It was declared here as a module.
+CoT/modules/Module_pos.v:41: error: Module top_module was already declared here: CoT/modules/Module_pos.v:1
+
+Module file path: CoT/modules/Module_pos.v
+Testbench file path: hdlbits_testbenches/Module_pos_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/Module_pos_sim', 'CoT/modules/Module_pos.v', 'hdlbits_testbenches/Module_pos_0_tb.v']' returned non-zero exit status 5.

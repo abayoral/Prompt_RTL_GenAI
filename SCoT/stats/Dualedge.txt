@@ -1,0 +1,5 @@
+SCoT/modules/Dualedge.v:28: error: reg q; cannot be driven by primitives or continuous assignment.
+1 error(s) during elaboration.
+Module file path: SCoT/modules/Dualedge.v
+Testbench file path: hdlbits_testbenches/Dualedge_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/Dualedge_sim', 'SCoT/modules/Dualedge.v', 'hdlbits_testbenches/Dualedge_0_tb.v']' returned non-zero exit status 1.

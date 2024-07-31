@@ -1,0 +1,9 @@
+SCoT/modules/Module_fadd.v:11: error: Unknown module type: add16
+SCoT/modules/Module_fadd.v:20: error: Unknown module type: add16
+3 error(s) during elaboration.
+*** These modules were missing:
+        add16 referenced 2 times.
+***
+Module file path: SCoT/modules/Module_fadd.v
+Testbench file path: hdlbits_testbenches/Module_fadd_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/Module_fadd_sim', 'SCoT/modules/Module_fadd.v', 'hdlbits_testbenches/Module_fadd_0_tb.v']' returned non-zero exit status 3.

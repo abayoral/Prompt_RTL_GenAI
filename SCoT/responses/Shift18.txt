@@ -1,0 +1,48 @@
+Given the requirements and the thought process, here is the Verilog module for a 64-bit arithmetic shift register with synchronous load:
+
+```verilog
+module top_module (
+    input wire clk,
+    input wire load,
+    input wire ena,
+    input wire [1:0] amount,
+    input wire [63:0] data,
+    output reg [63:0] q
+);
+    always @(posedge clk) begin
+        // Check if load is high to load data into the register.
+        if (load) begin
+            q <= data;
+        end
+        else if (ena) begin
+            // Perform the shift operation based on the amount signal.
+            case (amount)
+                2'b00: q <= q << 1;          // Shift left by 1 bit
+                2'b01: q <= q << 8;          // Shift left by 8 bits
+                2'b10: q <= $signed(q) >>> 1; // Arithmetic shift right by 1 bit
+                2'b11: q <= $signed(q) >>> 8; // Arithmetic shift right by 8 bits
+                default: q <= q;              // Default case (should never happen)
+            endcase
+        end
+    end
+endmodule
+```
+
+### Explanation:
+
+1. **Module Declaration:**
+    - The inputs and outputs are declared as per the requirements.
+    - `clk`, `load`, `ena`, `amount`, and `data` are inputs.
+    - `q` is the output.
+
+2. **Always Block:**
+    - The always block is triggered on the rising edge of the clock (`clk`).
+    - Inside the always block:
+        - If `load` is high, the register `q` is loaded with the input data (`data`).
+        - If `load` is low and `ena` is high, the value of `amount` determines the type of shift:
+            - `2'b00`: Shift left by 1 bit.
+            - `2'b01`: Shift left by 8 bits.
+            - `2'b10`: Arithmetic shift right by 1 bit using `$signed`.
+            - `2'b11`: Arithmetic shift right by 8 bits using `$signed`.
+
+By following this approach, the implementation meets the specified requirements for the 64-bit arithmetic shift register with synchronous load capability.

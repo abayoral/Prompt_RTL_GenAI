@@ -1,0 +1,53 @@
+Based on the solving process laid out in the "Chain of Thought" section, let's implement an example 3-stage shift register using three instances of a provided `my_dff` module.
+
+Here is the Verilog code implementing the three-stage shift register:
+
+```verilog
+module top_module (
+    input wire clk,
+    input wire d,
+    output wire q
+);
+    // Intermediate signals for connecting the stages
+    wire q1, q2;
+
+    // Instantiate three instances of my_dff module
+    my_dff dff1 (
+        .clk(clk),
+        .d(d),
+        .q(q1)
+    );
+
+    my_dff dff2 (
+        .clk(clk),
+        .d(q1),
+        .q(q2)
+    );
+
+    my_dff dff3 (
+        .clk(clk),
+        .d(q2),
+        .q(q)
+    );
+
+endmodule
+
+// Assume the my_dff module is defined as follows:
+module my_dff (
+    input wire clk,
+    input wire d,
+    output reg q
+);
+    always @(posedge clk) begin
+        q <= d;
+    end
+endmodule
+```
+
+The `top_module` shift register uses three D flip-flops (`my_dff` instances). Here's a quick summary of how it works:
+- The input data `d` is fed into the first flip-flop (`dff1`).
+- The output of the first flip-flop (`q1`) is connected to the input of the second flip-flop (`dff2`).
+- The output of the second flip-flop (`q2`) is connected to the input of the third flip-flop (`dff3`).
+- The output of the third flip-flop (`q`) is the output of the entire shift register.
+
+This design captures the value on the input `d` at the rising edge of the clock (`clk`) and shifts it through three stages of flip-flops, making the final output `q` represent the value that entered the register three clock cycles earlier.

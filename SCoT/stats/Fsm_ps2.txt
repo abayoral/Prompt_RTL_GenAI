@@ -1,0 +1,5 @@
+SCoT/modules/Fsm_ps2.v:8: syntax error
+SCoT/modules/Fsm_ps2.v:8: error: Invalid module instantiation
+Module file path: SCoT/modules/Fsm_ps2.v
+Testbench file path: hdlbits_testbenches/Fsm_ps2_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/Fsm_ps2_sim', 'SCoT/modules/Fsm_ps2.v', 'hdlbits_testbenches/Fsm_ps2_0_tb.v']' returned non-zero exit status 2.

@@ -1,0 +1,45 @@
+Following the structured approach, we can effectively implement the 4-bit priority encoder in Verilog with the given requirements and procedure. Below is the Verilog code for the module named "top_module":
+
+```verilog
+module top_module(
+    input wire [3:0] in,   // 4-bit input
+    output reg [1:0] pos   // 2-bit output representing position of the highest-order active bit
+);
+    always @(*) begin
+        // Default output to zero
+        pos = 2'b00;
+        
+        // Check highest-order bit first, moving to the lowest-order bit
+        if (in[3])
+            pos = 2'b11;
+        else if (in[2])
+            pos = 2'b10;
+        else if (in[1])
+            pos = 2'b01;
+        else if (in[0])
+            pos = 2'b00;
+    end
+endmodule
+```
+
+### Explanation
+1. **Module Declaration**:
+   - The module `top_module` is declared with a 4-bit input `in` and a 2-bit output `pos`.
+
+2. **Always Block**:
+   - An `always` block is used to evaluate the priority encoder logic. This block is triggered whenever there is a change in the input `in`.
+   - The `always` block uses combinational logic (`@(*)` sensitivity list) to determine the output `pos`.
+
+3. **Default Output**:
+   - Initially, the output `pos` is set to `2'b00`.
+
+4. **Priority Encoding Logic**:
+   - The input bits are checked in descending order, starting from the highest-order bit (`in[3]`) down to the lowest-order bit (`in[0]`).
+   - The first `if` condition checks if `in[3]` is high. If true, `pos` is set to `2'b11`.
+   - If `in[3]` is not high, the next condition checks if `in[2]` is high, and sets `pos` to `2'b10` if true.
+   - This process continues for bits `in[1]` and `in[0]`.
+
+5. **Output Assignment**:
+   - The value of `pos` is updated based on the highest-order bit that is detected as high. If no bits are high, `pos` remains `2'b00` by default.
+   
+This implementation ensures the correct operation of a 4-bit priority encoder as per the provided requirements.

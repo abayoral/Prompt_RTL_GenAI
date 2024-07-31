@@ -1,0 +1,42 @@
+Here's the Verilog module implementing an XOR gate using three different techniques: an assign statement, a combinational always block, and a clocked always block.
+
+```verilog
+module top_module (
+    input wire a, // Input a
+    input wire b, // Input b
+    input wire clk, // Clock input for clocked always block
+    output wire out_assign, // Output using assign statement
+    output reg out_always_comb, // Output using combinational always block
+    output reg out_always_ff // Output using clocked always block
+);
+
+    // XOR using assign statement
+    assign out_assign = a ^ b;
+
+    // XOR using combinational always block
+    always @(*) begin
+        out_always_comb = a ^ b;
+    end
+
+    // XOR using clocked always block
+    always @(posedge clk) begin
+        out_always_ff <= a ^ b;
+    end
+
+endmodule
+```
+
+### Explanation:
+1. **Assign Statement:**
+   - The `assign` statement directly computes the XOR operation and assigns the result to `out_assign`.
+
+2. **Combinational Always Block:**
+   - The `always @(*)` block is used to describe combinational logic. 
+   - The sensitivity list `*` indicates that the block should be executed whenever any input (`a` or `b`) changes.
+   - Inside this block, the result of `a ^ b` is assigned to `out_always_comb`.
+
+3. **Clocked Always Block:**
+   - The `always @(posedge clk)` block is used to describe sequential logic, which is triggered on the rising edge of the clock.
+   - Inside this block, the result of `a ^ b` is assigned to `out_always_ff`.
+
+This module demonstrates three different techniques to achieve the same logical operation, leveraging Verilog's flexibility in describing hardware behavior.

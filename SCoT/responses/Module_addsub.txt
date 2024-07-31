@@ -1,0 +1,79 @@
+Based on the detailed problem description, we can create the `top_module` Verilog code using the given `add16` module for the 32-bit adder-subtractor. Here’s the step-by-step implementation:
+
+```verilog
+module add16 (
+    input wire [15:0] a,
+    input wire [15:0] b,
+    input wire cin,
+    output wire [15:0] sum,
+    output wire cout
+);
+    // Assuming add16 implementation is provided.
+    // This is a placeholder.
+    assign {cout, sum} = a + b + cin;
+endmodule
+
+module top_module (
+    input wire [31:0] a,
+    input wire [31:0] b,
+    input wire sub,
+    output wire [31:0] sum
+);
+    wire [15:0] sum_lower, sum_upper;
+    wire [15:0] b_inverted_lower, b_inverted_upper;
+    wire carry_out_lower, carry_into_upper;
+
+    // Split inputs into lower and upper 16 bits
+    wire [15:0] a_lower = a[15:0];
+    wire [15:0] a_upper = a[31:16];
+    wire [15:0] b_lower = b[15:0];
+    wire [15:0] b_upper = b[31:16];
+
+    // Conditionally invert b based on sub signal
+    assign b_inverted_lower = b_lower ^ {16{sub}};
+    assign b_inverted_upper = b_upper ^ {16{sub}};
+
+    // First 16-bit adder instance
+    add16 add_lower (
+        .a(a_lower),
+        .b(b_inverted_lower),
+        .cin(sub),
+        .sum(sum_lower),
+        .cout(carry_out_lower)
+    );
+
+    // Second 16-bit adder instance
+    add16 add_upper (
+        .a(a_upper),
+        .b(b_inverted_upper),
+        .cin(carry_out_lower),
+        .sum(sum_upper),
+        .cout(carry_into_upper)  // not used
+    );
+
+    // Concatenate the lower and upper sums to form the final 32-bit sum
+    assign sum = {sum_upper, sum_lower};
+endmodule
+```
+
+### Explanation:
+
+1. **Module Declaration:**
+   - `input wire [31:0] a, b`: 32-bit input operands.
+   - `input wire sub`: Control signal for addition (0) or subtraction (1).
+   - `output wire [31:0] sum`: 32-bit output sum.
+
+2. **Intermediate Signals:**
+   - `sum_lower, sum_upper`: Intermediate sums from the two `add16` instances.
+   - `b_inverted_lower, b_inverted_upper`: Inverted parts of `b` based on `sub` signal.
+   - `carry_out_lower`: Carry-out from the first `add16` instance.
+   - `carry_into_upper`: Carry-out from the second `add16` instance (not used further).
+
+3. **Components:**
+   - Split the inputs `a` and `b` into upper and lower 16-bit segments.
+   - Invert `b` inputs conditionally based on the `sub` signal using the XOR operation.
+   - Instantiate two `add16` modules: one for the lower 16 bits and one for the upper 16 bits.
+   - Ensure proper handling of the carry-out and carry-in between the two 16-bit additions.
+   - Concatenate the results from the two 16-bit adders to form the final 32-bit sum.
+
+By following these steps, the `top_module` will correctly perform 32-bit addition or subtraction based on the provided control signal.

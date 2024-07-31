@@ -1,9 +1,9 @@
-SCoT/modules/adder3.v:9: error: Unknown module type: Full_Adder
-SCoT/modules/adder3.v:17: error: Unknown module type: Full_Adder
-SCoT/modules/adder3.v:25: error: Unknown module type: Full_Adder
+SCoT/modules/adder3.v:12: error: Unknown module type: full_adder
+SCoT/modules/adder3.v:21: error: Unknown module type: full_adder
+SCoT/modules/adder3.v:30: error: Unknown module type: full_adder
 4 error(s) during elaboration.
 *** These modules were missing:
-        Full_Adder referenced 3 times.
+        full_adder referenced 3 times.
 ***
 Module file path: SCoT/modules/adder3.v
 Testbench file path: hdlbits_testbenches/Adder3_0_tb.v

@@ -1,0 +1,16 @@
+```verilog
+module mod_a ( input in1, input in2, output out );
+
+  // Module functionality for mod_a is assumed to be defined here
+
+endmodule
+
+module top_module ( input a, input b, output out );
+  // Instantiate mod_a
+  mod_a u_mod_a (
+    .in1(a),
+    .in2(b),
+    .out(out)
+  );
+endmodule
+```

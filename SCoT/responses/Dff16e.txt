@@ -1,0 +1,41 @@
+Certainly! Here is the Verilog code that structures the 16 D flip-flops with the given requirements:
+
+```verilog
+module top_module(
+    input wire clk,
+    input wire resetn,
+    input wire [1:0] byteena,
+    input wire [15:0] d,
+    output reg [15:0] q
+);
+    // D flip-flop logic for 16-bit register with byte-enable and synchronous, active-low reset
+    always @(posedge clk) begin
+        if (!resetn) begin
+            // Reset all flip-flops to 0 when resetn is low
+            q <= 16'b0;
+        end else begin
+            // Condition to update the upper 8 bits if byteena[1] is high
+            if (byteena[1])
+                q[15:8] <= d[15:8];
+            // Condition to update the lower 8 bits if byteena[0] is high
+            if (byteena[0])
+                q[7:0] <= d[7:0];
+        end
+    end
+endmodule
+```
+
+### Explanation
+1. **Module Declaration**:
+    - The inputs include clock (`clk`), synchronous active-low reset (`resetn`), byte enable (`byteena`), and 16-bit data input (`d`).
+    - The output is a 16-bit register (`q`).
+
+2. **Always Block**:
+    - The always block is sensitive to the positive edge of the clock (`posedge clk`).
+    - Inside the block:
+        - **Reset Condition**: If `resetn` is low (`!resetn`), the entire 16-bit output (`q`) is set to zero.
+        - **Update Conditions**: When `resetn` is high:
+            - If `byteena[1]` is high, update the upper 8 bits (`q[15:8]`) from `d[15:8]`.
+            - If `byteena[0]` is high, update the lower 8 bits (`q[7:0]`) from `d[7:0]`.
+
+This code ensures that the output register `q` properly handles the synchronous reset and byte-enable functionality as per the requirements.

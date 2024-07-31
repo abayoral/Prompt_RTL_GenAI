@@ -1,0 +1,7 @@
+Zero-shot/modules/Fsm_serialdata.v:10: syntax error
+Zero-shot/modules/Fsm_serialdata.v:10: error: Invalid module instantiation
+Zero-shot/modules/Fsm_serialdata.v:17: syntax error
+Zero-shot/modules/Fsm_serialdata.v:17: error: Invalid module instantiation
+Module file path: Zero-shot/modules/Fsm_serialdata.v
+Testbench file path: hdlbits_testbenches/Fsm_serialdata_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/Fsm_serialdata_sim', 'Zero-shot/modules/Fsm_serialdata.v', 'hdlbits_testbenches/Fsm_serialdata_0_tb.v']' returned non-zero exit status 4.

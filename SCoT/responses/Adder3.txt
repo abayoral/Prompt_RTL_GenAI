@@ -1,0 +1,70 @@
+Based on the provided chain of thought, we can now proceed to write the Verilog code for both the full-adder module and the 3-bit ripple-carry adder. This approach ensures modularity and reusability.
+
+### Full-Adder Module
+First, we create the full-adder module that will be instantiated within the ripple-carry adder.
+
+#### Full-Adder Implementation
+```verilog
+module full_adder (
+    input wire a,
+    input wire b,
+    input wire cin,
+    output wire sum,
+    output wire cout
+);
+    assign {cout, sum} = a + b + cin;
+endmodule
+```
+
+### 3-Bit Ripple-Carry Adder Module
+Next, we implement the 3-bit ripple-carry adder using three instances of the full-adder module.
+
+#### Ripple-Carry Adder Implementation
+```verilog
+module top_module (
+    input wire [2:0] a,
+    input wire [2:0] b,
+    input wire cin,
+    output wire [2:0] sum,
+    output wire [2:0] cout
+);
+    wire carry1, carry2;
+
+    // Instantiate three full-adders
+    full_adder fa0 (
+        .a(a[0]),
+        .b(b[0]),
+        .cin(cin),
+        .sum(sum[0]),
+        .cout(cout[0])
+    );
+
+    full_adder fa1 (
+        .a(a[1]),
+        .b(b[1]),
+        .cin(cout[0]),
+        .sum(sum[1]),
+        .cout(cout[1])
+    );
+
+    full_adder fa2 (
+        .a(a[2]),
+        .b(b[2]),
+        .cin(cout[1]),
+        .sum(sum[2]),
+        .cout(cout[2])
+    );
+endmodule
+```
+
+### Explanation
+1. **Full-Adder Module:**
+   - The full-adder module takes three inputs (`a`, `b`, and `cin`) and produces a sum and a carry out.
+   - The line `assign {cout, sum} = a + b + cin;` is used to carry out the addition in a compact manner, where `{cout, sum}` represents a 2-bit result from the addition.
+
+2. **3-Bit Ripple-Carry Adder Module:**
+   - The ripple-carry adder module takes two 3-bit numbers (`a` and `b`) and an initial carry-in (`cin`).
+   - Intermediate signals `carry1` and `carry2` are defined to pass carry-out from one full-adder to the next.
+   - Three instances of the `full_adder` module are created to handle each bit of the input numbers, propagating the carry as necessary through each stage.
+
+This approach fulfills the requirement of creating a 3-bit ripple-carry adder using separate instances of a full-adder, ensuring that the addition properly propagates carry-out signals through each stage.

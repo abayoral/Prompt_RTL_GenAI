@@ -1,0 +1,39 @@
+Test 1 passed!
+Test 2 passed!
+Test 3 passed!
+Test 4 passed!
+Test 5 passed!
+Test 6 passed!
+Test 7 passed!
+Test 8 passed!
+Test 9 passed!
+Test 10 passed!
+Test 11 passed!
+Test 12 passed!
+Test 13 passed!
+Test 14 passed!
+Test 15 passed!
+Test 16 passed!
+Test 17 passed!
+Test 18 passed!
+Mismatch at index 19: Inputs = [00010001], Generated = [100], Reference = [000]
+Mismatch at index 20: Inputs = [00010001], Generated = [100], Reference = [000]
+Mismatch at index 21: Inputs = [00010010], Generated = [100], Reference = [001]
+Mismatch at index 22: Inputs = [00010010], Generated = [100], Reference = [001]
+Mismatch at index 23: Inputs = [00010011], Generated = [100], Reference = [000]
+Mismatch at index 24: Inputs = [00010011], Generated = [100], Reference = [000]
+Mismatch at index 25: Inputs = [00010100], Generated = [100], Reference = [010]
+Mismatch at index 26: Inputs = [00010100], Generated = [100], Reference = [010]
+Mismatch at index 27: Inputs = [00010101], Generated = [100], Reference = [000]
+Mismatch at index 28: Inputs = [00010101], Generated = [100], Reference = [000]
+Mismatch at index 29: Inputs = [00010110], Generated = [100], Reference = [001]
+Mismatch at index 30: Inputs = [00010110], Generated = [100], Reference = [001]
+Mismatch at index 31: Inputs = [00010111], Generated = [100], Reference = [000]
+Mismatch at index 32: Inputs = [00010111], Generated = [100], Reference = [000]
+Mismatch at index 33: Inputs = [00011000], Generated = [100], Reference = [011]
+15 mismatches out of 34 total tests.
+hdlbits_testbenches/Always_casez_0_tb.v:423: $finish called at 68000 (10ps)
+Module file path: SCoT/modules/Always_casez.v
+Testbench file path: hdlbits_testbenches/Always_casez_0_tb.v
+Compilation successful. Executable created at SCoT/simulations/Always_casez_sim
+Simulation completed successfully.

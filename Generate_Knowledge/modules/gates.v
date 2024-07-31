@@ -8,6 +8,7 @@ module top_module(
     output out_xnor,
     output out_anotb
 );
+    // Logic gate implementations
     assign out_and = a & b;
     assign out_or = a | b;
     assign out_xor = a ^ b;

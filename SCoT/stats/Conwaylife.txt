@@ -1,0 +1,23 @@
+SCoT/modules/Conwaylife.v:22: error: A reference to a wire or reg (`r') is not allowed in a constant expression.
+SCoT/modules/Conwaylife.v:22: error: A reference to a wire or reg (`rr') is not allowed in a constant expression.
+SCoT/modules/Conwaylife.v:22: error: Array index expressions must be constant here.
+SCoT/modules/Conwaylife.v:35: error: A reference to a wire or reg (`r') is not allowed in a constant expression.
+SCoT/modules/Conwaylife.v:35: error: Array index expressions must be constant here.
+SCoT/modules/Conwaylife.v:44: error: A reference to a wire or reg (`r') is not allowed in a constant expression.
+SCoT/modules/Conwaylife.v:44: error: Array index expressions must be constant here.
+SCoT/modules/Conwaylife.v:46: error: A reference to a wire or reg (`r') is not allowed in a constant expression.
+SCoT/modules/Conwaylife.v:46: error: Array index expressions must be constant here.
+SCoT/modules/Conwaylife.v:48: error: A reference to a wire or reg (`r') is not allowed in a constant expression.
+SCoT/modules/Conwaylife.v:48: error: Array index expressions must be constant here.
+SCoT/modules/Conwaylife.v:48: error: A reference to a wire or reg (`r') is not allowed in a constant expression.
+SCoT/modules/Conwaylife.v:48: error: Array index expressions must be constant here.
+SCoT/modules/Conwaylife.v:55: error: A reference to a wire or reg (`r') is not allowed in a constant expression.
+SCoT/modules/Conwaylife.v:55: error: Array index expressions must be constant here.
+SCoT/modules/Conwaylife.v:55: error: A reference to a wire or reg (`r') is not allowed in a constant expression.
+SCoT/modules/Conwaylife.v:55: error: Array index expressions must be constant here.
+SCoT/modules/Conwaylife.v:63: error: A reference to a wire or reg (`r') is not allowed in a constant expression.
+SCoT/modules/Conwaylife.v:63: error: Array index expressions must be constant here.
+19 error(s) during elaboration.
+Module file path: SCoT/modules/Conwaylife.v
+Testbench file path: hdlbits_testbenches/Conwaylife_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/Conwaylife_sim', 'SCoT/modules/Conwaylife.v', 'hdlbits_testbenches/Conwaylife_0_tb.v']' returned non-zero exit status 19.

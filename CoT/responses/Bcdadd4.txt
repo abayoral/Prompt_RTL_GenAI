@@ -1,0 +1,72 @@
+Chain of Thought:
+
+1. **Understand the Requirements:**
+    - We need to implement a 4-digit BCD adder using the provided BCD full-adder (`bcd_fadd`).
+    - Each BCD digit is represented with 4 bits.
+    - Inputs are two 4-digit BCD numbers packed into 16-bit vectors (`a` and `b`), and a carry-in (`cin`).
+    - Outputs are the 4-digit BCD sum packed into a 16-bit vector (`sum`), and a carry-out (`cout`).
+
+2. **Determine the Inputs and Outputs:**
+    - Inputs: `a` (16-bit), `b` (16-bit), `cin` (1-bit)
+    - Outputs: `sum` (16-bit), `cout` (1-bit)
+
+3. **Define Intermediate Signals:**
+    - Intermediate carry signals between each BCD digit addition (`c1`, `c2`, `c3`).
+
+4. **Structuring the Module:**
+    - We need to instantiate the `bcd_fadd` module four times, one for each BCD digit.
+    - Each `bcd_fadd` instance handles the addition of corresponding digits from `a` and `b`.
+    - Propagate the carry-out from one instance to the carry-in of the next.
+    - The carry-out from the last instance forms the `cout` for the entire 4-digit addition.
+
+5. **Writing the Verilog Code:**
+   - Instantiate the `bcd_fadd` for each digit.
+   - Connect them in a ripple-carry manner.
+
+```verilog
+module top_module ( 
+    input [15:0] a, b,
+    input cin,
+    output cout,
+    output [15:0] sum );
+
+    wire c1, c2, c3;
+
+    // Instantiate the first BCD full-adder for the least significant digit
+    bcd_fadd adder0 (
+        .a(a[3:0]),
+        .b(b[3:0]),
+        .cin(cin),
+        .cout(c1),
+        .sum(sum[3:0])
+    );
+
+    // Instantiate the second BCD full-adder
+    bcd_fadd adder1 (
+        .a(a[7:4]),
+        .b(b[7:4]),
+        .cin(c1),
+        .cout(c2),
+        .sum(sum[7:4])
+    );
+
+    // Instantiate the third BCD full-adder
+    bcd_fadd adder2 (
+        .a(a[11:8]),
+        .b(b[11:8]),
+        .cin(c2),
+        .cout(c3),
+        .sum(sum[11:8])
+    );
+
+    // Instantiate the fourth BCD full-adder for the most significant digit
+    bcd_fadd adder3 (
+        .a(a[15:12]),
+        .b(b[15:12]),
+        .cin(c3),
+        .cout(cout),
+        .sum(sum[15:12])
+    );
+
+endmodule
+```

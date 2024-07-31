@@ -1,0 +1,83 @@
+Given the structured reasoning provided, we can now translate this into a Verilog module for a finite state machine (FSM) that detects PS/2 mouse message boundaries. Here's the Verilog implementation based on the identified states and logic:
+
+```verilog
+module top_module (
+    input wire clk,
+    input wire reset,
+    input wire [7:0] in,
+    output reg done
+);
+    // State declarations
+    typedef enum reg [1:0] {
+        IDLE  = 2'b00,  // Waiting for the start of a message
+        BYTE1 = 2'b01,  // First byte of the message detected
+        BYTE2 = 2'b10,  // Second byte of the message
+        BYTE3 = 2'b11   // Third byte of the message
+    } state_t;
+    
+    // Current state and next state registers
+    reg [1:0] current_state, next_state;
+    
+    // State transition logic (combinational)
+    always @(*) begin
+        case (current_state)
+            IDLE: begin
+                if (in[3] == 1'b1) begin
+                    next_state = BYTE1;
+                end else begin
+                    next_state = IDLE;
+                end
+                done = 1'b0;
+            end
+            
+            BYTE1: begin
+                next_state = BYTE2;
+                done = 1'b0;
+            end
+            
+            BYTE2: begin
+                next_state = BYTE3;
+                done = 1'b0;
+            end
+            
+            BYTE3: begin
+                next_state = IDLE;
+                done = 1'b1;  // Assert 'done' when in BYTE3
+            end
+            
+            default: begin
+                next_state = IDLE;
+                done = 1'b0;
+            end
+        endcase
+    end
+    
+    // State flip-flops (sequential logic)
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+    
+endmodule
+```
+
+### Explanation:
+
+1. **State Declarations:**
+    - The states are defined using an enumerated type `state_t` for clarity.
+    - States are `IDLE`, `BYTE1`, `BYTE2`, and `BYTE3`.
+
+2. **State Transition Logic:**
+    - This logic is implemented in the `always @(*)` block.
+    - Depending on the current state and input conditions, the FSM transitions to the next state.
+    - `done` is asserted high only when the FSM is in `BYTE3`.
+
+3. **Sequential Logic:**
+    - This logic is implemented in the `always @(posedge clk or posedge reset)` block.
+    - On a reset signal, the state is set to `IDLE`.
+    - Otherwise, the FSM transitions to the next state on each clock edge.
+
+This FSM ensures that the `done` signal is asserted immediately after receiving the third byte of each PS/2 mouse message, thus correctly identifying message boundaries.

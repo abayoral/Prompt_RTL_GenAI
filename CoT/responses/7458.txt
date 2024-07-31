@@ -1,47 +1,82 @@
-Chain of Thought:
+### Chain of Thought:
 
-    Understand the Requirements:
-        A 7458 chip has four AND gates and two OR gates.
-        For each of the two sets of inputs, the AND gates are connected to the OR gate.
-        The OR gate outputs the final result.
-        Eight inputs are associated with the first set: p1a, p1b, p1c, p1d (first AND gate), p1e and p1f (second AND gate).
-        Four inputs are associated with the second set: p2a, p2b (first AND gate), p2c and p2d (second AND gate).
-        p1y is the output of the first OR gate and p2y is the output of the second OR gate.
+1. **Understand the Requirements:**
+    - The module mimics the 7458 chip functionality which has four AND gates and two OR gates.
+    - The inputs (p1a, p1b, p1c, p1d, p1e, p1f) and outputs (p1y, p2y) need to be driven by their respective logic gates.
+    - Inputs:
+        - Group 1: p1a, p1b, p1c, p1d, p1e, p1f
+        - Group 2: p2a, p2b, p2c, p2d
+    - Outputs:
+        - p1y (driven by OR gates combining the results of four AND gates)
+        - p2y (driven by one OR gate combining the results of two AND gates)
 
-    Determine the Inputs and Outputs:
-        Inputs: p1a, p1b, p1c, p1d, p1e, p1f, p2a, p2b, p2c, p2d
-        Outputs: p1y, p2y
+2. **Determine the Logic:**
+    - For p1y:
+        - Combines four AND gates:
+            - AND Gate 1: p1a & p1b
+            - AND Gate 2: p1c & p1d
+            - AND Gate 3: p1e
+            - AND Gate 4: p1f
+        - OR gate combining the above four AND gate results.
+    - For p2y:
+        - Combines two AND gates:
+            - AND Gate 1: p2a & p2b
+            - AND Gate 2: p2c & p2d
+        - OR gate combining the above two AND gate results.
 
-    Define Intermediate Signals:
-        Forming two AND gates for each OR gate requires intermediate signals.
-        Use wires p1_and1, p1_and2 to represent the outputs of the first AND gates and 
-        wires p2_and1, p2_and2 to represent the outputs of the second AND gates.
+3. **Structuring the Module:**
+    - Declare the module with specified inputs and outputs.
+    - Use intermediate wires for AND gate results.
+    - Use assign statements to drive the outputs using the intermediate AND gate results combined with OR gates.
 
-    Structuring the Module:
-        Start with the module declaration, specifying the inputs and outputs.
-        Declare the intermediate signals.
-        Use assign statements to construct the AND and OR gates.
-        Using '&' for the AND operation and '|' for the OR operation.
-        Each OR gate takes the outputs of two AND gates.
+### Writing the Verilog Code Using Intermediate Wires:
 
-Writing the Verilog Code:
-
-verilog
-
-module top_module (
+```verilog
+module top_module ( 
     input p1a, p1b, p1c, p1d, p1e, p1f,
     output p1y,
     input p2a, p2b, p2c, p2d,
-    output p2y
+    output p2y 
 );
-    // Intermediate signals for AND gate outputs
-    wire p1_and1, p1_and2, p2_and1, p2_and2;
-    // AND gates logic
-    assign p1_and1 = p1a & p1b & p1c & p1d;
-    assign p1_and2 = p1e & p1f;
-    assign p2_and1 = p2a & p2b;
-    assign p2_and2 = p2c & p2d;
-    // OR gates logic
-    assign p1y = p1_and1 | p1_and2;
-    assign p2y = p2_and1 | p2_and2;
+    // Intermediate signals for AND gate results
+    wire and_p1ab, and_p1cd, and_p1e, and_p1f;
+    wire and_p2ab, and_p2cd;
+
+    // AND gates for p1y
+    assign and_p1ab = p1a & p1b;
+    assign and_p1cd = p1c & p1d;
+    assign and_p1e = p1e;
+    assign and_p1f = p1f;
+
+    // OR gate for p1y combining all AND gate results
+    assign p1y = and_p1ab | and_p1cd | and_p1e | and_p1f;
+
+    // AND gates for p2y
+    assign and_p2ab = p2a & p2b;
+    assign and_p2cd = p2c & p2d;
+
+    // OR gate for p2y combining both AND gate results
+    assign p2y = and_p2ab | and_p2cd;
+
 endmodule
+```
+
+### Writing the Verilog Code Without Intermediate Wires:
+
+```verilog
+module top_module ( 
+    input p1a, p1b, p1c, p1d, p1e, p1f,
+    output p1y,
+    input p2a, p2b, p2c, p2d,
+    output p2y 
+);
+    // OR gate for p1y combining the results of four AND gates
+    assign p1y = (p1a & p1b) | (p1c & p1d) | (p1e) | (p1f);
+
+    // OR gate for p2y combining the results of two AND gates
+    assign p2y = (p2a & p2b) | (p2c & p2d);
+    
+endmodule
+```
+
+Both implementations provide the same functionality, with the first one using intermediate wires and the second one directly using `assign` statements for the final outputs.

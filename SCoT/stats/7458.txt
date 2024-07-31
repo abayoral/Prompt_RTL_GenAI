@@ -1,6 +1,45 @@
-hdlbits_testbenches/7458_0_tb.v:25: error: port ``p1e'' is not a port of UUT.
-hdlbits_testbenches/7458_0_tb.v:25: error: port ``p1f'' is not a port of UUT.
-2 error(s) during elaboration.
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Test 3 passed!
+Test 4 passed!
+Test 5 passed!
+Test 6 passed!
+Mismatch at index 7: Inputs = [0, 1, 1, 0, 0, 1, 0, 0, 1, 1], Generated = [0, 0], Reference = [0, 1]
+Mismatch at index 8: Inputs = [0, 1, 1, 0, 0, 1, 0, 0, 1, 1], Generated = [0, 0], Reference = [0, 1]
+Test 9 passed!
+Test 10 passed!
+Test 11 passed!
+Test 12 passed!
+Mismatch at index 13: Inputs = [1, 1, 0, 0, 1, 1, 0, 1, 1, 0], Generated = [1, 0], Reference = [0, 0]
+Mismatch at index 14: Inputs = [1, 1, 0, 0, 1, 1, 0, 1, 1, 0], Generated = [1, 0], Reference = [0, 0]
+Mismatch at index 15: Inputs = [1, 1, 1, 0, 1, 1, 0, 1, 1, 1], Generated = [1, 0], Reference = [1, 1]
+Mismatch at index 16: Inputs = [1, 1, 1, 0, 1, 1, 0, 1, 1, 1], Generated = [1, 0], Reference = [1, 1]
+Test 17 passed!
+Test 18 passed!
+Mismatch at index 19: Inputs = [0, 0, 1, 1, 0, 0, 1, 0, 0, 1], Generated = [1, 0], Reference = [0, 0]
+Mismatch at index 20: Inputs = [0, 0, 1, 1, 0, 0, 1, 0, 0, 1], Generated = [1, 0], Reference = [0, 0]
+Test 21 passed!
+Test 22 passed!
+Mismatch at index 23: Inputs = [0, 1, 1, 1, 0, 1, 1, 0, 1, 1], Generated = [1, 0], Reference = [0, 1]
+Mismatch at index 24: Inputs = [0, 1, 1, 1, 0, 1, 1, 0, 1, 1], Generated = [1, 0], Reference = [0, 1]
+Mismatch at index 25: Inputs = [1, 0, 0, 1, 1, 0, 1, 1, 0, 0], Generated = [0, 0], Reference = [0, 1]
+Mismatch at index 26: Inputs = [1, 0, 0, 1, 1, 0, 1, 1, 0, 0], Generated = [0, 0], Reference = [0, 1]
+Mismatch at index 27: Inputs = [1, 0, 1, 1, 1, 0, 1, 1, 0, 1], Generated = [1, 0], Reference = [0, 1]
+Mismatch at index 28: Inputs = [1, 0, 1, 1, 1, 0, 1, 1, 0, 1], Generated = [1, 0], Reference = [0, 1]
+Mismatch at index 29: Inputs = [1, 1, 0, 1, 1, 1, 1, 1, 1, 0], Generated = [1, 0], Reference = [1, 1]
+Mismatch at index 30: Inputs = [1, 1, 0, 1, 1, 1, 1, 1, 1, 0], Generated = [1, 0], Reference = [1, 1]
+Test 31 passed!
+Test 32 passed!
+Test 33 passed!
+Test 34 passed!
+Test 35 passed!
+Test 36 passed!
+Test 37 passed!
+Test 38 passed!
+16 mismatches out of 39 total tests.
+hdlbits_testbenches/7458_0_tb.v:502: $finish called at 78000 (10ps)
 Module file path: SCoT/modules/7458.v
 Testbench file path: hdlbits_testbenches/7458_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/7458_sim', 'SCoT/modules/7458.v', 'hdlbits_testbenches/7458_0_tb.v']' returned non-zero exit status 2.
+Compilation successful. Executable created at SCoT/simulations/7458_sim
+Simulation completed successfully.

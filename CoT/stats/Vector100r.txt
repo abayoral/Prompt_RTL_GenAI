@@ -1,0 +1,4 @@
+CoT/modules/Vector100r.v:1: error: Variable declaration in unnamed block requires SystemVerilog.
+Module file path: CoT/modules/Vector100r.v
+Testbench file path: hdlbits_testbenches/Vector100r_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/Vector100r_sim', 'CoT/modules/Vector100r.v', 'hdlbits_testbenches/Vector100r_0_tb.v']' returned non-zero exit status 1.

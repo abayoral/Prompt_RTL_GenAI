@@ -1,0 +1,26 @@
+Mismatch at index 0: Inputs = [1, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [0, 00010001, 01011001, 01010101]
+Mismatch at index 1: Inputs = [0, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [0, 00010001, 01011001, 01010101]
+Mismatch at index 2: Inputs = [1, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [0, 00010001, 01011001, 01010110]
+Mismatch at index 3: Inputs = [0, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [0, 00010001, 01011001, 01010110]
+Mismatch at index 4: Inputs = [1, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [0, 00010001, 01011001, 01010111]
+Mismatch at index 5: Inputs = [0, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [0, 00010001, 01011001, 01010111]
+Mismatch at index 6: Inputs = [1, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [0, 00010001, 01011001, 01011000]
+Mismatch at index 7: Inputs = [0, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [0, 00010001, 01011001, 01011000]
+Mismatch at index 8: Inputs = [1, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [0, 00010001, 01011001, 01011001]
+Mismatch at index 9: Inputs = [0, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [0, 00010001, 01011001, 01011001]
+Mismatch at index 10: Inputs = [1, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [1, 00010010, 00000000, 00000000]
+Mismatch at index 11: Inputs = [0, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [1, 00010010, 00000000, 00000000]
+Mismatch at index 12: Inputs = [1, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [1, 00010010, 00000000, 00000001]
+Mismatch at index 13: Inputs = [0, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [1, 00010010, 00000000, 00000001]
+Mismatch at index 14: Inputs = [1, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [1, 00010010, 00000000, 00000010]
+Mismatch at index 15: Inputs = [0, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [1, 00010010, 00000000, 00000010]
+Mismatch at index 16: Inputs = [1, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [1, 00010010, 00000000, 00000011]
+Mismatch at index 17: Inputs = [0, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [1, 00010010, 00000000, 00000011]
+Mismatch at index 18: Inputs = [1, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [1, 00010010, 00000000, 00000100]
+Mismatch at index 19: Inputs = [0, 0, 1], Generated = [x, xxxxxxxx, xxxxxxxx, xxxxxxxx], Reference = [1, 00010010, 00000000, 00000100]
+20 mismatches out of 20 total tests.
+hdlbits_testbenches/Count_clock_0_tb.v:278: $finish called at 40000 (10ps)
+Module file path: CoT/modules/Count_clock.v
+Testbench file path: hdlbits_testbenches/Count_clock_0_tb.v
+Compilation successful. Executable created at CoT/simulations/Count_clock_sim
+Simulation completed successfully.

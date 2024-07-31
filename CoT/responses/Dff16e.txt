@@ -1,0 +1,52 @@
+To tackle this task, let's break it down step-by-step:
+
+1. **Understand the Requirements:**
+   - We need to create a module containing 16 D flip-flops.
+   - The flip-flops are divided into two bytes (upper byte and lower byte).
+   - There are `byteena` signals to control whether to write to the upper byte (`byteena[1]`) or lower byte (`byteena[0]`).
+   - A synchronous, active-low reset signal (`resetn`) should reset the outputs to zero.
+   - The flip-flops are triggered by the positive edge of the clock (`clk`).
+
+2. **Determine the Inputs and Outputs:**
+   - Inputs: `clk`, `resetn`, `byteena`, `d`
+   - Outputs: `q`
+
+3. **Intermediate Signals:**
+   - Not required as we can implement the logic directly in the `always` block.
+
+4. **Structural Approach:**
+   - Use an `always` block triggered on the positive edge of `clk`.
+   - Inside the `always` block, if `resetn` is low, set the output `q` to zero.
+   - If `resetn` is high, update the output `q` based on the `byteena` signals.
+     - If `byteena[1]` is high, update the upper byte (`q[15:8]`) with `d[15:8]`.
+     - If `byteena[0]` is high, update the lower byte (`q[7:0]`) with `d[7:0]`.
+
+Now let's write the required Verilog module:
+
+```verilog
+module top_module (
+    input clk,
+    input resetn,
+    input [1:0] byteena,
+    input [15:0] d,
+    output reg [15:0] q
+);
+
+    // Flip-flop logic: Capture d at the rising edge of clk based on byteena bits
+    always @(posedge clk) begin
+        if (!resetn) begin
+            // Active-low reset: set q to zero when resetn is low
+            q <= 16'b0;
+        end else begin
+            // Write to flip-flops based on byteena signals
+            if (byteena[1]) 
+                q[15:8] <= d[15:8];
+
+            if (byteena[0])
+                q[7:0] <= d[7:0];
+        end
+    end
+endmodule
+```
+
+This code satisfies the requirements by using an `always` block to capture values based on the provided control signals and synchronous reset condition.

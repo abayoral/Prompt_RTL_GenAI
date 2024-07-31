@@ -1,0 +1,44 @@
+SCoT/modules/Fsm3.v:13: warning: macro verilog undefined (and assumed null) at this point.
+SCoT/modules/Fsm3.v:23: warning: macro reg undefined (and assumed null) at this point.
+SCoT/modules/Fsm3.v:25: warning: macro verilog undefined (and assumed null) at this point.
+SCoT/modules/Fsm3.v:39: warning: macro case undefined (and assumed null) at this point.
+SCoT/modules/Fsm3.v:39: warning: macro in undefined (and assumed null) at this point.
+SCoT/modules/Fsm3.v:41: warning: macro verilog undefined (and assumed null) at this point.
+SCoT/modules/Fsm3.v:58: warning: macro verilog undefined (and assumed null) at this point.
+SCoT/modules/Fsm3.v:7: syntax error
+SCoT/modules/Fsm3.v:15: error: Invalid module item.
+SCoT/modules/Fsm3.v:19: syntax error
+SCoT/modules/Fsm3.v:23: error: Stray tic (`) here. Perhaps you put white space between the tic and preprocessor directive?
+SCoT/modules/Fsm3.v:26: error: Invalid module item.
+SCoT/modules/Fsm3.v:35: syntax error
+SCoT/modules/Fsm3.v:39: error: Stray tic (`) here. Perhaps you put white space between the tic and preprocessor directive?
+SCoT/modules/Fsm3.v:45: error: Invalid module item.
+SCoT/modules/Fsm3.v:46: syntax error
+SCoT/modules/Fsm3.v:46: error: Invalid module item.
+SCoT/modules/Fsm3.v:47: syntax error
+SCoT/modules/Fsm3.v:47: error: Invalid module item.
+SCoT/modules/Fsm3.v:48: syntax error
+SCoT/modules/Fsm3.v:48: error: Invalid module item.
+SCoT/modules/Fsm3.v:49: syntax error
+SCoT/modules/Fsm3.v:49: error: Invalid module item.
+SCoT/modules/Fsm3.v:50: syntax error
+SCoT/modules/Fsm3.v:62: error: Invalid module item.
+SCoT/modules/Fsm3.v:63: syntax error
+SCoT/modules/Fsm3.v:63: error: Invalid module item.
+SCoT/modules/Fsm3.v:64: syntax error
+SCoT/modules/Fsm3.v:64: error: Invalid module item.
+SCoT/modules/Fsm3.v:65: syntax error
+SCoT/modules/Fsm3.v:65: error: Invalid module item.
+SCoT/modules/Fsm3.v:66: syntax error
+SCoT/modules/Fsm3.v:66: error: Invalid module item.
+SCoT/modules/Fsm3.v:67: syntax error
+SCoT/modules/Fsm3.v:76: error: Invalid module item.
+SCoT/modules/Fsm3.v:80: error: 'B' has already been declared in this scope.
+SCoT/modules/Fsm3.v:16:      : It was declared here as a parameter.
+SCoT/modules/Fsm3.v:81: error: 'C' has already been declared in this scope.
+SCoT/modules/Fsm3.v:17:      : It was declared here as a parameter.
+SCoT/modules/Fsm3.v:82: error: 'D' has already been declared in this scope.
+SCoT/modules/Fsm3.v:18:      : It was declared here as a parameter.
+Module file path: SCoT/modules/Fsm3.v
+Testbench file path: hdlbits_testbenches/Fsm3_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'SCoT/simulations/Fsm3_sim', 'SCoT/modules/Fsm3.v', 'hdlbits_testbenches/Fsm3_0_tb.v']' returned non-zero exit status 31.

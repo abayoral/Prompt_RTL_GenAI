@@ -1,0 +1,22 @@
+```verilog
+module top_module (
+    input wire clk,
+    input wire [7:0] d,
+    output reg [7:0] q
+);
+    // D flip-flop logic: Capture d at the rising edge of clk for each bit
+    always @(posedge clk) begin
+        q <= d;
+    end
+endmodule
+```
+### Explanation:
+1. **Module Declaration:**
+   - The module is named `top_module` and has three ports: `clk`, `d`, and `q`.
+   - `clk` is the shared clock signal for all D flip-flops.
+   - `d` is an 8-bit input vector.
+   - `q` is an 8-bit output vector.
+
+2. **Always Block:**
+   - We use an `always` block triggered on the rising edge of `clk`.
+   - Inside the `always` block, the value of `d` is assigned to `q` using a non-blocking assignment (`<=`). This ensures each bit in `d` is captured into the corresponding bit in `q` on the rising edge of `clk`.

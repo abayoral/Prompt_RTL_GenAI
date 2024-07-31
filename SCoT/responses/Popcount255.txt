@@ -1,0 +1,42 @@
+```verilog
+module top_module (
+    input wire [254:0] in,
+    output reg [7:0] out
+);
+    integer i;
+    
+    // Always block to calculate the population count
+    always @(*) begin
+        // Initialize the output count to zero
+        out = 8'b00000000;
+        
+        // Loop over each bit in the input vector
+        for (i = 0; i < 255; i = i + 1) begin
+            if (in[i] == 1'b1) begin
+                out = out + 1;
+            end
+        end
+    end
+endmodule
+```
+
+### Explanation:
+1. **Module Declaration**:
+   - The module is named `top_module`.
+   - The input, `in`, is a 255-bit wide vector.
+   - The output, `out`, is an 8-bit wide vector to store the count of 1s.
+
+2. **Intermediate Variables**:
+   - A variable `i` of type integer is declared for the loop index.
+
+3. **Always Block**:
+   - The always block is triggered by any change in the inputs.
+   - The output (`out`) is initialized to 0 at the beginning of the always block.
+   
+4. **For Loop**:
+   - The for loop iterates over each bit of the input vector (`in`).
+   - For each bit, it checks if the bit is 1 (`if (in[i] == 1'b1)`).
+   - If the current bit is 1, the intermediate count (`out`) is incremented by 1.
+
+5. **Output Assignment**:
+   - After the completion of the loop, the final value of `out` holds the count of 1s in the input vector.
