@@ -1,0 +1,7 @@
+Self-calibration/modules/Module_shift8.v:21: syntax error
+Self-calibration/modules/Module_shift8.v:21: error: Incomprehensible case expression.
+Self-calibration/modules/Module_shift8.v:22: syntax error
+Self-calibration/modules/Module_shift8.v:22: error: Incomprehensible case expression.
+Module file path: Self-calibration/modules/Module_shift8.v
+Testbench file path: hdlbits_testbenches/Module_shift8_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Self-calibration/simulations/Module_shift8_sim', 'Self-calibration/modules/Module_shift8.v', 'hdlbits_testbenches/Module_shift8_0_tb.v']' returned non-zero exit status 4.

@@ -1,0 +1,61 @@
+```verilog
+module add1 (
+    input a,
+    input b,
+    input cin,
+    output sum,
+    output cout
+);
+    assign {cout, sum} = a + b + cin;
+endmodule
+
+module add16 (
+    input [15:0] a,
+    input [15:0] b,
+    input cin,
+    output [15:0] sum,
+    output cout
+);
+    wire [15:0] carry;
+    genvar i;
+
+    generate
+        for (i = 0; i < 16; i = i + 1) begin: adder_stage
+            if (i == 0) begin
+                add1 u0 (a[i], b[i], cin, sum[i], carry[i]);
+            end else begin
+                add1 u1 (a[i], b[i], carry[i-1], sum[i], carry[i]);
+            end
+        end
+    endgenerate
+    assign cout = carry[15];
+endmodule
+
+module top_module (
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+    wire [15:0] sum_lower;
+    wire [15:0] sum_upper;
+    wire carry_out_lower;
+
+    add16 lower_adder (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum_lower),
+        .cout(carry_out_lower)
+    );
+
+    add16 upper_adder (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(carry_out_lower),
+        .sum(sum_upper),
+        .cout(/* this carry out is ignored*/)
+    );
+
+    assign sum = {sum_upper, sum_lower};
+endmodule
+```

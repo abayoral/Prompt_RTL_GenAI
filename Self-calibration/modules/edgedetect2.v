@@ -3,13 +3,12 @@ module top_module (
     input [7:0] in,
     output reg [7:0] anyedge
 );
-    
-    reg [7:0] in_prev;
-    
-    always @(posedge clk) 
-    begin
-        anyedge <= (in ^ in_prev) & in;  // Detect edge and check if input is 1
-        in_prev <= in;   // Memorize the current input for the next clock cycle
+
+    reg [7:0] in_d;
+
+    always @(posedge clk) begin
+        in_d <= in;
+        anyedge <= in ^ in_d;
     end
 
 endmodule

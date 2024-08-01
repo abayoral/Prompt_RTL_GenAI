@@ -1,0 +1,25 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Mismatch at index 3: Inputs = [1, 0, 1], Generated = [1, 1, 1], Reference = [1, 1, 0]
+Mismatch at index 4: Inputs = [0, 0, 1], Generated = [1, 1, 1], Reference = [1, 1, 0]
+Test 5 passed!
+Test 6 passed!
+Mismatch at index 7: Inputs = [1, 1, 1], Generated = [0, 0, 0], Reference = [0, 0, 1]
+Mismatch at index 8: Inputs = [0, 1, 1], Generated = [0, 0, 0], Reference = [0, 0, 1]
+Test 9 passed!
+Test 10 passed!
+Mismatch at index 11: Inputs = [1, 0, 1], Generated = [1, 1, 1], Reference = [1, 1, 0]
+Mismatch at index 12: Inputs = [0, 0, 1], Generated = [1, 1, 1], Reference = [1, 1, 0]
+Test 13 passed!
+Test 14 passed!
+Mismatch at index 15: Inputs = [1, 1, 1], Generated = [0, 0, 0], Reference = [0, 0, 1]
+Mismatch at index 16: Inputs = [0, 1, 1], Generated = [0, 0, 0], Reference = [0, 0, 1]
+Test 17 passed!
+Test 18 passed!
+8 mismatches out of 19 total tests.
+hdlbits_testbenches/Alwaysblock2_0_tb.v:265: $finish called at 38000 (10ps)
+Module file path: Self-consistency/modules/Alwaysblock2.v
+Testbench file path: hdlbits_testbenches/Alwaysblock2_0_tb.v
+Compilation successful. Executable created at Self-consistency/simulations/Alwaysblock2_sim
+Simulation completed successfully.

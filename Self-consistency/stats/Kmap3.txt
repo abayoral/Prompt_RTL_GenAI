@@ -1,0 +1,32 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Mismatch at index 3: Inputs = [0, 0, 0, 1], Generated = [1], Reference = [0]
+Mismatch at index 4: Inputs = [0, 0, 0, 1], Generated = [1], Reference = [0]
+Mismatch at index 5: Inputs = [0, 0, 1, 0], Generated = [0], Reference = [1]
+Mismatch at index 6: Inputs = [0, 0, 1, 0], Generated = [0], Reference = [1]
+Mismatch at index 7: Inputs = [0, 0, 1, 1], Generated = [0], Reference = [1]
+Mismatch at index 8: Inputs = [0, 0, 1, 1], Generated = [0], Reference = [1]
+Mismatch at index 11: Inputs = [0, 1, 0, 1], Generated = [1], Reference = [0]
+Mismatch at index 12: Inputs = [0, 1, 0, 1], Generated = [1], Reference = [0]
+Test 13 passed!
+Test 14 passed!
+Test 15 passed!
+Test 16 passed!
+Mismatch at index 17: Inputs = [1, 0, 0, 0], Generated = [0], Reference = [1]
+Mismatch at index 18: Inputs = [1, 0, 0, 0], Generated = [0], Reference = [1]
+Mismatch at index 21: Inputs = [1, 0, 1, 0], Generated = [0], Reference = [1]
+Mismatch at index 22: Inputs = [1, 0, 1, 0], Generated = [0], Reference = [1]
+Mismatch at index 23: Inputs = [1, 0, 1, 1], Generated = [0], Reference = [1]
+Mismatch at index 24: Inputs = [1, 0, 1, 1], Generated = [0], Reference = [1]
+Test 25 passed!
+Test 26 passed!
+Test 29 passed!
+Test 30 passed!
+Test 31 passed!
+14 mismatches out of 32 total tests.
+hdlbits_testbenches/Kmap3_0_tb.v:357: $finish called at 64000 (10ps)
+Module file path: Self-consistency/modules/Kmap3.v
+Testbench file path: hdlbits_testbenches/Kmap3_0_tb.v
+Compilation successful. Executable created at Self-consistency/simulations/Kmap3_sim
+Simulation completed successfully.

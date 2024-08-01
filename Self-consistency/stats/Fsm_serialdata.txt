@@ -1,0 +1,7 @@
+Self-consistency/modules/Fsm_serialdata.v:10: syntax error
+Self-consistency/modules/Fsm_serialdata.v:10: error: Invalid module instantiation
+Self-consistency/modules/Fsm_serialdata.v:17: syntax error
+Self-consistency/modules/Fsm_serialdata.v:17: error: Invalid module instantiation
+Module file path: Self-consistency/modules/Fsm_serialdata.v
+Testbench file path: hdlbits_testbenches/Fsm_serialdata_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Self-consistency/simulations/Fsm_serialdata_sim', 'Self-consistency/modules/Fsm_serialdata.v', 'hdlbits_testbenches/Fsm_serialdata_0_tb.v']' returned non-zero exit status 4.

@@ -1,0 +1,38 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Mismatch at index 3: Inputs = [0, 0, 0, 1], Generated = [0], Reference = [1]
+Mismatch at index 4: Inputs = [0, 0, 0, 1], Generated = [0], Reference = [1]
+Mismatch at index 5: Inputs = [0, 0, 1, 0], Generated = [0], Reference = [1]
+Mismatch at index 6: Inputs = [0, 0, 1, 0], Generated = [0], Reference = [1]
+Test 7 passed!
+Test 8 passed!
+Test 9 passed!
+Test 10 passed!
+Test 11 passed!
+Test 12 passed!
+Mismatch at index 13: Inputs = [0, 1, 1, 0], Generated = [1], Reference = [0]
+Mismatch at index 14: Inputs = [0, 1, 1, 0], Generated = [1], Reference = [0]
+Test 15 passed!
+Test 16 passed!
+Test 17 passed!
+Test 18 passed!
+Mismatch at index 19: Inputs = [1, 0, 0, 1], Generated = [1], Reference = [0]
+Mismatch at index 20: Inputs = [1, 0, 0, 1], Generated = [1], Reference = [0]
+Test 21 passed!
+Test 22 passed!
+Test 23 passed!
+Test 24 passed!
+Test 25 passed!
+Test 26 passed!
+Mismatch at index 27: Inputs = [1, 1, 0, 1], Generated = [0], Reference = [1]
+Mismatch at index 28: Inputs = [1, 1, 0, 1], Generated = [0], Reference = [1]
+Mismatch at index 29: Inputs = [1, 1, 1, 0], Generated = [0], Reference = [1]
+Mismatch at index 30: Inputs = [1, 1, 1, 0], Generated = [0], Reference = [1]
+Test 31 passed!
+12 mismatches out of 32 total tests.
+hdlbits_testbenches/Kmap4_0_tb.v:411: $finish called at 64000 (10ps)
+Module file path: Self-calibration/modules/Kmap4.v
+Testbench file path: hdlbits_testbenches/Kmap4_0_tb.v
+Compilation successful. Executable created at Self-calibration/simulations/Kmap4_sim
+Simulation completed successfully.

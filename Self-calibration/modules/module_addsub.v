@@ -7,15 +7,24 @@ module top_module(
 
     wire [15:0] sum1, sum2;
     wire cout1, cout2;
-    wire [31:0] inverted_b;
+    wire [31:0] b_xor_sub;
 
-    // create xor gate to Invert b whenever sub is '1'
-    assign inverted_b = b ^ {32{sub}};
+    assign b_xor_sub = b ^ {32{sub}};
 
-    // create 16-bit adders
-    add16 add16_1(.a(a[15:0]), .b(inverted_b[15:0]), .cin(sub), .sum(sum1), .cout(cout1));
-    add16 add16_2(.a(a[31:16]), .b(inverted_b[31:16]), .cin(cout1), .sum(sum2), .cout(cout2));
-
-    assign sum = {sum2, sum1};
+    add16 adder1 (
+        .a(a[15:0]),
+        .b(b_xor_sub[15:0]),
+        .cin(sub),
+        .sum(sum[15:0]),
+        .cout(cout1)
+    );
+    
+    add16 adder2 (
+        .a(a[31:16]),
+        .b(b_xor_sub[31:16]),
+        .cin(cout1),
+        .sum(sum[31:16]),
+        .cout(cout2)
+    );
 
 endmodule

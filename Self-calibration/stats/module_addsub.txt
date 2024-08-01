@@ -1,9 +1,9 @@
-Self-consistency/modules/module_addsub.v:16: error: Unknown module type: add16
-Self-consistency/modules/module_addsub.v:17: error: Unknown module type: add16
+Self-calibration/modules/Module_addsub.v:14: error: Unknown module type: add16
+Self-calibration/modules/Module_addsub.v:22: error: Unknown module type: add16
 3 error(s) during elaboration.
 *** These modules were missing:
         add16 referenced 2 times.
 ***
-Module file path: Self-consistency/modules/module_addsub.v
+Module file path: Self-calibration/modules/Module_addsub.v
 Testbench file path: hdlbits_testbenches/Module_addsub_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Self-consistency/simulations/module_addsub_sim', 'Self-consistency/modules/module_addsub.v', 'hdlbits_testbenches/Module_addsub_0_tb.v']' returned non-zero exit status 3.
+Error during compilation: Command '['iverilog', '-o', 'Self-calibration/simulations/Module_addsub_sim', 'Self-calibration/modules/Module_addsub.v', 'hdlbits_testbenches/Module_addsub_0_tb.v']' returned non-zero exit status 3.

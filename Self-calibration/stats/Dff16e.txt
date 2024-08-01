@@ -1,0 +1,25 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Mismatch at index 3: Inputs = [1, 1, 01, 1101011000001001], Generated = [0011010100001001], Reference = [0011010100100100]
+Mismatch at index 4: Inputs = [0, 1, 01, 1101011000001001], Generated = [0011010100001001], Reference = [0011010100100100]
+Mismatch at index 5: Inputs = [1, 1, 10, 0101011001100011], Generated = [0101011000001001], Reference = [0011010100001001]
+Mismatch at index 6: Inputs = [0, 1, 10, 0101011001100011], Generated = [0101011000001001], Reference = [0011010100001001]
+Mismatch at index 7: Inputs = [1, 1, 11, 0111101100001101], Generated = [0111101100001101], Reference = [0101011000001001]
+Mismatch at index 8: Inputs = [0, 1, 11, 0111101100001101], Generated = [0111101100001101], Reference = [0101011000001001]
+Test 9 passed!
+Test 10 passed!
+Mismatch at index 11: Inputs = [1, 1, 01, 1000010001100101], Generated = [0111101101100101], Reference = [0111101100001101]
+Mismatch at index 12: Inputs = [0, 1, 01, 1000010001100101], Generated = [0111101101100101], Reference = [0111101100001101]
+Mismatch at index 13: Inputs = [1, 1, 10, 0101001000010010], Generated = [0101001001100101], Reference = [0111101101100101]
+Mismatch at index 14: Inputs = [0, 1, 10, 0101001000010010], Generated = [0101001001100101], Reference = [0111101101100101]
+Mismatch at index 15: Inputs = [1, 1, 11, 1110001100000001], Generated = [1110001100000001], Reference = [0101001001100101]
+Mismatch at index 16: Inputs = [0, 1, 11, 1110001100000001], Generated = [1110001100000001], Reference = [0101001001100101]
+Test 17 passed!
+Test 18 passed!
+12 mismatches out of 19 total tests.
+hdlbits_testbenches/Dff16e_0_tb.v:264: $finish called at 38000 (10ps)
+Module file path: Self-calibration/modules/Dff16e.v
+Testbench file path: hdlbits_testbenches/Dff16e_0_tb.v
+Compilation successful. Executable created at Self-calibration/simulations/Dff16e_sim
+Simulation completed successfully.

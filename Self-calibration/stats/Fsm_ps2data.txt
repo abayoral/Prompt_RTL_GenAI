@@ -1,0 +1,7 @@
+Self-calibration/modules/Fsm_ps2data.v:9: syntax error
+Self-calibration/modules/Fsm_ps2data.v:9: error: Invalid module instantiation
+Self-calibration/modules/Fsm_ps2data.v:15: syntax error
+Self-calibration/modules/Fsm_ps2data.v:15: error: Invalid module instantiation
+Module file path: Self-calibration/modules/Fsm_ps2data.v
+Testbench file path: hdlbits_testbenches/Fsm_ps2data_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Self-calibration/simulations/Fsm_ps2data_sim', 'Self-calibration/modules/Fsm_ps2data.v', 'hdlbits_testbenches/Fsm_ps2data_0_tb.v']' returned non-zero exit status 4.

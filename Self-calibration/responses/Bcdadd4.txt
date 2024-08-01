@@ -1,0 +1,31 @@
+```verilog
+module bcd_fadd (
+    input [3:0] a,
+    input [3:0] b,
+    input     cin,
+    output   cout,
+    output [3:0] sum );
+
+    wire [4:0] tmp;
+    assign tmp = a + b + cin;
+    
+    // If sum > 9, then we need to adjust it
+    assign {cout, sum} = (tmp > 9) ? (tmp + 4'b0110) : tmp;
+
+endmodule
+
+module top_module (
+    input [15:0] a, b,
+    input cin,
+    output cout,
+    output [15:0] sum );
+
+    wire cout1, cout2, cout3;
+
+    bcd_fadd digit0 ( .a(a[3:0]  ), .b(b[3:0]  ), .cin(cin   ), .cout(cout1), .sum(sum[3:0]  ) );
+    bcd_fadd digit1 ( .a(a[7:4]  ), .b(b[7:4]  ), .cin(cout1 ), .cout(cout2), .sum(sum[7:4]  ) );
+    bcd_fadd digit2 ( .a(a[11:8] ), .b(b[11:8] ), .cin(cout2 ), .cout(cout3), .sum(sum[11:8] ) );
+    bcd_fadd digit3 ( .a(a[15:12]), .b(b[15:12]), .cin(cout3 ), .cout(cout  ), .sum(sum[15:12]) );
+
+endmodule
+```

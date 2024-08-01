@@ -1,0 +1,5 @@
+Self-consistency/modules/Conwaylife.v:1: error: Variable declaration in unnamed block requires SystemVerilog.
+Self-consistency/modules/Conwaylife.v:1: error: Variable declaration in unnamed block requires SystemVerilog.
+Module file path: Self-consistency/modules/Conwaylife.v
+Testbench file path: hdlbits_testbenches/Conwaylife_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Self-consistency/simulations/Conwaylife_sim', 'Self-consistency/modules/Conwaylife.v', 'hdlbits_testbenches/Conwaylife_0_tb.v']' returned non-zero exit status 2.

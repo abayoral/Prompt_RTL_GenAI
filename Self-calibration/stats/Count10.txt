@@ -1,0 +1,42 @@
+Test 1 passed!
+Test 2 passed!
+Mismatch at index 3: Inputs = [1, 0], Generated = [0001], Reference = [0000]
+Mismatch at index 4: Inputs = [0, 0], Generated = [0010], Reference = [0000]
+Mismatch at index 5: Inputs = [1, 0], Generated = [0011], Reference = [0001]
+Mismatch at index 6: Inputs = [0, 0], Generated = [0100], Reference = [0001]
+Mismatch at index 7: Inputs = [1, 0], Generated = [0101], Reference = [0010]
+Mismatch at index 8: Inputs = [0, 0], Generated = [0110], Reference = [0010]
+Mismatch at index 9: Inputs = [1, 0], Generated = [0111], Reference = [0011]
+Mismatch at index 10: Inputs = [0, 1], Generated = [0000], Reference = [0011]
+Test 11 passed!
+Test 12 passed!
+Mismatch at index 13: Inputs = [1, 0], Generated = [0001], Reference = [0000]
+Mismatch at index 14: Inputs = [0, 0], Generated = [0010], Reference = [0000]
+Mismatch at index 15: Inputs = [1, 0], Generated = [0011], Reference = [0001]
+Mismatch at index 16: Inputs = [0, 0], Generated = [0100], Reference = [0001]
+Mismatch at index 17: Inputs = [1, 0], Generated = [0101], Reference = [0010]
+Mismatch at index 18: Inputs = [0, 0], Generated = [0110], Reference = [0010]
+Mismatch at index 19: Inputs = [1, 0], Generated = [0111], Reference = [0011]
+Mismatch at index 20: Inputs = [0, 0], Generated = [1000], Reference = [0011]
+Mismatch at index 21: Inputs = [1, 0], Generated = [1001], Reference = [0100]
+Mismatch at index 22: Inputs = [0, 0], Generated = [0000], Reference = [0100]
+Mismatch at index 23: Inputs = [1, 0], Generated = [0001], Reference = [0101]
+Mismatch at index 24: Inputs = [0, 0], Generated = [0010], Reference = [0101]
+Mismatch at index 25: Inputs = [1, 0], Generated = [0011], Reference = [0110]
+Mismatch at index 26: Inputs = [0, 0], Generated = [0100], Reference = [0110]
+Mismatch at index 27: Inputs = [1, 0], Generated = [0101], Reference = [0111]
+Mismatch at index 28: Inputs = [0, 0], Generated = [0110], Reference = [0111]
+Mismatch at index 29: Inputs = [1, 0], Generated = [0111], Reference = [1000]
+Test 30 passed!
+Test 31 passed!
+Mismatch at index 32: Inputs = [0, 0], Generated = [0000], Reference = [1001]
+Mismatch at index 33: Inputs = [1, 0], Generated = [0001], Reference = [0000]
+Mismatch at index 34: Inputs = [0, 0], Generated = [0010], Reference = [0000]
+Mismatch at index 35: Inputs = [1, 0], Generated = [0011], Reference = [0001]
+Mismatch at index 36: Inputs = [0, 0], Generated = [0100], Reference = [0001]
+30 mismatches out of 37 total tests.
+hdlbits_testbenches/Count10_0_tb.v:469: $finish called at 74000 (10ps)
+Module file path: Self-calibration/modules/Count10.v
+Testbench file path: hdlbits_testbenches/Count10_0_tb.v
+Compilation successful. Executable created at Self-calibration/simulations/Count10_sim
+Simulation completed successfully.

@@ -1,0 +1,15 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Test 3 passed!
+Test 4 passed!
+Test 5 passed!
+Test 6 passed!
+Test 7 passed!
+Test 8 passed!
+All tests passed!
+hdlbits_testbenches/Reduction_0_tb.v:132: $finish called at 18000 (10ps)
+Module file path: Self-calibration/modules/Reduction.v
+Testbench file path: hdlbits_testbenches/Reduction_0_tb.v
+Compilation successful. Executable created at Self-calibration/simulations/Reduction_sim
+Simulation completed successfully.

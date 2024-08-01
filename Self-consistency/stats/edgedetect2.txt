@@ -25,7 +25,7 @@ Mismatch at index 24: Inputs = [0, 00000000], Generated = [00000000], Reference 
 Test 25 passed!
 10 mismatches out of 26 total tests.
 hdlbits_testbenches/Edgedetect2_0_tb.v:337: $finish called at 52000 (10ps)
-Module file path: Self-consistency/modules/edgedetect2.v
+Module file path: Self-consistency/modules/Edgedetect2.v
 Testbench file path: hdlbits_testbenches/Edgedetect2_0_tb.v
-Compilation successful. Executable created at Self-consistency/simulations/edgedetect2_sim
+Compilation successful. Executable created at Self-consistency/simulations/Edgedetect2_sim
 Simulation completed successfully.
