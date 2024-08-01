@@ -1,0 +1,8 @@
+RaR/modules/Bugs_nand3.v:5: error: Unknown module type: andgate
+2 error(s) during elaboration.
+*** These modules were missing:
+        andgate referenced 1 times.
+***
+Module file path: RaR/modules/Bugs_nand3.v
+Testbench file path: hdlbits_testbenches/Bugs_nand3_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Bugs_nand3_sim', 'RaR/modules/Bugs_nand3.v', 'hdlbits_testbenches/Bugs_nand3_0_tb.v']' returned non-zero exit status 2.

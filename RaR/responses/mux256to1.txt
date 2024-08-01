@@ -1,11 +1,11 @@
 ```verilog
-module top_module #(parameter WIDTH = 256) (
-  input  [WIDTH-1:0] in,
-  input  [7:0]       sel,
-  output             out
+module top_module( 
+    input [255:0] in,    // 256-bit input vector
+    input [7:0] sel,     // 8-bit selector
+    output out          // 1-bit output
 );
-  assign out = in[sel];
+
+    assign out = in[sel];
+
 endmodule
 ```
-In Verilog, it is easy to extract a particular bit from a vector by index. Note how the example uses `sel` as an index directly. In hardware, this would be implemented with a large multiplexer.
-The WIDTH parameter is set to 256 as required, but in case of requirement changes (smaller or larger numbers of inputs), it is easy to adjust.

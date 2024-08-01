@@ -1,4 +1,4 @@
-// you're a senior Computer Architecture Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining the company's reputation in the industry.
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
 
 // Build the adder-subtractor below.
 // You are provided with a 16-bit adder module, which you need to instantiate twice:

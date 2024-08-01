@@ -3,16 +3,38 @@ module top_module(
     input [31:0] b,
     output [31:0] sum
 );
-    wire [15:0] sum1, sum2, sum3;
-    wire c1, c2, c3;
-    
-    // Instantiate the add16 modules
-    add16 u1 (a[15:0], b[15:0], 0, sum1, c1); // Least significant 16 bits
-    add16 u2 (a[31:16], b[31:16], 0, sum2, c2);
-    add16 u3 (a[31:16], b[31:16], 1, sum3, c3);
-    
-    // Instantiate the 2-to-1 multiplexer module
-    mux16 mux1 (.a(sum2), .b(sum3), .sel(c1), .y(sum[31:16]));
-    
-    assign sum[15:0] = sum1;
+    wire [15:0] sum_low, sum_high0, sum_high1;
+    wire cout_low, cout_high0, cout_high1;
+
+    // Lower 16 bits addition with carry-in = 0
+    add16 u1 (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum_low),
+        .cout(cout_low)
+    );
+
+    // Upper 16 bits addition with carry-in = 0
+    add16 u2 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b0),
+        .sum(sum_high0),
+        .cout(cout_high0)
+    );
+
+    // Upper 16 bits addition with carry-in = 1
+    add16 u3 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b1),
+        .sum(sum_high1),
+        .cout(cout_high1)
+    );
+
+    // Select the correct upper 16 bits sum based on cout_low
+    assign sum[15:0] = sum_low;
+    assign sum[31:16] = cout_low ? sum_high1 : sum_high0;
+
 endmodule

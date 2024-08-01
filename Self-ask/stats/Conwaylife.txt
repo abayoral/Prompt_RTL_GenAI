@@ -1,0 +1,27 @@
+Self-ask/modules/Conwaylife.v:22: error: A reference to a wire or reg (`nr') is not allowed in a constant expression.
+Self-ask/modules/Conwaylife.v:22: error: Array index expressions must be constant here.
+Self-ask/modules/Conwaylife.v:22: error: Unable to elaborate condition expression.
+Self-ask/modules/Conwaylife.v:35: error: A reference to a wire or reg (`i') is not allowed in a constant expression.
+Self-ask/modules/Conwaylife.v:35: error: Array index expressions must be constant here.
+Self-ask/modules/Conwaylife.v:42: error: A reference to a wire or reg (`i') is not allowed in a constant expression.
+Self-ask/modules/Conwaylife.v:42: error: Array index expressions must be constant here.
+Self-ask/modules/Conwaylife.v:42: error: A reference to a wire or reg (`i') is not allowed in a constant expression.
+Self-ask/modules/Conwaylife.v:42: error: Array index expressions must be constant here.
+Self-ask/modules/Conwaylife.v:43: error: A reference to a wire or reg (`i') is not allowed in a constant expression.
+Self-ask/modules/Conwaylife.v:43: error: Array index expressions must be constant here.
+Self-ask/modules/Conwaylife.v:43: error: A reference to a wire or reg (`i') is not allowed in a constant expression.
+Self-ask/modules/Conwaylife.v:43: error: Array index expressions must be constant here.
+Self-ask/modules/Conwaylife.v:44: error: A reference to a wire or reg (`i') is not allowed in a constant expression.
+Self-ask/modules/Conwaylife.v:44: error: Array index expressions must be constant here.
+Self-ask/modules/Conwaylife.v:45: error: A reference to a wire or reg (`i') is not allowed in a constant expression.
+Self-ask/modules/Conwaylife.v:45: error: Array index expressions must be constant here.
+Self-ask/modules/Conwaylife.v:51: error: A reference to a wire or reg (`i') is not allowed in a constant expression.
+Self-ask/modules/Conwaylife.v:51: error: Array index expressions must be constant here.
+Self-ask/modules/Conwaylife.v:51: error: A reference to a wire or reg (`i') is not allowed in a constant expression.
+Self-ask/modules/Conwaylife.v:51: error: Array index expressions must be constant here.
+Self-ask/modules/Conwaylife.v:58: error: A reference to a wire or reg (`i') is not allowed in a constant expression.
+Self-ask/modules/Conwaylife.v:58: error: Array index expressions must be constant here.
+23 error(s) during elaboration.
+Module file path: Self-ask/modules/Conwaylife.v
+Testbench file path: hdlbits_testbenches/Conwaylife_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Self-ask/simulations/Conwaylife_sim', 'Self-ask/modules/Conwaylife.v', 'hdlbits_testbenches/Conwaylife_0_tb.v']' returned non-zero exit status 23.

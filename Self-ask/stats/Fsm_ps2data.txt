@@ -1,0 +1,7 @@
+Self-ask/modules/Fsm_ps2data.v:9: syntax error
+Self-ask/modules/Fsm_ps2data.v:9: error: Invalid module instantiation
+Self-ask/modules/Fsm_ps2data.v:10: syntax error
+Self-ask/modules/Fsm_ps2data.v:10: error: Invalid module instantiation
+Module file path: Self-ask/modules/Fsm_ps2data.v
+Testbench file path: hdlbits_testbenches/Fsm_ps2data_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Self-ask/simulations/Fsm_ps2data_sim', 'Self-ask/modules/Fsm_ps2data.v', 'hdlbits_testbenches/Fsm_ps2data_0_tb.v']' returned non-zero exit status 4.

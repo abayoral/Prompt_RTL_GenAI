@@ -1,19 +1,26 @@
+Thank you for the clarification. Here is the complete Verilog module:
+
+```verilog
 module top_module ( 
     input p1a, p1b, p1c, p1d, p1e, p1f,
     output p1y,
     input p2a, p2b, p2c, p2d,
     output p2y );
 
-  wire w1, w2, w3, w4;
+    // Intermediate wires for AND gate outputs
+    wire and1_out, and2_out, and3_out, and4_out;
 
-  // AND gates
-  assign w1 = p1a & p1b;
-  assign w2 = p1c & p1d;
-  assign w3 = p1e & p1f;
-  assign w4 = p2a & p2b;
+    // AND gates for p1y
+    assign and1_out = p1a & p1b & p1c; // First AND gate for p1y
+    assign and2_out = p1d & p1e & p1f; // Second AND gate for p1y
 
-  // OR gates
-  assign p1y = w1 | w2;
-  assign p2y = w3 | w4;
+    // AND gates for p2y
+    assign and3_out = p2a & p2b; // First AND gate for p2y
+    assign and4_out = p2c & p2d; // Second AND gate for p2y
+
+    // OR gates for final outputs
+    assign p1y = and1_out | and2_out; // OR gate for p1y
+    assign p2y = and3_out | and4_out; // OR gate for p2y
 
 endmodule
+```

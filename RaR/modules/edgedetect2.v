@@ -1,14 +1,14 @@
 module top_module (
-    input wire clk,
-    input wire [7:0] in,
-    output reg [7:0] anyedge
-);
+    input clk,      // Clock signal
+    input [7:0] in, // 8-bit input vector
+    output reg [7:0] anyedge // 8-bit output vector indicating 0 to 1 transitions
+); 
 
-    reg [7:0] old_state;
+    reg [7:0] prev_in;
 
     always @(posedge clk) begin
-        anyedge = old_state ^ in;  // edge detection: XOR the current and previous input signals
-        old_state = in;            // update the old input signal state for the next clock cycle
+        anyedge <= (in & ~prev_in);
+        prev_in <= in;
     end
 
 endmodule

@@ -1,12 +1,11 @@
-Zero-shot/modules/countbcd.v:12: error: ena is not a valid l-value in top_module_tb.UUT.
-Zero-shot/modules/countbcd.v:4:      : ena is declared here as wire.
-Zero-shot/modules/countbcd.v:17: error: ena['sd1] is not a valid l-value in top_module_tb.UUT.
-Zero-shot/modules/countbcd.v:4:      : ena['sd1] is declared here as wire.
-Zero-shot/modules/countbcd.v:22: error: ena['sd2] is not a valid l-value in top_module_tb.UUT.
-Zero-shot/modules/countbcd.v:4:      : ena['sd2] is declared here as wire.
-Zero-shot/modules/countbcd.v:27: error: ena['sd3] is not a valid l-value in top_module_tb.UUT.
-Zero-shot/modules/countbcd.v:4:      : ena['sd3] is declared here as wire.
-4 error(s) during elaboration.
-Module file path: Zero-shot/modules/countbcd.v
+RoEm/modules/Countbcd.v:11: error: Unknown module type: bcd_counter
+RoEm/modules/Countbcd.v:20: error: Unknown module type: bcd_counter
+RoEm/modules/Countbcd.v:29: error: Unknown module type: bcd_counter
+RoEm/modules/Countbcd.v:38: error: Unknown module type: bcd_counter
+5 error(s) during elaboration.
+*** These modules were missing:
+        bcd_counter referenced 4 times.
+***
+Module file path: RoEm/modules/Countbcd.v
 Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/countbcd_sim', 'Zero-shot/modules/countbcd.v', 'hdlbits_testbenches/Countbcd_0_tb.v']' returned non-zero exit status 4.
+Error during compilation: Command '['iverilog', '-o', 'RoEm/simulations/Countbcd_sim', 'RoEm/modules/Countbcd.v', 'hdlbits_testbenches/Countbcd_0_tb.v']' returned non-zero exit status 5.

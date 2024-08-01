@@ -39,7 +39,13 @@ os.environ['framework_name'] = framework_name
 if framework_name == "RaR":
     framework_directory = os.path.join(os.getcwd(), "RaR")
     script_path = os.path.join(framework_directory, "rar.py")
-    # Update prompts and stats directory for Self-ask framework
+    # Update prompts and stats directory for RaR framework
+    prompts_dir = os.path.join(framework_directory, 'prompts')
+    stats_dir = os.path.join(framework_directory, 'stats')
+elif framework_name == "RoEm":
+    framework_directory = os.path.join(os.getcwd(), "RoEm")
+    script_path = os.path.join(framework_directory, "roem.py")
+    # Update prompts and stats directory for RaR framework
     prompts_dir = os.path.join(framework_directory, 'prompts')
     stats_dir = os.path.join(framework_directory, 'stats')
 else:
@@ -51,6 +57,14 @@ else:
 for i in range(5):
     if framework_name == "RaR":
         print(f"Executing rar.py for framework {framework_name} (iteration {i + 1})...")
+        try:
+            subprocess.run(['python', script_path], check=True)
+            print(f"Execution of {script_path} completed successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error executing {script_path}: {e}")
+            continue
+    elif framework_name == "RoEm":
+        print(f"Executing roem.py for framework {framework_name} (iteration {i + 1})...")
         try:
             subprocess.run(['python', script_path], check=True)
             print(f"Execution of {script_path} completed successfully.")

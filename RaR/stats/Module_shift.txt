@@ -1,0 +1,10 @@
+RaR/modules/Module_shift.v:4: error: Unknown module type: my_dff
+RaR/modules/Module_shift.v:5: error: Unknown module type: my_dff
+RaR/modules/Module_shift.v:6: error: Unknown module type: my_dff
+4 error(s) during elaboration.
+*** These modules were missing:
+        my_dff referenced 3 times.
+***
+Module file path: RaR/modules/Module_shift.v
+Testbench file path: hdlbits_testbenches/Module_shift_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Module_shift_sim', 'RaR/modules/Module_shift.v', 'hdlbits_testbenches/Module_shift_0_tb.v']' returned non-zero exit status 4.

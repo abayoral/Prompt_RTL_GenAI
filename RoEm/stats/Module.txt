@@ -1,0 +1,8 @@
+RoEm/modules/Module.v:2: error: Unknown module type: mod_a
+2 error(s) during elaboration.
+*** These modules were missing:
+        mod_a referenced 1 times.
+***
+Module file path: RoEm/modules/Module.v
+Testbench file path: hdlbits_testbenches/Module_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RoEm/simulations/Module_sim', 'RoEm/modules/Module.v', 'hdlbits_testbenches/Module_0_tb.v']' returned non-zero exit status 2.

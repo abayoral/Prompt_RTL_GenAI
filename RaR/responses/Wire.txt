@@ -1,0 +1,10 @@
+```verilog
+// Create a module named 'top_module' that behaves like a wire.
+// The module should have one input ('in') and one output ('out').
+module top_module( input in, output out );
+
+    // Assign the input signal 'in' to the output signal 'out'
+    assign out = in; 
+
+endmodule
+```

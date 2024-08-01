@@ -1,29 +1,76 @@
-module top_module(
-    input wire clk,
-    input wire reset,
-    input wire en,
-    output wire [15:0] q
+module top_module (
+    input clk,
+    input reset,   // Synchronous active-high reset
+    output [3:1] ena,
+    output [15:0] q
 );
 
-    wire [3:0] cnt1, cnt10, cnt100, cnt1000;
-    wire c1, c10, c100, cna;
+    reg [15:0] q_reg, q_next;
+    wire ones_carry, tens_carry, hundreds_carry;
 
-    bcd_counter U1 (
-        .clk(clk), .reset(reset), .en(en), .q(cnt1), .c(c1)
-    );
+    // Output assignments
+    assign q = q_reg;
+    assign ena[1] = ones_carry;
+    assign ena[2] = tens_carry;
+    assign ena[3] = hundreds_ccarry;
 
-    bcd_counter U2 (
-        .clk(clk), .reset(reset), .en(c1 & ena), .q(cnt10), .c(c10)
-    );
+    // Increment and carry logic
+    always @(*) begin
+        // Default next state assignment
+        q_next = q_reg;
+        
+        // Reset condition
+        if (reset) begin
+            q_next = 16'h0000;
+        end else begin
+            // Ones digit (q[3:0])
+            if (q_reg[3:0] == 4'd9) begin
+                q_next[3:0] = 4'd0;
+            end else begin
+                q_next[3:0] = q_reg[3:0] + 4'd1;
+            end
+            
+            // Tens digit enable and increment (q[7:4])
+            if (q_reg[3:0] == 4'd9) begin
+                if (q_reg[7:4] == 4'd9) begin
+                    q_next[7:4] = 4'd0;
+                end else begin
+                    q_next[7:4] = q_reg[7:4] + 4'd1;
+                end
+            end
+            
+            // Hundreds digit enable and increment (q[11:8])
+            if (q_reg[7:4] == 4'd9 && q_reg[3:0] == 4'd9) begin
+                if (q_reg[11:8] == 4'd9) begin
+                    q_next[11:8] = 4'd0;
+                end else begin
+                    q_next[11:8] = q_reg[11:8] + 4'd1;
+                end
+            end
+            
+            // Thousands digit enable and increment (q[15:12])
+            if (q_reg[11:8] == 4'd9 && q_reg[7:4] == 4'd9 && q_reg[3:0] == 4'd9) begin
+                if (q_reg[15:12] == 4'd9) begin
+                    q_next[15:12] = 4'd0;
+                end else begin
+                    q_next[15:12] = q_reg[15:12] + 4'd1;
+                end
+            end
+        end
+    end
 
-    bcd_counter U3 (
-        .clk(clk), .reset(reset), .en(c10 & ena), .q(cnt100), .c(c100)
-    );
+    // Carry signals
+    assign ones_carry = (q_reg[3:0] == 4'd9);
+    assign tens_carry = (q_reg[3:0] == 4'd9) && (q_reg[7:4] == 4'd9);
+    assign hundreds_carry = (q_reg[7:4] == 4'd9) && (q_reg[3:0] == 4'd9) && (q_reg[11:8] == 4'd9);
 
-    bcd_counter U4 (
-        .clk(clk), .reset(reset), .en(c100 & ena), .q(cnt1000), .c(cna)
-    );
-
-    assign q = {cnt1000, cnt100, cnt10, cnt1};
+    // Sequential logic for state updates
+    always @(posedge clk) begin
+        if (reset) begin
+            q_reg <= 16'h0000;
+        end else begin
+            q_reg <= q_next;
+        end
+    end
 
 endmodule

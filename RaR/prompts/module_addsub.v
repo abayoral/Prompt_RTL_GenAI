@@ -1,13 +1,59 @@
-Your project requires you to design a calculating circuit, an adder-subtractor, capable of conducting both addition and subtraction operations. For your convenience, a 16-bit adder module has been furnished, which you will need to use in your circuit design. 
+To better understand the problem statement and the tasks involved, let's break down and expand the question:
 
-The supplied 16-bit adder module is equipped with multiple inputs and outputs. This module hosts two independent 16-bit input numbers, termed as 'a' and 'b'. For functional representation, these are defined as 'input[15:0] a' and 'input[15:0] b'. An auxiliary input called 'cin', denoting the carry input, is also available. Concerning outputs, the module features a sum, expressed as 'output[15:0] sum', along with 'cout', indicating the carry output.
+You need to design an adder-subtractor module that can perform both addition and subtraction on 32-bit inputs. You will be provided with a 16-bit adder module, and this adder module must be instantiated twice in your top-level module to handle the 32-bit inputs.
 
-Your next phase in the project requires the incorporation of this 16-bit adder module twice into the adder-subtractor circuit. This is followed by the deployment of a 32-bit wide XOR gate to alter the 'b' input whenever the subtractor input, identified as "sub", is assigned a value of 1. You can visualize this conceptually as XORing 'b[31:0]' with the subtractor "sub", repeating the process 32 times.
+### Details:
+1. **Provided 16-bit Adder Module:**
+   You have a 16-bit adder module defined as follows:
+   ```verilog
+   module add16 ( 
+       input[15:0] a, 
+       input[15:0] b, 
+       input cin, 
+       output[15:0] sum, 
+       output cout 
+   );
+   ```
+   This module takes two 16-bit inputs (`a` and `b`), a carry-in signal (`cin`), and provides a 16-bit sum output (`sum`) along with a carry-out signal (`cout`).
 
-The design also stipulates forging a connection between the subtractor 'sub' input and the adder's carry-in, cin. 
+2. **32-bit Adder-Subtractor Design:**
+   You are to construct a top module named `top_module` that makes use of the `add16` module to perform operations on 32-bit inputs.
 
-The fundamental or 'top' module of your prospective circuit will incorporate 'a' and 'b' inputs, both of lengths 32 bits, represented as 'input[31:0]a' and 'input[31:0]b'. It will also acknowledge the subtractor input, termed as 'sub', and a 32-bit output sum, depicted as 'output[31:0] sum'.
+3. **Handling the Subtraction:**
+   You will use a 32-bit XOR gate to invert the `b` input when the `sub` signal is 1.
+   - Essentially, `b` should be XORed with `sub` replicated 32 times.
+   - The `sub` signal should also be connected to the carry-in (`cin`) of the adder for the subtraction operation.
 
-Another interesting design aspect to note is considering the XOR gate as a programmable inverter, which implies that one input can control whether the other one should be inverted or not.
+### Inputs and Outputs:
+- **Inputs:**
+  - `a`: a 32-bit wide input.
+  - `b`: a 32-bit wide input.
+  - `sub`: a 1-bit control signal to determine whether the operation is addition (`sub` = 0) or subtraction (`sub` = 1).
 
-Your task's portion that demands the creation of your exclusive code rests within this top module. This specifies that your principal focus should revolve around developing and integrating this unique code within the established complex or top module of the existing circuit framework.
+- **Output:**
+  - `sum`: a 32-bit wide output representing the result of the addition or subtraction.
+
+### Objective:
+Instantiate the `add16` module twice within the `top_module` to handle the full 32-bit `a` and `b` inputs. You will need to divide the 32-bit inputs into lower and upper 16-bit segments and then appropriately combine the results.
+
+### Clarified and Expanded Task:
+1. Instantiate the `add16` module twice to process both the lower and upper 16-bit segments of the 32-bit inputs.
+2. Use a 32-bit XOR operation on the `b` input based on the value of `sub` to determine whether you are performing an addition or subtraction.
+3. Connect the `sub` signal to the `cin` of the first 16-bit adder, and handle the carry-out (`cout`) correctly between the two 16-bit adder instantiations.
+4. Finally, combine the results from the two 16-bit operations to produce the 32-bit `sum` output.
+
+Here is the module definition for reference:
+```verilog
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    input sub,
+    output [31:0] sum
+);
+
+    // Insert your code here
+
+endmodule
+```
+
+Your task is to complete the `top_module` to perform the required adder-subtractor functionality by following the steps and details outlined above.

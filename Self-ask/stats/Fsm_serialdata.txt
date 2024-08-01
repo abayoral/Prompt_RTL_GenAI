@@ -1,0 +1,44 @@
+Self-ask/modules/Fsm_serialdata.v:10: syntax error
+Self-ask/modules/Fsm_serialdata.v:10: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:18: syntax error
+Self-ask/modules/Fsm_serialdata.v:18: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:26: syntax error
+Self-ask/modules/Fsm_serialdata.v:26: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:30: error: Invalid module item.
+Self-ask/modules/Fsm_serialdata.v:31: syntax error
+Self-ask/modules/Fsm_serialdata.v:36: error: Invalid module item.
+Self-ask/modules/Fsm_serialdata.v:37: syntax error
+Self-ask/modules/Fsm_serialdata.v:37: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:38: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:43: syntax error
+Self-ask/modules/Fsm_serialdata.v:43: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:48: syntax error
+Self-ask/modules/Fsm_serialdata.v:48: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:49: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:50: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:54: syntax error
+Self-ask/modules/Fsm_serialdata.v:54: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:57: syntax error
+Self-ask/modules/Fsm_serialdata.v:57: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:58: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:60: syntax error
+Self-ask/modules/Fsm_serialdata.v:60: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:65: syntax error
+Self-ask/modules/Fsm_serialdata.v:65: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:66: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:67: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:69: syntax error
+Self-ask/modules/Fsm_serialdata.v:69: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:74: syntax error
+Self-ask/modules/Fsm_serialdata.v:74: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:78: syntax error
+Self-ask/modules/Fsm_serialdata.v:83: error: Invalid module item.
+Self-ask/modules/Fsm_serialdata.v:84: syntax error
+Self-ask/modules/Fsm_serialdata.v:84: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:86: error: Invalid module item.
+Self-ask/modules/Fsm_serialdata.v:87: syntax error
+Self-ask/modules/Fsm_serialdata.v:87: error: Invalid module instantiation
+Self-ask/modules/Fsm_serialdata.v:91: error: Invalid module item.
+Module file path: Self-ask/modules/Fsm_serialdata.v
+Testbench file path: hdlbits_testbenches/Fsm_serialdata_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Self-ask/simulations/Fsm_serialdata_sim', 'Self-ask/modules/Fsm_serialdata.v', 'hdlbits_testbenches/Fsm_serialdata_0_tb.v']' returned non-zero exit status 41.

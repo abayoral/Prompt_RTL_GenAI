@@ -1,0 +1,8 @@
+RaR/modules/Fsm_serialdp.v:25: error: Unknown module type: parity
+2 error(s) during elaboration.
+*** These modules were missing:
+        parity referenced 1 times.
+***
+Module file path: RaR/modules/Fsm_serialdp.v
+Testbench file path: hdlbits_testbenches/Fsm_serialdp_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Fsm_serialdp_sim', 'RaR/modules/Fsm_serialdp.v', 'hdlbits_testbenches/Fsm_serialdp_0_tb.v']' returned non-zero exit status 2.

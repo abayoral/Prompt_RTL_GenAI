@@ -1,9 +1,15 @@
-You are tasked with creating a version of a binary ripple-carry adder that's optimized specifically for the addition of 3-bit numbers. This task will be accomplished by judiciously incorporating three full-adder subunits into your design. The primary objective of the ripple-carry adder you're constructing is to effectively sum two different 3-bit numbers, along with an additional function known as carry-in. The final product is not just a 3-bit sum but also a standalone carry-out.
+The task requires you to design a 3-bit binary ripple-carry adder by utilizing three instances of a full-adder module. This adder will take in two 3-bit binary numbers and an initial carry-in to produce a 3-bit sum and a carry-out value. To ensure that individual full adders are instantiated and their carry-out values are visible, it is essential to output the carry-out values from each full adder within the ripple-carry adder structure. Specifically, the last carry-out from the third full adder, labeled as cout[2], is the final carry-out that is traditionally observed. Consequently, your goal is to instantiate these full-adders and wire them appropriately to achieve functional adder behavior while also outputting intermediate carry-out values for verification.
 
-The quintessential aspect of your creation is that you architect a ripple-carry adder where each full-adder component not only contributes to the overall operation but also results in its own carry-out. This carry-out is a critical part of the ripple-carry adder that you are building, which utilizes three full-adders.
+With this understanding, please provide the necessary code to implement this functionality within the given module template:
 
-Above all else, ensure that your ripple carry adder design culminates with a final carry-out signal emerging from your third full adder unit, referred to in this context as 'cout[2]'. In most instances, this would be typically the only carry-out signal that would demand your attentive examination. 
+```verilog
+module top_module( 
+    input [2:0] a, b,
+    input cin,
+    output [2:0] cout,
+    output [2:0] sum );
 
-In order to ensure your newly designed ripple-carry adder integrates seamlessly with the current system, please refer to the detailed structure provided as 'top_module'. In this module, 'a', 'b', and 'cin' are the variables worth noting. Here, 'a' and 'b' constitute the two 3-bit numbers to be processed by the adder, while 'cin' is the carry-in. The outcomes from this adder operation – the sums and the carry-outs – are symbolized as 'sum' and 'cout' respectively.
+    // Insert your code here
 
-In the module, there's a piece of placeholder text, urging you to 'Insert your code here'. This is your cue to work in your 3-bit binary ripple-carry adder design. As you elaborate and rework on the question, be conscientious of not incorporating any responses or solutions, as your prime responsibility here is to more lucidly shed light on the question, thereby enhancing its intelligibility.
+endmodule
+```

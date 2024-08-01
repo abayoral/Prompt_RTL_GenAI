@@ -1,0 +1,11 @@
+RoEm/modules/Always_case.v:16: syntax error
+RoEm/modules/Always_case.v:16: error: Incomprehensible case expression.
+RoEm/modules/Always_case.v:17: syntax error
+RoEm/modules/Always_case.v:17: error: Incomprehensible case expression.
+RoEm/modules/Always_case.v:18: syntax error
+RoEm/modules/Always_case.v:18: error: Incomprehensible case expression.
+RoEm/modules/Always_case.v:19: syntax error
+RoEm/modules/Always_case.v:19: error: Incomprehensible case expression.
+Module file path: RoEm/modules/Always_case.v
+Testbench file path: hdlbits_testbenches/Always_case_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RoEm/simulations/Always_case_sim', 'RoEm/modules/Always_case.v', 'hdlbits_testbenches/Always_case_0_tb.v']' returned non-zero exit status 8.

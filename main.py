@@ -57,7 +57,8 @@ for v_file in v_files:
         [part.format(prompt=v_file, name=base_name, testbench=testbench_file) for part in command]
         for command in commands_template
     ]
-
+    
+    '''
     # Execute each command in sequence
     for command in commands:
         try:
@@ -65,6 +66,21 @@ for v_file in v_files:
             with open(stat_file_path, "w") as statfile:
                 result = subprocess.run(command, check=True, stdout=statfile, stderr=statfile)
                 print(f"Command {' '.join(command)} executed successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error executing command {' '.join(command)}: {e}")
+            break
+    '''
+
+    # Execute each command in sequence
+    for command in commands:
+        try:
+            if 'iverilog.py' in command[1]:  # Check if the command is running the testbench
+                stat_file_path = os.path.join(stats_dir, f"{base_name}.txt")
+                with open(stat_file_path, "w") as statfile:
+                    result = subprocess.run(command, check=True, stdout=statfile, stderr=statfile)
+            else:
+                result = subprocess.run(command, check=True)
+            print(f"Command {' '.join(command)} executed successfully.")
         except subprocess.CalledProcessError as e:
             print(f"Error executing command {' '.join(command)}: {e}")
             break

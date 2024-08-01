@@ -1,24 +1,41 @@
-The objective is to develop code for programming a finite state machine (FSM) that functions as a control hub for the operation of a motor. This FSM interacts with four inputs - x, y, 'clk' (recognized as 'clock'), and 'resetn' (primarily used for resetting). In turn, it also produces two resultants, identified as f and g, which directly influence the overall performance of the motor.
+Consider a scenario where you need to design a finite state machine (FSM) for controlling a motor. The FSM takes two inputs, x and y, from the motor, and produces two outputs, f and g, that are used to control the motor's operation. In addition to these inputs and outputs, the FSM also has a clock input (clk) and an active-low synchronous reset input (resetn).
 
-The FSM initially exists in a state referred to as State A, maintaining a static position as long as the 'resetn' input remains confirmed. However, following the de-assertion of the 'resetn' command, as soon as the clock's edge comes into play, the function of the FSM relies on successfully turning the output f into a value of 1, which should persist for a full clock cycle.
+Here are the detailed operational requirements for the FSM:
 
-Upon the completion of the aforementioned clock cycle, the programming of the FSM mandates a constant focus on the x input. The FSM is specifically configured to detect a particular sequence of values represented by 1, 0, and 1 provided by the x input over the course of three clock cycles. If such a pattern is observed, the FSM is then instructed to alter the value of g from its current stage to a value of 1 in the very next clock cycle.
+1. Initially, as long as the reset input (resetn) is active (i.e., low), the FSM should remain in its initial state, referred to as state A.
+2. Once the reset input is de-asserted (i.e., set to high), on the next rising edge of the clock (clk), the FSM should transition from state A and set the output f to 1 for exactly one clock cycle.
+3. Following this transition, the FSM enters a mode where it continuously monitors the value of the input x.
+   - The FSM should specifically look for the sequence 1, 0, 1 on the input x over three successive clock cycles.
+   - When this sequence (1, 0, 1) is detected, the output g should be set to 1 on the subsequent clock cycle.
+4. Once g is set to 1, the FSM should then monitor the input y for up to two clock cycles.
+   - If the input y becomes 1 within these two clock cycles, the output g should remain 1 indefinitely (until the reset is asserted again).
+   - If y does not become 1 within the two clock cycles, the output g should be set to 0 permanently (again, until the reset is asserted).
 
-Moving forward, the FSM continues to keep the g value as 1 while simultaneously observing the y input values. Should the y input produce a value of 1 within the span of the following two clock cycles, the FSM is prepped to lock the output g at the value of 1 until another reset command is triggered. However, a failure on part of y input to achieve a value of 1 within the set period of two clock cycles, calls for the FSM to revert g back to a value of 0, maintaining it until a reset is instructed again.
+A critical detail to note is that the monitoring of the input x does not begin until the clock cycle following the setting of the output f to 1.
 
-It is crucial to remember a specific hint for this FSM's operations, stating that the survey of the x input only commences in the cycle that follows the confirmation of f turning into a value of 1. The preliminary module that sets the FSM's operations into motion is already identified and you are required to develop the coding framework that can actualize these sequences of operations in a timely manner.
+With these requirements in mind, you should implement the FSM using a Verilog module structure as provided. The module should have the following ports:
+- clk: the clock input.
+- resetn: the active-low synchronous reset input.
+- x: input from the motor (monitored for the sequence 1, 0, 1).
+- y: input from the motor (checked within the two-clock-cycle window after g is set to 1).
+- f: the control output that is set to 1 for one clock cycle after the reset is de-asserted.
+- g: the control output that is set to 1 or 0 based on the conditions described.
 
-The structure of the module is defined as follows:
+The Verilog module to implement these functionalities begins as follows:
 
-Module top_module (
+```verilog
+module top_module (
     input clk,
     input resetn,    // active-low synchronous reset
     input x,
     input y,
-    output f,
-    output g
-);
+    output reg f,
+    output reg g
+); 
 
-	// Your code to be inserted here
+    // Insert your code here
 
 endmodule
+```
+
+Make sure to handle various states and transitions carefully to ensure the FSM meets all the specified conditions.

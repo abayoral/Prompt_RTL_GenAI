@@ -1,0 +1,11 @@
+Got it. Let's proceed with the implementation of the population count circuit for a 3-bit input vector, considering that the output should saturate at the maximum value representable by the 2-bit 'out'.
+
+```verilog
+module top_module( 
+    input [2:0] in,
+    output [1:0] out );
+
+    assign out = (in[0] + in[1] + in[2] > 3) ? 2'b11 : in[0] + in[1] + in[2];
+
+endmodule
+```

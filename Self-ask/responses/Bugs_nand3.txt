@@ -1,0 +1,51 @@
+```verilog
+module andgate ( 
+    output out, 
+    input a, 
+    input b, 
+    input c, 
+    input d, 
+    input e 
+);
+    assign out = a & b & c & d & e;
+endmodule
+
+module nandgate (
+    output out, 
+    input a, 
+    input b, 
+    input c
+); 
+
+    wire and_out;
+    
+    // use the 5-input AND gate with two inputs tied to 1
+    andgate inst1 ( 
+        .out(and_out), 
+        .a(a), 
+        .b(b), 
+        .c(c), 
+        .d(1'b1), 
+        .e(1'b1) 
+    );
+
+    assign out = ~and_out;  // NAND operation
+
+endmodule
+
+module top_module (
+    input a, 
+    input b, 
+    input c, 
+    output out
+); 
+
+    nandgate inst1 ( 
+        .out(out), 
+        .a(a), 
+        .b(b), 
+        .c(c)
+    );
+
+endmodule
+```

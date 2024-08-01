@@ -1,4 +1,4 @@
-// you're a senior  Microarchitecture Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining the company's reputation in the industry.
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
 
 // Make 3 instances of full-adder to create a 3-bit binary ripple-carry adder. 
 // The adder adds two 3-bit numbers and a carry-in to produce a 3-bit sum and carry out. 

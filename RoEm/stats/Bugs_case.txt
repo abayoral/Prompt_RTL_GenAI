@@ -1,0 +1,45 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Test 3 passed!
+Test 4 passed!
+Test 5 passed!
+Test 6 passed!
+Test 7 passed!
+Test 8 passed!
+Mismatch at index 9: Inputs = [00011010], Generated = [0001, 0], Reference = [0000, 0]
+Mismatch at index 10: Inputs = [00011010], Generated = [0001, 0], Reference = [0000, 0]
+Test 11 passed!
+Test 12 passed!
+Test 13 passed!
+Test 14 passed!
+Test 15 passed!
+Test 16 passed!
+Test 17 passed!
+Test 18 passed!
+Mismatch at index 19: Inputs = [00100100], Generated = [0101, 0], Reference = [0000, 0]
+Mismatch at index 20: Inputs = [00100100], Generated = [0101, 0], Reference = [0000, 0]
+Test 21 passed!
+Test 22 passed!
+Mismatch at index 23: Inputs = [10000001], Generated = [0110, 0], Reference = [0000, 0]
+Mismatch at index 24: Inputs = [10000001], Generated = [0110, 0], Reference = [0000, 0]
+Test 25 passed!
+Test 26 passed!
+Test 27 passed!
+Test 28 passed!
+Test 29 passed!
+Test 30 passed!
+Test 31 passed!
+Test 32 passed!
+Mismatch at index 33: Inputs = [00001001], Generated = [1001, 0], Reference = [0000, 0]
+Mismatch at index 34: Inputs = [00001001], Generated = [1001, 0], Reference = [0000, 0]
+Mismatch at index 35: Inputs = [01100011], Generated = [1001, 0], Reference = [0000, 0]
+Mismatch at index 36: Inputs = [01100011], Generated = [1001, 0], Reference = [0000, 0]
+Mismatch at index 37: Inputs = [00001101], Generated = [1001, 0], Reference = [0000, 0]
+Mismatch at index 38: Inputs = [00001101], Generated = [1001, 0], Reference = [0000, 0]
+12 mismatches out of 39 total tests.
+hdlbits_testbenches/Bugs_case_0_tb.v:493: $finish called at 78000 (10ps)
+Module file path: RoEm/modules/Bugs_case.v
+Testbench file path: hdlbits_testbenches/Bugs_case_0_tb.v
+Compilation successful. Executable created at RoEm/simulations/Bugs_case_sim
+Simulation completed successfully.

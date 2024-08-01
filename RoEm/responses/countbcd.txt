@@ -1,39 +1,78 @@
+```verilog
+module bcd_counter (
+    input clk,
+    input reset,
+    input ena,
+    output reg [3:0] q,
+    output reg ena_out
+);
+    always @(posedge clk) begin
+        if (reset) begin
+            q <= 4'd0;
+            ena_out <= 1'b0;
+        end else if (ena) begin
+            if (q == 4'd9) begin
+                q <= 4'd0;
+                ena_out <= 1'b1;
+            end else begin
+                q <= q + 4'd1;
+                ena_out <= 1'b0;
+            end
+        end else begin
+            ena_out <= 1'b0;
+        end
+    end
+endmodule
+
 module top_module (
     input clk,
     input reset,   // Synchronous active-high reset
     output [3:1] ena,
-    output [15:0] q);
+    output [15:0] q
+);
+    wire ena1, ena2, ena3;
+    wire ena1_out, ena2_out, ena3_out;
 
-    reg [15:0] counter;
-    
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            counter <= 16'h0000; // Reset the count
-            ena <= 3'b000;
-        end
-        else begin
-            if (counter[3:0] == 4'hA) begin    // If ones digit reaches 10
-                counter[3:0] <= 4'h0;  // Reset ones digit
-                ena[1] <= 1'b1;    // Enable tens digit to increment
-            end
-            
-            if (counter[7:4] == 4'hA && ena[1] == 1'b1) begin   // If tens digit reaches 10 and enabled
-                counter[7:4] <= 4'h0;  // Reset tens digit
-                ena[2] <= 1'b1;    // Enable hundreds digit to increment
-            end
-            
-            if (counter[11:8] == 4'hA && ena[2] == 1'b1) begin  // If hundreds digit reaches 10 and enabled
-                counter[11:8] <= 4'h0;  // Reset hundreds digit
-                ena[3] <= 1'b1;    // Enable thousands digit to increment
-            end
+    // Ones digit (q[3:0])
+    bcd_counter digit0 (
+        .clk(clk),
+        .reset(reset),
+        .ena(1'b1),
+        .q(q[3:0]),
+        .ena_out(ena1_out)
+    );
 
-            if (counter[15:12] == 4'hA && ena[3] == 1'b1)    // If thousands digit reaches 10 and enabled
-                counter[15:12] <= 4'h0;  // Reset thousands digit
-            
-            counter <= counter + 1;  // Increment the counter
-        end
-    end
+    // Tens digit (q[7:4])
+    bcd_counter digit1 (
+        .clk(clk),
+        .reset(reset),
+        .ena(ena1_out),
+        .q(q[7:4]),
+        .ena_out(ena2_out)
+    );
 
-    assign q = counter;  // Assign counter to output q
+    // Hundreds digit (q[11:8])
+    bcd_counter digit2 (
+        .clk(clk),
+        .reset(reset),
+        .ena(ena2_out),
+        .q(q[11:8]),
+        .ena_out(ena3_out)
+    );
+
+    // Thousands digit (q[15:12])
+    bcd_counter digit3 (
+        .clk(clk),
+        .reset(reset),
+        .ena(ena3_out),
+        .q(q[15:12]),
+        .ena_out()
+    );
+
+    // Enable signals
+    assign ena[1] = ena1_out;
+    assign ena[2] = ena2_out;
+    assign ena[3] = ena3_out;
 
 endmodule
+```

@@ -1,0 +1,7 @@
+RoEm/modules/Fsm_serialdp.v:10: syntax error
+RoEm/modules/Fsm_serialdp.v:10: error: Invalid module instantiation
+RoEm/modules/Fsm_serialdp.v:20: syntax error
+RoEm/modules/Fsm_serialdp.v:20: error: Invalid module instantiation
+Module file path: RoEm/modules/Fsm_serialdp.v
+Testbench file path: hdlbits_testbenches/Fsm_serialdp_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RoEm/simulations/Fsm_serialdp_sim', 'RoEm/modules/Fsm_serialdp.v', 'hdlbits_testbenches/Fsm_serialdp_0_tb.v']' returned non-zero exit status 4.

@@ -1,0 +1,36 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Test 3 passed!
+Test 4 passed!
+Test 5 passed!
+Test 6 passed!
+Test 7 passed!
+Test 8 passed!
+Test 9 passed!
+Test 10 passed!
+Test 11 passed!
+Test 12 passed!
+Test 13 passed!
+Test 14 passed!
+Mismatch at index 15: Inputs = [1, 0, 00000000000000000000000000000000], Generated = [00000000000000000000000000001110], Reference = [00000000000000000000000000000000]
+Mismatch at index 16: Inputs = [0, 0, 00000000000000000000000000000000], Generated = [00000000000000000000000000001110], Reference = [00000000000000000000000000000000]
+Test 17 passed!
+Test 18 passed!
+Test 19 passed!
+Test 20 passed!
+Mismatch at index 21: Inputs = [1, 1, 00000000000000000000000000000010], Generated = [00000000000000000000000000000000], Reference = [00000000000000000000000000001110]
+Mismatch at index 22: Inputs = [0, 1, 00000000000000000000000000000010], Generated = [00000000000000000000000000000000], Reference = [00000000000000000000000000001110]
+Mismatch at index 23: Inputs = [1, 0, 00000000000000000000000000000000], Generated = [00000000000000000000000000000010], Reference = [00000000000000000000000000000000]
+Mismatch at index 24: Inputs = [0, 0, 00000000000000000000000000000000], Generated = [00000000000000000000000000000010], Reference = [00000000000000000000000000000000]
+Test 25 passed!
+Test 26 passed!
+Test 27 passed!
+Test 28 passed!
+Test 29 passed!
+6 mismatches out of 30 total tests.
+hdlbits_testbenches/Edgecapture_0_tb.v:395: $finish called at 60000 (10ps)
+Module file path: RoEm/modules/Edgecapture.v
+Testbench file path: hdlbits_testbenches/Edgecapture_0_tb.v
+Compilation successful. Executable created at RoEm/simulations/Edgecapture_sim
+Simulation completed successfully.

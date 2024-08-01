@@ -4,24 +4,29 @@ module top_module(
     input sub,
     output [31:0] sum
 );
-    wire [31:0] binv;
-    wire [15:0] sum1, sum2;
-    wire c1, c2;
+    wire [15:0] sum_lower, sum_upper;
+    wire cout_lower, cout_upper;
+    wire [31:0] b_xor_sub;
 
-    assign binv = b ^ {32{sub}};
-   
-    add16 adder1(.a(a[15:0]),
-                 .b(binv[15:0]),
-                 .cin(sub),
-                 .sum(sum1),
-                 .cout(c1));
+    assign b_xor_sub = b ^ {32{sub}}; // Apply XOR with sub across all 32 bits of b
 
-    add16 adder2(.a(a[31:16]),
-                 .b(binv[31:16]),
-                 .cin(c1),
-                 .sum(sum2),
-                 .cout(c2));
+    // Instantiating the 16-bit adders
+    add16 adder_lower (
+        .a(a[15:0]),
+        .b(b_xor_sub[15:0]),
+        .cin(sub),
+        .sum(sum_lower),
+        .cout(cout_lower)
+    );
 
-    assign sum = {sum2, sum1};
+    add16 adder_upper (
+        .a(a[31:16]),
+        .b(b_xor_sub[31:16]),
+        .cin(cout_lower),
+        .sum(sum_upper),
+        .cout(cout_upper)
+    );
+
+    assign sum = {sum_upper, sum_lower};
 
 endmodule

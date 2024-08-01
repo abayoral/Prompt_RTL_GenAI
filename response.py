@@ -113,14 +113,24 @@ def get_response(design_prompt, module, model_type, outdir="", log=None, prompt_
 
     if prompt_strategy == 'Self-consistency':
         responses = []
-        for i in range(10): 
+        for i in range(5): 
             response = generate_verilog(conv, model_type)
             responses.append(reg.extract_verilog_code(response))
-        
         # Select the most consistent response
         final_response = get_most_consistent_response(responses)
     elif prompt_strategy == 'Self-ask':
-        final_response = handle_self_ask(conv, model_type)
+        final_response = handle_self_ask(conv, model_type,module)
+    elif prompt_strategy == 'Self-calibration':
+        response = generate_verilog(conv, model_type)
+        feedback_sys_prompt = 'You are an expert in Verilog code verification. Your task is to determine whether the provided Verilog code is correct. Respond with only "yes" if the code is correct or "no" if the code is incorrect. Do not provide any explanations, comments, or additional information. Simply answer "yes" or "no".'
+        verilog_code = reg.extract_verilog_code(response)
+        feedback_response = generate_response(feedback_sys_prompt,verilog_code,model_type).strip().lower()
+        if feedback_response == "no":
+            feedback_sys_prompt = 'You are an expert in Verilog coding and digital design. Your task is to review and correct the provided Verilog code. Identify and fix any syntax errors, logical errors, or common pitfalls in the code. Ensure that the corrected code is functional and meets the specifications provided. Respond with only the corrected Verilog code. Do not include any explanations or additional text.'
+            prompt = design_prompt + "/nsolution:/n" + verilog_code
+            final_response = generate_response(feedback_sys_prompt,prompt,model_type)
+        else:
+            final_response = response
     else:
         final_response = generate_verilog(conv, model_type)
 
@@ -130,7 +140,7 @@ def get_response(design_prompt, module, model_type, outdir="", log=None, prompt_
     print(f"Response written to {filename}")
     return final_response
 
-def handle_self_ask(conv, model_type):
+def handle_self_ask(conv, model_type,module):
     """
     Handles the 'Self-ask' prompt strategy by engaging in a multi-turn conversation with the LLM.
 
@@ -141,19 +151,36 @@ def handle_self_ask(conv, model_type):
     Returns:
     str: The final response after self-asking.
     """
+
     clarifying_question_prompt = (
-        "What clarifying questions would you ask to improve the specification of this Verilog module?"
-    )
+    "Identify the one clarifying question that is absolutely necessary to understand the specification of this Verilog module. "
+    "This question should be crucial to understanding the problem, without which a solution cannot be developed. "
+    "If no such question is needed, it is acceptable to proceed without asking any. "
+    "Please avoid asking any question that hints towards a solution.")
     
     # Ask for clarifying questions
     conv.add_message("user", clarifying_question_prompt)
-    questions_response = generate_verilog(conv, model_type)
-    clarifying_questions = extract_questions_from_response(questions_response)
+    question_response = generate_verilog(conv, model_type)
+    # clarifying_questions = extract_questions_from_response(questions_response)
+
+    # Construct the path to the solution file
+    solution_dir = "hdlbits_solutions"
+    solution_file_path = os.path.join(solution_dir, f"{module}.v")
+
+    # Read the solution file
+    if os.path.isfile(solution_file_path):
+        with open(solution_file_path, 'r') as file:
+            solution_code = file.read()
+            # Ask for a short answer based on the question and the solution
+        answer_prompt = question_response + ": " + solution_code                                                                                
+        conv2 = cv.Conversation()
+        conv2.add_message("system","You are an advanced Verilog design assistant. Based on the following Verilog module and the provided solution, generate a short, one-sentence answer to the question. Ensure the response is concise and directly addresses the question.")
+        conv2.add_message("user",answer_prompt)
+        user_answer = generate_verilog(conv2, model_type)
+    else:
+        user_answer = "Question cannot be answered, proceed to generate the Verilog code"
     
-    # User answers the questions
-    for question in clarifying_questions:
-        user_answer = input(f"Please answer the question: {question}\n")
-        conv.add_message("user", user_answer)
+    conv.add_message("user", user_answer)
     
     # Finalize the Verilog module based on the clarifications
     final_response = generate_verilog(conv, model_type)

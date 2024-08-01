@@ -1,0 +1,50 @@
+RaR/modules/Fsm_serialdata.v:10: syntax error
+RaR/modules/Fsm_serialdata.v:10: error: Invalid module instantiation
+RaR/modules/Fsm_serialdata.v:17: syntax error
+RaR/modules/Fsm_serialdata.v:17: error: Invalid module instantiation
+RaR/modules/Fsm_serialdata.v:22: syntax error
+RaR/modules/Fsm_serialdata.v:22: error: Invalid module instantiation
+RaR/modules/Fsm_serialdata.v:26: error: Invalid module item.
+RaR/modules/Fsm_serialdata.v:27: syntax error
+RaR/modules/Fsm_serialdata.v:33: error: Invalid module item.
+RaR/modules/Fsm_serialdata.v:34: syntax error
+RaR/modules/Fsm_serialdata.v:34: error: Invalid module instantiation
+RaR/modules/Fsm_serialdata.v:35: error: Invalid module instantiation
+RaR/modules/Fsm_serialdata.v:36: error: Invalid module instantiation
+RaR/modules/Fsm_serialdata.v:40: error: Invalid module item.
+RaR/modules/Fsm_serialdata.v:42: syntax error
+RaR/modules/Fsm_serialdata.v:42: error: Invalid module instantiation
+RaR/modules/Fsm_serialdata.v:44: syntax error
+RaR/modules/Fsm_serialdata.v:44: error: Invalid module instantiation
+RaR/modules/Fsm_serialdata.v:50: error: Invalid module item.
+RaR/modules/Fsm_serialdata.v:51: syntax error
+RaR/modules/Fsm_serialdata.v:51: error: Invalid module instantiation
+RaR/modules/Fsm_serialdata.v:53: error: Invalid module item.
+RaR/modules/Fsm_serialdata.v:54: syntax error
+RaR/modules/Fsm_serialdata.v:58: error: Invalid module item.
+RaR/modules/Fsm_serialdata.v:60: syntax error
+RaR/modules/Fsm_serialdata.v:60: error: Invalid module instantiation
+RaR/modules/Fsm_serialdata.v:62: syntax error
+RaR/modules/Fsm_serialdata.v:62: error: Invalid module instantiation
+RaR/modules/Fsm_serialdata.v:68: error: Invalid module item.
+RaR/modules/Fsm_serialdata.v:69: syntax error
+RaR/modules/Fsm_serialdata.v:69: error: Invalid module instantiation
+RaR/modules/Fsm_serialdata.v:70: error: Invalid module instantiation
+RaR/modules/Fsm_serialdata.v:72: error: Invalid module item.
+RaR/modules/Fsm_serialdata.v:73: syntax error
+RaR/modules/Fsm_serialdata.v:76: error: Invalid module item.
+RaR/modules/Fsm_serialdata.v:77: syntax error
+hdlbits_testbenches/Fsm_serialdata_0_tb.v:3: error: Invalid module item.
+hdlbits_testbenches/Fsm_serialdata_0_tb.v:8: error: 'clk' has already been declared in this scope.
+RaR/modules/Fsm_serialdata.v:2:      : It was declared here as a net.
+hdlbits_testbenches/Fsm_serialdata_0_tb.v:9: error: 'in' has already been declared in this scope.
+RaR/modules/Fsm_serialdata.v:3:      : It was declared here as a net.
+hdlbits_testbenches/Fsm_serialdata_0_tb.v:10: error: 'reset' has already been declared in this scope.
+RaR/modules/Fsm_serialdata.v:4:      : It was declared here as a net.
+hdlbits_testbenches/Fsm_serialdata_0_tb.v:12: error: 'out_byte' has already been declared in this scope.
+RaR/modules/Fsm_serialdata.v:5:      : It was declared here as a variable.
+hdlbits_testbenches/Fsm_serialdata_0_tb.v:13: error: 'done' has already been declared in this scope.
+RaR/modules/Fsm_serialdata.v:6:      : It was declared here as a variable.
+Module file path: RaR/modules/Fsm_serialdata.v
+Testbench file path: hdlbits_testbenches/Fsm_serialdata_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Fsm_serialdata_sim', 'RaR/modules/Fsm_serialdata.v', 'hdlbits_testbenches/Fsm_serialdata_0_tb.v']' returned non-zero exit status 42.

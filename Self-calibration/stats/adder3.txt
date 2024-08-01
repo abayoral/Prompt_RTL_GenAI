@@ -1,0 +1,7 @@
+Self-consistency/modules/adder3.v:10: error: Module definition Full_Adder cannot nest into module top_module.
+hdlbits_testbenches/Adder3_0_tb.v:3: error: Module definition top_module_tb cannot nest into module top_module.
+hdlbits_testbenches/Adder3_0_tb.v:78: syntax error
+I give up.
+Module file path: Self-consistency/modules/adder3.v
+Testbench file path: hdlbits_testbenches/Adder3_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'Self-consistency/simulations/adder3_sim', 'Self-consistency/modules/adder3.v', 'hdlbits_testbenches/Adder3_0_tb.v']' returned non-zero exit status 4.

@@ -1,0 +1,4 @@
+RoEm/modules/Rule90.v:1: error: Variable declaration in unnamed block requires SystemVerilog.
+Module file path: RoEm/modules/Rule90.v
+Testbench file path: hdlbits_testbenches/Rule90_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RoEm/simulations/Rule90_sim', 'RoEm/modules/Rule90.v', 'hdlbits_testbenches/Rule90_0_tb.v']' returned non-zero exit status 1.

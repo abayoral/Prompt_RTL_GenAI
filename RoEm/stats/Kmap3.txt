@@ -1,0 +1,32 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Test 3 passed!
+Test 4 passed!
+Test 5 passed!
+Test 6 passed!
+Test 7 passed!
+Test 8 passed!
+Test 11 passed!
+Test 12 passed!
+Mismatch at index 13: Inputs = [0, 1, 1, 0], Generated = [1], Reference = [0]
+Mismatch at index 14: Inputs = [0, 1, 1, 0], Generated = [1], Reference = [0]
+Mismatch at index 15: Inputs = [0, 1, 1, 1], Generated = [1], Reference = [0]
+Mismatch at index 16: Inputs = [0, 1, 1, 1], Generated = [1], Reference = [0]
+Mismatch at index 17: Inputs = [1, 0, 0, 0], Generated = [0], Reference = [1]
+Mismatch at index 18: Inputs = [1, 0, 0, 0], Generated = [0], Reference = [1]
+Test 21 passed!
+Test 22 passed!
+Test 23 passed!
+Test 24 passed!
+Test 25 passed!
+Test 26 passed!
+Test 29 passed!
+Test 30 passed!
+Test 31 passed!
+6 mismatches out of 32 total tests.
+hdlbits_testbenches/Kmap3_0_tb.v:357: $finish called at 64000 (10ps)
+Module file path: RoEm/modules/Kmap3.v
+Testbench file path: hdlbits_testbenches/Kmap3_0_tb.v
+Compilation successful. Executable created at RoEm/simulations/Kmap3_sim
+Simulation completed successfully.

@@ -1,0 +1,13 @@
+Here's the Verilog code for the `top_module` with the simplified Boolean expression derived from your provided K-map:
+
+```verilog
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+); 
+    assign out = (~d & b) | (d & ~b);
+endmodule
+```

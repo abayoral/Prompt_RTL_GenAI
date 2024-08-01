@@ -8,7 +8,7 @@ Test 6 passed!
 Test 7 passed!
 All tests passed!
 hdlbits_testbenches/Gates_0_tb.v:127: $finish called at 16000 (10ps)
-Module file path: Self-ask/modules/gates.v
+Module file path: Self-ask/modules/Gates.v
 Testbench file path: hdlbits_testbenches/Gates_0_tb.v
-Compilation successful. Executable created at Self-ask/simulations/gates_sim
+Compilation successful. Executable created at Self-ask/simulations/Gates_sim
 Simulation completed successfully.

@@ -1,0 +1,7 @@
+RaR/modules/Module_shift8.v:19: syntax error
+RaR/modules/Module_shift8.v:19: error: Incomprehensible case expression.
+RaR/modules/Module_shift8.v:20: syntax error
+RaR/modules/Module_shift8.v:20: error: Incomprehensible case expression.
+Module file path: RaR/modules/Module_shift8.v
+Testbench file path: hdlbits_testbenches/Module_shift8_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Module_shift8_sim', 'RaR/modules/Module_shift8.v', 'hdlbits_testbenches/Module_shift8_0_tb.v']' returned non-zero exit status 4.

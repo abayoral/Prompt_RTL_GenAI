@@ -1,21 +1,47 @@
-I would like to request your expertise in creating an innovative 'top_module', leveraging the Verilog hardware description language. This module must be constructed to function as a four-state shift register, with this complex structure requiring the integration of four discrete instances of the MUXDFF sub-circuit. Furthermore, it is necessary to note that the design must be compatible with the DE2 board, a prevalent Field-Programmable Gate Array (FPGA) that plays a crucial role in digital logic circuit design and testing.
+Please create a top-level Verilog module named `top_module` that serves as a 4-bit shift register. This design will be built using four instances of a subcircuit named `MUXDFF`. Here are the detailed requirements for your implementation:
 
-Understanding the functionality of the DE2 board is essential as you will need to connect the circuit's inputs effectively. The main connection points are to the SW switches on the DE2 board, which will be tied to the 'R' inputs of your uniquely designed module. Alongside these essential links, additional inputs must be incorporated: 'clk', 'E', 'L', and 'w'. These inputs should be interfaced directly with the KEY connection points located on the DE2 board, specifically assigned to slots KEY[0], KEY[1], KEY[2], and KEY[3] as per the suggested sequence.
+1. **Module Declaration:**
+   - Name the top-level module `top_module`.
+   - Your module should have the following port declarations:
+     - Inputs:
+       - A 4-bit wide input `SW` which represents the switches.
+       - A 4-bit wide input `KEY` which contains four different control signals:
+         - `KEY[0]` is the clock signal (`clk`).
+         - `KEY[1]` is the enable signal (`E`).
+         - `KEY[2]` is the load signal (`L`).
+         - `KEY[3]` is the write input signal (`w`).
+     - Outputs:
+       - A 4-bit wide output `LEDR` which represents the red LEDs.
 
-In addition to these assembly tasks, your designed circuit's outputs should be configured to lead directly to the LEDR[3:0] indicators on the DE2 board. These are essentially red light-emitting diodes (LED).
+2. **Subcircuit Instantiation:**
+   - Instantiate four instances of your `MUXDFF` subcircuit within the top-level module. Each instance will handle one bit of the 4-bit shift register.
 
-To assist the development of this highly intricate structure, a basic organizational layout is provided, outlining the necessary modules:
+3. **Connection Details:**
+   - Connect the `R` input of each `MUXDFF` instance to the individual bits of the `SW` switches.
+   - The clock signal (`clk`) should be connected to `KEY[0]`.
+   - The enable signal (`E`) should be connected to `KEY[1]`.
+   - The load signal (`L`) should be connected to `KEY[2]`.
+   - The write input signal (`w`) should be connected to `KEY[3]`.
+   - The output of each `MUXDFF` instance should be connected to the respective bits of the `LEDR` output array.
 
+Below is a template to guide your implementation. You should define your `MUXDFF` subcircuit according to the requirements it needs to fulfill. Insert the necessary code into the provided template:
+
+```verilog
 module top_module (
-    input [3:0] SW,
-    input [3:0] KEY,
-    output [3:0] LEDR
+    input [3:0] SW,      // Switches
+    input [3:0] KEY,     // Control signals
+    output [3:0] LEDR    // LED outputs
 );
+
+    // Code to instantiate MUXDFF subcircuits goes here
+
 endmodule
 
-Additionally, in this blueprint, it is mandatory to situate a MUXDFF module within the Verilog file. This module might potentially adopt a structure similar to:
+// Define the MUXDFF subcircuit below
 
 module MUXDFF (...);
+    // Implementation of MUXDFF subcircuit goes here
 endmodule
+```
 
-This MUXDFF module should be integrated directly beneath the previously detailed 'top_module'. However, take note that the specific Verilog coding for all these modules has not been supplied in this query. The scope of this inquiry only extends to the strategic assembly and connection of the modules, as well as their compatibility with the DE2 board's key features.
+Please ensure that each connection and functionality in your `top_module` and `MUXDFF` subcircuit is appropriately handled according to the described specifications.
