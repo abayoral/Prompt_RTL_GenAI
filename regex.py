@@ -6,7 +6,11 @@ def read_generated_code(file_path):
         return file.read()
 
 def extract_verilog_code(text):
-    verilog_pattern = r'(?s)module\s+top_module\s*\(.*?\);\s*.*?endmodule'
+    #verilog_pattern = r'(?s)module\s+top_module\s*\(.*?\);\s*.*?endmodule'
+    verilog_pattern  = r'module\s+\w+\s*(?:#\([^)]*\))?\s*\([\s\S]*?\)\s*;[\s\S]*?endmodule'
+
+
+
     matches = re.findall(verilog_pattern, text, re.DOTALL)
     return '\n\n'.join(matches).strip()
 

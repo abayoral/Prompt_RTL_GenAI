@@ -1,0 +1,26 @@
+```verilog
+module mod_a ( output out1, output out2, input in1, input in2, input in3, input in4);
+// Functionality of mod_a is not provided
+endmodule
+
+module top_module ( 
+    input a, 
+    input b, 
+    input c,
+    input d,
+    output out1,
+    output out2
+);
+
+// Instantiate mod_a and connect ports by name
+mod_a u_mod_a (
+    .out1(out1),
+    .out2(out2),
+    .in1(a),
+    .in2(b),
+    .in3(c),
+    .in4(d)
+);
+
+endmodule
+```

@@ -49,14 +49,23 @@ def get_sys_prompt(prompt_strategy=None):
                 "You are an advanced assistant for designing Verilog modules. "
                 "You will first ask clarifying questions to ensure the specification is clear and complete. "
                 "After getting answers to your questions, you will generate the complete Verilog module. "
-                "Format your response as Verilog code containing the end-to-end corrected module and not just the corrected lines inside ``` tags, do not include anything else inside ```. "
+                "Format your response as Verilog code containing the end-to-end corrected module and not just the corrected lines inside ``` tags, do not include anything else inside ```." 
+            )
+        elif prompt_strategy == 'Least-to-most':
+            return (
+                "You are an advanced Verilog design assistant. You will first break the problem into smaller, manageable sub-problems without solving them. "
+                "Once the sub-problems are identified, solve them one by one, appending the solution of each sub-problem to the prompt until a complete solution is achieved. "
+                "Format your response strictly as follows:\n"
+                "1. Sub-problems: List each sub-problem clearly, prefixed with 'Sub-problem X:'.\n"
+                "2. Solution: Provide the solution for each sub-problem, prefixed with 'Solution for Sub-problem X:'.\n"
+                "Ensure that the final response is a complete Verilog code containing all sub-solutions appended together, and maintain consistency throughout." 
             )
         else:
             return (
                 "You are an autocomplete engine for Verilog code. "
                 "Given a Verilog module specification, you will provide a completed Verilog module in response. "
                 "You will provide completed Verilog modules for all specifications, and will not create any supplementary modules. "
-                "Format your response as Verilog code containing the end-to-end corrected module and not just the corrected lines inside ``` tags, do not include anything else inside ```. "
+                "Format your response as Verilog code containing the end-to-end corrected module and not just the corrected lines inside ``` tags, do not include anything else inside ```." 
             )
 
 def generate_verilog(conv, model_type, model_id=""):
@@ -119,18 +128,9 @@ def get_response(design_prompt, module, model_type, outdir="", log=None, prompt_
         # Select the most consistent response
         final_response = get_most_consistent_response(responses)
     elif prompt_strategy == 'Self-ask':
-        final_response = handle_self_ask(conv, model_type,module)
-    elif prompt_strategy == 'Self-calibration':
-        response = generate_verilog(conv, model_type)
-        feedback_sys_prompt = 'You are an expert in Verilog code verification. Your task is to determine whether the provided Verilog code is correct. Respond with only "yes" if the code is correct or "no" if the code is incorrect. Do not provide any explanations, comments, or additional information. Simply answer "yes" or "no".'
-        verilog_code = reg.extract_verilog_code(response)
-        feedback_response = generate_response(feedback_sys_prompt,verilog_code,model_type).strip().lower()
-        if feedback_response == "no":
-            feedback_sys_prompt = 'You are an expert in Verilog coding and digital design. Your task is to review and correct the provided Verilog code. Identify and fix any syntax errors, logical errors, or common pitfalls in the code. Ensure that the corrected code is functional and meets the specifications provided. Respond with only the corrected Verilog code. Do not include any explanations or additional text.'
-            prompt = design_prompt + "/nsolution:/n" + verilog_code
-            final_response = generate_response(feedback_sys_prompt,prompt,model_type)
-        else:
-            final_response = response
+        final_response = handle_self_ask(conv, model_type, module)
+    elif prompt_strategy == 'Least-to-most':
+        final_response = handle_least_to_most(conv, design_prompt, model_type)
     else:
         final_response = generate_verilog(conv, model_type)
 
@@ -140,7 +140,7 @@ def get_response(design_prompt, module, model_type, outdir="", log=None, prompt_
     print(f"Response written to {filename}")
     return final_response
 
-def handle_self_ask(conv, model_type,module):
+def handle_self_ask(conv, model_type, module):
     """
     Handles the 'Self-ask' prompt strategy by engaging in a multi-turn conversation with the LLM.
 
@@ -172,7 +172,7 @@ def handle_self_ask(conv, model_type,module):
         with open(solution_file_path, 'r') as file:
             solution_code = file.read()
             # Ask for a short answer based on the question and the solution
-        answer_prompt = question_response + ": " + solution_code                                                                                
+        answer_prompt = question_response + ": " + solution_code                                                                                 
         conv2 = cv.Conversation()
         conv2.add_message("system","You are an advanced Verilog design assistant. Based on the following Verilog module and the provided solution, generate a short, one-sentence answer to the question. Ensure the response is concise and directly addresses the question.")
         conv2.add_message("user",answer_prompt)
@@ -187,21 +187,56 @@ def handle_self_ask(conv, model_type,module):
     
     return final_response
 
-def extract_questions_from_response(response):
+def handle_least_to_most(conv, design_prompt, model_type):
     """
-    Extracts questions from the language model's response.
+    Handles the 'Least-to-most' prompting strategy by breaking the problem into sub-problems and solving them sequentially.
+
+    Parameters:
+    conv (cv.Conversation): The conversation object.
+    design_prompt (str): The original design prompt for the Verilog module.
+    model_type (str): The type of LLM to use.
+
+    Returns:
+    str: The final response after solving the sub-problems.
+    """
+    # Step 1: Ask the LLM to break the problem into sub-problems
+    breakdown_prompt = (
+        "Break the following Verilog design problem into smaller sub-problems. "
+        "Do not solve the sub-problems yet, just list them clearly."
+        "Format each sub-problem as 'Sub-problem X: <description>'.")
+    conv.add_message("user", breakdown_prompt + "\n" + design_prompt)
+    breakdown_response = generate_verilog(conv, model_type)
+    
+    # Step 2: Extract sub-problems from the response
+    sub_problems = extract_sub_problems(breakdown_response)
+    
+    # Step 3: Solve each sub-problem sequentially
+    final_solution = ""
+    for i, sub_problem in enumerate(sub_problems):
+        conv.add_message("user", f"Solve sub-problem {i+1}: {sub_problem}")
+        sub_solution = generate_verilog(conv, model_type)
+        final_solution += f"Solution for Sub-problem {i+1}:\n{sub_solution}\n"
+        
+        # Add the solution of the sub-problem back to the conversation
+        conv.add_message("assistant", sub_solution)
+    
+    return final_solution
+
+def extract_sub_problems(response):
+    """
+    Extracts sub-problems from the language model's response.
 
     Parameters:
     response (str): The response from the language model.
 
     Returns:
-    list: A list of questions extracted from the response.
+    list: A list of sub-problems extracted from the response.
     """
-    questions = []
+    sub_problems = []
     for line in response.split('\n'):
-        if line.strip().endswith('?'):
-            questions.append(line.strip())
-    return questions
+        if line.strip().startswith("Sub-problem"):
+            sub_problems.append(line.strip())
+    return sub_problems
 
 def main():
     usage = ("Usage: response.py [--help] --prompt=<prompt> --name=<module name> --testbench=<testbench file> --model=<llm model> --model_id=<model id> --technique=<technique>\n\n"
@@ -259,7 +294,7 @@ def main():
             os.environ['framework_name'] = arg  # Set environment variable based on input
             prompt_strategy = arg
 
-    if not (prompt and module and testbench and model):
+    if not (prompt and module and model):
         print("Missing required argument(s).")
         print(usage)
         sys.exit(2)
