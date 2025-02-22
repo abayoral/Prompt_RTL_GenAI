@@ -1,0 +1,36 @@
+```verilog
+module serial2parallel (
+    input clk,
+    input rst_n,
+    input din_serial,
+    input din_valid,
+    output reg [7:0] dout_parallel,
+    output reg dout_valid
+);
+
+reg [2:0] cnt; // 3-bit counter to count up to 8
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        cnt <= 3'b000;          // Reset counter
+        dout_parallel <= 8'b0;  // Reset parallel output
+        dout_valid <= 1'b0;     // Reset valid output
+    end else begin
+        if (din_valid) begin
+            dout_parallel <= {dout_parallel[6:0], din_serial}; // Shift in the serial input
+            
+            if (cnt == 3'd7) begin
+                dout_valid <= 1'b1;  // Set valid output after 8 bits
+                cnt <= 3'b000;       // Reset counter
+            end else begin
+                dout_valid <= 1'b0;  // Not valid until 8 bits are received
+                cnt <= cnt + 1'b1;   // Increment counter
+            end
+        end else begin
+            dout_valid <= 1'b0;      // Keep valid low if din_valid is not asserted
+        end
+    end
+end
+
+endmodule
+```

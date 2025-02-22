@@ -1,8 +1,12 @@
-module top_module( 
+module top_module(
     input [1023:0] in,
     input [7:0] sel,
-    output [3:0] out );
+    output [3:0] out
+);
 
+    // Use an indexed vector part select to extract the correct 4-bit slice
+    // for the given selection 'sel'. The syntax for an indexed part select is
+    // variable_name[starting_bit+:width].
     assign out = in[sel*4 +: 4];
 
 endmodule

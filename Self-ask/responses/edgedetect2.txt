@@ -1,4 +1,4 @@
-Thank you for the clarification. Here is the complete Verilog module based on the provided specifications:
+Thank you for the clarification. Based on the specification and your response, here's the complete Verilog module that detects when the input signal changes from one clock cycle to the next and sets the output bit for cycles following a 0 to 1 transition.
 
 ```verilog
 module top_module (
@@ -7,12 +7,11 @@ module top_module (
     output reg [7:0] anyedge
 );
 
-    reg [7:0] prev_in;
+    reg [7:0] in_d; // to store delayed input
 
     always @(posedge clk) begin
-        prev_in <= in;
-        anyedge <= in & ~prev_in;
+        anyedge <= (in_d ^ in) & ~in_d; // Capture any 0 to 1 transition
+        in_d <= in; // Update delayed input
     end
-
 endmodule
 ```

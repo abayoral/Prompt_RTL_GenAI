@@ -1,5 +1,5 @@
 ```verilog
-module top_module (
+module top_module(
     input clk,
     input reset,    // Active-high synchronous reset to 32'h1
     output reg [31:0] q
@@ -7,12 +7,11 @@ module top_module (
 
     always @(posedge clk) begin
         if (reset) begin
-            q <= 32'h1;
+            q <= 32'h1;  // Reset LFSR to a non-zero starting value
         end else begin
-            // Galois LFSR with taps at bit positions 32, 22, 2, and 1
-            q <= {q[30:0], q[31] ^ q[21] ^ q[1] ^ q[0]};
+            q <= {q[30:0], q[31] ^ q[21] ^ q[1] ^ q[0]}; // Feedback for the taps
         end
     end
-
+    
 endmodule
 ```

@@ -4,7 +4,8 @@ module top_module(
     input sel,
     output [99:0] out );
 
+    // Use the ternary operator for a 100-bit 2-to-1 multiplexer
     assign out = sel ? b : a;
-
+    
 endmodule
 ```

@@ -1,9 +1,14 @@
 ```verilog
-module add16 ( input [15:0] a, input [15:0] b, input cin, output [15:0] sum, output cout );
+module add16 ( 
+    input [15:0] a, 
+    input [15:0] b, 
+    input cin, 
+    output [15:0] sum, 
+    output cout 
+);
 
-always @(*) begin
-    {cout, sum} = a + b + cin;
-end
+// Add your implementation here if needed, for instance
+assign {cout, sum} = a + b + cin;
 
 endmodule
 
@@ -13,30 +18,30 @@ module top_module(
     input sub,
     output [31:0] sum
 );
-    wire [15:0] sum_lower, sum_upper;
-    wire cout_lower, cout_upper;
+
     wire [31:0] b_xor_sub;
+    wire cout1, cout2;
 
-    assign b_xor_sub = b ^ {32{sub}}; // Apply XOR with sub across all 32 bits of b
+    // Invert the b input based on sub using XOR (exclusive OR) with sub.
+    // Sub is replicated 32 times by the verilog syntax {N{signal}}
+    assign b_xor_sub = b ^ {32{sub}};
 
-    // Instantiating the 16-bit adders
-    add16 adder_lower (
+    // Instantiate two 16-bit adders
+    add16 adder1 (
         .a(a[15:0]),
         .b(b_xor_sub[15:0]),
         .cin(sub),
-        .sum(sum_lower),
-        .cout(cout_lower)
+        .sum(sum[15:0]),
+        .cout(cout1)
     );
 
-    add16 adder_upper (
+    add16 adder2 (
         .a(a[31:16]),
         .b(b_xor_sub[31:16]),
-        .cin(cout_lower),
-        .sum(sum_upper),
-        .cout(cout_upper)
+        .cin(cout1),
+        .sum(sum[31:16]),
+        .cout(cout2) // Not used, but connected
     );
-
-    assign sum = {sum_upper, sum_lower};
 
 endmodule
 ```

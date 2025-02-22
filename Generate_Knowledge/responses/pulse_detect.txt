@@ -1,0 +1,69 @@
+```verilog
+module pulse_detect (
+    input wire clk,
+    input wire rst_n,
+    input wire data_in,
+    output reg data_out
+);
+
+    // State encoding
+    typedef enum reg [1:0] {
+        STATE_IDLE     = 2'b00,  // Initial state, no pulse detected
+        STATE_DETECT_1 = 2'b01,  // Detected the first 0->1 transition
+        STATE_DETECT_0 = 2'b10,  // Detected the 1->0 transition
+        STATE_PULSE    = 2'b11   // Pulse detected
+    } state_t;
+  
+    state_t state, next_state;
+
+    // State transition logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= STATE_IDLE;
+            data_out <= 1'b0;
+        end else begin
+            state <= next_state;
+            // Output logic: Only set data_out high at final detection
+            if (state == STATE_PULSE) begin
+                data_out <= 1'b1;
+            end else begin
+                data_out <= 1'b0;
+            end
+        end
+    end
+
+    // Next state logic
+    always @(*) begin
+        case (state)
+            STATE_IDLE: begin
+                if (data_in == 1'b1) 
+                    next_state = STATE_DETECT_1;
+                else
+                    next_state = STATE_IDLE;
+            end
+
+            STATE_DETECT_1: begin
+                if (data_in == 1'b0) 
+                    next_state = STATE_DETECT_0;
+                else
+                    next_state = STATE_DETECT_1;
+            end
+
+            STATE_DETECT_0: begin
+                if (data_in == 1'b1) 
+                    next_state = STATE_PULSE;
+                else
+                    next_state = STATE_IDLE;
+            end
+
+            STATE_PULSE: begin
+                // Automatically transition back to IDLE to await another pulse
+                next_state = STATE_IDLE;
+            end
+
+            default: next_state = STATE_IDLE;
+        endcase
+    end
+
+endmodule
+```

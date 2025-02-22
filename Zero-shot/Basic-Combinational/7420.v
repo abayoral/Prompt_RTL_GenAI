@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 //The 7400-series integrated circuits are a series of digital chips with a few gates each. 
 //The 7420 is a chip with two 4-input NAND gates.
 

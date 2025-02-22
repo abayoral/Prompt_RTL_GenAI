@@ -1,0 +1,55 @@
+module multi_pipe_8bit(
+    input wire clk,
+    input wire rst_n,
+    input wire mul_en_in,
+    input wire [7:0] mul_a,
+    input wire [7:0] mul_b,
+    output reg mul_en_out,
+    output reg [15:0] mul_out
+);
+
+    // Pipeline registers for partial products and sums
+    reg [7:0] mul_a_reg, mul_b_reg;
+    reg [15:0] partial_sum [0:7];
+    reg [15:0] mul_out_reg;
+    reg [7:0] stage_enable;
+
+    integer i;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset behavior: Clear all pipeline registers and outputs
+            mul_a_reg <= 8'b0;
+            mul_b_reg <= 8'b0;
+            mul_en_out <= 1'b0;
+            mul_out <= 16'b0;
+            for (i = 0; i < 8; i = i + 1) begin
+                partial_sum[i] <= 16'b0;
+            end
+            mul_out_reg <= 16'b0;
+            stage_enable <= 8'b0;
+        end else begin
+            // Pipeline stage for input register
+            if (mul_en_in) begin
+                mul_a_reg <= mul_a;
+                mul_b_reg <= mul_b;
+                stage_enable[0] <= 1'b1;
+            end else begin
+                stage_enable[0] <= 1'b0;
+            end
+            
+            // Partial product generation and accumulation
+            partial_sum[0] <= stage_enable[0] ? {(mul_a_reg & {8{mul_b_reg[0]}}), 8'b0} : 16'b0;
+            for (i = 1; i < 8; i = i + 1) begin
+                partial_sum[i] <= stage_enable[i-1] ? partial_sum[i-1] + 
+                                    {8'b0, (mul_a_reg & {8{mul_b_reg[i]}}) << i} : 16'b0;
+                stage_enable[i] <= stage_enable[i-1];
+            end
+
+            // Output assignment and enable signal
+            mul_out_reg <= partial_sum[7];
+            mul_en_out <= stage_enable[7];
+            mul_out <= mul_en_out ? mul_out_reg : 16'b0;
+        end
+    end
+endmodule

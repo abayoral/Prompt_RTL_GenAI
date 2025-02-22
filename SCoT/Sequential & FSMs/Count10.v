@@ -1,10 +1,9 @@
-// Build a decade counter that counts from 0 through 9, inclusive, with a period of 10. The reset input is synchronous, and should reset the counter to 0.
+Your task is to design and implement a digital circuit in Verilog that functions as a decade counter. The module you need to create is named `top_module`, and it performs the operation of counting in binary from 0 to 9 repeatedly, forming a complete cycle that resets back to 0 after reaching 9. This counting cycle has a period of 10, meaning the counter completes one full cycle through its defined range in ten clock cycles. 
 
-module top_module (
-    input clk,
-    input reset,        // Synchronous active-high reset
-    output [3:0] q);
+The module takes in two key inputs: 
+1. `clk` - This is the clock signal which drives the counter. With every rising or falling edge of this clock signal, the counter should progress to the next count value if not reset.
+2. `reset` - This is a synchronous and active-high reset signal. When this input is asserted high during a clock cycle, the counter should reset to 0, overriding the normal count sequence.
 
-    // Insert your code here
+The output of the module is a 4-bit vector `q` representing the current count value of the counter. Each bit in this vector is part of a 4-bit binary count value, ranging from `0000` (decimal 0) to `1001` (decimal 9), inclusively. The counter must handle the reset operation in such a way that if the reset is active during the clock pulse, the output `q` immediately transitions to 0 on the same clock cycle, regardless of its previous state.
 
-endmodule
+In constructing this module, consider how the synchronous reset affects counting and how to implement the counting logic so that the counter seamlessly transitions from 9 back to 0 while correctly responding to the reset input when activated. You will need to decide on an appropriate method for detecting when the counter should reset naturally at the count of 9 and ensure that all aspects of the counting logic properly consider the binary nature of the output `q`.

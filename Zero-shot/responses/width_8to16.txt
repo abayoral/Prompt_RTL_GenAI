@@ -1,0 +1,44 @@
+```verilog
+module width_8to16 (
+    input wire clk,
+    input wire rst_n,
+    input wire valid_in,
+    input wire [7:0] data_in,
+    output reg valid_out,
+    output reg [15:0] data_out
+);
+
+    // Internal register to store the upper 8 bits
+    reg [7:0] high_byte;
+    // Internal flag to track whether the first 8-bit input is stored
+    reg first_byte_valid;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // On reset, clear all outputs and internal state
+            data_out <= 16'h0000;
+            valid_out <= 1'b0;
+            high_byte <= 8'h00;
+            first_byte_valid <= 1'b0;
+        end else begin
+            if (valid_in) begin
+                if (!first_byte_valid) begin
+                    // Store the first 8-bit data into the higher bits and set the flag
+                    high_byte <= data_in;
+                    first_byte_valid <= 1'b1;
+                end else begin
+                    // Combine stored high byte with current low byte to form 16-bit output
+                    data_out <= {high_byte, data_in};
+                    valid_out <= 1'b1;
+                    // Reset the flag to indicate readiness for a new pair
+                    first_byte_valid <= 1'b0;
+                end
+            end else begin
+                // If the current input is not valid, hold the current output state
+                valid_out <= 1'b0;
+            end
+        end
+    end
+
+endmodule
+```

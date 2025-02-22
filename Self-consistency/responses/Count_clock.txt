@@ -7,56 +7,70 @@ module top_module(
     output reg [7:0] mm,
     output reg [7:0] ss); 
 
-    // Internal intermediate signals for convenience
-    wire [3:0] hh_ones, hh_tens;
-    wire [3:0] mm_ones, mm_tens;
-    wire [3:0] ss_ones, ss_tens;
-    
-    assign hh_ones = hh[3:0];
-    assign hh_tens = hh[7:4];
-    assign mm_ones = mm[3:0];
-    assign mm_tens = mm[7:4];
-    assign ss_ones = ss[3:0];
-    assign ss_tens = ss[7:4];
+    // Internal registers for BCD counting of hours, minutes, and seconds
+    reg [3:0] hours_ones, hours_tens;
+    reg [3:0] mins_ones, mins_tens;
+    reg [3:0] secs_ones, secs_tens;
 
-    always @(posedge clk or posedge reset) begin
+    // On reset, initialize to 12:00:00 AM
+    always @(posedge clk) begin
         if (reset) begin
-            // Reset to 12:00:00 AM
-            hh <= 8'b0001_0010;  // 12 in BCD
-            mm <= 8'b0000_0000;  // 00 in BCD
-            ss <= 8'b0000_0000;  // 00 in BCD
-            pm <= 0;             // AM
-        end
+            hours_ones <= 4'd2;
+            hours_tens <= 4'd1;
+            mins_ones <= 4'd0;
+            mins_tens <= 4'd0;
+            secs_ones <= 4'd0;
+            secs_tens <= 4'd0;
+            pm <= 1'b0; // AM
+        end 
         else if (ena) begin
-            // Increment seconds
-            if (ss_ones == 4'd9) begin
-                if (ss_tens == 4'd5) begin
-                    ss <= 8'b0000_0000;  // Reset seconds to 00 and increment minutes
-                    if (mm_ones == 4'd9) begin
-                        if (mm_tens == 4'd5) begin
-                            mm <= 8'b0000_0000;  // Reset minutes to 00 and increment hours
-                            if (hh_ones == 4'd9 || (hh_ones == 4'd2 && hh_tens == 4'd1)) begin
-                                // Advance PM/AM and reset hours as needed
-                                hh <= 8'b0001_0001;  // 01 in BCD
-                                pm <= ~pm;            // Toggle AM/PM
-                            end else if (hh_ones == 4'd2 && hh_tens == 4'd0) begin
-                                hh <= 8'b0011_0010;  // 12 in BCD
+            // Increment the seconds
+            if (secs_ones == 4'd9) begin
+                secs_ones <= 4'd0;
+                if (secs_tens == 4'd5) begin
+                    secs_tens <= 4'd0;
+
+                    // Increment the minutes
+                    if (mins_ones == 4'd9) begin
+                        mins_ones <= 4'd0;
+                        if (mins_tens == 4'd5) begin
+                            mins_tens <= 4'd0;
+                            
+                            // Increment the hours
+                            if (hours_ones == 4'd9 || (hours_tens == 4'd1 && hours_ones == 4'd2)) begin
+                                hours_ones <= 4'd1;
+                                if (hours_tens == 4'd1) begin
+                                    hours_tens <= 4'd0;
+                                    // Toggle AM/PM
+                                    pm <= ~pm;
+                                end
                             end else begin
-                                hh <= hh + 1;
+                                hours_ones <= hours_ones + 1'b1;
                             end
+                            
+                            if (hours_ones == 4'd2 && hours_tens == 4'd0) begin
+                                hours_ones <= 4'd1;
+                                hours_tens <= 4'd1;
+                            end
+
                         end else begin
-                            mm <= {mm_tens + 1, 4'b0000};
+                            mins_tens <= mins_tens + 1'b1;
                         end
                     end else begin
-                        mm <= {mm_tens, mm_ones + 1};
+                        mins_ones <= mins_ones + 1'b1;
                     end
                 end else begin
-                    ss <= {ss_tens + 1, 4'b0000};
+                    secs_tens <= secs_tens + 1'b1;
                 end
             end else begin
-                ss <= {ss_tens, ss_ones + 1};
+                secs_ones <= secs_ones + 1'b1;
             end
         end
     end
+
+    // Concatenate BCD digits into 8-bit outputs.
+    assign hh = {hours_tens, hours_ones};
+    assign mm = {mins_tens, mins_ones};
+    assign ss = {secs_tens, secs_ones};
 
 endmodule

@@ -1,0 +1,98 @@
+```verilog
+module traffic_light (
+    input wire rst_n,
+    input wire clk,
+    input wire pass_request,
+    output reg [7:0] clock,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+    // State encoding
+    typedef enum reg [1:0] {
+        idle = 2'b00,
+        s1_red = 2'b01,
+        s2_yellow = 2'b10,
+        s3_green = 2'b11
+    } state_t;
+    
+    // State registers
+    reg [1:0] state, next_state;
+    reg [7:0] cnt, next_cnt;
+
+    // State transition always block
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= idle;
+            cnt <= 8'd0;
+        end else begin
+            state <= next_state;
+            cnt <= next_cnt;
+        end
+    end
+
+    // State machine and cnt logic
+    always @(*) begin
+        // Default assignments
+        next_state = state;
+        next_cnt = cnt;
+        red = 1'b0;
+        yellow = 1'b0;
+        green = 1'b0;
+
+        case (state)
+            idle: begin
+                next_state = s1_red;
+                next_cnt = 8'd10;
+            end
+            
+            s1_red: begin
+                red = 1'b1;
+                if (cnt == 8'd0) begin
+                    next_state = s3_green;
+                    next_cnt = 8'd60;
+                end else begin
+                    next_cnt = cnt - 1;
+                end
+            end
+            
+            s2_yellow: begin
+                yellow = 1'b1;
+                if (cnt == 8'd0) begin
+                    next_state = s1_red;
+                    next_cnt = 8'd10;
+                end else begin
+                    next_cnt = cnt - 1;
+                end
+            end
+            
+            s3_green: begin
+                green = 1'b1;
+                if (cnt > 10 && pass_request) begin
+                    next_cnt = 8'd10;
+                end else if (cnt == 0) begin
+                    next_state = s2_yellow;
+                    next_cnt = 8'd5;
+                end else begin
+                    next_cnt = cnt - 1;
+                end
+            end
+            
+            default: begin
+                next_state = idle;
+            end
+        endcase
+    end
+
+    // Map cnt to clock output
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            clock <= 8'b0;
+        end else begin
+            clock <= cnt;
+        end
+    end
+
+endmodule
+```

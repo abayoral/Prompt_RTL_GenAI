@@ -4,16 +4,16 @@ module top_module (
     output [7:0] min
 );
 
-    wire [7:0] min1, min2;
+    // Intermediate wires to hold the result of two-way min comparisons
+    wire [7:0] min_ab;
+    wire [7:0] min_cd;
 
-    // Find the minimum between a and b
-    assign min1 = (a < b) ? a : b;
-
-    // Find the minimum between c and d
-    assign min2 = (c < d) ? c : d;
-
-    // Find the minimum between min1 and min2
-    assign min = (min1 < min2) ? min1 : min2;
+    // First level of comparison: find the min between pairs (a, b) and (c, d)
+    assign min_ab = (a < b) ? a : b;
+    assign min_cd = (c < d) ? c : d;
+    
+    // Second level of comparison: find the min between the results of the first level
+    assign min = (min_ab < min_cd) ? min_ab : min_cd;
 
 endmodule
 ```

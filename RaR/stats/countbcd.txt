@@ -1,6 +1,0 @@
-RaR/modules/Countbcd.v:15: error: Unable to bind wire/reg/memory `hundreds_ccarry' in `top_module_tb.UUT'
-RaR/modules/Countbcd.v:15: error: Unable to elaborate r-value: hundreds_ccarry
-2 error(s) during elaboration.
-Module file path: RaR/modules/Countbcd.v
-Testbench file path: hdlbits_testbenches/Countbcd_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Countbcd_sim', 'RaR/modules/Countbcd.v', 'hdlbits_testbenches/Countbcd_0_tb.v']' returned non-zero exit status 2.

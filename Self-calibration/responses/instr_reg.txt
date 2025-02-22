@@ -1,0 +1,62 @@
+The provided Verilog code for the `instr_reg` module has a few logical and syntactical aspects that can be improved. Let's review and correct them:
+
+1. **Reset Behavior**: 
+   - The reset signal is described as active-low, however, the usage of negedge in the `always` block may not be the best choice for clarity with active low signals. It is more common to use posedge for simplicity and to use an internal active high reset.
+
+2. **Fetch Control Logic**:
+   - The fetch signals should be mutually exclusive, meaning care should be taken to not have overlapping fetch states unless explicitly allowed or defined.
+
+3. **Default State**:
+   - The default case should not include re-assigning values from themselves unless necessary, as this is effectively a no-operation.
+
+4. **Output conditional behavior**:
+   - It's good practice to use non-blocking assignments consistently in sequential logic and avoid combinational logic that depends on latches or uninitialized signals.
+
+Here's the corrected version with comments explaining the modifications:
+
+```verilog
+module instr_reg (
+    input wire clk,
+    input wire rst_n,          // Active low reset signal, renamed for clarity
+    input wire [1:0] fetch,    // Fetch control signal
+    input wire [7:0] data,     // Data input
+    
+    output reg [2:0] ins,      // Opcode output
+    output reg [4:0] ad1,      // Register address output
+    output reg [7:0] ad2       // Full instruction output (when fetched from second source)
+);
+
+    reg [7:0] ins_p1;  // Register for first source
+    reg [7:0] ins_p2;  // Register for second source
+
+    // Always block with posedge clock for simple, clear logic
+    // Clear registers on reset
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Initialize registers to zero on active low reset
+            ins_p1 <= 8'b0;
+            ins_p2 <= 8'b0;
+        end else begin
+            case (fetch)
+                2'b01: ins_p1 <= data; // Fetching from data to ins_p1
+                2'b10: ins_p2 <= data; // Fetching from data to ins_p2
+                // For mutually exclusive fetch, there's no need for default case
+            endcase
+        end
+    end
+
+    // Continually assign outputs based on current instruction sources
+    always @(*) begin
+        ins = ins_p1[7:5];   // High 3 bits (Opcode)
+        ad1 = ins_p1[4:0];   // Low 5 bits (Register address)
+        ad2 = ins_p2;        // Full 8-bit instruction from ins_p2
+    end
+endmodule
+```
+
+**Summary of Changes**:
+- Changed `rst` to `rst_n` to denote active low.
+- Used `posedge clk` in the `always` block for clarity.
+- Simplified the default case in the `case` statement.
+- Provided clear division between sequential and combinational blocks for better readability and functionality.

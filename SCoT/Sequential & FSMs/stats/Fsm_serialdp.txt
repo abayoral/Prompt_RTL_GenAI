@@ -1,0 +1,7 @@
+RaR/modules/Fsm_serialdp.v:10: syntax error
+RaR/modules/Fsm_serialdp.v:10: error: Invalid module instantiation
+RaR/modules/Fsm_serialdp.v:19: syntax error
+RaR/modules/Fsm_serialdp.v:19: error: Invalid module instantiation
+Module file path: RaR/modules/Fsm_serialdp.v
+Testbench file path: hdlbits_testbenches/Fsm_serialdp_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Fsm_serialdp_sim', 'RaR/modules/Fsm_serialdp.v', 'hdlbits_testbenches/Fsm_serialdp_0_tb.v']' returned non-zero exit status 4.

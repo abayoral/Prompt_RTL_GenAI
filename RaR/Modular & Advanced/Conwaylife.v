@@ -1,25 +1,21 @@
-// Conway's Game of Life is a two-dimensional cellular automaton.
+Imagine you are a seasoned Digital Design Engineer at a premier hardware design company, and you have been entrusted with the responsibility of crafting a crucial Verilog module. This module is of utmost importance as it is a key component for a next-generation product that your company is developing. The success of this design directly influences the company's standing in the competitive computer hardware industry.
 
-// The "game" is played on a two-dimensional grid of cells, where each cell is either 1 (alive) or 0 (dead). At each time step, each cell changes state depending on how many neighbours it has:
+Your design task is inspired by Conway's Game of Life, which is a well-known two-dimensional cellular automaton. This "game" unfolds on a grid that stretches infinitely, consisting of cells that have two possible states: alive (1) and dead (0). Each cell's state at any given time is influenced by the number of alive neighboring cells it has:
 
-// 0-1 neighbour: Cell becomes 0.
-// 2 neighbours: Cell state does not change.
-// 3 neighbours: Cell becomes 1.
-// 4+ neighbours: Cell becomes 0.
-// The game is formulated for an infinite grid. In this circuit, we will use a 16x16 grid. To make things more interesting, we will use a 16x16 toroid, where the sides wrap around to the other side of the grid. For example, the corner cell (0,0) has 8 neighbours: (15,1), (15,0), (15,15), (0,1), (0,15), (1,1), (1,0), and (1,15). The 16x16 grid is represented by a length 256 vector, where each row of 16 cells is represented by a sub-vector: q[15:0] is row 0, q[31:16] is row 1, etc. (This tool accepts SystemVerilog, so you may use 2D vectors if you wish.)
+- A cell with 0 to 1 neighboring cells that are alive will die or stay dead (state becomes 0).
+- A cell with exactly 2 neighboring cells that are alive will remain in its current state (whether alive or dead).
+- A cell surrounded by exactly 3 neighbors that are alive will become alive (state becomes 1).
+- If a cell has 4 or more living neighbors, it will die or stay dead (state becomes 0).
 
-// load: Loads data into q at the next clock edge, for loading initial state.
-// q: The 16x16 current state of the game, updated every clock cycle.
-// The game state should advance by one timestep every clock cycle.
+For the purpose of this design, convert the concept into a digital simulation constrained to a finite, yet cyclic, 16x16 grid. Here, the grid is modeled as a 16x16 toroidal structure, meaning that edges “wrap around,” so that cells on one edge are adjacent to those on the opposite edge. For instance, the cell located at the top-left corner (0,0) has its neighbors on the opposite side of the grid, making it adjacent to seemingly distant positions such as (15,1), (15,0), and so on. 
 
-// Hint: A test case that's easily understandable and tests some boundary conditions is the blinker 256'h7. It is 3 cells in row 0 columns 0-2. It oscillates between a row of 3 cells and a column of 3 cells (in column 1, rows 15, 0, and 1).
+This grid is represented in your circuit as a single, linear 256-bit vector where each sequence of 16 bits corresponds to one row of the grid: q[15:0] maps to row 0, q[31:16] to row 1, continuing in this manner until q[255:240], which corresponds to row 15.
 
-module top_module(
-    input clk,
-    input load,
-    input [255:0] data,
-    output [255:0] q ); 
+Key functionalities of the circuit include:
 
-    // Insert your code here
+- **Loading Initial Data**: Upon a signal, the current state of all cells (represented by the vector `q`) is updated with initial data provided through an input vector at the next clock edge.
+- **Advancing the Game**: The state of the grid is updated in accordance with the rules of the game on each clock cycle, simulating the passage of time and progression of the game.
 
-endmodule
+Additionally, reference the "blinker" pattern, a specific configuration that offers a straightforward test case for the edge-wrapping logic and other boundary behaviors of your grid. This pattern consists of three alive cells initially in the first three positions of the first row. Over time, it oscillates between a horizontal configuration and a vertical one, demonstrating the correct implementation of Conway’s rules in edge cases.
+
+Your task is to implement this logic in the context of the Verilog module provided, ensuring that each cell's state is updated according to the described rules, considering the grid's toroidal structure, and successfully simulating the continuous progression of the Game of Life.

@@ -1,3 +1,5 @@
+// you're a senior Digital Logic Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // The truth table is for a three-input, one-output function. 
 //It has 8 rows for each of the 8 possible input combinations, and one output column. 
 //There are four inputs combinations where the output is 1, and four where the output is 0.

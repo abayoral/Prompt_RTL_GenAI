@@ -3,8 +3,10 @@ module top_module(
     input a, b,
     output cout, sum );
 
-    assign sum = a ^ b; // Sum is the XOR of the inputs
-    assign cout = a & b; // Carry-out is the AND of the inputs
+    // Sum is the XOR of the two inputs
+    assign sum = a ^ b;
+    // Cout is the AND of the two inputs
+    assign cout = a & b;
 
 endmodule
 ```

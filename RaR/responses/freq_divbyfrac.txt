@@ -1,0 +1,88 @@
+```verilog
+module freq_divbyfrac (
+    input wire clk,   // Input clock
+    input wire rst_n, // Active low reset
+    output reg clk_div // Output divided clock
+);
+
+    // State encoding for finite state machine
+    typedef enum reg [2:0] {
+        STATE_0, // Initial state
+        STATE_1,
+        STATE_2,
+        STATE_3,
+        STATE_4,
+        STATE_5,
+        STATE_6
+    } state_t;
+
+    state_t current_state, next_state;
+    reg clk_div_internal;
+
+    // State register
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            current_state <= STATE_0;
+        else
+            current_state <= next_state;
+    end
+
+    // Next state and output logic
+    always @(*) begin
+        // Default assignments
+        next_state = current_state;
+        clk_div_internal = 0;
+
+        case (current_state)
+            STATE_0: begin
+                next_state = STATE_1;
+                clk_div_internal = 1; // First part of the full cycle
+            end
+            STATE_1: begin
+                next_state = STATE_2;
+                clk_div_internal = 0;
+            end
+            STATE_2: begin
+                next_state = STATE_3;
+                clk_div_internal = 1; // Second part of the full cycle
+            end
+            STATE_3: begin
+                next_state = STATE_4;
+                clk_div_internal = 0;
+            end
+            STATE_4: begin
+                next_state = STATE_5;
+                clk_div_internal = 0;
+            end
+            STATE_5: begin
+                next_state = STATE_6;
+                clk_div_internal = 1; // Complete one segment
+            end
+            STATE_6: begin
+                next_state = STATE_0;
+                clk_div_internal = 0;
+            end
+        endcase
+    end
+
+    // Double-edged clocking to achieve phase adjustment
+    reg clk_div_internal_edge;
+    always @(posedge clk or negedge clk or negedge rst_n) begin
+        if (!rst_n)
+            clk_div_internal_edge <= 0;
+        else
+            clk_div_internal_edge <= clk_div_internal;
+    end
+
+    // Create final divided clock signal using phase-shifted signals
+    always @(posedge clk or negedge clk or negedge rst_n) begin
+        if (!rst_n)
+            clk_div <= 0;
+        else
+            clk_div <= clk_div_internal | clk_div_internal_edge;
+    end
+
+endmodule
+```
+
+This design uses a simple state machine approach to manage the cycle timing across 7 states for achieving a 3.5 clock division. It employs both edges of the clock signal to manage the fractional division aspect effectively. The logic incorporates phase adjustment through double-edge clocking and OR'ing signals to maintain uniform period output.

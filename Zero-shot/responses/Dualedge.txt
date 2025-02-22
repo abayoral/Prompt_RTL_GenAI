@@ -7,19 +7,23 @@ module top_module (
 
     reg q_pos, q_neg;
 
-    // Positive edge-triggered flip-flop
+    // Positive edge flip-flop
     always @(posedge clk) begin
         q_pos <= d;
     end
 
-    // Negative edge-triggered flip-flop
+    // Negative edge flip-flop
     always @(negedge clk) begin
         q_neg <= d;
     end
 
-    // Combining both edges' outputs
+    // Select the appropriate output based on the clock edge using logic
     always @(*) begin
-        q = clk ? q_pos : q_neg;
+        if (clk) begin
+            q = q_pos;
+        end else begin
+            q = q_neg;
+        end
     end
 
 endmodule

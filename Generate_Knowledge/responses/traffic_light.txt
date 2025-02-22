@@ -1,0 +1,95 @@
+```verilog
+module traffic_light (
+  input wire rst_n,
+  input wire clk,
+  input wire pass_request,
+  output reg red,
+  output reg yellow,
+  output reg green,
+  output reg [7:0] clock
+);
+
+  // State parameters
+  parameter [1:0] S_RED = 2'b00, S_YELLOW = 2'b01, S_GREEN = 2'b10;
+  
+  reg [1:0] state, next_state;
+  reg [7:0] cnt, next_cnt;
+  reg pedestrian_button_pressed;
+
+  // State transition and timing logic
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      state <= S_RED;
+      cnt <= 8'd10; // Initial Red state, with 10 cycles countdown
+      pedestrian_button_pressed <= 1'b0;
+    end else begin
+      state <= next_state;
+      cnt <= next_cnt;
+
+      if (pass_request && state == S_GREEN && cnt > 10)
+        pedestrian_button_pressed <= 1'b1;
+      else if (cnt == 0)
+        pedestrian_button_pressed <= 1'b0;
+    end
+  end
+  
+  // Next state and counter logic
+  always @(*) begin
+    next_state = state;
+    next_cnt = cnt;
+
+    case (state)
+      S_RED: begin
+        red = 1'b1;
+        yellow = 1'b0;
+        green = 1'b0;
+        if (cnt != 0)
+          next_cnt = cnt - 1;
+        else begin
+          next_state = S_GREEN;
+          next_cnt = 8'd60; // Green for 60 cycles
+        end
+      end
+
+      S_GREEN: begin
+        red = 1'b0;
+        yellow = 1'b0;
+        green = 1'b1;
+
+        if (pedestrian_button_pressed && cnt > 10) begin
+          next_cnt = 8'd10; // Reduce to 10 cycles if pedestrian button is pressed
+          pedestrian_button_pressed = 1'b0;
+        end else if (cnt != 0)
+          next_cnt = cnt - 1;
+        else begin
+          next_state = S_YELLOW;
+          next_cnt = 8'd5; // Yellow for 5 cycles
+        end
+      end
+
+      S_YELLOW: begin
+        red = 1'b0;
+        yellow = 1'b1;
+        green = 1'b0;
+        if (cnt != 0)
+          next_cnt = cnt - 1;
+        else begin
+          next_state = S_RED;
+          next_cnt = 8'd10; // Red for 10 cycles
+        end
+      end
+      
+      default: begin
+        next_state = S_RED;
+        next_cnt = 8'd10;
+      end
+    endcase
+  end
+
+  // Output current count
+  always @(*) begin
+    clock = cnt;
+  end
+
+endmodule
+```

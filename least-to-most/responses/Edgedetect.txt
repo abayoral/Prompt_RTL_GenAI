@@ -5,11 +5,12 @@ module top_module (
     output reg [7:0] pedge
 );
 
-    reg [7:0] in_delayed;
+    reg [7:0] prev_in; // Register to hold the previous clock cycle's input
 
     always @(posedge clk) begin
-        in_delayed <= in;
-        pedge <= in & ~in_delayed;
+        // Positive edge detection logic
+        pedge <= ~prev_in & in; // Set output bit when transition from 0 to 1 is detected
+        prev_in <= in; // Update previous input
     end
 
 endmodule

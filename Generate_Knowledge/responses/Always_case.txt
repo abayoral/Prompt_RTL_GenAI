@@ -1,5 +1,4 @@
 ```verilog
-// synthesis verilog_input_version verilog_2001
 module top_module ( 
     input [2:0] sel, 
     input [3:0] data0,
@@ -9,7 +8,7 @@ module top_module (
     input [3:0] data4,
     input [3:0] data5,
     output reg [3:0] out
-);
+    );
 
     always@(*) begin
         case(sel)
@@ -19,7 +18,7 @@ module top_module (
             3'd3: out = data3;
             3'd4: out = data4;
             3'd5: out = data5;
-            default: out = 4'd0;
+            default: out = 4'b0000;
         endcase
     end
 

@@ -1,0 +1,80 @@
+```verilog
+module alu(
+    input [31:0] a,
+    input [31:0] b,
+    input [5:0] aluc,
+    output reg [31:0] r,
+    output reg zero,
+    output reg carry,
+    output reg negative,
+    output reg overflow,
+    output reg flag
+);
+
+    reg [32:0] temp;  // Temporary register to hold intermediate results for carry
+    reg signed [31:0] sa, sb; // Signed versions for arithmetic operations
+
+    always @* begin
+        // Default output values
+        r = 32'hz;
+        zero = 0;
+        carry = 0;
+        negative = 0;
+        overflow = 0;
+        flag = 0;
+
+        // Sign extended inputs for arithmetic operations
+        sa = a;
+        sb = b;
+
+        case (aluc)
+            6'b100000: begin // ADD
+                temp = a + b;
+                r = temp[31:0];
+                carry = temp[32];
+                overflow = (sa[31] == sb[31]) && (r[31] != sa[31]);
+            end
+            6'b100001: begin // ADDU
+                temp = a + b;
+                r = temp[31:0];
+                carry = temp[32];
+            end
+            6'b100010: begin // SUB
+                temp = a - b;
+                r = temp[31:0];
+                carry = temp[32];
+                overflow = (sa[31] != sb[31]) && (r[31] != sa[31]);
+            end
+            6'b100011: begin // SUBU
+                temp = a - b;
+                r = temp[31:0];
+                carry = temp[32];
+            end
+            6'b100100: r = a & b; // AND
+            6'b100101: r = a | b; // OR
+            6'b100110: r = a ^ b; // XOR
+            6'b100111: r = ~(a | b); // NOR
+            6'b101010: begin // SLT
+                flag = (sa < sb) ? 1 : 0;
+                r = {31'b0, flag};
+            end
+            6'b101011: begin // SLTU
+                flag = (a < b) ? 1 : 0;
+                r = {31'b0, flag};
+            end
+            6'b000000: r = b << a[4:0]; // SLL
+            6'b000010: r = b >> a[4:0]; // SRL
+            6'b000011: r = (b >>> a[4:0]); // SRA
+            6'b000100: r = b << a[4:0]; // SLLV
+            6'b000110: r = b >> a[4:0]; // SRLV
+            6'b000111: r = b >>> a[4:0]; // SRAV
+            6'b001111: r = {b[15:0], 16'b0}; // LUI
+            default: r = 32'hz; // Unhandled cases
+        endcase
+
+        zero = (r == 32'b0) ? 1 : 0; // Zero flag
+        negative = r[31]; // Negative flag from MSB
+    end
+
+endmodule
+```

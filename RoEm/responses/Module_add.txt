@@ -7,7 +7,7 @@ module add16 (
     output cout
 );
 
-    assign {cout, sum} = a + b + cin;
+// Assume implementation of add16
 
 endmodule
 
@@ -16,28 +16,25 @@ module top_module(
     input [31:0] b,
     output [31:0] sum
 );
+    wire cout_lower;
 
-    wire [15:0] sum_lower;
-    wire [15:0] sum_upper;
-    wire carry_out_lower;
-
+    // Instantiate the first 16-bit adder for the lower half
     add16 lower_adder (
-        .a(a[15:0]), 
-        .b(b[15:0]), 
-        .cin(1'b0), 
-        .sum(sum_lower), 
-        .cout(carry_out_lower)
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum[15:0]),
+        .cout(cout_lower)
     );
 
+    // Instantiate the second 16-bit adder for the upper half
     add16 upper_adder (
-        .a(a[31:16]), 
-        .b(b[31:16]), 
-        .cin(carry_out_lower), 
-        .sum(sum_upper), 
-        .cout()
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(cout_lower),
+        .sum(sum[31:16]),
+        .cout() // cout is not used
     );
-
-    assign sum = {sum_upper, sum_lower};
 
 endmodule
 ```

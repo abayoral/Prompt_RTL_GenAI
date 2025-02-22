@@ -1,9 +1,5 @@
-// Create a half adder. A half adder adds two bits (with no carry-in) and produces a sum and carry-out.
+You are a senior Digital Design Engineer at a prominent and influential hardware design company, where you have been assigned an essential project. Your task is to develop a crucial Verilog module that is central to the functionality of an upcoming next-generation product line. The performance and reliability of this module are key factors in preserving the esteemed reputation of your company within the highly competitive computer hardware industry. 
 
-module top_module( 
-    input a, b,
-    output cout, sum );
+Your specific assignment is to create a half adder, a fundamental building block in digital circuitry. A half adder is responsible for adding two single-bit binary numbers, where neither bit has an incoming carry value from a previous operation. It produces two outputs: a sum, which is the result of the addition, and a carry-out, which indicates whether there was an overflow into the next higher bit position. 
 
-    // Insert your code here
-
-endmodule
+The task involves completing the provided skeleton of a Verilog module named `top_module` that takes two single-bit inputs, `a` and `b`. You are to define the logic inside this module to compute the `sum` and `carry-out (cout)`, ensuring the module is robust and efficient, keeping in mind the importance of its role in the larger project. Considerations such as synthesis readiness, power efficiency, timing, and scalability are crucial, as your development work will directly contribute to the cutting-edge nature and market success of the product.

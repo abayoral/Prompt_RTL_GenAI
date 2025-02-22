@@ -1,48 +1,42 @@
-### Chain of Thought
+To create a module containing 8 D flip-flops with active high asynchronous reset, triggered by the positive edge of the clock (clk), we need to ensure that each flip-flop handles the reset signal independently and asynchronously. In this design, when the reset signal (`areset`) is high, the output of each flip-flop (`q`) should be reset to zero regardless of the clock signal. When the reset is not active, the flip-flops will capture the input data (`d`) on the rising edge of the clock.
 
-1. **Understand the Requirements**:
-    - Create 8 D flip-flops with an active high asynchronous reset and positive edge-triggered clock.
-    - Each flip-flop captures the corresponding bit of the input vector `d` at the positive edge of `clk`.
-    - If `areset` is high, the output `q` should be reset to 0 asynchronously.
+Chain of Thought:
 
-2. **Determine the Inputs and Outputs**:
-    - Inputs: `clk`, `areset`, `d[7:0]`
-    - Output: `q[7:0]`
+1. **Understand the Requirements:**
+   - We need 8 D flip-flops with a shared clock (`clk`) and asynchronous reset (`areset`).
+   - Each flip-flop will have a data input from the vector `d` and provide an output in the vector `q`.
+   - The reset should be active high, meaning it will reset `q` to zero regardless of the clock.
 
-3. **Define Intermediate Signals**:
-    - No intermediate signals are needed since each flip-flop operates independently.
+2. **Determine Inputs and Outputs:**
+   - Inputs: `clk` (clock), `areset` (asynchronous reset), `d[7:0]` (8-bit data input)
+   - Outputs: `q[7:0]` (8-bit output)
 
-4. **Structuring the Module**:
-    - Start with the module declaration, specifying the inputs and outputs.
-    - Use a behavioral `always` block for each D flip-flop, triggered on the rising edge of `clk` and `areset`.
-    - Inside each `always` block, implement the D flip-flop logic:
-        - If `areset` is high, set the corresponding bit in `q` to 0.
-        - Otherwise, capture the corresponding bit from `d` at each rising edge of `clk`.
+3. **Define Intermediate Signals:**
+   - No intermediate signals are needed as the logic of each flip-flop is straightforward.
 
-5. **Writing the Verilog Code**:
+4. **Structuring the Module:**
+   - Use an always block sensitive to both the positive edge of `clk` and the level of `areset`.
+   - Within the always block, check if `areset` is high to reset `q`.
+   - If `areset` is low, capture the value of `d` on the positive edge of `clk`.
+
+5. **Writing the Verilog Code:**
 
 ```verilog
-module top_module (
-    input clk,
-    input areset,   // active high asynchronous reset
-    input [7:0] d,
+module dff_array (
+    input wire clk,
+    input wire areset,   // active high asynchronous reset
+    input wire [7:0] d,
     output reg [7:0] q
 );
-
-    // 8 D flip-flops with active high asynchronous reset
+    // Define flip-flop logic with asynchronous reset
     always @(posedge clk or posedge areset) begin
-        if (areset)
-            q <= 8'b00000000;
-        else
-            q <= d;
+        if (areset) begin
+            q <= 8'b0;   // Reset q to zero when areset is high
+        end else begin
+            q <= d;      // Capture the value of d on the rising edge of clk
+        end
     end
-
 endmodule
 ```
 
-### Explanation:
-- **Module Declaration**: Specifies the module `top_module` with inputs `clk`, `areset`, `d`, and output `q`.
-- **Always Block**: 
-    - Triggered on the rising edge of `clk` or `areset`.
-    - If `areset` is high, all bits in `q` are set to 0, asynchronously resetting the flip-flops.
-    - If `areset` is low, the value of `d` is captured into `q` at each rising edge of `clk`.
+This design will ensure that all D flip-flops reset their output to zero when the asynchronous reset is active, independent of clock activity. When the reset is not active, they will latch the input data on every rising edge of the clock. This approach maintains synchronous capture of input data and ensures that the reset operation is immediate, meeting the design specifications.

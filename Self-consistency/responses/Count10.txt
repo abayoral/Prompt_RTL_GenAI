@@ -1,17 +1,16 @@
 module top_module (
     input clk,
     input reset,        // Synchronous active-high reset
-    output reg [3:0] q);
+    output reg [3:0] q  // Making q a reg so it can hold state
+);
 
     always @(posedge clk) begin
         if (reset) begin
-            q <= 4'd0;
+            q <= 4'b0000;  // Reset counter to 0
+        end else if (q == 4'b1001) begin
+            q <= 4'b0000;  // Reset counter when it reaches 9
         end else begin
-            if (q == 4'd9) begin
-                q <= 4'd0;
-            end else begin
-                q <= q + 4'd1;
-            end
+            q <= q + 1;    // Increment counter
         end
     end
 

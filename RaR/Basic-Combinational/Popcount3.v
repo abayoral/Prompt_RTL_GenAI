@@ -1,10 +1,5 @@
-// A "population count" circuit counts the number of '1's in an input vector. 
-//Build a population count circuit for a 3-bit input vector.
+Imagine you are a senior Digital Logic Design Engineer working at a prominent hardware design company. Your current assignment is highly crucial as it involves creating a Verilog module that will be central to a cutting-edge product line. The successful development of this module is essential to preserving and enhancing your company’s prestigious standing in the highly competitive computer hardware market. 
 
-module top_module( 
-    input [2:0] in,
-    output [1:0] out );
+The project at hand involves designing a "population count" circuit. This specific circuit’s function is to calculate the number of '1's present in a given input vector, which in this scenario is a 3-bit binary number. Your task is to construct a population count circuit specifically tailored for processing a 3-bit input vector. The challenge lies not only in devising a solution that accurately computes the count of '1's but also in ensuring that the design is efficient and reliable for integration into a next-generation hardware product.
 
-    //INSERT YOUR CODE HERE
-
-endmodule
+The module you are tasked to develop, titled `top_module`, takes a 3-bit input vector, labeled `in`, and produces an output `out`, which is a 2-bit binary number representing the population count—the total number of '1's found within the 3-bit input vector. Your objective is to complete the design of this module by inserting the appropriate Verilog code in the designated area, thereby fulfilling the critical requirements of the project and contributing to the success of the new hardware product.

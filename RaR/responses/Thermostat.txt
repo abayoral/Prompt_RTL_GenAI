@@ -8,15 +8,13 @@ module top_module (
     output aircon,
     output fan
 ); 
-
-    // Heater should be on only in heating mode and only when it is too cold
+    // Heater is activated if in heating mode (mode = 1) and it's too cold
     assign heater = mode & too_cold;
-
-    // Air conditioner should be on only in cooling mode and only when it is too hot
+    
+    // Air conditioner is activated if in cooling mode (mode = 0) and it's too hot
     assign aircon = ~mode & too_hot;
 
-    // Fan should be on whenever the heater is on, the air conditioner is on, or when fan_on is set
-    assign fan = heater | aircon | fan_on;
-
+    // Fan is activated if either the heater or the air conditioner is on, or if manually turned on
+    assign fan = fan_on | heater | aircon;
 endmodule
 ```

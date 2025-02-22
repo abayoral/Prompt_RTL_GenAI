@@ -1,0 +1,50 @@
+```verilog
+module multi_booth_8bit (
+    input wire clk,
+    input wire reset,
+    input wire [7:0] a,  // Multiplier
+    input wire [7:0] b,  // Multiplicand
+    output reg [15:0] p, // Product
+    output reg rdy       // Ready signal
+);
+
+    reg [15:0] multiplicand;
+    reg [16:0] multiplier;
+    reg [4:0] ctr;
+    reg [33:0] acc; // Accumulator to accommodate booth algorithm steps
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            // Initialize everything on reset
+            multiplicand <= {{8{b[7]}}, b}; // Sign-extended multiplicand
+            multiplier <= {1'b0, {{8{a[7]}}, a}}; // Sign-extended multiplier, with extra bit for booth's algorithm
+            p <= 16'b0;
+            acc <= 34'b0;
+            ctr <= 5'b0;
+            rdy <= 1'b0;
+        end else begin
+            if (ctr < 5'd16) begin
+                // Execute Booth's algorithm cycle
+                case (multiplier[1:0])
+                    2'b01: acc = acc + ({multiplicand, 17'b0}); // Add multiplicand
+                    2'b10: acc = acc - ({multiplicand, 17'b0}); // Subtract multiplicand
+                    default: acc = acc; // No operation
+                endcase
+
+                // Arithmetic right shift
+                acc = acc >>> 1;
+                ctr = ctr + 1;
+
+                // Shift multiplier
+                multiplier = multiplier >>> 1;
+                multiplier[16] = acc[0]; // Bring in sign bit from accumulator
+            end else begin
+                // Finalize calculation after 16 cycles
+                p <= acc[16:1]; // Result of multiplication
+                rdy <= 1'b1;    // Signal ready
+            end
+        end
+    end
+
+endmodule
+```

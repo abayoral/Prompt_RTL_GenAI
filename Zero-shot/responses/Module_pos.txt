@@ -8,6 +8,8 @@ module mod_a (
     input d
 );
 
+// Module functionality goes here (not defined in the given specification)
+
 endmodule
 
 module top_module ( 
@@ -19,12 +21,13 @@ module top_module (
     output out2
 );
 
-    mod_a inst1 (
-        .out1(out1), 
-        .out2(out2), 
-        .a(a), 
-        .b(b), 
-        .c(c), 
+    // Instantiating mod_a and connecting ports appropriately
+    mod_a u_mod_a (
+        .out1(out1),
+        .out2(out2),
+        .a(a),
+        .b(b),
+        .c(c),
         .d(d)
     );
 

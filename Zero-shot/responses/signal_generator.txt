@@ -1,0 +1,37 @@
+```verilog
+module signal_generator (
+    input wire clk,
+    input wire rst_n,
+    output reg [4:0] wave
+);
+
+    reg state; // 0 for increment mode, 1 for decrement mode
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset condition: initialize wave and state
+            wave <= 5'b00000;
+            state <= 1'b0;
+        end else begin
+            if (state == 1'b0) begin
+                // Increment mode
+                if (wave == 5'b11111) begin
+                    // Switch to decrement mode at peak
+                    state <= 1'b1;
+                end else begin
+                    wave <= wave + 5'b00001;
+                end
+            end else begin
+                // Decrement mode
+                if (wave == 5'b00000) begin
+                    // Switch to increment mode at valley
+                    state <= 1'b0;
+                end else begin
+                    wave <= wave - 5'b00001;
+                end
+            end
+        end
+    end
+
+endmodule
+```

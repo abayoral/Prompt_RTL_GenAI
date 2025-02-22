@@ -6,16 +6,20 @@ module top_module (
     output reg [31:0] out
 );
 
-    reg [31:0] in_prev;
+    // Previous state of 'in' to compare transitions
+    reg [31:0] previous_in;
 
     always @(posedge clk) begin
         if (reset) begin
+            // On reset, clear the output signals (set all to 0)
             out <= 32'b0;
+            previous_in <= 32'b0;
+        end else begin
+            // Check for '1' to '0' transition for each bit
+            out <= out | (previous_in & ~in);
+            // Update the previous input state
+            previous_in <= in;
         end
-        else begin
-            out <= out | (in_prev & ~in); // Set out bit if transition 1->0 detected
-        end
-        in_prev <= in; // Store previous input state
     end
 
 endmodule

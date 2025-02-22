@@ -1,7 +1,8 @@
-```
+```verilog
 module top_module(
     output zero
 );
+    // Output a constant 0
     assign zero = 1'b0;
 endmodule
 ```

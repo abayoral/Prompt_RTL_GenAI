@@ -1,0 +1,50 @@
+```verilog
+module freq_divbyfrac (
+    input wire clk,
+    input wire rst_n,
+    output reg clk_div
+);
+
+    localparam MUL2_DIV_CLK = 7;
+    localparam STATE_4 = 4;
+    localparam STATE_3 = 3;
+    
+    reg [2:0] counter; // Counter to count clock cycles
+    reg clk_div_4;     // Intermediate clock for 4 cycles
+    reg clk_div_3;     // Intermediate clock for 3 cycles
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            counter <= 0;
+            clk_div_4 <= 0;
+        end else begin
+            if (counter < STATE_4 - 1) begin
+                counter <= counter + 1;
+            end else begin
+                counter <= 0;
+                clk_div_4 <= ~clk_div_4;
+            end
+        end
+    end
+
+    always @(negedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            counter <= 0;
+            clk_div_3 <= 0;
+        end else begin
+            if (counter < STATE_3 - 1) begin
+                counter <= counter + 1;
+            end else begin
+                counter <= 0;
+                clk_div_3 <= ~clk_div_3;
+            end
+        end
+    end
+
+    always @(*) begin
+        clk_div = clk_div_4 | clk_div_3; // Combine the phase-shifted clocks
+    end
+endmodule
+```
+
+In this complete Verilog module, the clock signal is divided by a factor of 3.5 as described. The counters cycle through different state lengths for the positive and negative edges of the clock to create the fractional division. The intermediate clocks (`clk_div_4` and `clk_div_3`) are generated for 4 and 3 cycles respectively. The final output `clk_div` is produced by logically OR-ing these intermediate clocks, thereby ensuring smooth output as required.

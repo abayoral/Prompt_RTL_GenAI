@@ -1,0 +1,30 @@
+```verilog
+module edge_detect (
+    input wire clk,
+    input wire rst_n,
+    input wire a,
+    output reg rise,
+    output reg down
+);
+
+    reg a_prev; // Register to hold the previous state of 'a'
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset all outputs and states
+            a_prev <= 1'b0;
+            rise   <= 1'b0;
+            down   <= 1'b0;
+        end else begin
+            // Detect rising edge
+            rise <= (a & ~a_prev);
+
+            // Detect falling edge
+            down <= (~a & a_prev);
+
+            // Update previous state of 'a'
+            a_prev <= a;
+        end
+    end
+endmodule
+```

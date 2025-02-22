@@ -1,7 +1,0 @@
-Zero-shot/modules/Fsm_ps2.v:8: syntax error
-Zero-shot/modules/Fsm_ps2.v:8: error: Invalid module instantiation
-Zero-shot/modules/Fsm_ps2.v:15: syntax error
-Zero-shot/modules/Fsm_ps2.v:15: error: Invalid module instantiation
-Module file path: Zero-shot/modules/Fsm_ps2.v
-Testbench file path: hdlbits_testbenches/Fsm_ps2_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/Fsm_ps2_sim', 'Zero-shot/modules/Fsm_ps2.v', 'hdlbits_testbenches/Fsm_ps2_0_tb.v']' returned non-zero exit status 4.

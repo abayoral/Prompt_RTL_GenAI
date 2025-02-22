@@ -3,43 +3,40 @@ module top_module(
     input clk,
     input [7:0] in,
     input reset,    // Synchronous reset
-    output reg done); //
-    
+    output reg done
+);
+
     // State encoding
-    typedef enum logic [1:0] {
-        IDLE    = 2'b00,
-        BYTE1   = 2'b01,
-        BYTE2   = 2'b10,
-        BYTE3   = 2'b11
+    typedef enum reg [1:0] {
+        IDLE    = 2'b00, // Idle state, waiting for the start of a message
+        BYTE1   = 2'b01, // Received first byte of the message
+        BYTE2   = 2'b10, // Received second byte of the message
+        BYTE3   = 2'b11  // Received third byte of the message
     } state_t;
-    
-    state_t state, next_state;
+
+    // State variables
+    reg [1:0] state, next_state;
 
     // State transition logic (combinational)
     always @(*) begin
         case (state)
             IDLE: begin
-                if (in[3] == 1)    // Look for the first byte with bit[3] = 1
+                if (in[3] == 1)  // Check if this is the first byte of a message
                     next_state = BYTE1;
                 else
                     next_state = IDLE;
-                done = 0;
             end
             BYTE1: begin
-                next_state = BYTE2;
-                done = 0;
+                next_state = BYTE2; // Always transition to BYTE2 after BYTE1
             end
             BYTE2: begin
-                next_state = BYTE3;
-                done = 0;
+                next_state = BYTE3; // Always transition to BYTE3 after BYTE2
             end
             BYTE3: begin
-                next_state = IDLE; // After the third byte, go back to IDLE
-                done = 1;          // Signal done for one cycle
+                next_state = IDLE; // After BYTE3, go back to IDLE
             end
             default: begin
-                next_state = IDLE;
-                done = 0;
+                next_state = IDLE; // Default to IDLE state
             end
         endcase
     end
@@ -50,6 +47,16 @@ module top_module(
             state <= IDLE;
         else
             state <= next_state;
+    end
+
+    // Output logic
+    always @(posedge clk) begin
+        if (reset) 
+            done <= 0;
+        else if (state == BYTE3)
+            done <= 1;  // Assert done signal when reaching BYTE3
+        else
+            done <= 0;
     end
 
 endmodule

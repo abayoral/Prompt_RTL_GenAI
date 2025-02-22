@@ -1,9 +1,9 @@
 ```verilog
 module top_module(
     output zero
-);// Module body starts after semicolon
+); // Module body starts after semicolon
 
-    assign zero = 1'b0;
+    assign zero = 1'b0; // Assign a constant value of 0 to the output
 
 endmodule
 ```

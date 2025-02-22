@@ -1,0 +1,66 @@
+```verilog
+module pulse_detect (
+    input wire clk,
+    input wire rst_n,
+    input wire data_in,
+    output reg data_out
+);
+
+    // Define states for state machine
+    typedef enum reg [1:0] {
+        IDLE = 2'b00,
+        GOT_ONE = 2'b01,
+        GOT_PULSE = 2'b10
+    } state_t;
+    
+    state_t current_state, next_state;
+
+    // State update logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            current_state <= IDLE;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+
+    // Next state and output logic
+    always @(*) begin
+        // Default assignments
+        next_state = current_state;
+        data_out = 1'b0;
+
+        case (current_state)
+            IDLE: begin
+                if (data_in == 1'b1) begin
+                    next_state = GOT_ONE;
+                end else begin
+                    next_state = IDLE;
+                end
+            end
+
+            GOT_ONE: begin
+                if (data_in == 1'b0) begin
+                    next_state = GOT_PULSE;
+                end else begin
+                    next_state = GOT_ONE;
+                end
+            end
+
+            GOT_PULSE: begin
+                if (data_in == 1'b0) begin
+                    next_state = IDLE;
+                    data_out = 1'b1;  // Pulse detected
+                end else begin
+                    next_state = GOT_ONE;
+                end
+            end
+
+            default: begin
+                next_state = IDLE;
+            end
+        endcase
+    end
+
+endmodule
+```

@@ -1,35 +1,38 @@
-Please act as a professional Verilog designer.
+You are tasked with designing a Verilog hardware module for performing 32-bit single-precision floating-point multiplication following the IEEE 754 standard. Your role as a professional Verilog designer is to implement a module named `float_multi`. This module is expected to efficiently handle the multiplication operation with high precision, which is crucial for a wide range of computational applications requiring accurate arithmetic calculations.
 
-Implement a module of a 32-bit floating-point multiplier for IEEE-754 standard single-precision arithmetic.
-The float_multi module is designed to perform high-precision multiplication of 32-bit single-precision floating-point numbers, following the IEEE 754 standard. This module enables accurate arithmetic operations essential for various computational applications.
+The `float_multi` module will include the following:
 
-Module name:
-float_multi
+### Module Architecture and Components
 
-Input ports:
-    clk (input): Clock signal for synchronization.
-    rst (input): Reset signal (active high).
-    a (input [31:0]): First operand in IEEE 754 format.
-    b (input [31:0]): Second operand in IEEE 754 format.
+1. **Inputs and Outputs:**
+   - **clk (input):** A clock signal that synchronizes operations within the module.
+   - **rst (input):** A reset signal (active high) that initializes the module to its starting state.
+   - **a (input [31:0]):** Represents the first floating-point operand, encoded in IEEE 754 single-precision format.
+   - **b (input [31:0]):** Represents the second floating-point operand, also in IEEE 754 format.
+   - **z (output reg [31:0]):** The output that provides the multiplication result, formatted in IEEE 754 single-precision.
 
-Output ports:
-    z (output reg [31:0]): Result of the multiplication in IEEE 754 format.
+2. **Internal Signals and Registers:**
+   - **cycle counter:** A 3-bit register that tracks the progress of the operation across multiple clock cycles.
+   - **Mantissas:** 24-bit registers `a_mantissa`, `b_mantissa`, and `z_mantissa` to store the significands/mantissas of `a`, `b`, and the result `z`.
+   - **Exponents:** 10-bit registers `a_exponent`, `b_exponent`, and `z_exponent` to handle the exponents of `a`, `b`, and the result `z`.
+   - **Sign Bits:** Registers `a_sign`, `b_sign`, and `z_sign` for the sign information of each operand and the result.
+   - **Intermediate Product:** A 50-bit register `product` that temporarily holds the result of multiplying the mantissas of `a` and `b`.
+   - **Rounding Control Bits:** Registers `guard_bit`, `round_bit`, and `sticky` that are used to perform rounding operations on the intermediate product.
 
-Internal signals:
-    counter (reg [2:0]): Cycle counter for operation sequencing.
-    a_mantissa, b_mantissa, z_mantissa (reg [23:0]): Mantissas of input and output numbers.
-    a_exponent, b_exponent, z_exponent (reg [9:0]): Exponents of input and output numbers.
-    a_sign, b_sign, z_sign (reg): Sign bits for inputs and output.
-    product (reg [49:0]): Intermediate product of the mantissas.
-    guard_bit, round_bit, sticky (reg): Rounding control bits.
+### Implementation Details
 
-Implementation:
-    -Initialization: The counter is reset to zero on the rst signal.
-    -Input Processing: The mantissas, exponents, and sign bits of inputs a and b are extracted during the first clock cycle.
-    -Special Cases Handling: The module identifies special cases like NaN (Not a Number) and infinity based on the inputs.
-    -Normalization: Mantissas are normalized if needed.
-    -Multiplication: The mantissas are multiplied, combining the signs and adjusting the exponents.
-    -Rounding and Adjustment: The module rounds the result and adjusts the exponent to ensure accurate representation.
-    -Output Generation: The final result is formatted in IEEE 754 standard, addressing overflow and underflow scenarios.
+- **Initialization:** On receiving a high reset signal (`rst`), the module should reset its internal state, including the cycle counter and relevant registers.
+  
+- **Input Processing:** During the initial clock cycle, the module should extract the mantissas, exponents, and sign bits from the input operands `a` and `b`.
 
-Give me the complete code.
+- **Handling Special Cases:** The module must account for special numeric cases, such as Zero, Infinity, and NaN (Not a Number), by checking specific bit patterns in the inputs.
+
+- **Normalization and Exponent Calculation:** Normalize mantissas when necessary and calculate the resulting exponent by appropriately adjusting the sum of the exponents from inputs `a` and `b`.
+
+- **Mantissa Multiplication:** Perform the multiplication of mantissas, utilizing the sign bits to determine the sign of the resultant number.
+
+- **Rounding and Adjustments:** Use the rounding bits to correctly round the product while handling potential overflows or exponent adjustments.
+
+- **Output Generation:** Format the final result to conform with the IEEE 754 standard and manage any edge cases of overflow or underflow before setting the output `z`.
+
+By equipping yourself with this detailed understanding, you are prepared to code a robust, efficient implementation that faithfully adheres to the IEEE 754 standard for floating-point arithmetic. Now, prepare the entire Verilog code that fulfills these specifications, ensuring accuracy and efficiency in the multiplication operation.

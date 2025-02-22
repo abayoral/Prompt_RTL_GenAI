@@ -2,10 +2,10 @@
 module top_module( 
     input a, 
     input b, 
-    output out 
-);
+    output out );
 
-assign out = ~(a ^ b);
+    // Compute the XNOR of inputs a and b
+    assign out = ~(a ^ b);
 
 endmodule
 ```

@@ -1,0 +1,35 @@
+```verilog
+module signal_generator (
+    input wire clk,
+    input wire rst_n,
+    output reg [4:0] wave
+);
+
+    // Internal state register to track the waveform mode: 0 = increment, 1 = decrement
+    reg state;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // On reset, reinitialize the state and wave to 0
+            state <= 0;
+            wave <= 5'b00000;
+        end else begin
+            if (state == 0) begin
+                // Increment mode
+                wave <= wave + 1;
+                if (wave == 5'b11111) begin
+                    // Transition to decrement mode when peak is reached
+                    state <= 1;
+                end
+            end else begin
+                // Decrement mode
+                wave <= wave - 1;
+                if (wave == 5'b00000) begin
+                    // Transition to increment mode when valley is reached
+                    state <= 0;
+                end
+            end
+        end
+    end
+endmodule
+```

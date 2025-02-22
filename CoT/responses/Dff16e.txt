@@ -1,27 +1,32 @@
-To tackle this task, let's break it down step-by-step:
+To implement the module with 16 D flip-flops that have byte-enable inputs, we must carefully consider the control signals to manage which parts of the data (upper byte or lower byte) are written to the registers on each clock cycle. The `resetn` signal is a synchronous active-low reset, meaning that on the next clock edge, if resetn is low, the outputs should be reset. Here is the Chain of Thought to solve the task:
+
+Chain of Thought:
 
 1. **Understand the Requirements:**
-   - We need to create a module containing 16 D flip-flops.
-   - The flip-flops are divided into two bytes (upper byte and lower byte).
-   - There are `byteena` signals to control whether to write to the upper byte (`byteena[1]`) or lower byte (`byteena[0]`).
-   - A synchronous, active-low reset signal (`resetn`) should reset the outputs to zero.
-   - The flip-flops are triggered by the positive edge of the clock (`clk`).
+   - We need 16 D flip-flops to store a 16-bit wide data input `d`.
+   - The flip-flops' outputs are represented by `q`.
+   - The `byteena` control signal should determine which bytes of `q` get updated with `d` on each clock cycle.
+     - `byteena[0]`: Controls the lower byte `d[7:0]`.
+     - `byteena[1]`: Controls the upper byte `d[15:8]`.
+   - A synchronous active-low reset (`resetn`) should set `q` to zero when it's low.
 
 2. **Determine the Inputs and Outputs:**
    - Inputs: `clk`, `resetn`, `byteena`, `d`
-   - Outputs: `q`
+   - Output: `q`
 
-3. **Intermediate Signals:**
-   - Not required as we can implement the logic directly in the `always` block.
+3. **Define Intermediate Signals:**
+   - No intermediate signals are necessary as this can be managed directly in the always block.
 
-4. **Structural Approach:**
-   - Use an `always` block triggered on the positive edge of `clk`.
-   - Inside the `always` block, if `resetn` is low, set the output `q` to zero.
-   - If `resetn` is high, update the output `q` based on the `byteena` signals.
-     - If `byteena[1]` is high, update the upper byte (`q[15:8]`) with `d[15:8]`.
-     - If `byteena[0]` is high, update the lower byte (`q[7:0]`) with `d[7:0]`.
+4. **Structuring the Module:**
+   - Declare the module with specified inputs and outputs.
+   - Provide a register array for the output `q` to store data.
+   - Use an always block triggered on the positive edge of `clk`.
+   - Implement the synchronous reset and byte-enable logic:
+     - If `resetn` is low, reset the output `q` to zero.
+     - Otherwise, if byteena[0] is high, update q[7:0] with d[7:0].
+     - If byteena[1] is high, update q[15:8] with d[15:8].
 
-Now let's write the required Verilog module:
+5. **Writing the Verilog Code:**
 
 ```verilog
 module top_module (
@@ -32,21 +37,21 @@ module top_module (
     output reg [15:0] q
 );
 
-    // Flip-flop logic: Capture d at the rising edge of clk based on byteena bits
+    // Flip-flop logic: Capture d based on byteena and resetn signals
     always @(posedge clk) begin
         if (!resetn) begin
-            // Active-low reset: set q to zero when resetn is low
-            q <= 16'b0;
+            q <= 16'b0; // Asynchronous active-low reset
         end else begin
-            // Write to flip-flops based on byteena signals
-            if (byteena[1]) 
-                q[15:8] <= d[15:8];
-
-            if (byteena[0])
-                q[7:0] <= d[7:0];
+            if (byteena[0]) begin
+                q[7:0] <= d[7:0]; // Update lower byte if byteena[0] is high
+            end
+            if (byteena[1]) begin
+                q[15:8] <= d[15:8]; // Update upper byte if byteena[1] is high
+            end
         end
     end
+
 endmodule
 ```
 
-This code satisfies the requirements by using an `always` block to capture values based on the provided control signals and synchronous reset condition.
+This module implements 16 D flip-flops with byte-enable control and an active-low synchronous reset.

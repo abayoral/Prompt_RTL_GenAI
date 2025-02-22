@@ -1,0 +1,27 @@
+```verilog
+module multi_8bit (
+    input [7:0] A,    // Multiplicand
+    input [7:0] B,    // Multiplier
+    output reg [15:0] product // 16-bit Product
+);
+    reg [15:0] multiplicand;  // Intermediate 16-bit multiplicand for shifting
+    reg [7:0] multiplier;     // Local copy of the multiplier
+    integer i;
+
+    always @(*) begin
+        product = 16'b0;          // Initialize product to zero
+        multiplicand = {8'b0, A}; // Align multiplicand to lower 8 bits and extend to 16 bits
+        multiplier = B;           // Copy the multiplier
+
+        // Process each bit of the multiplier
+        for (i = 0; i < 8; i = i + 1) begin
+            // Check if the current bit of multiplier is 1
+            if (multiplier[0] == 1'b1) begin
+                product = product + multiplicand; // Add the multiplicand to the product
+            end
+            multiplicand = multiplicand << 1; // Left shift multiplicand for the next bit
+            multiplier = multiplier >> 1;     // Right shift multiplier to check next bit
+        end
+    end
+endmodule
+```

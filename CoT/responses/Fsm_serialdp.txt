@@ -1,145 +1,116 @@
-Let's go through the problem and determine how we can achieve this:
+To modify the existing serial receiver FSM and datapath to include odd parity checking, we need to enhance the functionality to handle the additional parity bit and perform the necessary checks before asserting the `done` signal. Here’s how we can approach this:
 
-1. **Identify the Requirements**: 
-   - The FSM should identify the start bit (0).
-   - After detecting the start bit, it must read 9 bits (8 data bits + 1 parity bit).
-   - Perform odd parity check on the 9 bits received.
-   - Ensure a correct stop bit (1) at the end.
-   - Assert the done signal only if the byte is correctly received and the parity check passes.
+### Chain of Thought:
+1. **Understand the Requirements:**
+   - The existing module should receive a serial bit stream, identify the start bit, read 8 data bits, a parity bit, and then verify a stop bit.
+   - Odd parity means that the number of 1s in the 9 bits (8 data + 1 parity) must be odd.
+   - The `done` signal is asserted only if the byte is correctly received and passes the parity check.
 
-2. **Inputs and Outputs**:
+2. **State Machine Design:**
+   - **Idle:** Wait for the start bit (0). Transition to the next state when detected.
+   - **Data Reception:** Shift in the 8 data bits.
+   - **Parity Check:** Receive the parity bit and check against the calculated parity.
+   - **Stop Bit:** Ensure there is a correct stop bit (1).
+   - **Error Handling:** Return to the idle state if there is an error in parity or incorrect stop bit.
+
+3. **Implement the Parity Module:**
+   - Use the provided `parity` module to keep track of the number of 1s.
+
+4. **Identify Inputs and Outputs:**
    - Inputs: `clk`, `in`, `reset`
-   - Outputs: `out_byte[7:0]`, `done`
-   
-3. **Intermediate Signals**:
-   - Define a 9-bit shift register to store the received bits.
-   - Define an FSM with states to handle start bit detection, data reception, parity check, and stop bit check.
-   - Utilize the `parity` module to perform the parity check.
+   - Outputs: `out_byte` (8-bit data byte), `done` (indicates successful reception)
 
-4. **FSM States**:
-   - `IDLE`: Waiting for the start bit.
-   - `START`: Start bit detected.
-   - `DATA`: Receiving 9 bits of data + parity.
-   - `STOP`: Checking the stop bit.
-   - `DONE`: If the byte is correctly received and parity check passes.
+5. **Verilog Implementation:**
+   - Use a state machine with the appropriate states to coordinate the reception process.
+   - Integrate the `parity` module for checking the parity.
 
-5. **Implementation**:
-   - Use the `parity` module to calculate the parity of the incoming bitstream.
-   - Accumulate received bits in a shift register.
-   - Transition through FSM states based on the inputs and conditions.
-   
-Here is the Verilog module for the described functionality:
-
+### Verilog Implementation:
 ```verilog
-module top_module (
+module top_module(
     input clk,
     input in,
     input reset,    // Synchronous reset
     output reg [7:0] out_byte,
     output reg done
-); 
-    // FSM states
-    typedef enum logic [2:0] {
-        IDLE,
-        START,
-        DATA,
-        PARITY,
-        STOP,
-        DONE
-    } state_t;
-    state_t state, next_state;
+);
 
-    // Using a shift register to store incoming bits
-    reg [8:0] shift_reg;
-    reg [3:0] bit_counter;
+    reg [3:0] state; // State register
+    reg [7:0] data;  // Register to collect received data bits
     wire odd_parity;
+    reg reset_parity;
+    reg [3:0] bit_count; // Counter for bits received
 
-    // Parity module
-    parity parity_module (
+    // State encoding
+    localparam IDLE      = 4'b0000;
+    localparam START     = 4'b0001;
+    localparam DATA      = 4'b0010;
+    localparam PARITY    = 4'b0011;
+    localparam STOP      = 4'b0100;
+    localparam DONE      = 4'b0101;
+
+    // Parity module instantiation
+    parity parity_inst (
         .clk(clk),
-        .reset(state == IDLE || state == DONE),
+        .reset(reset_parity),
         .in(in),
         .odd(odd_parity)
     );
 
-    // FSM transition logic
     always @(posedge clk) begin
         if (reset) begin
             state <= IDLE;
-            shift_reg <= 9'b0;
-            bit_counter <= 0;
+            data <= 0;
+            bit_count <= 0;
             done <= 0;
+            reset_parity <= 1;
         end else begin
-            state <= next_state;
-        end
-    end
-
-    always @(*) begin
-        // Default next state and outputs
-        next_state = state;
-        done = 0;
-        case(state)
-            IDLE: begin
-                if (in == 0) // Detect start bit
-                    next_state = START;
-            end
-            START: begin
-                next_state = DATA;
-                bit_counter = 0;
-            end
-            DATA: begin
-                if (bit_counter < 8) begin
-                    next_state = DATA;
-                end else begin
-                    next_state = PARITY;
+            case (state)
+                IDLE: begin
+                    done <= 0;
+                    if (in == 0) begin // Detect start bit
+                        state <= START;
+                        reset_parity <= 1; // Reset parity calculation
+                    end
                 end
-            end
-            PARITY: begin
-                next_state = STOP;
-            end
-            STOP: begin
-                if (in == 1) begin // Stop bit should be 1
-                    if (odd_parity) begin
-                        next_state = DONE;
-                        done = 1;
+                START: begin
+                    reset_parity <= 0; // Start parity calculation
+                    state <= DATA;
+                    bit_count <= 0;
+                end
+                DATA: begin
+                    data <= {in, data[7:1]}; // Shift in data
+                    bit_count <= bit_count + 1;
+                    if (bit_count == 7)
+                        state <= PARITY;
+                end
+                PARITY: begin
+                    if (odd_parity == 1) begin // Odd parity check
+                        state <= STOP;
                     end else begin
-                        next_state = IDLE;
-                    end 
-                end else begin // Wait for correct stop bit
-                    next_state = IDLE;
+                        state <= IDLE; // Parity error, reset
+                    end
                 end
-            end
-            DONE: begin
-                out_byte = shift_reg[7:0];
-                done = 1;
-                next_state = IDLE;
-            end
-        endcase
-    end
-
-    // Shift register and bit counter
-    always @(posedge clk) begin
-        if (reset) begin
-            shift_reg <= 9'b0;
-            bit_counter <= 0;
-        end else begin
-            if (state == DATA) begin
-                shift_reg <= {in, shift_reg[8:1]};
-                bit_counter <= bit_counter + 1;
-            end else if (state == PARITY) begin
-                shift_reg[8] <= in; // Parity bit
-            end
+                STOP: begin
+                    if (in == 1) begin // Check stop bit
+                        out_byte <= data;
+                        done <= 1;
+                        state <= DONE;
+                    end else begin
+                        state <= IDLE; // Error, reset
+                    end
+                end
+                DONE: begin
+                    state <= IDLE; // Go back to idle for next byte
+                end
+                default: state <= IDLE;
+            endcase
         end
     end
-
 endmodule
 ```
 
-### Explanation:
-
-- **State Transition Logic**: Handles the FSM states and transitions.
-- **Shift Register and Bit Counter**: Accumulates the incoming bits and counts them.
-- **Parity Checking**: Utilizes the `parity` module to ensure odd parity.
-- **Final Output**: Asserts the `done` signal if all conditions are met, and stores the received byte in `out_byte`.
-
-This FSM and data path efficiently handle the serial receiving and parity checking required for the described system.
+### Key Considerations:
+- The `data` register is used to assemble the incoming bits into a byte.
+- The `parity` module is reset at the start of byte reception and checks parity once all bits are received.
+- The stop bit is expected to be high (`1`), and any discrepancies lead to resetting the FSM to Idle.
+- Error handling redirects the state machine back to Idle to prepare for the next valid byte reception.

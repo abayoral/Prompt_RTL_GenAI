@@ -2,24 +2,29 @@
 module top_module (
     input clk,
     input d,
-    output q
+    output reg q
 );
 
-    // Internal signals to capture on positive and negative edges
-    reg q_posedge, q_negedge;
+    reg q_pos, q_neg;
 
-    // Capture on positive edge
+    // Positive edge flip-flop, capturing the value of d at posedge clock
     always @(posedge clk) begin
-        q_posedge <= d;
+        q_pos <= d;
     end
 
-    // Capture on negative edge
+    // Negative edge flip-flop, capturing the value of d at negedge clock
     always @(negedge clk) begin
-        q_negedge <= d;
+        q_neg <= d;
     end
 
-    // Combine the outputs of the two flip-flops using a multiplexer
-    assign q = clk ? q_negedge : q_posedge;
+    // Output logic, sensitive to either clock edge change
+    always @(posedge clk or negedge clk) begin
+        // On either edge of the clock, transfer the respective flip-flop result to q
+        if (clk) 
+            q <= q_pos;
+        else 
+            q <= q_neg;
+    end
 
 endmodule
 ```

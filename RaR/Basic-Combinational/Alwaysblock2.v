@@ -1,14 +1,9 @@
-// Build an XOR gate three ways, using an assign statement, a combinational always block, and a clocked always block.
+Imagine you are a senior Digital Design Engineer working at a leading company specialized in hardware design. You hold a significant responsibility for developing a crucial Verilog module that is part of a next-generation product under development. The task is of great importance because the success of this module will play a pivotal role in ensuring the company maintains its esteemed reputation within the competitive computer hardware industry. With that as background, your specific objective is to construct an XOR gate within this Verilog module using three distinct methods. 
 
-// synthesis verilog_input_version verilog_2001
-module top_module(
-    input clk,
-    input a,
-    input b,
-    output wire out_assign,
-    output reg out_always_comb,
-    output reg out_always_ff   );
+1. The first method requires you to implement the XOR functionality using an 'assign' statement. This is a fundamental approach where you will directly assign the result of the XOR operation to the designated output wire 'out_assign'.
 
-    // Insert your code here
+2. The second method entails using a 'combinational always block'. This approach involves creating a block that operates based on changes in the inputs 'a' and 'b', allowing you to specify how 'out_always_comb' should update whenever either input changes.
 
-endmodule
+3. The third and final method requires using a 'clocked always block'. Here, you must design the system so that 'out_always_ff' is updated with the XOR result on the rising edge of the clock signal 'clk', demonstrating the operation within a sequential circuit context.
+
+Your task is to incorporate all three implementations within the given Verilog module template, while adhering to the synthesis standards associated with the Verilog 2001 input version. The original module provides input signals 'clk', 'a', and 'b', and you must successfully produce outputs through 'out_assign', 'out_always_comb', and 'out_always_ff'. The solution you develop must exemplify your expertise in digital design and fulfill the high expectations placed on your role, ensuring the module is optimized and accurately aligns with industry standards.

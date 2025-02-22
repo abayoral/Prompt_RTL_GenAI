@@ -1,14 +1,13 @@
 ```verilog
-module add16 (
-    input [15:0] a,
-    input [15:0] b,
-    input cin,
-    output [15:0] sum,
-    output cout
+module add16 ( 
+    input[15:0] a, 
+    input[15:0] b, 
+    input cin, 
+    output[15:0] sum, 
+    output cout 
 );
-    // Example implementation (simple ripple carry adder)
-    // Actual implementation may differ
-    assign {cout, sum} = a + b + cin; 
+    // This is a placeholder for the actual implementation of the add16 module
+    assign {cout, sum} = a + b + cin;
 endmodule
 
 module top_module(
@@ -16,26 +15,26 @@ module top_module(
     input [31:0] b,
     output [31:0] sum
 );
-    wire [15:0] sum_lower;
-    wire [15:0] sum_upper;
+    
     wire cout_lower;
     
-    add16 lower_adder (
+    // Lower 16 bits adder
+    add16 adder_lower (
         .a(a[15:0]),
         .b(b[15:0]),
         .cin(1'b0),
-        .sum(sum_lower),
+        .sum(sum[15:0]),
         .cout(cout_lower)
     );
     
-    add16 upper_adder (
+    // Upper 16 bits adder
+    add16 adder_upper (
         .a(a[31:16]),
         .b(b[31:16]),
         .cin(cout_lower),
-        .sum(sum_upper),
-        .cout()
+        .sum(sum[31:16]),
+        .cout() // cout is not used in top module 
     );
-    
-    assign sum = {sum_upper, sum_lower};
+
 endmodule
 ```

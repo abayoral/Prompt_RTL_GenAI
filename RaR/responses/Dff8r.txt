@@ -1,16 +1,18 @@
+```verilog
 module top_module (
     input clk,
-    input reset,    // Synchronous reset
+    input reset,            // Synchronous reset
     input [7:0] d,
     output reg [7:0] q
 );
 
     always @(posedge clk) begin
         if (reset) begin
-            q <= 8'b0;
+            q <= 8'b0;     // Reset all flip-flops to 0
         end else begin
-            q <= d;
+            q <= d;        // Store the input data into the flip-flops
         end
     end
 
 endmodule
+```

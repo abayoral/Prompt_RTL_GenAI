@@ -1,0 +1,2 @@
+./simv -l run.log
+===========Your Design Passed===========

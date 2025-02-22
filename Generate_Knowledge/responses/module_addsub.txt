@@ -6,9 +6,7 @@ module add16 (
     output [15:0] sum,
     output cout
 );
-
-    assign {cout, sum} = a + b + cin;
-    
+// Logic for add16 module is assumed to be implemented correctly as per specification
 endmodule
 
 module top_module(
@@ -18,27 +16,27 @@ module top_module(
     output [31:0] sum
 );
 
-    wire [31:0] b_xored;
-    wire cout1, cout2;
-    
-    // XOR b with sub replicated 32 times
-    assign b_xored = b ^ {32{sub}};
-    
-    // Instantiate two 16-bit adders
-    add16 adder1 (
+    wire [31:0] b_xor_sub;
+    wire cout_lower, cout_upper;
+
+    // XOR b with sub (sub is replicated to match the width of b)
+    assign b_xor_sub = b ^ {32{sub}};
+
+    // Instantiate two adders
+    add16 adder_lower (
         .a(a[15:0]),
-        .b(b_xored[15:0]),
+        .b(b_xor_sub[15:0]),
         .cin(sub),
         .sum(sum[15:0]),
-        .cout(cout1)
+        .cout(cout_lower)
     );
 
-    add16 adder2 (
+    add16 adder_upper (
         .a(a[31:16]),
-        .b(b_xored[31:16]),
-        .cin(cout1),
+        .b(b_xor_sub[31:16]),
+        .cin(cout_lower),
         .sum(sum[31:16]),
-        .cout(cout2)
+        .cout(cout_upper)
     );
 
 endmodule

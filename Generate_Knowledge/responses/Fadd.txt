@@ -1,13 +1,19 @@
-```verilog
 module top_module( 
     input a, b, cin,
     output cout, sum );
 
-    // Sum is the XOR of the input bits and carry-in.
-    assign sum = a ^ b ^ cin;
-
-    // Carry-out is the majority function of the input bits and carry-in.
-    assign cout = (a & b) | (a & cin) | (b & cin);
+    // Internal signals for the sum and carry-out of the first stage
+    wire sum_ab, carry_ab, carry_abc;
+    
+    // Calculate the sum and carry-out of a and b
+    assign sum_ab = a ^ b;
+    assign carry_ab = a & b;
+    
+    // Calculate the final sum and carry-out using sum_ab and cin
+    assign sum = sum_ab ^ cin;
+    assign carry_abc = sum_ab & cin;
+    
+    // Final carry-out is the OR of the intermediate carry-outs
+    assign cout = carry_abc | carry_ab;
 
 endmodule
-```

@@ -1,14 +1,11 @@
-// Create 8 D flip-flops with active high asynchronous reset. All DFFs should be triggered by the positive edge of clk.
+The task requires the design of a hardware module that implements eight D flip-flops, each equipped with an active high asynchronous reset functionality. A D flip-flop is a type of digital storage element that captures the value on the data input (D) on the rising edge of a clock signal (clk) and holds this value until the next rising edge, unless reset is activated. The specific requirements for this module are as follows:
 
-// Hint: The only difference in code between synchronous and asynchronous reset flip-flops is in the sensitivity list.
+1. **Asynchronous Reset**: The reset signal (areset) is asynchronous and is considered active high. This means that when the reset input is high, the flip-flop should be reset to a predefined value, regardless of the current state of the clock signal. This behavior distinguishes it from synchronous reset, where the signal would have an effect only on the clock's active edge.
 
-module top_module (
-    input clk,
-    input areset,   // active high asynchronous reset
-    input [7:0] d,
-    output [7:0] q
-);
+2. **Positive Edge Triggered**: Each D flip-flop should respond to the positive edge (rising edge) of the clock signal (clk). This is the moment within each clock cycle that the flip-flop captures the input data (d) and updates its output (q).
 
-	// Insert your code here
+3. **Array of Flip-Flops**: There are a total of eight independent D flip-flops. Each flip-flop must take a bit from the 8-bit wide input data vector (d) and affect a corresponding bit in the 8-bit wide output vector (q). Therefore, for each operation cycle, you will use eight data bits as input and produce eight output bits.
 
-endmodule
+4. **Sensitivity List**: It's important to note that the main difference between asynchronous reset flip-flops and synchronous ones is how they are defined in the hardware description language regarding their sensitivity list. Typically, an asynchronous reset involves adding the reset signal in the sensitivity list, so the flip-flop can react immediately to changes in areset, independent of the clock's state.
+
+The challenge in this task is to correctly implement the functionality described above in a module, ensuring that all flip-flops synchronize properly with the clock and react to the asynchronous reset appropriately. Consider creating a block of code within the module that leverages the appropriate sensitivity list for asynchronous reset logic and ensures the circuit reacts immediately to changes in the reset condition. The expected result is a fully functional top_module that accurately models the desired flip-flop behavior.

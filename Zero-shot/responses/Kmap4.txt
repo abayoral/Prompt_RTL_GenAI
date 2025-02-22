@@ -5,7 +5,27 @@ module top_module(
     input c,
     input d,
     output out
-);
-    assign out = (~a & b & ~d) | (~a & b & c) | (a & ~b & d) | (a & c & ~d);
+); 
+
+    wire a_n, b_n, c_n, d_n;
+    
+    // Not gates for complementing the inputs
+    not (a_n, a);
+    not (b_n, b);
+    not (c_n, c);
+    not (d_n, d);
+
+    // Simplified sum-of-products expression derived from K-map
+    // out = (a' b  c' d) + (a b' c d') + (a b  c' d') + (a' b' c d)
+
+    wire term1, term2, term3, term4;
+    
+    assign term1 = a_n & b & c_n & d;
+    assign term2 = a & b_n & c & d_n;
+    assign term3 = a & b & c_n & d_n;
+    assign term4 = a_n & b_n & c & d;
+
+    assign out = term1 | term2 | term3 | term4;
+
 endmodule
 ```

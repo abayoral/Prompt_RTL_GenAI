@@ -1,10 +1,30 @@
+```verilog
 module top_module( 
-    input [99:0] a, b,
+    input [99:0] a, 
+    input [99:0] b,
     input cin,
     output cout,
-    output [99:0] sum );
+    output [99:0] sum 
+);
 
-    // Use Verilog's built-in addition operator for behaviorally modelling
-    assign {cout, sum} = a + b + cin;
+    // Use an intermediate wire to hold the carry bits between each addition
+    wire [100:0] carry;
+
+    // Assign the initial carry-in
+    assign carry[0] = cin;
+
+    // Perform the addition using a generate block for bitwise addition
+    genvar i;
+    generate
+        for (i = 0; i < 100; i = i + 1) begin: adder_bit
+            // Full adder logic for each bit
+            assign sum[i] = a[i] ^ b[i] ^ carry[i];
+            assign carry[i+1] = (a[i] & b[i]) | (a[i] & carry[i]) | (b[i] & carry[i]);
+        end
+    endgenerate
+
+    // Final carry out
+    assign cout = carry[100];
 
 endmodule
+```

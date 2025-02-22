@@ -1,11 +1,10 @@
-// Implement the following D flip-flop with synchronous reset
+Imagine you are in a role as a seasoned Digital Design Engineer at a prominent hardware design company known for pioneering cutting-edge technology. Your current assignment involves the development of a crucial Verilog module, which is a component of a next-generation product that your company is planning to launch. The performance and reliability of this module are vital, playing a significant role in upholding and advancing your company's esteemed reputation within the tightly competitive computer hardware industry. 
 
-module top_module (
-    input clk,
-    input d, 
-    input r,   // synchronous reset
-    output q);
+Specifically, your task is to implement a D flip-flop with a synchronous reset capability. This component is pivotal as it determines how data inputs are stored and maintained correctly in sync with the clock signal, ensuring that any reset operation aligns with the system's clock. The module you are to design should include the following primary input and output signals:
 
-// Insert your code here
+- `clk`: The clock signal that orchestrates the timing and operations within the flip-flop, synchronizing data capture with reset behavior.
+- `d`: The data input signal, which represents the data your flip-flop is intended to store upon clock activation.
+- `r`: The synchronous reset input, which serves to reset the state of the flip-flop in synchronization with the clock signal—essential when a reset is required without disrupting the clock cycle.
+- `q`: The output signal reflecting the current state of the flip-flop, which should hold the data or reset value based on the input and reset conditions.
 
-endmodule
+Your final implementation should ensure that these operations are conducted accurately without unintended latencies or errors, given the synchronous nature of the reset. This function must adhere to design conventions and be robust enough to be incorporated into the larger system framework, contributing to the overall reliability and performance of the upcoming product.

@@ -1,38 +1,38 @@
 ```verilog
 module top_module (
     input a, b, c, d, e,
-    output [24:0] out
-);
+    output [24:0] out );
 
-    assign out[24] = ~(a ^ a);   // a == a, so out[24] is always 1.
-    assign out[23] = ~(a ^ b);
-    assign out[22] = ~(a ^ c);
-    assign out[21] = ~(a ^ d);
-    assign out[20] = ~(a ^ e);
+    // Compute all 25 pairwise comparisons by computing the XNOR of each pair
+    assign out[24] = ~(a ^ a); // a compared to a
+    assign out[23] = ~(a ^ b); // a compared to b
+    assign out[22] = ~(a ^ c); // a compared to c
+    assign out[21] = ~(a ^ d); // a compared to d
+    assign out[20] = ~(a ^ e); // a compared to e
     
-    assign out[19] = ~(b ^ a);
-    assign out[18] = ~(b ^ b);
-    assign out[17] = ~(b ^ c);
-    assign out[16] = ~(b ^ d);
-    assign out[15] = ~(b ^ e);
+    assign out[19] = ~(b ^ a); // b compared to a
+    assign out[18] = ~(b ^ b); // b compared to b
+    assign out[17] = ~(b ^ c); // b compared to c
+    assign out[16] = ~(b ^ d); // b compared to d
+    assign out[15] = ~(b ^ e); // b compared to e
     
-    assign out[14] = ~(c ^ a);
-    assign out[13] = ~(c ^ b);
-    assign out[12] = ~(c ^ c);
-    assign out[11] = ~(c ^ d);
-    assign out[10] = ~(c ^ e);
+    assign out[14] = ~(c ^ a); // c compared to a
+    assign out[13] = ~(c ^ b); // c compared to b
+    assign out[12] = ~(c ^ c); // c compared to c
+    assign out[11] = ~(c ^ d); // c compared to d
+    assign out[10] = ~(c ^ e); // c compared to e
     
-    assign out[9] = ~(d ^ a);
-    assign out[8] = ~(d ^ b);
-    assign out[7] = ~(d ^ c);
-    assign out[6] = ~(d ^ d);
-    assign out[5] = ~(d ^ e);
+    assign out[9]  = ~(d ^ a); // d compared to a
+    assign out[8]  = ~(d ^ b); // d compared to b
+    assign out[7]  = ~(d ^ c); // d compared to c
+    assign out[6]  = ~(d ^ d); // d compared to d
+    assign out[5]  = ~(d ^ e); // d compared to e
     
-    assign out[4] = ~(e ^ a);
-    assign out[3] = ~(e ^ b);
-    assign out[2] = ~(e ^ c);
-    assign out[1] = ~(e ^ d);
-    assign out[0] = ~(e ^ e);
+    assign out[4]  = ~(e ^ a); // e compared to a
+    assign out[3]  = ~(e ^ b); // e compared to b
+    assign out[2]  = ~(e ^ c); // e compared to c
+    assign out[1]  = ~(e ^ d); // e compared to d
+    assign out[0]  = ~(e ^ e); // e compared to e
 
 endmodule
 ```

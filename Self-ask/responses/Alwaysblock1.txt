@@ -1,5 +1,4 @@
 ```verilog
-// synthesis verilog_input_version verilog_2001
 module top_module(
     input a, 
     input b,
@@ -7,13 +6,13 @@ module top_module(
     output reg out_alwaysblock
 );
 
-	// Using an assign statement to implement the AND gate
-	assign out_assign = a & b;
-	
-	// Using a combinational always block to implement the AND gate
-	always @(*) begin
-		out_alwaysblock = a & b;
-	end
+    // Using assign statement for AND operation
+    assign out_assign = a & b;
+    
+    // Using always block for AND operation
+    always @(*) begin
+        out_alwaysblock = a & b;
+    end
 
 endmodule
 ```

@@ -1,3 +1,5 @@
+Thank you for the clarification. Based on the description and constraints provided, here is the complete Verilog module:
+
 ```verilog
 module top_module (
     input too_cold,
@@ -7,16 +9,16 @@ module top_module (
     output heater,
     output aircon,
     output fan
-); 
+);
 
-    // Heater is on if in heating mode and it's too cold
-    assign heater = mode && too_cold;
+    // Heater is turned on in heating mode when it's too cold
+    assign heater = mode & too_cold;
 
-    // Air conditioner is on if in cooling mode and it's too hot
-    assign aircon = ~mode && too_hot;
+    // Air conditioner is turned on in cooling mode when it's too hot
+    assign aircon = ~mode & too_hot;
 
-    // Fan is on if either the heater or air conditioner is on, or the user requested the fan to be on
-    assign fan = heater || aircon || fan_on;
+    // Fan is on when either the heater or air conditioner is on, or when requested
+    assign fan = heater | aircon | fan_on;
 
 endmodule
 ```

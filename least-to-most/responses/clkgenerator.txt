@@ -1,0 +1,17 @@
+```verilog
+module clkgenerator #(parameter PERIOD = 10) (
+    output reg clk
+);
+
+    // Initialize the clock signal
+    initial begin
+        clk = 0;
+    end
+
+    // Generate the clock signal
+    always begin
+        #(PERIOD/2) clk = ~clk; // Toggle the clock every half PERIOD
+    end
+
+endmodule
+```

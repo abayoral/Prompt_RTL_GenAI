@@ -4,11 +4,11 @@ module top_module (
     output reg [7:0] anyedge
 );
 
-    reg [7:0] prev_in;
+    reg [7:0] prev_in; // Register to store the input from the previous clock cycle
 
     always @(posedge clk) begin
-        anyedge <= (in & ~prev_in); // Detect 0 to 1 transitions
-        prev_in <= in;
+        prev_in <= in; // Capture the current input for the next clock cycle
+        anyedge <= (prev_in ^ in) & in; // Detect 0 to 1 transitions and update anyedge
     end
 
 endmodule

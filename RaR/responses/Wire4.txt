@@ -1,17 +1,15 @@
 ```verilog
 module top_module( 
-    input a, 
-    input b, 
-    input c, 
-    output w, 
-    output x, 
-    output y, 
-    output z 
-);
-    // Establishing the specified connections
-    assign w = a;
-    assign x = b;
-    assign y = b;
-    assign z = c;
+    input a, b, c,
+    output w, x, y, z );
+
+// Assign inputs to outputs as specified
+assign w = a;
+assign x = b;
+assign y = b;
+assign z = c;
+
 endmodule
 ```
+
+This Verilog module follows the specifications provided, connecting each of the inputs `a`, `b`, and `c` to the desired outputs `w`, `x`, `y`, and `z` directly. This approach ensures simplicity, readability, and directness in routing the signals.

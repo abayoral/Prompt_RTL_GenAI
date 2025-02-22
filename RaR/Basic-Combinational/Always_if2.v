@@ -1,27 +1,7 @@
-// The following code contains incorrect behaviour that creates a latch. 
-// Fix the bugs so that you will shut off the computer only if it's really overheated, 
-// and stop driving if you've arrived at your destination or you need to refuel.
+As a seasoned Digital Design Engineer at a premier hardware design company, you have been entrusted with the critical task of developing a Verilog module that plays a crucial role in the success of a groundbreaking next-generation product. The module's performance and reliability are of paramount importance as they directly impact the reputation and standing of your computer hardware company within the competitive industry landscape. 
 
-// This is the circuit described by the code, not the circuit you want to build.
+The current Verilog code you are working on contains functionality issues that inadvertently create a latch, an unintended behavior that must be rectified. Your task is to identify and correct these errors so that the module performs its intended functions accurately. Specifically, your objective is to ensure that the computer shuts down only when it genuinely detects overheating conditions, and that the system ceases driving operations either upon reaching a designated destination or when there is an immediate need to refuel the gas tank due to it being empty.
 
-// synthesis verilog_input_version verilog_2001
-module top_module (
-    input      cpu_overheated,
-    output reg shut_off_computer,
-    input      arrived,
-    input      gas_tank_empty,
-    output reg keep_driving  ); //
+The existing Verilog code snippet outlines the description of a circuit that is not aligned with the desired design specifications. Your job is to modify and refine this code to eliminate the erroneous behavior, ensuring that the module operates as expected without creating any inadvertent latches. As you proceed with your task, consider the influence of each condition within the always blocks, ensuring that the logic accurately reflects the intended operational criteria.
 
-    // Fix the bug in teh following code
-    
-    always @(*) begin
-        if (cpu_overheated)
-           shut_off_computer = 1;
-    end
-
-    always @(*) begin
-        if (~arrived)
-           keep_driving = ~gas_tank_empty;
-    end
-
-endmodule
+In doing so, pay particular attention to the structural logic of the module as defined by the current code. Understanding the role of each condition and output variable, focus on how the logic should be adjusted to meet the specified criteria: shutting off the computer only when overheating is confirmed, and ceasing to drive either when the vehicle arrives at its destination or when a lack of fuel necessitates stopping. Adjust the code to attain these precise functionalities while considering industry best practices in hardware design to ensure reliable and efficient module performance.

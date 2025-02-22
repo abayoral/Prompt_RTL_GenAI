@@ -1,114 +1,115 @@
-Let's follow the Chain of Thought to design and implement the FSM and the datapath for capturing the PS/2 mouse message.
+To develop the required module, we'll create a finite state machine (FSM) that identifies message boundaries and a datapath to capture the 24-bit message. Let's proceed step by step:
 
-### Chain of Thought:
+### Chain of Thought
 
 1. **Understand the Requirements:**
-   - We need an FSM to detect the start of a 3-byte PS/2 mouse message based on the first byte having bit[3] = 1.
-   - Once a message is detected, we need to store each byte in sequence for the 3-byte message.
-   - Once all 3 bytes are received, we have to output the 24-bit message via `out_bytes` and assert the `done` signal.
+   - We need an FSM to detect a 3-byte message from a PS/2 byte stream.
+   - The first byte of a message has bit[3] set to 1.
+   - We need to capture the 3-byte message and output it when the `done` signal is asserted.
 
 2. **Determine the Inputs and Outputs:**
-   - Inputs: 
-     - `clk`: Clock signal.
-     - `in[7:0]`: 8-bit input byte stream.
-     - `reset`: Synchronous reset signal.
-   - Outputs:
-     - `out_bytes[23:0]`: 24-bit message output.
-     - `done`: A signal asserting the completion of a 3-byte message.
+   - Inputs: `clk`, `reset`, `in[7:0]`
+   - Outputs: `out_bytes[23:0]`, `done`
 
-3. **Define the States of the FSM:**
-   - `IDLE`: Wait for the first byte with bit[3] = 1.
-   - `BYTE1`: First byte is detected, store and wait for the second byte.
-   - `BYTE2`: Second byte is received, store and wait for the third byte.
-   - `DONE`: Third byte is received, capture the message, assert `done`, reset back to `IDLE`.
+3. **Define FSM States:**
+   - **IDLE:** Initial state, waiting for a byte with bit[3] = 1.
+   - **BYTE1:** First byte detected, waiting for second byte.
+   - **BYTE2:** Second byte received, waiting for third byte.
+   - **DONE:** All three bytes are received, trigger `done`.
 
-4. **Determine the Intermediate Signals:**
-   - State register to hold the current state.
-   - Registers to hold the 3 bytes of the message separately.
+4. **Controlling Transitions:**
+   - Move from `IDLE` to `BYTE1` on receiving a byte with bit[3] = 1.
+   - Transition from `BYTE1` to `BYTE2` on receiving the next byte.
+   - Transition from `BYTE2` to `DONE` on receiving the third byte.
+   - Return to `IDLE` after `DONE`.
 
-5. **Structuring the FSM and Datapath:**
-   - Use an always block to implement the state transitions and byte capturing based on the FSM's state.
-   - Use combinational logic to determine the output (`done` and `out_bytes`).
+5. **Capture the Data:**
+   - Use registers to store bytes as they are received.
+   - Concatenate these to form `out_bytes`.
 
-6. **Writing the Verilog Code:**
+6. **Output Logic:**
+   - Assert `done` and output `out_bytes` when in `DONE`.
+   - Output logic for `done` is combinational.
+
+### Verilog Code
 
 ```verilog
 module top_module (
     input clk,
     input [7:0] in,
-    input reset,    // Synchronous reset
+    input reset,  // Synchronous reset
     output reg [23:0] out_bytes,
     output reg done
 );
-    // Define states
-    typedef enum reg [1:0] {
-        IDLE = 2'b00,
+
+    // FSM State Encoding
+    typedef enum logic [1:0] {
+        IDLE  = 2'b00,
         BYTE1 = 2'b01,
         BYTE2 = 2'b10,
-        DONE = 2'b11
+        DONE  = 2'b11
     } state_t;
-
+  
     state_t state, next_state;
+
+    // Registers to store each byte of the message
     reg [7:0] byte1, byte2, byte3;
 
-    // State transition logic
+    // FSM State Transition
     always @(posedge clk) begin
-        if (reset)
+        if (reset) begin
             state <= IDLE;
-        else
+        end else begin
             state <= next_state;
+        end
     end
 
-    // Next state logic and output logic
+    // FSM Next State Logic and Byte Capture
     always @(*) begin
-        done = 0;
+        // Default assignments
         next_state = state;
+        done = 0;
 
         case (state)
             IDLE: begin
-                if (in[3]) // Bit 3 of the first byte should be 1
+                if (in[3]) begin  // Look for bit[3] = 1
                     next_state = BYTE1;
+                    byte1 = in;
+                end
             end
+
             BYTE1: begin
                 next_state = BYTE2;
+                byte2 = in;
             end
+
             BYTE2: begin
                 next_state = DONE;
+                byte3 = in;
             end
+
             DONE: begin
                 done = 1;
-                next_state = IDLE; // Go back to IDLE after done
+                out_bytes = {byte1, byte2, byte3};  // Concatenate the captured bytes
+                next_state = IDLE;  // Prepare for next message
             end
         endcase
     end
 
-    // Datapath logic to capture bytes
+    // Reset the bytes to avoid latching unintended values until the next valid reception
     always @(posedge clk) begin
         if (reset) begin
-            byte1 <= 0;
-            byte2 <= 0;
-            byte3 <= 0;
-        end
-        else begin
-            case (next_state)
-                BYTE1: byte1 <= in;
-                BYTE2: byte2 <= in;
-                DONE: byte3 <= in;
-            endcase
+            byte1 <= 8'b0;
+            byte2 <= 8'b0;
+            byte3 <= 8'b0;
         end
     end
-
-    // Output assignment
-    always @(*) begin
-        if (state == DONE) begin
-            out_bytes = {byte1, byte2, byte3};
-        end
-        else begin
-            out_bytes = 24'b0; // Don't-care output (can be optimized depending on use-case)
-        end
-    end
-
 endmodule
 ```
 
-This design ensures that the FSM transitions correctly between states based on the input byte stream and captures the three-byte message properly, asserting the `done` signal when the message is completely received.
+### Explanation
+
+- **State Machine Logic:** We use an always block to transition between states based on the current input and FSM state. The `DONE` state asserts `done` and captures the `out_bytes`.
+- **Output Logic**: `out_bytes` is valid only when `done` is high, otherwise it doesn't hold any significant value.
+
+This module effectively identifies and captures a three-byte message in a PS/2 byte stream, outputting the message when completed.

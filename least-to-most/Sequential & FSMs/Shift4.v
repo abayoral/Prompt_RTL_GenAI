@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // Build a 4-bit shift register (right shift), with asynchronous reset, synchronous load, and enable.
 
 // areset: Resets shift register to zero.

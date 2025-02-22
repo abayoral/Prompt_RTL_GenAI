@@ -3,39 +3,42 @@ module top_module(
     input clk,
     input in,
     input areset,
-    output reg out); //
+    output reg out
+);
 
-    parameter A = 2'b00, B = 2'b01, C = 2'b10, D = 2'b11;
-    reg [1:0] state, next_state;
+    // State encoding
+    typedef enum reg [1:0] {STATE_A, STATE_B, STATE_C, STATE_D} state_t;
+    state_t current_state, next_state;
 
     // State transition logic
     always @(*) begin
-        case (state)
-            A: next_state = (in == 0) ? A : B;
-            B: next_state = (in == 0) ? C : B;
-            C: next_state = (in == 0) ? A : D;
-            D: next_state = (in == 0) ? C : B;
-            default: next_state = A;
+        case (current_state)
+            STATE_A: next_state = (in == 0) ? STATE_A : STATE_B;
+            STATE_B: next_state = (in == 0) ? STATE_C : STATE_B;
+            STATE_C: next_state = (in == 0) ? STATE_A : STATE_D;
+            STATE_D: next_state = (in == 0) ? STATE_C : STATE_B;
+            default: next_state = STATE_A;
         endcase
     end
 
     // State flip-flops with asynchronous reset
     always @(posedge clk or posedge areset) begin
-        if (areset)
-            state <= A;
-        else
-            state <= next_state;
+        if (areset) 
+            current_state <= STATE_A;
+        else 
+            current_state <= next_state;
     end
 
     // Output logic
     always @(*) begin
-        case (state)
-            A: out = 1'b0;
-            B: out = 1'b0;
-            C: out = 1'b0;
-            D: out = 1'b1;
-            default: out = 1'b0;
+        case (current_state)
+            STATE_A: out = 0;
+            STATE_B: out = 0;
+            STATE_C: out = 0;
+            STATE_D: out = 1;
+            default: out = 0;
         endcase
     end
+
 endmodule
 ```

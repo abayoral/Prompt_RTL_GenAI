@@ -1,30 +1,27 @@
-Please act as a professional Verilog designer.
+I am reaching out to request a fully detailed and well-structured Verilog Hardware Description Language (HDL) code to implement a specific module, which is crucial for a CPU's instruction processing system. The module is to be named `instr_reg` and is designed to capture, hold, and breakdown CPU instructions. This will involve fetching, delineating the instructions into specific components, and then providing these components as outputs to facilitate further processing.
 
-An instruction register module designed to hold and process CPU instructions. It captures incoming instructions from various sources and separates them into distinct fields for further processing.
+**Module Designation:**  
+- The designated name for this module is `instr_reg`, reflecting its role as an instruction register.
 
-Module name:
-    instr_reg
+**Input Signals:**  
+1. `clk`: This is the clock signal that will synchronize operations within the module.
+2. `rst`: An active low reset signal designed to reset the instruction register to a predefined state upon activation.
+3. `fetch [1:0]`: A 2-bit wide control signal tasked with determining the source of instruction fetching. If the signal value is `01`, this indicates fetching from an internal register, whereas a value of `10` specifies fetching from an external memory source, either RAM or ROM.
+4. `data [7:0]`: An 8-bit data line serving as the input for instructions that the module can fetch and process.
 
-Input ports:
-    clk: Clock signal for synchronization.
-    rst: Active low reset signal to initialize the register.
-    fetch [1:0]: Control signal indicating the source of the instruction (1 for register, 2 for RAM/ROM).
-    data [7:0]: 8-bit data input representing the instruction to be fetched.
+**Output Signals:**  
+1. `ins [2:0]`: Outputs the most significant 3 bits from the fetched instruction, denoting the operation code or opcode.
+2. `ad1 [4:0]`: Outputs the least significant 5 bits from the instruction, acting as the address for registers.
+3. `ad2 [7:0]`: Provides the full 8-bit output aligned with the complete data whenever instruction data is sourced from the external memory.
 
-Output ports:
-    ins [2:0]: High 3 bits of the instruction, indicating the opcode or operation.
-    ad1 [4:0]: Low 5 bits of the instruction, representing the register address.
-    ad2 [7:0]: The full 8-bit data from the second source.
+**Functional and Structural Details:**  
+- Internally, the module utilizes two registers, each 8 bits wide, named `ins_p1` and `ins_p2`. These registers are responsible for holding instructions sourced from the specified sources based on control signals.
+- The module's operation is clock-driven, specifically responding to the rising edge of the `clk` signal, consistent with typical synchronous designs.
+- Upon detecting a low-active `rst` signal, both registers, `ins_p1` and `ins_p2`, are initialized to a zero state, effectively clearing any previously held data.
+- The `fetch` signal governs the fetching mechanism, as follows:
+  - With `fetch` set to `2'b01`, the module grabs the instruction from the `data` input and lodges it into the `ins_p1` register.
+  - If the `fetch` signal reads `2'b10`, the system retrieves and stores the instruction into the `ins_p2` register.
+  - In conditions where neither of these fetch signals is activated, the module preserves the current data within both `ins_p1` and `ins_p2`.
+- The outputs, which include `ins`, `ad1`, and `ad2`, are calculated and provided based on the content of the instruction registers, specifically crafted to be integrated within a CPU's architecture for further stages of instruction processing.
 
-Implementation:
-    The instruction register contains two 8-bit registers (ins_p1 and ins_p2) to store instructions from different sources.
-    On the rising edge of the clock (clk), if the reset (rst) signal is low, both registers are initialized to zero.
-    Based on the fetch signal:
-    If fetch is 2'b01, the instruction is fetched from the data input into ins_p1.
-    If fetch is 2'b10, the instruction is fetched from the data input into ins_p2.
-    If neither condition is met, the previous values in both registers are retained.
-    The outputs ins, ad1, and ad2 are derived from the stored instructions.
-
-
-Give me the complete code.
-
+I request a complete Verilog code snippet that seamlessly aligns with these detailed specifications and accurately embodies the described functions and structure of the `instr_reg` module. This should include all necessary declarations, synchronous elements, conditional logic, and output assignments to fulfill the outlined operational goals.

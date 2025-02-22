@@ -4,6 +4,7 @@ TEST_DESIGN = ../../modules/multi_8bit
 
 compile:
 	iverilog -o simv ${TEST_DESIGN}.v testbench.v
+	
 sim:
 		./simv -l run.log
 

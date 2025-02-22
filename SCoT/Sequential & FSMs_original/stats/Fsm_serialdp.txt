@@ -1,0 +1,7 @@
+least-to-most/modules/Fsm_serialdp.v:10: syntax error
+least-to-most/modules/Fsm_serialdp.v:10: error: Invalid module instantiation
+least-to-most/modules/Fsm_serialdp.v:14: syntax error
+least-to-most/modules/Fsm_serialdp.v:14: error: Invalid module instantiation
+Module file path: least-to-most/modules/Fsm_serialdp.v
+Testbench file path: hdlbits_testbenches/Fsm_serialdp_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'least-to-most/simulations/Fsm_serialdp_sim', 'least-to-most/modules/Fsm_serialdp.v', 'hdlbits_testbenches/Fsm_serialdp_0_tb.v']' returned non-zero exit status 4.

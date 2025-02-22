@@ -1,36 +1,33 @@
-Please act as a professional verilog designer.
+As a skilled Verilog designer, you're tasked with creating a dual-port random access memory (RAM) module with specific parameters and functionalities. This module is referred to as "RAM" and its primary function is to manage concurrent read and write operations. Here's a detailed breakdown of the requirements and components for this design:
 
-Implement a dual-port RAM with a depth of 8 and a bit width of 6 bits, with all data initialized to 000000. It has two groups of ports, respectively for reading data and writing data, and read and write operations can be carried out at the same time. When the read_en signal is 1, the read_data of the corresponding position is read through the read_addr signal and output; When the write_en signal is 1, data is written to the corresponding position through the write_addr signal and write-data signal.
+**Module Name:**
+- **RAM**
 
-Module name:  
-    RAM               
-Input ports:
-	clk: Clock signal used for synchronous operation.
-	rst_n: Active-low reset signal. Defined as 0 for reset and 1 for reset signal inactive.
-	write_en: Write enable signal to initiate a write operation.
-	write_addr: Address for the write operation.
-	write_data: Data to be written to the RAM.
-	read_en: Read enable signal to initiate a read operation.
-	read_addr: Address for the read operation.
+**Input Ports:**
+- **clk**: This is a clock signal essential for ensuring synchronous operations. All operations within the module will be triggered on the rising edge of this signal.
+- **rst_n**: An active-low reset signal meaning that, when set to low (0), it initiates a reset state clearing necessary data.
+- **write_en**: This signal, when set to high (1), enables the write functionality, allowing data to be written to the RAM at the designated address.
+- **write_addr**: Specifies the address within the RAM where data should be written. This is a crucial input that determines which memory location will store the incoming data.
+- **write_data**: This represents the data to be stored in the RAM. It is expected to follow the specified bit width.
+- **read_en**: When this signal is set high (1), it enables the reading functionality, allowing data stored in RAM at the specified address to be output.
+- **read_addr**: Specifies the address within the RAM from which data should be read. It determines the location of data retrieval.
 
-Output ports:
-    read_data: Output signal representing the data read from the RAM.
+**Output Ports:**
+- **read_data**: This is the data output signal that represents the content read from the RAM when the read operation is active. It outputs data corresponding to the provided read address.
 
-Parameter: 
-	WIDTH = 6;
-    DEPTH = 8;
+**Parameters:**
+- **WIDTH = 6**: Defines the bit width for both the RAM array and the data elements. Each memory location will store data up to 6 bits wide.
+- **DEPTH = 8**: Defines the total number of accessible memory addresses, meaning there are 8 separately addressable storage locations.
 
-Implementation:
-RAM Array:
-The module includes a register array, RAM. The array is defined as reg [DEPTH - 1 : 0] RAM [2**WIDTH-1:0], allowing for 2^6 memory locations, each with a width of 6 bits.
-Write Operation:
-The first always block triggers on the positive edge of the clock signal (posedge clk) or the negative edge of the reset signal (negedge rst_n).
-On reset, indicated by !rst_n, all memory locations in the RAM array are cleared to 0.
-If the write enable signal (write_en) is active, the data (write_data) is written to the RAM array at the specified address (write_addr).
-Read Operation:
-The second always block triggers on the positive edge of the clock signal (posedge clk) or the negative edge of the reset signal (negedge rst_n).
-On reset, indicated by !rst_n, the read_data register is cleared to 0.
-If the read enable signal (read_en) is active, the data at the specified address (read_addr) in the RAM array is assigned to the read_data register.
-If the read enable signal is not active, the read_data register is cleared to 0.
+**Implementation Details:**
 
-Give me the complete code.
+- **RAM Array Definition**: 
+  You'll create a register array (RAM) with a depth of 8 and a bit width of 6 bits. The specific syntax for this is `reg [WIDTH-1:0] RAM [DEPTH-1:0]`, where each element of the array can store 6-bit wide data.
+
+- **Write Operation**: 
+  A procedural block will execute on the positive edge of `clk` or the negative edge of `rst_n`. Upon reset activation (`!rst_n`), all elements within the RAM will be reset to 0. If `write_en` is high, data from `write_data` will be stored in the address specified by `write_addr`.
+
+- **Read Operation**: 
+  Another procedural block will activate on the same clock conditions as the write operation. During reset, the `read_data` register must also be cleared to 0. When `read_en` is active, the data from the address provided by `read_addr` will be output through `read_data`.
+
+The above specifications should be translated into Verilog code, ensuring that the module performs as outlined, accommodating simultaneous read and write operations while responding correctly to reset signals. Ensure signal stability and integrity by testing the design thoroughly.

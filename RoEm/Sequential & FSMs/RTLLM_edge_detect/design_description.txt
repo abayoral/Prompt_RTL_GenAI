@@ -1,20 +1,19 @@
-Please act as a professional verilog designer.
+You are currently equipped with knowledge extending up to October 2023. In this scenario, imagine that you are a professional Verilog designer, proficient in creating digital logic designs using Verilog HDL (Hardware Description Language). Your task is to develop a Verilog module named 'edge_detect'. The primary function of this module is to perform edge detection on a given 1-bit input signal referred to as 'a', which experiences slow changes.
 
-Implement a module for edge detection. There is a slowly changing 1-bit signal a. When "a" changes from 0 to 1, the indicating signal rise is 1. When "a" changes from 1 to 0, the falling edge of signal a is shown, the indicating signal down is 1. rise or down will be set to 1 on the next clock when the corresponding edge appears, and then return to 0 until the corresponding edge appears again.
+Specifically, your module should comport itself in the following manner:
 
-Module name:  
-    edge_detect      
+1. **Rising Edge Detection**: When the input signal 'a' transitions from a logic low (0) to a logic high (1), this change is to be reflected by setting an output signal named 'rise' to 1. This indication should occur on the next positive edge of the clock signal 'clk' after the transition is detected.
 
-Input ports:
-    clk: Clock signal.
-    rst_n: Reset signal (active low).
-    a: Input signal.
+2. **Falling Edge Detection**: Conversely, when 'a' transitions from a logic high (1) to a logic low (0), an output signal named 'down' should be set to 1, once again in alignment with the next positive edge of the clock 'clk' following detection of this transition.
 
-Output ports:
-    rise: Output signal indicating a rising edge.
-    down: Output signal indicating a falling edge.
+3. **Signal Reset and Synchronization**:
+   - Both output signals 'rise' and 'down' should be synchronized with the clock signal. 
+   - The signals must be reset to 0 after they have been set in response to an edge, and they should remain 0 until the next respective edge is detected.
+   - During the reset condition, the module should ensure proper initialization and zeroing out of both output signals.
 
-Implementation:
-The edge_detect module detects rising and falling edges in the input signal a and generates corresponding output signals rise and down. The rising and falling edges are detected on the positive edge of the clock signal clk. If a rising edge is detected, the rise output signal is set to 1. If a falling edge is detected, the down output signal is set to 1. Otherwise, both output signals are set to 0. These output signals are synchronized with the clock and remain set to 1 until the corresponding edge appears again.
+4. **Inputs and Outputs**:
+   - You will define input ports for a clock signal (`clk`) and a reset signal (`rst_n`), typical in synchronous digital systems. The reset is active-low, meaning the module initializes to a known state when the reset signal is at logic low.
+   - An additional input port will receive the signal 'a', the primary signal being monitored for edge changes.
+   - The outputs will consist of two signals 'rise' and 'down', which indicate detected rising and falling edges, respectively.
 
-Give me the complete code.
+This edge detection logic should be implemented while ensuring robustness and compliance with logic synthesis rules, considering that 'a' changes slowly compared to the clock frequency. Develop and provide the full Verilog code for this module, encapsulating the described functionality.

@@ -1,26 +1,17 @@
-Please act as a professional verilog designer.
+Could you assist by acting as an experienced Verilog designer to develop a Verilog module for a 32-bit integer multiplying accumulator? In this design, we need to set up a module named "pe" that features a specific set of input and output ports. Particularly, we want this module to function as a MAC_PE (Multiply-Accumulate Processing Element), where an accumulator register holds the ongoing accumulation result through multiple clock cycles.
 
-Implement a Multiplying Accumulator for 32bit integer. In the MAC_PE, there is a register that stores the partial sum (the intermediate accumulation result), and in each cycle, the result of “a multiplied by b” will be accumulated in this register, and the “c” shows the value of the register.
+We require the following input ports for this module:
+1. **clk**: A clock signal triggering synchronous operations within the module. This is vital for the timing and sequence of operations carried out by the module.
+2. **rst**: A reset signal with a dual-state capability, where a logic level of '1' activates the reset condition and a logic level of '0' deactivates it.
+3. **a**: A 32-bit input serving as one operand for the multiplication operation.
+4. **b**: Another 32-bit input acting as the second operand in the multiplication.
 
-Module name:  
-    pe   
+For the output, we need:
+1. **c**: A 32-bit output that represents the cumulative value that results from the multiply-accumulate process.
 
-Input ports:
-    clk: Clock signal used for synchronous operations.
-    rst: Reset signal. Defined as 1 for reset and 0 for reset signal inactive.
-    a: 32-bit input operand A.
-    b: 32-bit input operand B.
+The main function of the "pe" module is to perform the multiplication of the inputs 'a' and 'b' and accumulate this product into a register over time. This is achieved by:
+- Initially, employing an accumulator register to store the ongoing result.
+- Utilizing an 'always' block that responds to the rising edge of the 'clk' (clock signal) or 'rst' (reset signal). Anytime the reset is asserted, the accumulator should reset to zero.
+- When the reset is not asserted, the product of inputs 'a' and 'b' is consistently added to the current value of the accumulator.
 
-Output ports:
-    c: 32-bit output representing the accumulated result.
-
-Implementation:
-The module implements a parallel multiplier and accumulator using registers and an always block. It multiplies the input operands and accumulates the result into an output register.
-Accumulator Register:
-The module includes a register, c, to store the accumulated result.
-On the positive edge of the clock signal (clk) or the positive edge of the reset signal (rst), the module updates the register.
-If the reset signal (rst) is high, indicating a reset condition, the register (c) is set to 0. If the reset signal (rst) is low, the register (c) is updated by adding the product of the input operands (a and b) to its current value.
-Multiplication and Accumulation:
-Inside the always block, the module performs the multiplication and accumulation operation. If the reset signal (rst) is high, the register (c) is set to 0. If the reset signal (rst) is low, the module adds the product of the input operands (a and b) to the register (c).
-
-Give me the complete code.
+I'm looking for a comprehensive Verilog code that accurately models these specifications, detailing the structural and behavioral elements required to achieve the desired multiply-accumulate functionality. The code should demonstrate clarity and adherence to Verilog syntax standards, effectively showcasing how the accumulation process is managed across clock cycles within the "pe" module.

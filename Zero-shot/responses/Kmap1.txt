@@ -4,8 +4,12 @@ module top_module(
     input b,
     input c,
     output out
-); 
-    // Simplify the K-map: The function f(a, b, c) is always 1 regardless of the values of a, b, and c
+);
+
+    // The Karnaugh map shows that the output is always '1' for all input conditions.
+    // Therefore, the simplified equation for the circuit is:
+    // out = 1
+
     assign out = 1;
 
 endmodule

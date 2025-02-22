@@ -1,11 +1,10 @@
 ```verilog
-module top_module( 
+module top_module (
     input [255:0] in,    // 256-bit input vector
-    input [7:0] sel,     // 8-bit selector
-    output out          // 1-bit output
+    input [7:0] sel,     // 8-bit select line
+    output out           // Selected output bit
 );
-
+    // Select the appropriate bit from the input vector according to the sel value
     assign out = in[sel];
-
 endmodule
 ```

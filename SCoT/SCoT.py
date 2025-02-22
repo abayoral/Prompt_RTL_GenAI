@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 
 # Get the directory of the current script
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -11,54 +11,62 @@ sys.path.append(main_folder_path)
 # Now you can import the function
 from response import generate_response
 
-# Function to read the system prompt from a file
-def read_system_prompt(file_path):
-    with open(file_path, 'r') as file:
-        return file.read()
+def main(prompt_dir):
+    os.environ['prompt_dir'] = prompt_dir
 
-# Function to read a user prompt from a file
-def read_user_prompt(file_path):
-    with open(file_path, 'r') as file:
-        return file.read()
-
-# Function to save the result to a file
-def save_result(file_path, response):
-    with open(file_path, 'w') as file:
-        file.write(response)
-
-# Use the imported function
-if __name__ == "__main__":
-    # Path to the generate_knowledge.txt file
+    if not os.path.exists(prompt_dir):
+        print(f"Error: {prompt_dir} does not exist.")
+        return
+    
+    model_type = "ChatGPT4o"
+    prompt_dir_orig = prompt_dir + "_original"
+    
     generate_knowledge_path = os.path.join(current_dir, 'Exemplars_CoT.txt')
     
-    # Read the system prompt from the file
-    system_prompt = read_system_prompt(generate_knowledge_path)
+    with open(generate_knowledge_path, 'r') as f:
+        system_prompt = f.read()
     
-    # Directory containing the prompts
-    prompts_dir = os.path.join(current_dir, 'original_prompts')
+    # Process each prompt file in prompt_dir
+    for file in os.listdir(prompt_dir_orig):
+        file_path_read = os.path.join(prompt_dir_orig, file)
+        file_path_write = os.path.join(prompt_dir, file)
+        
+        if os.path.isfile(file_path_read):
+            with open(file_path_read, 'r') as f:
+                user_prompt = f.read()
+            
+            response = generate_response(system_prompt, user_prompt, model_type)
+            
+            with open(file_path_write, 'w') as f:
+                f.write(response)
+            
+            print(f"Processed and saved response for {file}")
     
-    # Directory to save the results
-    gk_prompts_dir = os.path.join(current_dir, 'prompts')
-    os.makedirs(gk_prompts_dir, exist_ok=True)
+    # Check for RTLLM_ directories inside prompt_dir and process design_description.txt
+    for subdir in os.listdir(prompt_dir_orig):
+        subdir_path_read = os.path.join(prompt_dir_orig, subdir)
+        subdir_path_write = os.path.join(prompt_dir, subdir)
+        if os.path.isdir(subdir_path_read) and subdir.startswith("RTLLM_"):
+            design_desc_path_read = os.path.join(subdir_path_read, "design_description.txt")
+            design_desc_path_write = os.path.join(subdir_path_write, "design_description.txt")
+            if os.path.exists(design_desc_path_read):
+                with open(design_desc_path_read, 'r') as f:
+                    initial_prompt = f.read()
+                
+                expanded_prompt = generate_response(
+                    "Rephrase and expand the following question, but do not provide any solutions or answers. Focus solely on clarifying and elaborating the question itself.",
+                    initial_prompt, model_type
+                ).strip()
+                
+                with open(design_desc_path_write, 'w') as f:
+                    f.write(expanded_prompt)
+                
+                print(f"Updated {design_desc_path_write} with expanded prompt.")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python scot.py <prompt_dir>")
+        sys.exit(1)
     
-    # Loop through each prompt file in the prompts folder
-    for prompt_file in os.listdir(prompts_dir):
-        prompt_file_path = os.path.join(prompts_dir, prompt_file)
-        
-        # Read the user prompt from the file
-        user_prompt = read_user_prompt(prompt_file_path)
-        
-        # Define the model type and prompt strategy
-        model_type = "ChatGPT4o"
-        prompt_strategy = None  # or set your specific strategy if needed
-        
-        # Call the generate_response function
-        response = generate_response(system_prompt, user_prompt, model_type, prompt_strategy)
-        
-        # Path to save the result
-        result_file_path = os.path.join(gk_prompts_dir, prompt_file)
-        
-        # Save the response to the result file (excluding the original prompt)
-        save_result(result_file_path, response)
-        
-        print(f"Processed and saved response for {prompt_file}")
+    prompt_dir = sys.argv[1]
+    main(prompt_dir)

@@ -1,17 +1,1 @@
-```verilog
-module top_module(
-    input clk,
-    input reset,    // Active-high synchronous reset to 32'h1
-    output reg [31:0] q
-); 
-
-    always @(posedge clk) begin
-        if (reset) begin
-            q <= 32'h1;
-        end else begin
-            q <= {q[30:0], q[31] ^ q[21] ^ q[1] ^ q[0]};
-        end
-    end
-
-endmodule
-```
+Is the specified active-high synchronous reset intended to initialize the LFSR to the value 32'h1 upon reset, as indicated in the comments?

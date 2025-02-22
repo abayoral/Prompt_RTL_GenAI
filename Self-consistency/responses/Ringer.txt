@@ -5,10 +5,10 @@ module top_module (
     output motor         // Vibrate
 );
 
-    // Motor should be on if vibrate_mode is 1 and there is an incoming call
+    // The motor should be on when vibrate_mode is 1 and ring is 1
     assign motor = ring & vibrate_mode;
-    
-    // Ringer should be on if vibrate_mode is 0 and there is an incoming call
+
+    // The ringer should be on when vibrate_mode is 0 and ring is 1
     assign ringer = ring & ~vibrate_mode;
 
 endmodule

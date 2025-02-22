@@ -1,32 +1,39 @@
-// you are given a module add16 that performs a 16-bit addition. You must instantiate two of them to create a 32-bit adder. 
-// One add16 module computes the lower 16 bits of the addition result, 
-// while the second add16 module computes the upper 16 bits of the result. 
-// Your 32-bit adder does not need to handle carry-in (assume 0) or carry-out (ignored).
+As a seasoned Digital Design Engineer working at a renowned hardware design company, you are entrusted with the responsibility of creating a highly important Verilog module integral to the development of a cutting-edge product. The module you're required to develop plays a crucial role in upholding your company's esteemed reputation within the competitive computer hardware industry. 
 
-// Connect the add16 modules together as shown in the diagram below. The provided module add16 has the following declaration:
+The task involves utilizing a given 16-bit adder, known as the `add16` module, which you will use as a building block to construct a more complex 32-bit adder. This 32-bit adder is to be realized by instantiating two `add16` modules, each of which will handle a portion of the 32-bit addition: one `add16` module will process the lower 16 bits, and the other will manage the upper 16 bits. Notably, this 32-bit adder design excludes the need to consider carry-in for the overall operation (assumed to be 0) or carry-out (which can be disregarded after completion). 
 
-module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );
+Below is the given declaration for the `add16` module, which performs the operation using internal components and interacts with inputs and outputs as follows:
 
-// Within each add16, 16 full adders (module add1, not provided) are instantiated to actually perform the addition. 
-// You must write the full adder module that has the following declaration:
+```verilog
+module add16 ( 
+    input [15:0] a, 
+    input [15:0] b, 
+    input cin, 
+    output [15:0] sum, 
+    output cout 
+);
+```
 
-module add1 ( input a, input b, input cin, output sum, output cout );
+Within the `add16` module, it incorporates 16 instances of another essential module, a 1-bit full adder called `add1`. Your additional responsibility is to construct this `add1` module, with its specification provided here:
 
-// Recall that a full adder computes the sum and carry-out of a+b+cin.
+```verilog
+module add1 ( 
+    input a, 
+    input b, 
+    input cin, 
+    output sum, 
+    output cout 
+);
+```
 
-// In summary, there are three modules in this design:
+A full adder, such as `add1`, is designed to compute both the sum and carry-out for the equation a + b + cin, where `cin` represents the carry-in logic bit, typically propagated from a previous lower bit calculation in a cascading series of full adders otherwise known as a ripple carry adder.
 
-// Hint: top_module — Your top-level module that contains two of...
-// add16, provided — A 16-bit adder module 
-// add1 — A 1-bit full adder module.
-// If your submission is missing a module add1, 
-// you will get an error message that says Error (12006): Node instance "user_fadd[0].a1" instantiates undefined entity "add1".
+In summary, you are tasked with completing the design using three critical Verilog modules:
 
-module top_module (
-    input [31:0] a,
-    input [31:0] b,
-    output [31:0] sum
-    // Insert your code here
-);//
+1. **`top_module`**: This is your primary top-level module in which you will integrate two `add16` modules to achieve the overall 32-bit adder functionality. It takes as input two 32-bit wide signals and outputs their summed result as a 32-bit wide signal.
 
-endmodule
+2. **`add16`**: A pre-defined 16-bit adder module provided to you for use, which you need to connect appropriately within the top-level module.
+
+3. **`add1`**: A 1-bit full adder module that you are tasked with developing. Please note that failing to define this module will result in a compilation error, specifically indicating that an undefined entity "add1" is being instantiated.
+
+Your objective is to write the necessary Verilog code within the `top_module`, connecting and instantiating each component appropriately to achieve the intended 32-bit addition task without the incorporation of an initial carry-in or attention towards the final carry-out. The external inputs and outputs for `top_module` must reflect the expected design, encapsulating the efficient use of the provided and developed modules.

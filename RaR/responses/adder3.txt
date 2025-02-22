@@ -1,17 +1,25 @@
 ```verilog
-module full_adder (
-    input a, b, cin,
-    output sum, cout 
+module full_adder(
+    input a,
+    input b,
+    input cin,
+    output sum,
+    output cout
 );
     assign {cout, sum} = a + b + cin;
 endmodule
 
-module top_module( 
-    input [2:0] a, b,
-    input cin,
-    output [2:0] cout,
-    output [2:0] sum
+module top_module(
+    input [2:0] a,       // 3-bit input a
+    input [2:0] b,       // 3-bit input b
+    input cin,           // Carry-in input
+    output [2:0] sum,    // 3-bit sum output
+    output [2:0] cout    // 3-bit carry-output (cout[2] is the final carry-out)
 );
+
+    wire c1, c2;         // Internal carry wires
+
+    // Instantiate the first full adder
     full_adder fa0 (
         .a(a[0]),
         .b(b[0]),
@@ -20,6 +28,7 @@ module top_module(
         .cout(cout[0])
     );
 
+    // Instantiate the second full adder
     full_adder fa1 (
         .a(a[1]),
         .b(b[1]),
@@ -28,6 +37,7 @@ module top_module(
         .cout(cout[1])
     );
 
+    // Instantiate the third full adder
     full_adder fa2 (
         .a(a[2]),
         .b(b[2]),
@@ -38,3 +48,5 @@ module top_module(
 
 endmodule
 ```
+
+This module uses instances of a `full_adder` to construct a 3-bit binary ripple-carry adder. Each instance is responsible for computing the sum and carry-out for each bit position in the input vectors `a` and `b`. The carry-out of each full adder becomes the carry-in of the subsequent full adder, allowing the carries to "ripple" through the chain, hence the name ripple-carry adder. The `sum` output represents the result of adding the two 3-bit numbers together, and `cout[2]` provides the final carry-out. The internal carry-out signals (`cout[0]`, `cout[1]`, and `cout[2]`) are also output, as required.

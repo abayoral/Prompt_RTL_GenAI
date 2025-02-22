@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // Suppose you are designing a circuit to control a cellphone's ringer and vibration motor. 
 // Whenever the phone needs to ring from an incoming call (input ring), your circuit must either 
 // turn on the ringer (output ringer = 1) or the motor (output motor = 1), but not both. 

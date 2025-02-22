@@ -1,14 +1,18 @@
+```verilog
 module top_module (
     input clk,
     input [7:0] in,
     output reg [7:0] anyedge
 );
-    reg [7:0] in_reg;
 
-    always @(posedge clk)
-    begin
-        anyedge <= (in_reg ^ in) & in;   // Detects any edge
-        in_reg <= in;
+    reg [7:0] prev_in;
+
+    always @(posedge clk) begin
+        // Detect a 0 to 1 transition for each bit in the vector
+        anyedge <= (prev_in ^ in) & in;
+        // Store the current input for the next clock cycle comparison
+        prev_in <= in;
     end
-    
+
 endmodule
+```

@@ -1,18 +1,9 @@
-// Create a set of counters suitable for use as a 12-hour clock (with am/pm indicator). Your counters are clocked by a fast-running clk, with a pulse on ena whenever your clock should increment (i.e., once per second).
+Your task is to design a set of counters configured to function as a conventional 12-hour analog clock representation, incorporating an AM/PM indicator. The counters are triggered by an internal, high-frequency clock signal, labeled as 'clk'. The clock time should increment by issuing a pulse to the 'ena' (enable) input, which occurs precisely once per second, ensuring time progresses in a real-world manner.
 
-// reset resets the clock to 12:00 AM. pm is 0 for AM and 1 for PM. hh, mm, and ss are two BCD (Binary-Coded Decimal) digits each for hours (01-12), minutes (00-59), and seconds (00-59). Reset has higher priority than enable, and can occur even when not enabled.
+Upon asserting the 'reset' signal, the clock should immediately revert to the beginning of a brand-new day at 12:00 AM. In this configuration, the 'pm' output signal distinctly identifies the mid-day period, where '0' signifies AM (Ante Meridiem) and '1' indicates PM (Post Meridiem). The clock maintains separate counters for hours (hh), minutes (mm), and seconds (ss), with each counter employing a two-digit Binary-Coded Decimal format. Hours range from 01 to 12, while both minutes and seconds span from 00 to 59 inclusive.
 
-// Hint: Note that 11:59:59 PM advances to 12:00:00 AM, and 12:59:59 PM advances to 01:00:00 PM. There is no 00:00:00.
+The 'reset' operation takes precedence over the 'enable' functionality. This stipulates that if the 'reset' signal is activated even momentarily, it will override any concurrent 'enable' signals, ensuring the clock is promptly reset, regardless of the current state of the timekeeping.
 
-module top_module(
-    input clk,
-    input reset,
-    input ena,
-    output pm,
-    output [7:0] hh,
-    output [7:0] mm,
-    output [7:0] ss); 
+Notably, consider the wrap-around conditions specific to 12-hour clocks: at 11:59:59 PM, the clock should transition directly to 12:00:00 AM. At 12:59:59 PM, it should roll over to 01:00:00 PM. Additionally, there is no representation of a '00:00:00' timestamp, adhering to the 12-hour format.
 
-    // Insert your code here
-
-endmodule
+Implement this logic within a module named 'top_module'. The inputs are the 'clk', 'reset', and 'ena', while the outputs are 'pm', 'hh', 'mm', and 'ss', which need to be implemented to adhere to the outlined behavior and specifications. The task requires encoding appropriate behavior for these components within the provided framework, ensuring correct transition and display of chronological time as per real-world scenarios.

@@ -1,0 +1,33 @@
+```verilog
+module fixed_point_subtractor #(parameter Q = 8, N = 16) (
+    input  [N-1:0] a,
+    input  [N-1:0] b,
+    output reg [N-1:0] c
+);
+    // Internal register to hold the subtraction result
+    reg signed [N:0] res;
+
+    // Extended signed input operands for internal processing
+    reg signed [N:0] op_a;
+    reg signed [N:0] op_b;
+
+    always @(*) begin
+        // Extend the sign bit for inputs a and b
+        op_a = {a[N-1], a}; // Extend to one bit wider for sign extension
+        op_b = {b[N-1], b}; // Extend to one bit wider for sign extension
+
+        // Perform subtraction
+        res = op_a - op_b;
+
+        // Check for zero result and handle sign
+        if (res[N:0] == 0) begin
+            c = 0;
+        end else begin
+            c = res[N-1:0]; // Take the lower N bits for the result
+        end
+    end
+    
+endmodule
+```
+
+This module provides fixed-point subtraction with careful handling of signed operands, using parameterized width to determine the number of integer and fractional bits. It ensures correct sign handling, including special treatment when the result is zero. The inputs `a` and `b` are sign-extended for precision, and the subtraction result is computed and assigned to the output `c`, maintaining parameter-specified constraints.

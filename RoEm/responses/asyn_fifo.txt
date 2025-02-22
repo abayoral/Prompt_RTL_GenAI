@@ -1,0 +1,91 @@
+```verilog
+module asyn_fifo #(
+    parameter DEPTH = 16,
+    parameter WIDTH = 8
+)(
+    input wire wclk,
+    input wire rclk,
+    input wire wrstn,
+    input wire rrstn,
+    input wire winc,
+    input wire rinc,
+    input wire [WIDTH-1:0] wdata,
+    output wire [WIDTH-1:0] rdata,
+    output wire wfull,
+    output wire rempty
+);
+
+    localparam ADDR_WIDTH = $clog2(DEPTH);
+    
+    reg [ADDR_WIDTH-1:0] waddr, raddr;
+    reg [ADDR_WIDTH:0] wptr, rptr, wptr_gray, rptr_gray;
+    reg [ADDR_WIDTH:0] wptr_gray_sync1, wptr_gray_sync2;
+    reg [ADDR_WIDTH:0] rptr_gray_sync1, rptr_gray_sync2;
+    
+    reg [WIDTH-1:0] mem[0:DEPTH-1];
+
+    // Dual-port RAM write logic
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            waddr <= 0;
+            wptr <= 0;
+        end else if (winc && !wfull) begin
+            mem[waddr] <= wdata;
+            waddr <= waddr + 1;
+            wptr <= wptr + 1;
+        end
+    end
+
+    // Dual-port RAM read logic
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            raddr <= 0;
+            rptr <= 0;
+        end else if (rinc && !rempty) begin
+            raddr <= raddr + 1;
+            rptr <= rptr + 1;
+        end
+    end
+
+    // Gray code conversion
+    function [ADDR_WIDTH:0] bin2gray(input [ADDR_WIDTH:0] bin);
+        bin2gray = (bin >> 1) ^ bin;
+    endfunction
+
+    // Calculate gray pointers
+    always @(*) begin
+        wptr_gray = bin2gray(wptr);
+        rptr_gray = bin2gray(rptr);
+    end
+
+    // Synchronize rptr_gray into write clock domain
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            rptr_gray_sync1 <= 0;
+            rptr_gray_sync2 <= 0;
+        end else begin
+            rptr_gray_sync1 <= rptr_gray;
+            rptr_gray_sync2 <= rptr_gray_sync1;
+        end
+    end
+
+    // Synchronize wptr_gray into read clock domain
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            wptr_gray_sync1 <= 0;
+            wptr_gray_sync2 <= 0;
+        end else begin
+            wptr_gray_sync1 <= wptr_gray;
+            wptr_gray_sync2 <= wptr_gray_sync1;
+        end
+    end
+
+    // Calculate full and empty status
+    assign wfull = (wptr_gray == {~rptr_gray_sync2[ADDR_WIDTH:ADDR_WIDTH-1], rptr_gray_sync2[ADDR_WIDTH-2:0]});
+    assign rempty = (rptr_gray == wptr_gray_sync2);
+
+    // Read data output
+    assign rdata = mem[raddr];
+
+endmodule
+```

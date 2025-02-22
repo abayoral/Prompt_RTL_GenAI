@@ -2,43 +2,49 @@ module top_module(
     input clk,
     input in,
     input areset,
-    output reg out); //
+    output reg out);
 
-    // State Encoding
+    // State encoding
     typedef enum logic [1:0] {
-        STATE_A = 2'b00,
-        STATE_B = 2'b01,
-        STATE_C = 2'b10,
-        STATE_D = 2'b11
+        A = 2'b00,
+        B = 2'b01,
+        C = 2'b10,
+        D = 2'b11
     } state_t;
 
-    state_t state, next_state;
+    state_t current_state, next_state;
 
-    // State Transition Logic
+    // State transition logic
     always @(*) begin
-        case (state)
-            STATE_A: next_state = (in) ? STATE_B : STATE_A;
-            STATE_B: next_state = (in) ? STATE_B : STATE_C;
-            STATE_C: next_state = (in) ? STATE_D : STATE_A;
-            STATE_D: next_state = (in) ? STATE_B : STATE_C;
-            default: next_state = STATE_A;  // Default state
+        case (current_state)
+            A: begin
+                next_state = (in) ? B : A;
+                out = 0;
+            end
+            B: begin
+                next_state = (in) ? B : C;
+                out = 0;
+            end
+            C: begin
+                next_state = (in) ? D : A;
+                out = 0;
+            end
+            D: begin
+                next_state = (in) ? B : C;
+                out = 1;
+            end
+            default: begin
+                next_state = A;
+                out = 0;
+            end
         endcase
     end
 
-    // State Flip-Flops with Asynchronous Reset
+    // State flip-flops with asynchronous reset
     always @(posedge clk or posedge areset) begin
         if (areset)
-            state <= STATE_A;
+            current_state <= A;
         else
-            state <= next_state;
+            current_state <= next_state;
     end
-
-    // Output Logic
-    always @(*) begin
-        case (state)
-            STATE_D: out = 1'b1;
-            default: out = 1'b0;
-        endcase
-    end
-
 endmodule

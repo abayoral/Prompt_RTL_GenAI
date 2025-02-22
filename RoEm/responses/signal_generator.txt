@@ -1,0 +1,47 @@
+```verilog
+module signal_generator(
+    input clk,
+    input rst_n,
+    output reg [4:0] wave
+);
+
+    // State machine states
+    typedef enum reg {
+        STATE_UP,    // Increment state
+        STATE_DOWN   // Decrement state
+    } state_t;
+
+    reg state; // Current state of the state machine
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset both the wave output and state on active low reset
+            wave <= 5'b00000;
+            state <= STATE_UP;
+        end else begin
+            case (state)
+                STATE_UP: begin
+                    if (wave == 5'b11111) begin // Check if wave is at maximum value
+                        state <= STATE_DOWN;   // Switch to decrement state
+                    end else begin
+                        wave <= wave + 1;      // Increment wave
+                    end
+                end
+
+                STATE_DOWN: begin
+                    if (wave == 5'b00000) begin // Check if wave is at minimum value
+                        state <= STATE_UP;     // Switch to increment state
+                    end else begin
+                        wave <= wave - 1;      // Decrement wave
+                    end
+                end
+
+                default: begin
+                    state <= STATE_UP;          // Default/reset state
+                    wave <= 5'b00000;           // Reset wave to minimum
+                end
+            endcase
+        end
+    end
+endmodule
+```

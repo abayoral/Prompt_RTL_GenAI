@@ -1,19 +1,20 @@
 ```verilog
-module top_module( 
+module top_module(
     input [254:0] in,
-    output [7:0] out );
-    
+    output [7:0] out
+);
     integer i;
     reg [7:0] count;
     
     always @(*) begin
-        count = 0;
+        count = 8'b0;  // Initialize count to zero
         for (i = 0; i < 255; i = i + 1) begin
-            count = count + in[i];
+            if (in[i]) begin
+                count = count + 1;
+            end
         end
     end
     
-    assign out = count;
-    
+    assign out = count;  // Output the population count
 endmodule
 ```

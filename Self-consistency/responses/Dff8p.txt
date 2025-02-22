@@ -6,9 +6,9 @@ module top_module (
 );
 
     always @(negedge clk) begin
-        if (reset)
+        if (reset) 
             q <= 8'h34;
-        else
+        else 
             q <= d;
     end
 

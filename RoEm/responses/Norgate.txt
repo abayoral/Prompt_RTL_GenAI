@@ -1,8 +1,11 @@
+```verilog
 module top_module( 
     input a, 
     input b, 
     output out );
 
+    // Implementing NOR gate using bitwise OR and NOT
     assign out = ~(a | b);
-
+    
 endmodule
+```

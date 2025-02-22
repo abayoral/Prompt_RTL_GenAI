@@ -4,8 +4,11 @@ module top_module(
     input b,
     input c,
     output out
-); 
-    // Simplify the K-map: The function f(a, b, c) is always 1 regardless of the values of a, b, and c
+);
+
+    // The k-map simplification results in the expression: out = 1
+    // As the output is always 1 regardless of inputs a, b, or c
+
     assign out = 1;
 
 endmodule

@@ -1,0 +1,9 @@
+./simv -l run.log
+At time                   40, clock =   8, red = 1, yellow = 0, green = 0
+At time                  140, clock =   9, red = 0, yellow = 0, green = 1
+At time                  740, clock =  10, red = 0, yellow = 1, green = 0
+At time                  890, clock =   1, red = 1, yellow = 0, green = 0
+At time                  920, clock =   9, red = 0, yellow = 0, green = 1
+At time                  930, clock =   8, red = 0, yellow = 0, green = 1
+===========Failed===========          1
+testbench.v:78: $finish called at 930 (1ns)

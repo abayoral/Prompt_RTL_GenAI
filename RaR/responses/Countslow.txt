@@ -1,22 +1,22 @@
 ```verilog
-module top_module (
+module top_module(
     input clk,
     input slowena,
     input reset,
-    output reg [3:0] q);
+    output reg [3:0] q
+);
 
     always @(posedge clk) begin
         if (reset) begin
-            q <= 4'b0000;
-        end
-        else if (slowena) begin
+            q <= 4'b0000;  // Synchronous reset to 0
+        end else if (slowena) begin
             if (q == 4'b1001) begin
-                q <= 4'b0000;
-            end
-            else begin
-                q <= q + 1;
+                q <= 4'b0000;  // Wrap around to 0 when counter reaches 9
+            end else begin
+                q <= q + 1;   // Increment counter
             end
         end
+        // If slowena is low, retain the current value of q
     end
 
 endmodule

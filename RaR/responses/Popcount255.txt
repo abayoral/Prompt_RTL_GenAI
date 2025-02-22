@@ -1,18 +1,15 @@
 ```verilog
-module top_module(
-    input [254:0] in,
-    output reg [7:0] out
-    );
-    
+module top_module( 
+    input [254:0] in,   // A 255-bit input vector
+    output reg [7:0] out // An 8-bit output representing the count of '1's
+);
     integer i;
     
     always @(*) begin
-        out = 8'd0; // Initialize the output to zero
-        // Iterate through each bit of the input vector
+        out = 0; // Initialize the output count to zero
         for (i = 0; i < 255; i = i + 1) begin
-            out = out + in[i]; // Increment the output count if the bit is '1'
+            out = out + in[i]; // Increment count if the bit at position i is 1
         end
     end
-    
 endmodule
 ```

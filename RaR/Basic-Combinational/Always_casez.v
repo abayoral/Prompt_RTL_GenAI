@@ -1,13 +1,7 @@
-// Build a priority encoder for 8-bit inputs. Given an 8-bit vector, 
-// the output should report the first (least significant) bit in the vector that is 1. 
-// Report zero if the input vector has no bits that are high. 
-// For example, the input 8'b10010000 should output 3'd4, because bit[4] is first bit that is high.
+In your role as a senior Digital Design Engineer at a prominent hardware design company, you have been entrusted with the development of an essential Verilog module that plays a crucial role in the rollout of a next-generation product. The company’s reputation within the competitive computer hardware industry hinges on the success of this module, making its design and operation vital.
 
-// synthesis verilog_input_version verilog_2001
-module top_module (
-    input [7:0] in,
-    output reg [2:0] pos );
+Your task is to design a priority encoder for 8-bit inputs. The objective of this module is to intake an 8-bit vector and successfully identify and report the index of the first '1' bit starting from the least significant bit position. If the vector contains no bits set to '1', the output should return zero. It is imperative to ensure that the design meets this functionality accurately, as incorrect reporting of bits could have significant repercussions on the product's performance.
 
-    // Insert your code here
+For example, consider the input vector 8'b10010000. In this scenario, the priority encoder should output the decimal value 4, expressed as a 3-bit binary 3'd4, because the first '1' encountered from the right-hand side (starting from bit[0]) is at position bit[4].
 
-endmodule
+Additionally, you are required to adhere to the Verilog 2001 standard, which imposes specific syntax and design practices, ensuring compatibility and synthesis readiness across various tools that support this version of Verilog.

@@ -1,39 +1,19 @@
-// Suppose you're building a circuit to process scancodes from a PS/2 keyboard for a game. 
-// Given the last two bytes of scancodes received, you need to indicate whether one of the 
-// arrow keys on the keyboard have been pressed. This involves a fairly simple mapping, 
-// which can be implemented as a case statement (or if-elseif) with four cases.
+You have recently been promoted to a senior position as a Digital Design Engineer at a prestigious hardware design firm, where you have been entrusted with a mission-critical task. You are responsible for creating an essential Verilog module intended to be a core component of an upcoming, state-of-the-art product. The module's success is vital for sustaining your company's esteemed reputation in the competitive hardware industry.
 
+The specific challenge you face involves designing a circuit that processes scancodes from a PS/2 keyboard, which is to be used in a gaming context. Your objective is to determine whether any of the arrow keys—left, down, right, or up—on the keyboard have been pressed, based on the last two bytes of scancodes received. The task can be accomplished by implementing a simple mapping using a case statement (or alternatively, an if-elseif structure) with exactly four cases corresponding to the four arrow keys.
 
-// Scancode [15:0]	Arrow key
-// 16'he06b		left arrow
-// 16'he072		down arrow
-// 16'he074		right arrow
-// 16'he075		up arrow
-// Anything else	none
+The identified scancenodes for the arrow keys are as follows:
+- A scancode of `16'he06b` corresponds to the left arrow.
+- A scancode of `16'he072` corresponds to the down arrow.
+- A scancode of `16'he074` corresponds to the right arrow.
+- A scancode of `16'he075` corresponds to the up arrow.
 
-// Hint: Your circuit has one 16-bit input, and four outputs. Build this circuit that 
-// recognizes these four scancodes and asserts the correct output.
+For any other scancode value, none of the arrow keys should be indicated as pressed.
 
-// To avoid creating latches, all outputs must be assigned a value in all possible conditions. 
-// Simply having a default case is not enough. You must assign a value to all four outputs in 
-// all four cases and the default case. This can involve a lot of unnecessary typing. 
-// One easy way around this is to assign a "default value" to the outputs before the case statement:
+Your circuit is designed with one 16-bit input, `scancode`, and it needs to produce four binary outputs: `left`, `down`, `right`, and `up`. Each output should be asserted as '1' when its corresponding arrow key is detected, and '0' otherwise.
 
-// always @(*) begin
-//    up = 1'b0; down = 1'b0; left = 1'b0; right = 1'b0;
-//    case (scancode)
-//        ... // Set to 1 as necessary.
-//    endcase
-// end
+To prevent the creation of unintended latches, it's crucial to ensure that all four outputs are assigned a value in every possible scenario, not just via a default case. This requirement often leads to extensive and repetitive typing, but a streamlined approach involves pre-assigning default values to the outputs before entering the case statement, as demonstrated in the provided hint.
 
-// synthesis verilog_input_version verilog_2001
-module top_module (
-    input [15:0] scancode,
-    output reg left,
-    output reg down,
-    output reg right,
-    output reg up  ); 
+Your task is to develop the Verilog code that fits within the `top_module` framework, ensuring the proper functioning of the module by detecting the specified scancodes and setting the appropriate outputs accurately.
 
-    // Insert your code here
-
-endmodule
+The Verilog module should be compliant with the Verilog 2001 synthesis standard.

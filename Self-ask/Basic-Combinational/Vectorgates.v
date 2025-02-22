@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // Build a circuit that has two 3-bit inputs that computes 
 // the bitwise-OR of the two vectors, the logical-OR of the two vectors, 
 and the inverse (NOT) of both vectors. Place the inverse of b in 

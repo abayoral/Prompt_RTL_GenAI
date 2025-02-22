@@ -1,23 +1,26 @@
-Please act as a professional verilog designer.
+As a skilled Verilog designer, your objective is to develop a module entitled `calendar` that serves as a perpetual time-keeping device, akin to a digital clock. This module is designed to maintain ongoing time, starting at zero for the seconds (`Secs`), minutes (`Mins`), and hours (`Hours`). Paying meticulous attention to the operational logic is essential for achieving a precise implementation.
 
-Implement a module of perpetual calendar. The starting value of Secs, Mins, and Hours are all 0. Both Secs and Mins loop continuously from 0 to 59. When Secs=59, Min increases by 1 at the next cycle, and when Min=59 && Secs=59, Hours increases by 1 at the next cycle. Hours is counted from the 0-23 cycle.
+In this system, the seconds counter (`Secs`) functions on a cycle spanning from 0 to 59. It increments with every clock pulse, advancing one second at a time. Once `Secs` reach 59, they reset back to 0 in the subsequent cycle and simultaneously prompt an increment in the minutes counter.
 
-Module name:  
-    calendar  
-                 
-Input ports:
-    CLK: Clock input
-    RST: Active high reset signal
+The minutes counter (`Mins`) also operates in a loop, ranging from 0 to 59. Each time `Secs` complete a cycle (i.e., reach 59), it signifies the passage of a full minute, necessitating an increment in the `Mins` count. Should the `Mins` counter hit 59, the end of a full hour is indicated, triggering an increment in the hours counter.
 
-Output ports:
-    Hours: 6-bit output representing the current hours
-    Mins: 6-bit output representing the current minutes
-    Secs: 6-bit output representing the current seconds
+Conversely, the hours counter (`Hours`) circulates through a range of 0 to 23. An entire hour is marked by 59 minutes and 59 seconds. Consequently, when both `Mins` and `Secs` are at 59, it leads to an increment in `Hours`. Upon surpassing 23, the `Hours` counter resets to 0, ready to start a new cycle.
 
-Implementation:
-The calendar module uses three always blocks to update the values of seconds, minutes, and hours based on the clock signal and reset signal.
-The first always block triggers on the positive edge of the clock signal (posedge CLK) or the positive edge of the reset signal (posedge RST). It checks if the reset signal is active (RST) and sets the seconds value (Secs) to 0. If the seconds value is 59, it wraps around and sets the seconds value to 0. Otherwise, it increments the seconds value by 1.
-The second always block also triggers on the positive edge of the clock signal or the positive edge of the reset signal. It handles the minutes value (Mins). If the reset signal is active, it sets the minutes value to 0. If both the minutes and seconds values are 59, it wraps around and sets the minutes value to 0. If the seconds value is 59, it increments the minutes value by 1. Otherwise, it keeps the minutes value unchanged.
-The third always block triggers on the positive edge of the clock signal or the positive edge of the reset signal. It handles the hours value (Hours). If the reset signal is active, it sets the hours value to 0. If the hours, minutes, and seconds values are all at their maximum (23, 59, and 59 respectively), it wraps around and sets the hours value to 0. If the minutes and seconds values are both 59, it increments the hours value by 1. Otherwise, it keeps the hours value unchanged.
+The module incorporates several specific input and output ports to manage timekeeping:
+- **Input Ports:**
+  - `CLK`: This is the clock signal that drives the timing operation of the module, dictating when updates to seconds, minutes, and hours should occur.
+  - `RST`: An active-high reset signal that, when asserted, immediately resets `Secs`, `Mins`, and `Hours` to 0, irrespective of their current states.
 
-Give me the complete code.
+- **Output Ports:**
+  - `Secs`: A 6-bit output providing the current count of seconds.
+  - `Mins`: A 6-bit output representing the current minute count.
+  - `Hours`: A 6-bit output indicating the current hour count.
+
+The functionality of the module is meticulously organized using three distinct `always` blocks, each serving a critical role:
+1. **Seconds Handling**: The first `always` block is responsible for updating `Secs`. It executes at the rising edge of `CLK` or when `RST` is asserted. If `RST` is active, `Secs` is instantaneously reset to 0. In the absence of a reset, `Secs` increment with each clock cycle until hitting 59, at which point they reset to 0 in the following cycle.
+
+2. **Minutes Handling**: Similarly, the second block, also activated by `CLK` or `RST`, oversees updates to `Mins`. Upon an active `RST`, `Mins` are immediately reset to 0. Each time `Secs` complete a cycle (by reaching 59), it prompts `Mins` to increment. If `Mins` themselves reach 59 concurrently with `Secs`, they reset to 0 in the ensuing cycle.
+
+3. **Hours Handling**: Addressing the `Hours` count, the third `always` block manages its updates and reset functionality. An active `RST` instantaneously resets `Hours` to 0. `Hours` increment with the completion of each full hour, identified by both `Secs` and `Mins` completing their cycles (both reaching 59). When `Hours` surpass 23, preparation for a new day begins as it resets to 0.
+
+When designing your Verilog code, ensure that it reflects the described logical structure, effectively managing the intricate timekeeping logic. Additionally, focus on guaranteeing that each counter responds correctly to both incrementation and the reset conditions dictated by the `RST` signal, ensuring reliable operation for this perpetual calendar system.

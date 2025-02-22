@@ -1,13 +1,7 @@
-// Build a decade counter that counts from 0 through 9, inclusive, with a period of 10. The reset input is synchronous, and should reset the counter to 0. We want to be able to pause the counter rather than always incrementing every clock cycle, so the slowena input indicates when the counter should increment.
+Imagine you are serving as a senior Digital Design Engineer at a cutting-edge hardware design company. You're currently tasked with an important project: the development of a critical Verilog module for a next-generation product. This particular module is crucial as it plays a significant role in ensuring that your company's leading position in the competitive computer hardware industry is maintained and reinforced.
 
-// Hint: This is a regular decade counter with an enable control signal
+The specific task at hand is to create a decade counter, which is a counter that counts from 0 through 9 and then cycles back to 0, completing a full count every ten cycles. The special characteristic of this counter is its synchronous reset input, which means that when reset is activated, the counter should immediately return to a count of 0, but this reset action occurs in sync with the clock signal. Additionally, the design includes a feature to pause the counting mechanism as needed. This is controlled via the `slowena` input. When `slowena` is enabled (or high), the counter should increment its value by one on each clock cycle. Conversely, when `slowena` is disabled (or low), the counter should pause and retain its current value, even as clock cycles continue.
 
-module top_module (
-    input clk,
-    input slowena,
-    input reset,
-    output [3:0] q);
+With these operational parameters in mind, you're to design, develop, and integrate a module called `top_module`. This module will receive multiple input signals: `clk` for the clock, `slowena` for enabling count functionality, and `reset` for synchronously resetting the counter. The module is also set to produce a 4-bit output `q`, representing the current value of the counter, which should vary between 0 and 9 according to the input conditions.
 
-    // Insert your code here
-
-endmodule
+Based on these requirements, consider how you can architect your Verilog design to aptly manage these functionalities and ensure efficient synchronization with clock cycles for seamless operation. The code implementation must be clean, maintainable, and highly reliable to reflect the high standards expected of your company and the industry. The success of this component will contribute directly to the overall efficacy and market reception of the next-generation hardware product your team is developing.

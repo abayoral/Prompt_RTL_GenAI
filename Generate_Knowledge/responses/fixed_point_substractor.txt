@@ -1,0 +1,39 @@
+```verilog
+module fixed_point_subtractor #(parameter Q = 8, N = 16)(
+    input [N-1:0] a,
+    input [N-1:0] b,
+    output reg [N-1:0] c
+);
+    // Internal register to hold the intermediate result
+    reg [N-1:0] res;
+
+    // Helper wires for signed arithmetic
+    wire signed [N-1:0] signed_a;
+    wire signed [N-1:0] signed_b;
+    wire signed [N:0] signed_res; // Using N+1 to handle overflow
+
+    // Assign inputs to signed wires for arithmetic
+    assign signed_a = a;
+    assign signed_b = b;
+    
+    // Perform subtraction
+    always @(*) begin
+        res = signed_a - signed_b;
+
+        // Check for zero result to ensure the sign bit is zero
+        if (res == 0) begin
+            c = 0; // Explicitly set the entire result to zero
+        end else begin
+            c = res[N-1:0]; // Assign the result, keeping only N bits
+        end
+    end
+endmodule
+```
+
+Note:
+
+1. **Signed Arithmetic**: By using `wire signed` for `signed_a` and `signed_b`, the code accounts for sign extension during arithmetic operations.
+
+2. **Zero Handling**: The `if (res == 0)` condition ensures that when the subtraction result is zero, all bits including the sign bit are explicitly set to zero.
+
+3. **Parameterization**: The `Q` parameter is provided for your reference, typically used in other arithmetic modules with more complex operations. Here it's associated with the precision, dictating the lower bits used for fraction, but does not directly affect subtraction logic.

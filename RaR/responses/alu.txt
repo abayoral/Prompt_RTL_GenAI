@@ -1,0 +1,106 @@
+```verilog
+module alu (
+    input [31:0] a,         // Operand a
+    input [31:0] b,         // Operand b
+    input [5:0] aluc,       // ALU control signal
+    output reg [31:0] r,    // Result
+    output reg zero,        // Zero flag
+    output reg carry,       // Carry flag
+    output reg negative,    // Negative flag
+    output reg overflow,    // Overflow flag
+    output reg flag         // SLT/SLTU flag
+);
+
+    always @(*) begin
+        // Default values for outputs
+        carry = 0;
+        overflow = 0;
+        flag = 0;
+        negative = 0;
+        zero = 0;
+
+        case (aluc)
+            6'b100000: begin // ADD
+                {carry, r} = a + b;
+                overflow = (~a[31] & ~b[31] & r[31]) | (a[31] & b[31] & ~r[31]);
+            end
+
+            6'b100001: begin // ADDU
+                {carry, r} = a + b;
+            end
+
+            6'b100010: begin // SUB
+                {carry, r} = a - b;
+                overflow = (a[31] & ~b[31] & ~r[31]) | (~a[31] & b[31] & r[31]);
+            end
+
+            6'b100011: begin // SUBU
+                {carry, r} = a - b;
+            end
+
+            6'b100100: begin // AND
+                r = a & b;
+            end
+
+            6'b100101: begin // OR
+                r = a | b;
+            end
+
+            6'b100110: begin // XOR
+                r = a ^ b;
+            end
+
+            6'b100111: begin // NOR
+                r = ~(a | b);
+            end
+
+            6'b101010: begin // SLT
+                r = $signed(a) < $signed(b);
+                flag = r;
+            end
+
+            6'b101011: begin // SLTU
+                r = a < b;
+                flag = r;
+            end
+
+            6'b000000: begin // SLL
+                r = b << a[4:0];
+            end
+
+            6'b000010: begin // SRL
+                r = b >> a[4:0];
+            end
+
+            6'b000011: begin // SRA
+                r = $signed(b) >>> a[4:0];
+            end
+
+            6'b000100: begin // SLLV
+                r = b << a[4:0];
+            end
+
+            6'b000110: begin // SRLV
+                r = b >> a[4:0];
+            end
+
+            6'b000111: begin // SRAV
+                r = $signed(b) >>> a[4:0];
+            end
+
+            6'b001111: begin // LUI
+                r = {a[15:0], 16'b0};
+            end
+
+            default: begin
+                r = 32'bz; // High impedance for non-defined operations
+            end
+        endcase
+
+        // Setting the zero and negative flags
+        zero = (r == 32'b0);
+        negative = r[31];
+    end
+
+endmodule
+```

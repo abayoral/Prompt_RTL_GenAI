@@ -1,0 +1,46 @@
+```verilog
+module mux2X1 (
+    input wire sel,
+    input wire [7:0] in0,
+    input wire [7:0] in1,
+    output wire [7:0] out
+);
+    assign out = sel ? in1 : in0;
+endmodule
+
+module barrel_shifter (
+    input wire [7:0] in,
+    input wire [2:0] ctrl,
+    output wire [7:0] out
+);
+    wire [7:0] stage1; // Output after shifting by 4 bits
+    wire [7:0] stage2; // Output after shifting by 2 bits
+    wire [7:0] stage3; // Output after shifting by 1 bit
+    
+    // Stage 1: Shift by 4 bits if ctrl[2] is asserted
+    mux2X1 mux4 (
+        .sel(ctrl[2]),
+        .in0(in),
+        .in1({in[3:0], in[7:4]}),
+        .out(stage1)
+    );
+
+    // Stage 2: Shift by 2 bits if ctrl[1] is asserted
+    mux2X1 mux2 (
+        .sel(ctrl[1]),
+        .in0(stage1),
+        .in1({stage1[1:0], stage1[7:2]}),
+        .out(stage2)
+    );
+
+    // Stage 3: Shift by 1 bit if ctrl[0] is asserted
+    mux2X1 mux1 (
+        .sel(ctrl[0]),
+        .in0(stage2),
+        .in1({stage2[0], stage2[7:1]}),
+        .out(stage3)
+    );
+
+    assign out = stage3; // Final output
+endmodule
+```

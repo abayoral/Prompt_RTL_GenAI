@@ -1,0 +1,14 @@
+least-to-most/modules/Module_shift8.v:23: error: q is not a valid l-value in top_module_tb.UUT.
+least-to-most/modules/Module_shift8.v:11:      : q is declared here as wire.
+least-to-most/modules/Module_shift8.v:24: error: q is not a valid l-value in top_module_tb.UUT.
+least-to-most/modules/Module_shift8.v:11:      : q is declared here as wire.
+least-to-most/modules/Module_shift8.v:25: error: q is not a valid l-value in top_module_tb.UUT.
+least-to-most/modules/Module_shift8.v:11:      : q is declared here as wire.
+least-to-most/modules/Module_shift8.v:26: error: q is not a valid l-value in top_module_tb.UUT.
+least-to-most/modules/Module_shift8.v:11:      : q is declared here as wire.
+least-to-most/modules/Module_shift8.v:27: error: q is not a valid l-value in top_module_tb.UUT.
+least-to-most/modules/Module_shift8.v:11:      : q is declared here as wire.
+5 error(s) during elaboration.
+Module file path: least-to-most/modules/Module_shift8.v
+Testbench file path: hdlbits_testbenches/Module_shift8_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'least-to-most/simulations/Module_shift8_sim', 'least-to-most/modules/Module_shift8.v', 'hdlbits_testbenches/Module_shift8_0_tb.v']' returned non-zero exit status 5.

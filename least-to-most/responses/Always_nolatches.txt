@@ -8,23 +8,19 @@ module top_module (
 ); 
 
     always @(*) begin
-        // Default values
+        // Default values for all outputs
         left = 1'b0;
         down = 1'b0;
         right = 1'b0;
         up = 1'b0;
         
+        // Checking the scancode and setting the appropriate output
         case (scancode)
-            16'he06b: left = 1'b1;
-            16'he072: down = 1'b1;
-            16'he074: right = 1'b1;
-            16'he075: up = 1'b1;
-            default: begin
-                left = 1'b0;
-                down = 1'b0;
-                right = 1'b0;
-                up = 1'b0;
-            end
+            16'he06b: left = 1'b1;   // Left arrow
+            16'he072: down = 1'b1;   // Down arrow
+            16'he074: right = 1'b1;  // Right arrow
+            16'he075: up = 1'b1;     // Up arrow
+            default: ;  // Do nothing, all outputs remain 0 by default
         endcase
     end
 

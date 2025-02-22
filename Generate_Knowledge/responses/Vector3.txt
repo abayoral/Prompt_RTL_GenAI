@@ -3,14 +3,15 @@ module top_module (
     input [4:0] a, b, c, d, e, f,
     output [7:0] w, x, y, z );
 
-    // Concatenate input vectors a, b, c, d, e, f into a single 30-bit vector
-    wire [29:0] combined_vector = {a, b, c, d, e, f};
+    // Concatenate the inputs and two 1 bits, then split into outputs
+    wire [31:0] combined;
+    assign combined = {a, b, c, d, e, f, 2'b11}; // 30 bits from input + 2 bits = 32 bits
 
-    // Append two '1' bits to get a 32-bit vector
-    wire [31:0] extended_vector = {combined_vector, 2'b11};
-
-    // Split the 32-bit extended_vector into four 8-bit output vectors
-    assign {w, x, y, z} = extended_vector;
+    // Split the combined 32-bit into four 8-bit parts
+    assign w = combined[31:24];
+    assign x = combined[23:16];
+    assign y = combined[15:8];
+    assign z = combined[7:0];
 
 endmodule
 ```

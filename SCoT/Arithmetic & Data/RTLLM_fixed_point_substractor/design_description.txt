@@ -1,35 +1,33 @@
-Please act as a professional Verilog designer.
+As a professional Verilog designer, your task is to develop a Verilog module that performs subtraction on fixed-point numbers with a defined precision. This module is crucial for applications requiring precise arithmetic operations where both integer and fractional parts of numbers must be considered. Here, the requirement is to implement a module named `fixed_point_subtractor` with specific parameterized values for flexibility in defining precision levels.
 
-Implement a module of a fixed-point subtractor for precise arithmetic operations with fixed precision.
+**Module Parameters:**
 
-Module name:
-    fixed_point_subtractor
+- **Q**: This parameter sets the number of bits dedicated to representing the fractional part of the fixed-point number. It defines the level of precision available for fractional calculations.
+- **N**: This parameter specifies the total number of bits used for the entire fixed-point number, which includes both integer and fractional parts combined. It determines the overall size and range of values the inputs and outputs can represent.
 
-Parameterized values:
-    Q: Represents the number of fractional bits in the fixed-point representation.
-    N: Represents the total number of bits (both integer and fractional) used for inputs and outputs.
+**Input Ports:**
 
-Input ports:
-    a [N-1:0]: First N-bit fixed-point input operand.
-    b [N-1:0]: Second N-bit fixed-point input operand.
+- **a [N-1:0]**: An N-bit wide port, this represents the first operand for the subtraction. It contains both the integer and fractional components as defined by the parameter N.
+- **b [N-1:0]**: Similar to port a, this N-bit wide port represents the second operand, which will be subtracted from the first one.
 
-Output ports:
+**Output Ports:**
 
-    c [N-1:0]: N-bit output representing the result of the fixed-point subtraction.
-Internal registers:
-    res [N-1:0]: N-bit register used to store the result of the subtraction operation.
+- **c [N-1:0]**: This port will output the result of the fixed-point subtraction operation in the same N-bit format, maintaining both integer and fractional precision.
 
-Implementation:
-    Same Sign Subtraction: When the signs of a and b are the same, their fractional and integer parts are subtracted. The sign of the result will be the same as the inputs.
+**Internal Registers:**
 
-Different Sign Subtraction:
-    If a is positive and b is negative, the absolute values of a and b are added. The result will have a positive sign if a is greater than b, and a negative sign otherwise.
-    If a is negative and b is positive, the same logic applies, with the result's sign depending on the relative sizes of a and b.
+- **res [N-1:0]**: A temporary storage space within the module used to hold the intermediate result of the subtraction operation before assigning it to the output port.
 
-Handling Zero: 
-    When the result is zero, the sign bit is explicitly set to 0 to handle this edge case.
+**Implementation Details:**
 
-Precision: 
-    The fixed-point precision is defined by the parameters Q (fractional bits) and N (total bits). This ensures that the subtraction is performed accurately while maintaining the necessary precision for both integer and fractional parts.
+1. **Subtraction with Same Signs**: When both operands a and b have the same sign (either both positive or both negative), their fractional and integer parts are directly subtracted. The resulting sign will be the same as that of the operands.
 
-Give me the complete code.
+2. **Subtraction with Different Signs**: 
+   - **Positive a and Negative b**: The absolute values of a and b are added together. The result will retain a positive sign if the absolute value of a exceeds that of b, and a negative sign if otherwise.
+   - **Negative a and Positive b**: Conversely, if a is negative and b is positive, their absolute values are also added. The sign of the result depends on which operand has the larger absolute value.
+
+3. **Handling Zero Outputs**: An important edge case to address is when the arithmetic result is zero, where the sign bit must explicitly be set to 0 to ensure clarity and correctness in representation.
+
+4. **Precision Management**: The fixed-point arithmetic precision is carefully managed by the parameters Q and N. These ensure that both integer and fractional parts are represented accurately, preserving the desired numerical fidelity in calculations.
+
+For this task, your objective is to write the complete Verilog code for the `fixed_point_subtractor` module, incorporating these specifications and handling all edge cases.

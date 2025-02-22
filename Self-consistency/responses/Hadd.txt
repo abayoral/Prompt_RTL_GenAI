@@ -2,7 +2,10 @@ module top_module(
     input a, b,
     output cout, sum );
 
+    // Assign the sum as the XOR of a and b
     assign sum = a ^ b;
+    
+    // Assign the cout as the AND of a and b
     assign cout = a & b;
 
 endmodule

@@ -1,29 +1,30 @@
-Please act as a professional verilog designer.
+Imagine you are serving in the role of a skilled Verilog designer, tasked with the creation and implementation of a digital module referred to as the "Triangle Wave Signal Generator." This module is designed to produce a waveform characterized by oscillating behavior, wherein the waveform values increase and decrease over time. Specifically, the design involves manipulating a signal named "wave," which is confined to 5 bits in width. This signal should exhibit a cyclic pattern; it increments progressively from 0 to a peak value of 31, followed by a decremental reversal back to its original value of 0.
 
-Implement a Triangle Wave signal generator module that generates a waveform by incrementing and decrementing a 5-bit signal named "wave". The waveform cycles between 0 and 31, which is incremented or decremented by 1.
+### Design Details:
 
+#### Module Name:
+- The module is to be named `signal_generator`.
 
-Module name:  
-    signal_generator 
-                 
-Input ports:
-    clk: Clock signal used for synchronous operation.
-    rst_n: Active-low reset signal. Defined as 0 for reset and 1 for reset signal inactive.
+#### Input Ports:
+- **clk**: This serves as the clock signal, ensuring that all operations within the module are synchronized with the system clock's rising edges.
+- **rst_n**: This is an active-low reset signal. When this signal is low (logic level 0), it indicates that the module should enter a reset state, clearing its registers. Conversely, a high signal (logic level 1) signifies that the reset condition is inactive, and normal operation should continue.
 
-Output ports:
-    wave: 5-bit output waveform signal representing the generated waveform.
+#### Output Ports:
+- **wave**: This is the main output, a 5-bit signal reflecting the current value of the generated triangle waveform.
 
-Implementation:
-State and Waveform Generation:
-The module includes a register, state, used to control the state of the waveform generation.
-The module also includes a register, wave, with a width of 5 bits, which represents the generated waveform.
-The state and waveform registers are updated in the always block, triggered on the positive edge of the clock signal (posedge clk) or the negative edge of the reset signal (negedge rst_n).
-On reset, indicated by ~rst_n, the state register is cleared to 0, and the wave register is cleared to 0.
-The waveform generation is controlled using a case statement based on the current state:
-If the state is 0, the waveform (wave) is incremented by 1.
-If the waveform reaches 31 (wave == 31), the state is transitioned to 1.
-If the state is 1, the waveform is decremented by 1.
-If the waveform reaches 0 (wave == 0), the state is transitioned back to 0.
-The waveform generation continues to cycle between 0 and 31 based on the state transitions.
+#### Implementation Strategy:
+- **State and Waveform Generation**:
+  1. Utilize a register titled `state` to oversee the mode of waveform generation, dictating whether the waveform should currently be incrementing or decrementing.
+  2. Another register, also named `wave`, is to be employed in capturing the waveform's current magnitude, within its limit of 5 bits.
+  3. Updates to both the `state` and `wave` registers occur within an always block, activated either by a rising edge in the clock signal (`posedge clk`) or a falling edge in the reset signal (`negedge rst_n`).
+  4. **Reset Behavior**: On detection of a reset condition (i.e., when `~rst_n` is true), both `state` and `wave` registers should be initialized to 0.
 
-Give me the complete code.
+- **Waveform State Transitions**:
+  1. **Increment Mode**: When the `state` is 0, the `wave` value should increment by 1 at each clock cycle.
+  2. **Peak Transition**: Upon hitting the maximum value of 31 (i.e., `wave == 31`), the `state` transitions to 1, signifying a switch to decrementing mode.
+  3. **Decrement Mode**: While in state 1, the `wave` value should decrement by 1 at each clock cycle.
+  4. **Valley Transition**: When the `wave` reduces to 0 (i.e., `wave == 0`), the `state` reverts to 0, returning to increment mode.
+
+- **Continuous Operation**: The module perpetuates the cycle of increasing and decreasing `wave` values between 0 and 31, contingent upon the aforementioned state transitions.
+
+With this comprehensive understanding of the requirements, your task is to deliver the fully-coded module adhering to these specifications.

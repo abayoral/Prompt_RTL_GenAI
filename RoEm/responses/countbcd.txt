@@ -1,78 +1,79 @@
 ```verilog
-module bcd_counter (
-    input clk,
-    input reset,
-    input ena,
-    output reg [3:0] q,
-    output reg ena_out
-);
-    always @(posedge clk) begin
-        if (reset) begin
-            q <= 4'd0;
-            ena_out <= 1'b0;
-        end else if (ena) begin
-            if (q == 4'd9) begin
-                q <= 4'd0;
-                ena_out <= 1'b1;
-            end else begin
-                q <= q + 4'd1;
-                ena_out <= 1'b0;
-            end
-        end else begin
-            ena_out <= 1'b0;
-        end
-    end
-endmodule
-
 module top_module (
     input clk,
     input reset,   // Synchronous active-high reset
     output [3:1] ena,
-    output [15:0] q
-);
-    wire ena1, ena2, ena3;
-    wire ena1_out, ena2_out, ena3_out;
-
-    // Ones digit (q[3:0])
-    bcd_counter digit0 (
+    output [15:0] q);
+    
+    // Internal wires for carries between counters
+    wire carry0, carry1, carry2;
+    
+    // One-digit BCD counters
+    bcd_counter ones_digit (
         .clk(clk),
         .reset(reset),
-        .ena(1'b1),
-        .q(q[3:0]),
-        .ena_out(ena1_out)
+        .carry_out(carry0),
+        .q(q[3:0])
     );
-
-    // Tens digit (q[7:4])
-    bcd_counter digit1 (
+    
+    bcd_counter tens_digit (
         .clk(clk),
         .reset(reset),
-        .ena(ena1_out),
-        .q(q[7:4]),
-        .ena_out(ena2_out)
+        .carry_in(carry0),
+        .carry_out(carry1),
+        .ena(ena[1]),
+        .q(q[7:4])
     );
-
-    // Hundreds digit (q[11:8])
-    bcd_counter digit2 (
+    
+    bcd_counter hundreds_digit (
         .clk(clk),
         .reset(reset),
-        .ena(ena2_out),
-        .q(q[11:8]),
-        .ena_out(ena3_out)
+        .carry_in(carry1),
+        .carry_out(carry2),
+        .ena(ena[2]),
+        .q(q[11:8])
     );
-
-    // Thousands digit (q[15:12])
-    bcd_counter digit3 (
+    
+    bcd_counter thousands_digit (
         .clk(clk),
         .reset(reset),
-        .ena(ena3_out),
-        .q(q[15:12]),
-        .ena_out()
+        .carry_in(carry2),
+        .ena(ena[3]),
+        .q(q[15:12])
     );
+    
+    assign ena[1] = carry0;
+    assign ena[2] = carry1;
+    assign ena[3] = carry2;
 
-    // Enable signals
-    assign ena[1] = ena1_out;
-    assign ena[2] = ena2_out;
-    assign ena[3] = ena3_out;
+endmodule
+
+module bcd_counter (
+    input clk,
+    input reset,
+    input carry_in,
+    output carry_out,
+    output reg ena,
+    output reg [3:0] q);
+
+    always @(posedge clk) begin
+        if (reset) begin
+            q <= 4'b0000;
+            ena <= 0;
+        end
+        else if (carry_in || ena) begin
+            if (q == 4'b1001) begin
+                q <= 4'b0000;
+                ena <= 1;
+            end
+            else begin
+                q <= q + 1;
+                ena <= 0;
+            end
+        end
+    end
+
+    assign carry_out = (q == 4'b1001);
 
 endmodule
 ```

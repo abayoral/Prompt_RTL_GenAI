@@ -1,34 +1,23 @@
 ```verilog
-module mod_a (
-    output out1, 
-    output out2, 
-    input a, 
-    input b, 
-    input c, 
-    input d
-);
-
-// Module implementation (omitted for simplicity)
-
-endmodule
-
 module top_module ( 
     input a, 
     input b, 
-    input c, 
+    input c,
     input d,
     output out1,
     output out2
 );
 
-mod_a instance_mod_a (
-    .out1(out1),
-    .out2(out2),
-    .a(a),
-    .b(b),
-    .c(c),
-    .d(d)
+mod_a u_mod_a (
+    .output1(out1),  // Connect first output of mod_a to out1 of top_module
+    .output2(out2),  // Connect second output of mod_a to out2 of top_module
+    .input1(a),      // Connect first input of mod_a to a of top_module
+    .input2(b),      // Connect second input of mod_a to b of top_module
+    .input3(c),      // Connect third input of mod_a to c of top_module
+    .input4(d)       // Connect fourth input of mod_a to d of top_module
 );
 
 endmodule
 ```
+
+Note: In the code provided, `mod_a` is instantiated within `top_module`, and its ports are connected to the corresponding ports of `top_module`. The instantiation of `mod_a` is assumed to use named port connections to maintain clarity in port mapping, ensuring that each top-level port aligns correctly with each modular port by the order specified.

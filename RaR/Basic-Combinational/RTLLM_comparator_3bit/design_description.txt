@@ -1,24 +1,31 @@
-Please act as a professional Verilog designer.
+Imagine you are a professional Verilog designer with the task of developing a specific hardware module using Verilog, a hardware description language. Your required assignment is to build a Verilog module, designated as `comparator_3bit`, which will serve as a 3-bit comparator. Your role is to ensure this module is capable of comparing two 3-bit binary inputs, accurately determining and reporting the relational status between them—whether one is greater, less, or equal to the other.
 
-Implement a module of a 3-bit comparator for comparing binary numbers.
+In building this `comparator_3bit` module, you will need to consider the following details:
 
-Module name:  
-    comparator_3bit               
-Input ports:
-    A [2:0]: First 3-bit input operand (the first binary number to compare).
-    B [2:0]: Second 3-bit input operand (the second binary number to compare).
-Output ports:
-    A_greater: 1-bit output indicating if A is greater than B.
-    A_equal: 1-bit output indicating if A is equal to B.
-    A_less: 1-bit output indicating if A is less than B.
+### Input Specifications:
 
-Implementation:
-Comparison Logic: The module compares the two 3-bit binary numbers A and B using combinational logic.
-- The outputs A_greater, A_equal, and A_less are determined based on the comparison of A and B.
-- A_greater is set to 1 if A > B, A_equal is set to 1 if A == B, and A_less is set to 1 if A < B.
+1. **Operands**:
+   - **Operand 'A'**: This is a 3-bit input vector, referenced as `A[2:0]`. It represents the first binary number to be compared.
+   - **Operand 'B'**: Similarly, this is another 3-bit input vector, indicated as `B[2:0]`. This represents the second binary number in the comparison process.
 
-Output Encoding: The outputs are mutually exclusive, meaning only one of the three outputs will be high (1) at any given time, based on the comparison results.
+These operands will be the base data that your module will analyze to ascertain their relationship.
 
-Give me the complete code.
+### Output Requirements:
 
- 
+The module should produce three distinct 1-bit outputs, each representing a particular comparative result between the two inputs:
+
+1. **`A_greater`**: This 1-bit output should be high (logic level 1) only when the binary number `A` is greater than the binary number `B`.
+   
+2. **`A_equal`**: This output is meant to be high only if `A` is exactly equal to `B`.
+   
+3. **`A_less`**: This output should become high when `A` is less than `B`.
+
+It's crucial that in the resultant outputs, only one of the outputs can be high at any given time, meaning the outputs should be mutually exclusive as they represent distinct states of comparison.
+
+### Functional Implementation:
+
+To achieve the required functionality, you must employ combinational logic within your Verilog module. This logic must compute the comparison result of `A` against `B`, setting only one of the outputs (`A_greater`, `A_equal`, or `A_less`) to high based on the comparative outcome. The logic should be clean and optimized to run effectively without unnecessary complexity.
+
+### Objective:
+
+Your objective is to deliver a complete and correctly functioning Verilog code implementation of this module. The code should strictly adhere to standard coding practices in Verilog to ensure that it is free from syntax errors, easy to understand, and accurately encapsulates the core module design that fulfills the described comparator function. This involves careful definition and precise detailing of ports and operational logic to ensure clarity and correctness throughout your implementation.

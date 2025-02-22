@@ -1,30 +1,22 @@
-Please act as a professional Verilog designer.
+As a seasoned Verilog designer, you are tasked with developing a module named `instr_reg` that is integral to the functioning of a CPU. This module's primary role is to capture and process CPU instructions, which may originate from multiple sources, and then meticulously parse them into separate fields for subsequent operations.
 
-An instruction register module designed to hold and process CPU instructions. It captures incoming instructions from various sources and separates them into distinct fields for further processing.
+The architectural overview of the `instr_reg` module includes defining several input and output ports. Specifically, the input ports consist of:
+- `clk`: A clock signal utilized for maintaining synchronization across the processes. It is essential for triggering operations at defined clock edges.
+- `rst`: An active-low reset signal, crucial for initializing the module and bringing the instruction registers back to a known state (typically zero) upon system reset.
+- `fetch[1:0]`: A 2-bit control signal that dictates the source of the incoming instruction. Distinguishing instructions fetched from different sources, where a value of `01` implies fetching from a register and `10` indicates fetching from RAM/ROM.
+- `data[7:0]`: An 8-bit data bus that carries the instruction to be processed for fetching.
 
-Module name:
-    instr_reg
+The module also defines several output ports:
+- `ins[2:0]`: Extracts the high-order 3 bits from the captured instruction, commonly used to identify the opcode or operation type.
+- `ad1[4:0]`: Responsible for holding the lower 5 bits of the instruction, typically associated with addresses or operand specifiers required for the instruction execution.
+- `ad2[7:0]`: Outputs the entire 8-bit instruction from the secondary source, maintaining the complete data integrity.
 
-Input ports:
-    clk: Clock signal for synchronization.
-    rst: Active low reset signal to initialize the register.
-    fetch [1:0]: Control signal indicating the source of the instruction (1 for register, 2 for RAM/ROM).
-    data [7:0]: 8-bit data input representing the instruction to be fetched.
+An essential aspect of the implementation is the internal mechanism where the instruction register maintains two distinct 8-bit registers (`ins_p1` and `ins_p2`). These are used to store instructions fetched from various sources. Key functionality includes:
+- On the event of the clock's rising edge, the module checks the reset condition. If the reset signal is low, the system undergoes initialization by setting both registers to zero.
+- The logic dictated by `fetch` determines the data flow:
+  - A fetch value of `01` results in storing the incoming instruction from the `data` input into `ins_p1`.
+  - A fetch value of `10` leads to storing the instruction into `ins_p2`.
+  - In scenarios where these conditions are unmet, the registers retain their last known values.
+- Finally, the outputs `ins`, `ad1`, and `ad2` are crafted from the stored instructions, enabling their usage in further processing stages within the CPU architecture.
 
-Output ports:
-    ins [2:0]: High 3 bits of the instruction, indicating the opcode or operation.
-    ad1 [4:0]: Low 5 bits of the instruction, representing the register address.
-    ad2 [7:0]: The full 8-bit data from the second source.
-
-Implementation:
-    The instruction register contains two 8-bit registers (ins_p1 and ins_p2) to store instructions from different sources.
-    On the rising edge of the clock (clk), if the reset (rst) signal is low, both registers are initialized to zero.
-    Based on the fetch signal:
-    If fetch is 2'b01, the instruction is fetched from the data input into ins_p1.
-    If fetch is 2'b10, the instruction is fetched from the data input into ins_p2.
-    If neither condition is met, the previous values in both registers are retained.
-    The outputs ins, ad1, and ad2 are derived from the stored instructions.
-
-
-Give me the complete code.
-
+This detailed description provides a comprehensive understanding of the module's functionality and operation, setting the stage for writing complete Verilog HDL code that encapsulates all these behaviors and requirements.

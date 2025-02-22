@@ -7,15 +7,15 @@ module top_module (
     output heater,
     output aircon,
     output fan
-);
+); 
 
-    // Heater logic
+    // Heater is on when in heating mode and it's too cold
     assign heater = mode & too_cold;
-
-    // Air conditioner logic
+    
+    // Air conditioner is on when in cooling mode and it's too hot
     assign aircon = ~mode & too_hot;
-
-    // Fan logic
+    
+    // Fan is on if the heater is on, or the air conditioner is on, or fan_on is requested
     assign fan = heater | aircon | fan_on;
 
 endmodule

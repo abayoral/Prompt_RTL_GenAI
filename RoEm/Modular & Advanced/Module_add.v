@@ -1,3 +1,5 @@
+// you're a senior FPGA Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // You are given a module add16 that performs a 16-bit addition. 
 //Instantiate two of them to create a 32-bit adder. 
 //One add16 module computes the lower 16 bits of the addition result, 

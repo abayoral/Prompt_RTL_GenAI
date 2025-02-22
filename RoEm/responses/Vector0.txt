@@ -7,10 +7,10 @@ module top_module (
     output wire o0
 );
 
-    // Assign the input vector to the output vector
+    // Assign output vector to be the same as input vector
     assign outv = vec;
-    
-    // Split the input vector into 1-bit outputs
+
+    // Split the input vector into separate outputs
     assign o0 = vec[0];
     assign o1 = vec[1];
     assign o2 = vec[2];

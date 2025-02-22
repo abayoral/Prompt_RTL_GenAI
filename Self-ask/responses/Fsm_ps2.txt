@@ -1,34 +1,44 @@
-Got it. Here's the Verilog module for the described finite state machine:
+Thank you for confirming that. Now, here's the complete Verilog module for the described FSM:
 
 ```verilog
 module top_module(
     input clk,
     input [7:0] in,
     input reset,    // Synchronous reset
-    output reg done); 
+    output reg done // Output is registered
+);
 
-    // State encoding
+    // Define the states for the FSM
     typedef enum reg [1:0] {
-        IDLE = 2'b00,
-        BYTE1 = 2'b01,
-        BYTE2 = 2'b10,
-        BYTE3 = 2'b11
+        IDLE = 2'd0,     // Waiting for the start of a message
+        BYTE_1 = 2'd1,   // First byte received
+        BYTE_2 = 2'd2,   // Second byte received
+        BYTE_3 = 2'd3    // Third byte received
     } state_t;
 
-    state_t state, next_state;
+    state_t current_state, next_state;
 
     // State transition logic (combinational)
     always @(*) begin
-        case (state)
+        case (current_state)
             IDLE: begin
                 if (in[3] == 1'b1)
-                    next_state = BYTE1;
+                    next_state = BYTE_1;
                 else
                     next_state = IDLE;
             end
-            BYTE1: next_state = BYTE2;
-            BYTE2: next_state = BYTE3;
-            BYTE3: next_state = (in[3] == 1'b1) ? BYTE1 : IDLE;
+            BYTE_1: begin
+                next_state = BYTE_2;
+            end
+            BYTE_2: begin
+                next_state = BYTE_3;
+            end
+            BYTE_3: begin
+                if (in[3] == 1'b1)
+                    next_state = BYTE_1;
+                else
+                    next_state = IDLE;
+            end
             default: next_state = IDLE;
         endcase
     end
@@ -36,20 +46,19 @@ module top_module(
     // State flip-flops (sequential)
     always @(posedge clk) begin
         if (reset)
-            state <= IDLE;
+            current_state <= IDLE;
         else
-            state <= next_state;
+            current_state <= next_state;
     end
 
     // Output logic
     always @(posedge clk) begin
         if (reset)
             done <= 1'b0;
-        else if (state == BYTE3)
+        else if (current_state == BYTE_3)
             done <= 1'b1;
         else
             done <= 1'b0;
     end
-
 endmodule
 ```

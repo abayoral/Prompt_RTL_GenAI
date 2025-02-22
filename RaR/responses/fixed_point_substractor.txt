@@ -1,0 +1,43 @@
+```verilog
+module fixed_point_subtractor #(parameter N = 16, parameter Q = 8)(
+    input  [N-1:0] a,
+    input  [N-1:0] b,
+    output [N-1:0] c
+);
+
+    reg [N-1:0] res;
+    wire signed [N-1:0] signed_a;
+    wire signed [N-1:0] signed_b;
+    wire signed [N-1:0] signed_res;
+
+    // Interpret inputs as signed fixed-point numbers
+    assign signed_a = a;
+    assign signed_b = b;
+
+    // Subtraction operation with handling for fixed-point arithmetic
+    always @(*) begin
+        // Perform subtraction
+        res = signed_a - signed_b;
+
+        // Handle special case when both inputs have different signs
+        if (signed_a[N-1] != signed_b[N-1]) begin
+            // a is positive, b is negative
+            if (signed_a[N-1] == 0) begin
+                res = signed_a + (~signed_b + 1); // a - (-b) -> a + b
+            end else begin
+                res = signed_a + signed_b; // (-a) - b -> -(a + b)
+            end
+        end
+
+        // Ensure zero result has zero sign bit
+        if (res == 0) begin
+            res = 0;
+        end
+    end
+
+    assign c = res;
+
+endmodule
+```
+
+This module implements a fixed-point subtraction operation while considering sign and zero representation. The module is parameterized for bit width `N` and fractional width `Q` for flexibility in handling different fixed-point representations. It interprets the inputs as signed fixed-point numbers and ensures correct handling of both subtraction and addition scenarios based on operand signs. Additionally, it maintains zero result conditions, ensuring the sign bit is properly set to zero.

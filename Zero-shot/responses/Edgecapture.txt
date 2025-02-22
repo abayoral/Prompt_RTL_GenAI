@@ -10,11 +10,12 @@ module top_module (
 
     always @(posedge clk) begin
         if (reset) begin
-            out <= 32'b0;
+            out <= 32'b0;  // Reset all output bits
         end else begin
             // Capture the transition from 1 to 0
             out <= out | (prev_in & ~in);
         end
+        // Update previous input for the next cycle
         prev_in <= in;
     end
 

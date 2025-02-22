@@ -1,0 +1,31 @@
+Test 0 passed!
+Test 1 passed!
+Mismatch at index 2: Inputs = [1, 0, 0], Generated = [0], Reference = [1]
+Mismatch at index 3: Inputs = [0, 0, 0], Generated = [0], Reference = [1]
+Test 4 passed!
+Test 5 passed!
+Mismatch at index 6: Inputs = [1, 1, 0], Generated = [0], Reference = [1]
+Test 7 passed!
+Test 8 passed!
+Test 9 passed!
+Test 10 passed!
+Test 11 passed!
+Test 12 passed!
+Test 13 passed!
+Test 14 passed!
+Test 15 passed!
+Test 16 passed!
+Test 17 passed!
+Mismatch at index 18: Inputs = [1, 0, 0], Generated = [0], Reference = [1]
+Mismatch at index 19: Inputs = [0, 0, 0], Generated = [0], Reference = [1]
+Test 20 passed!
+Test 21 passed!
+Mismatch at index 22: Inputs = [1, 1, 0], Generated = [0], Reference = [1]
+Mismatch at index 23: Inputs = [0, 1, 0], Generated = [0], Reference = [1]
+Test 24 passed!
+7 mismatches out of 25 total tests.
+hdlbits_testbenches/Fsm3_0_tb.v:335: $finish called at 50000 (10ps)
+Module file path: least-to-most/modules/Fsm3.v
+Testbench file path: hdlbits_testbenches/Fsm3_0_tb.v
+Compilation successful. Executable created at least-to-most/simulations/Fsm3_sim
+Simulation completed successfully.

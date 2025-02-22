@@ -12,7 +12,7 @@ module top_module (
     input [1:0] sel,
     input [7:0] a,
     input [7:0] b,
-    input [7:8] c,
+    input [7:0] c,
     input [7:0] d,
     output [7:0] out
 );

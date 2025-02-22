@@ -1,0 +1,49 @@
+```verilog
+module multi_booth_8bit (
+    input clk,
+    input reset,
+    input [7:0] a,
+    input [7:0] b,
+    output reg [15:0] p,
+    output reg rdy
+);
+
+    reg [15:0] multiplicand;
+    reg [15:0] multiplier;
+    reg [4:0] ctr;
+    reg [15:0] accum;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            // Extend a and b to 16-bit signed
+            multiplicand <= { {8{b[7]}}, b };
+            multiplier   <= { {8{a[7]}}, a };
+            accum <= 16'b0;  // Accumulator for partial sum
+            ctr   <= 5'b0;
+            p     <= 16'b0;
+            rdy   <= 1'b0;
+        end else if (ctr < 5'd16) begin
+            // Booth's Algorithm procedural loop
+            case ({multiplier[1:0]})
+                2'b01: accum <= accum + multiplicand;  // Add multiplicand to accum
+                2'b10: accum <= accum - multiplicand;  // Subtract multiplicand from accum
+                default: accum <= accum;               // No operation
+            endcase
+
+            // Arithmetic right shift
+            multiplier <= {accum[0], multiplier[15:1]};   
+            accum <= accum >>> 1; // Shift accum and sign extend
+
+            // Increment counter
+            ctr <= ctr + 1'b1;
+
+            // If end of calculation cycle
+            if (ctr == 5'd15) begin
+                p <= {accum[15], accum[15:0]}; // Final product is stored in 'p'
+                rdy <= 1'b1;                   // Ready signal set after 16 cycles
+            end
+        end
+    end
+
+endmodule
+```

@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // The following code contains incorrect behaviour that creates a latch. 
 // Fix the bugs so that you will shut off the computer only if it's really overheated, 
 // and stop driving if you've arrived at your destination or you need to refuel.

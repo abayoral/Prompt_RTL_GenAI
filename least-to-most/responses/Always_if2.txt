@@ -7,20 +7,21 @@ module top_module (
     input      gas_tank_empty,
     output reg keep_driving  ); //
 
-    // Fix the bug in the following code
-    
+    // Corrected implementation
     always @(*) begin
+        // Shut off the computer only if it's really overheated
         if (cpu_overheated)
             shut_off_computer = 1;
         else
-            shut_off_computer = 0;
+            shut_off_computer = 0; // Ensure there's no latch by assigning default value
     end
 
     always @(*) begin
+        // Stop driving if arrived or if a refuel is needed
         if (arrived || gas_tank_empty)
             keep_driving = 0;
         else
-            keep_driving = 1;
+            keep_driving = 1; // Ensure there's no latch by assigning default value
     end
 
 endmodule

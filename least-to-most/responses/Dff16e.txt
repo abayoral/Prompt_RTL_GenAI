@@ -11,12 +11,12 @@ module top_module (
         if (!resetn) begin
             q <= 16'b0;
         end else begin
-            if (byteena[1]) begin
-                q[15:8] <= d[15:8];
-            end
-            if (byteena[0]) begin
+            // Check byte enables and update accordingly
+            if (byteena[0])
                 q[7:0] <= d[7:0];
-            end
+
+            if (byteena[1])
+                q[15:8] <= d[15:8];
         end
     end
 

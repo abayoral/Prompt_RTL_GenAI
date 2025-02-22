@@ -2,7 +2,8 @@ module top_module(
     input a, b, cin,
     output cout, sum );
 
-    assign sum = a ^ b ^ cin;
-    assign cout = (a & b) | (b & cin) | (cin & a);
+    // Full adder logic
+    assign sum = a ^ b ^ cin;        // Sum is XOR of a, b, and cin
+    assign cout = (a & b) | (b & cin) | (cin & a); // Carry-out is determined by any two of the three inputs being high
 
 endmodule

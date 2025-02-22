@@ -1,0 +1,69 @@
+```verilog
+module freq_divbyfrac (
+    input wire clk,
+    input wire rst_n,
+    output reg clk_div
+);
+
+    // Parameters for the frequency division
+    localparam integer FULL_CYCLE_CNT = 7;  // 3.5 x 2 = 7
+
+    // State variables
+    reg [2:0] counter;  // Counts from 0 to 6 i.e., modulo 7 counter
+    reg internal_clk;   // Intermediate CLK signal
+    reg clk_pos_edge;   // Clock for positive edge
+    reg clk_neg_edge;   // Clock for negative edge
+    reg half_cycle;     // To indicate half-cycle period
+
+    // Counter logic and clock generation
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            counter <= 3'd0;
+            internal_clk <= 1'b0;
+        end else begin
+            if (counter == FULL_CYCLE_CNT - 1) begin
+                counter <= 3'd0;
+                internal_clk <= ~internal_clk;
+            end else begin
+                counter <= counter + 3'd1;
+            end
+        end
+    end
+
+    // Generate half-cycle flag for duty cycle balance
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) 
+            half_cycle <= 1'b0;
+        else
+            half_cycle <= (counter < 3'd4) ? 1'b1 : 1'b0;
+    end
+
+    // Generate positive and negative edge clock
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            clk_pos_edge <= 1'b0;
+        end else begin
+            if (counter == 3'd0 || counter == 3'd4) 
+                clk_pos_edge <= ~clk_pos_edge;
+        end
+    end
+
+    always @(negedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            clk_neg_edge <= 1'b0;
+        end else begin
+            if (half_cycle)
+                clk_neg_edge <= ~clk_neg_edge;
+        end
+    end
+
+    // Combining phase-shifted clocks
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) 
+            clk_div <= 1'b0;
+        else 
+            clk_div <= clk_pos_edge | clk_neg_edge;
+    end
+
+endmodule
+```

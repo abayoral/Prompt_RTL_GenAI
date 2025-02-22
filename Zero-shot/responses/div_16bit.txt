@@ -1,0 +1,46 @@
+```verilog
+module div_16bit (
+    input [15:0] A,       // Dividend
+    input [7:0] B,        // Divisor
+    output reg [15:0] result, // Quotient
+    output reg [15:0] odd      // Remainder
+);
+
+    integer i;
+    reg [15:0] dividend;
+    reg [15:0] temp_remain;
+    reg [7:0] divisor;
+
+    always @(*) begin
+        // Initialize
+        dividend = A;
+        divisor = B;
+        temp_remain = 0;
+        result = 0;
+        
+        // Edge case for zero divisor
+        if (divisor == 0) begin
+            result = 16'hFFFF; // Indicating invalid division
+            odd = dividend; // Remainder is the dividend
+        end else begin
+            // Perform division similar to long division
+            for (i = 15; i >= 0; i = i - 1) begin
+                // Shift left, bring the next bit of the dividend into remainder
+                temp_remain = {temp_remain[14:0], dividend[i]};
+                
+                // Compare and subtract if possible
+                if (temp_remain >= divisor) begin
+                    temp_remain = temp_remain - divisor;
+                    result[i] = 1;
+                end else begin
+                    result[i] = 0;
+                end
+            end
+
+            // Final remainder after full division process
+            odd = temp_remain;
+        end
+    end
+
+endmodule
+```

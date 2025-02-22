@@ -1,24 +1,9 @@
-// The PS/2 mouse protocol sends messages that are three bytes long. However, within a continuous byte stream, it's not obvious where messages start and end. The only indication is that the first byte of each three byte message always has bit[3]=1 (but bit[3] of the other two bytes may be 1 or 0 depending on data).
+As a senior Digital Design Engineer at a prominent hardware design company, you have been assigned a crucial project to develop a Verilog module for an innovative, next-generation product. This particular module plays a vital role not only in the functionality of the product but also in upholding the esteemed reputation that your computer hardware company has secured in the competitive industry.
 
-// We want a finite state machine that will search for message boundaries when given an input byte stream. The algorithm we'll use is to discard bytes until we see one with bit[3]=1. We then assume that this is byte 1 of a message, and signal the receipt of a message once all 3 bytes have been received (done).
+The task involves working with the PS/2 mouse communication protocol, which transmits data in messages composed of three distinct bytes. One of the primary challenges in processing this data stream is identifying the starting point of each message, as the bytes are continuously streamed without clear delimiters to signify boundaries. The only indicator available is that the first byte of each message consistently has its third bit (bit[3]) set to 1. The remaining two bytes in the sequence might have their third bit set to either 1 or 0, depending on the transmitted data, adding an additional layer of complexity.
 
-// The FSM should signal done in the cycle immediately after the third byte of each message was successfully received.
+Your goal is to design a finite state machine (FSM) that efficiently detects the start and end of these messages within the stream. The intended approach is to ignore all incoming bytes until a byte is encountered where bit[3] is set to 1. This byte is presumed to be the first byte of a new message. Once this byte is identified, the FSM should track the subsequent bytes until all three bytes of the message are successfully received. After receipt of the third byte, the FSM should trigger a ‘done’ signal in the next clock cycle to indicate that a complete message has been processed.
 
-// Although in[7:0] is a byte, the FSM only has one input: in[3].
-// You need ~4 states. Three states likely wouldn't work because one of them needs to assert done, and done is asserted for only one cycle for each received message.
+Design considerations include the FSM’s reliance solely on in[3], despite in[7:0] being a full byte, to perform its operations. The FSM setup requires approximately four states to function optimally, as three states may prove insufficient, given that one state must be dedicated to asserting the 'done' signal, which needs to be activated for one cycle with each full message reception. 
 
-module top_module(
-    input clk,
-    input [7:0] in,
-    input reset,    // Synchronous reset
-    output done); //
-
-    // Insert your code below
-
-    // State transition logic (combinational)
-
-    // State flip-flops (sequential)
- 
-    // Output logic
-
-endmodule
+Your challenge is to construct the Verilog module code incorporating synchronized reset functionality, outlining both the state transition logic and the state-holding mechanisms efficiently. Achieving a redesign that is both technically sound and aligns with the strategic product goals is imperative. How will you incorporate these requirements into your FSM design strategy, ensuring synchronous operation with the provided clock input and adherence to the reset protocol?

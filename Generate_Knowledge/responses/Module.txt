@@ -1,16 +1,14 @@
 ```verilog
-module mod_a ( input in1, input in2, output out );
-
-  // Module functionality for mod_a is assumed to be defined here
-
+module top_module ( input a, input b, output out );
+    // Instantiate mod_a and connect top-level ports to mod_a's ports
+    mod_a instance_name (
+        .in1(a),
+        .in2(b),
+        .out(out)
+    );
 endmodule
 
-module top_module ( input a, input b, output out );
-  // Instantiate mod_a
-  mod_a u_mod_a (
-    .in1(a),
-    .in2(b),
-    .out(out)
-  );
+module mod_a (input in1, input in2, output out);
+    assign out = in1 & in2; // Example implementation of mod_a
 endmodule
 ```

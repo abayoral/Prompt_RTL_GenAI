@@ -1,0 +1,8 @@
+hdlbits_testbenches/Fsm_serial_0_tb.v:17: error: Unknown module type: top_module
+2 error(s) during elaboration.
+*** These modules were missing:
+        top_module referenced 1 times.
+***
+Module file path: RaR/modules/Fsm_serial.v
+Testbench file path: hdlbits_testbenches/Fsm_serial_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Fsm_serial_sim', 'RaR/modules/Fsm_serial.v', 'hdlbits_testbenches/Fsm_serial_0_tb.v']' returned non-zero exit status 2.

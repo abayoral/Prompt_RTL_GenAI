@@ -1,69 +1,57 @@
-Let's dive into designing a dual-edge triggered flip-flop using a combination of both positive-edge and negative-edge triggered flip-flops. The idea is to create two flip-flops, one triggered by the positive edge of the clock and the other by the negative edge. We then use a selector to choose the correct value based on the clock edge.
+To create a functionally equivalent dual-edge triggered flip-flop using an FPGA, we can use a combination of positive-edge and negative-edge triggered flip-flops. The idea is to use two separate flip-flops: one triggered on the positive edge and the other on the negative edge. Then, we'll use a multiplexer to select between the outputs of these two flip-flops based on the clock signal. This way, the output `q` will effectively update on both edges of the clock.
 
-### Chain of Thought:
+Chain of Thought:
 
 1. **Understand the Requirements:**
-    - We need to create a flip-flop that reacts to both the positive and negative edges of the clock signal.
-    - FPGAs do not support dual-edge triggered flip-flops directly.
-    - The solution must work around this limitation using available resources.
+   - We need to simulate dual-edge triggering behavior using components available in FPGAs.
+   - We can use one flip-flop for the positive edge and another for the negative edge.
+   - Select between these outputs using a clock-driven multiplexer.
 
 2. **Determine the Inputs and Outputs:**
-    - **Inputs:** `clk`, `d`
-    - **Output:** `q`
+   - Inputs: `clk` for clock, `d` for data input.
+   - Output: `q` for the flip-flop output.
 
 3. **Define Intermediate Signals:**
-    - We need two internal signals to store the data captured by the flip-flops at the positive and negative edges of the clock.
-    - An internal signal can be used to toggle between these two captured values based on the clock edge.
+   - Two intermediate signals will be used to hold the outputs of the positive and negative edge-triggered flip-flops.
 
 4. **Structuring the Module:**
-    - Use two always blocks: one triggered by the positive edge of the clock and the other by the negative edge.
-    - Each always block will update its respective internal signal with the value of the data input `d`.
-    - Use a selector to output the correct value between the two internal signals.
+   - Use two flip-flops, one for the positive edge and another for the negative edge of the clock.
+   - Output of the flip-flops are the intermediate signals.
+   - Use a multiplexer to select between these two signals based on the clock.
+   - Logic: If the clock is high, take the output from the positive edge flip-flop; if low, take the output from the negative edge flip-flop.
 
 5. **Writing the Verilog Code:**
 
 ```verilog
 module top_module (
-    input wire clk,
-    input wire d,
+    input clk,
+    input d,
     output reg q
 );
 
-    // Intermediate signals for storing values at different clock edges
-    reg q_posedge; // Value at positive edge of the clock
-    reg q_negedge; // Value at negative edge of the clock
+    // Declare intermediate signals for both edge-triggered flip-flops
+    reg q_pos, q_neg;
 
-    // Process for the positive edge of the clock
+    // Positive edge-triggered flip-flop
     always @(posedge clk) begin
-        q_posedge <= d;
+        q_pos <= d;
     end
 
-    // Process for the negative edge of the clock
+    // Negative edge-triggered flip-flop
     always @(negedge clk) begin
-        q_negedge <= d;
+        q_neg <= d;
     end
 
-    // Select the appropriate value of q based on clock edge
+    // Select between q_pos and q_neg based on the clock
     always @(*) begin
-        if (clk)
-            q = q_negedge; // Use the value captured at the negative edge
-        else
-            q = q_posedge; // Use the value captured at the positive edge
+        if (clk) begin
+            q = q_pos;
+        end else begin
+            q = q_neg;
+        end
     end
 
 endmodule
 ```
 
-### Explanation:
-- **Intermediate Signals:**
-  - `q_posedge`: stores the value of `d` at the positive edge of the clock.
-  - `q_negedge`: stores the value of `d` at the negative edge of the clock.
-- **Always Blocks:**
-  - The first always block captures the value of `d` when there is a positive edge on `clk`.
-  - The second always block captures the value of `d` when there is a negative edge on `clk`.
-- **Output Logic:**
-  - We then use an always block with a combinational sensitivity list to assign the output `q`. This block decides which internal signal to output based on the current value of `clk`:
-    - If `clk` is high, we output `q_negedge`.
-    - If `clk` is low, we output `q_posedge`.
-
-This way, we emulate a dual-edge triggered flip-flop by combining the functionality of two single-edge triggered flip-flops.
+This approach allows you to effectively mimic dual-edge triggered behavior using two flip-flops and a multiplexer, a common technique when dual-edge hardware is unavailable.

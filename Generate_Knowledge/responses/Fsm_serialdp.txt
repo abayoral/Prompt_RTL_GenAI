@@ -3,7 +3,8 @@ module parity (
     input clk,
     input reset,
     input in,
-    output reg odd);
+    output reg odd
+);
 
     always @(posedge clk)
         if (reset) odd <= 0;
@@ -15,38 +16,37 @@ module top_module(
     input clk,
     input in,
     input reset,    // Synchronous reset
-    output reg [7:0] out_byte,
-    output reg done
+    output [7:0] out_byte,
+    output done
 );
-    // FSM State Definitions
-    typedef enum reg [2:0] {
-        IDLE,
-        START,
-        DATA,
-        PARITY,
-        STOP,
-        DONE
-    } state_t;
 
-    state_t state, next_state;
-    reg [2:0] bit_cnt;    // Bit counter for tracking received bits
-    reg [7:0] shift_reg;  // Shift register to store received data bits
-    wire odd_parity;      // Parity check output
+    // Internal signal and state definitions
+    reg [3:0] bit_count;
+    reg [7:0] shift_reg;
+    reg receiving;
+    reg done_reg;
+    reg parity_reset;
+    wire parity_odd;
 
-    // Instantiate parity module
-    parity parity_check(
+    // Instantiate the parity checker
+    parity parity_inst (
         .clk(clk),
-        .reset(reset || state == IDLE),
+        .reset(parity_reset),
         .in(in),
-        .odd(odd_parity)
+        .odd(parity_odd)
     );
 
+    // FSM states
+    parameter IDLE = 2'd0, RECEIVE = 2'd1, CHECK_PARITY = 2'd2, DONE = 2'd3;
+    reg [1:0] state, next_state;
+
     // State transition logic
-    always @(posedge clk) begin
-        if (reset) 
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
             state <= IDLE;
-        else 
+        end else begin
             state <= next_state;
+        end
     end
 
     // Next state logic
@@ -54,57 +54,49 @@ module top_module(
         next_state = state;
         case (state)
             IDLE: begin
-                done = 0;
-                if (in == 0) 
-                    next_state = START;  // Start bit detected
+                if (!in) // Wait for start bit (start bit is low)
+                    next_state = RECEIVE;
             end
-            START: begin
-                if (bit_cnt == 0)
-                    next_state = DATA;
+            RECEIVE: begin
+                if (bit_count == 9) // 8 data bits + 1 parity bit received
+                    next_state = CHECK_PARITY;
             end
-            DATA: begin
-                if (bit_cnt == 7)
-                    next_state = PARITY;
-            end
-            PARITY: begin
-                if (odd_parity == in) 
-                    next_state = STOP;
-                else 
-                    next_state = IDLE;  // Parity failed, go back to IDLE
-            end
-            STOP: begin
-                if (in == 1) 
-                    next_state = DONE;  // Stop bit detected
-                else 
-                    next_state = IDLE;  // Stop bit failed, go back to IDLE
+            CHECK_PARITY: begin
+                if (parity_odd) // Check odd parity
+                    next_state = DONE;
+                else
+                    next_state = IDLE; // Invalid parity, reset to IDLE
             end
             DONE: begin
-                done = 1;
-                next_state = IDLE;
+                if (in) // Stop bit is high
+                    next_state = IDLE;
             end
-            default: next_state = IDLE;
         endcase
     end
-      
-    // Output and Bit counter logic
+
+    // Output logic and internal logic
     always @(posedge clk) begin
-        if (reset) begin
-            bit_cnt <= 0;
-            shift_reg <= 0;
-        end
-        else if (state == START) 
-            bit_cnt <= 0;  // Reset bit counter at start
-        else if (state == DATA) begin
-            shift_reg <= {in, shift_reg[7:1]}; // Shift in the new bit
-            bit_cnt <= bit_cnt + 1;
+        if (state == IDLE) begin
+            bit_count <= 0;
+            receiving <= 0;
+            done_reg <= 0;
+        end else if (state == RECEIVE) begin
+            bit_count <= bit_count + 1;
+            receiving <= 1;
+            if (bit_count < 8) // Store the 8 data bits
+                shift_reg[bit_count] <= in;
+            parity_reset <= (bit_count == 0); // Reset parity checker on start of data reception
+        end else if (state == CHECK_PARITY) begin
+            receiving <= 0;
+            done_reg <= 0;
+        end else if (state == DONE) begin
+            out_byte <= shift_reg;
+            receiving <= 0;
+            done_reg <= 1;
         end
     end
 
-    // Output assignment
-    always @(posedge clk) begin
-        if (state == DONE)
-            out_byte <= shift_reg;
-    end
-    
+    assign done = done_reg;
+
 endmodule
 ```

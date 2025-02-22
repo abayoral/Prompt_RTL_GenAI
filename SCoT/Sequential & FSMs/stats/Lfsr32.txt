@@ -1,0 +1,8 @@
+hdlbits_testbenches/Lfsr32_0_tb.v:16: error: Unknown module type: top_module
+2 error(s) during elaboration.
+*** These modules were missing:
+        top_module referenced 1 times.
+***
+Module file path: RaR/modules/Lfsr32.v
+Testbench file path: hdlbits_testbenches/Lfsr32_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Lfsr32_sim', 'RaR/modules/Lfsr32.v', 'hdlbits_testbenches/Lfsr32_0_tb.v']' returned non-zero exit status 2.

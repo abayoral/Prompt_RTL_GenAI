@@ -1,11 +1,9 @@
-// Implement a Mealy-type finite state machine that recognizes the sequence "101" on an input signal named x. Your FSM should have an output signal, z, that is asserted to logic-1 when the "101" sequence is detected. Your FSM should also have an active-low asynchronous reset. You may only have 3 states in your state machine. Your FSM should recognize overlapping sequences.
+You are a senior Digital Design Engineer at a prominent hardware design company, where you are entrusted with the development of a crucial Verilog module for an upcoming next-generation product. This task is of paramount importance, as the successful implementation of this module is critical for sustaining and enhancing your company's esteemed reputation within the competitive computer hardware industry.
 
-module top_module (
-    input clk,
-    input aresetn,    // Asynchronous active-low reset
-    input x,
-    output z ); 
+Your specific task involves designing and implementing a Mealy-type finite state machine (FSM) in Verilog. The objective of this FSM is to accurately detect and recognize the binary sequence "101" as it appears on an input signal named `x`. When the FSM successfully identifies this sequence, it is required to assert an output signal, `z`, to a logic-1 level. This assertion serves as an indication that the sequence has been detected.
 
-    // Insert your code here
+The FSM must be constructed with a constraint of utilizing only three distinct states to effectively recognize the sequence "101". Moreover, it is essential for the FSM to be designed in a way that allows for the recognition of overlapping sequences, meaning that the FSM should be capable of detecting subsequent occurrences of the sequence within the stream of input data without requiring a reset or interruption in processing.
 
-endmodule
+Another critical specification for this design is the incorporation of an active-low asynchronous reset signal named `aresetn`. This signal should be capable of resetting the FSM at any point, regardless of the clock cycle, ensuring that the module can be reset to its initial state without delay when necessary.
+
+To summarize, your task is to implement this FSM within the provided module template, ensuring all specified conditions and constraints are met. The module includes inputs: `clk` for the clock signal, `aresetn` for the asynchronous active-low reset, and `x` for the sequence-detection input, along with the output `z` which indicates the detection of the "101" sequence. Please proceed to insert your Verilog code within the module to fulfill these requirements.

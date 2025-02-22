@@ -1,12 +1,1 @@
-// create one instance of module mod_a, then connect the module's three pins (in1, in2, and out) 
-// to your top-level module's three ports (wires a, b, and out). 
-//The module mod_a is provided for you — you must instantiate it.
-
-
-//Hint: When connecting modules, only the ports on the module are important. 
-// You do not need to know the code inside the module. 
-// The code for module mod_a looks like this:
-
-module top_module ( input a, input b, output out );
-// Insert your code here
-endmodule
+Imagine a scenario where you are tasked with working within a system that involves interconnecting various hardware components. You have been given a top-level module named `top_module` which has three ports: `a`, `b`, and `out`. These ports are defined as input and output wires and are ready to be connected with other parts of your system. Alongside this, you are provided with another module, named `mod_a`, which serves as a black box in this context. You don't need to concern yourself with the internal workings or the underlying code of `mod_a`; instead, your task is simply to instantiate this module and effectively connect it to the `top_module`. Specifically, `mod_a` possesses three pins labeled `in1`, `in2`, and `out`. Your goal is to create an instance of `mod_a` and establish connections such that the `in1` pin of `mod_a` is connected to the `a` wire of the `top_module`, the `in2` pin of `mod_a` is connected to the `b` wire, and the `out` pin of `mod_a` is connected to the `out` wire. This exercise focuses strictly on the connection and instantiation process, highlighting the importance of understanding port interactions between modules.

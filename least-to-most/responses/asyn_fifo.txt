@@ -1,0 +1,145 @@
+```verilog
+module dual_port_ram #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16,
+    parameter ADDR_WIDTH = 4  // For 16-depth FIFO, needs 4 address bits
+) (
+    input wire wclk,
+    input wire wenc,
+    input wire [ADDR_WIDTH-1:0] waddr,
+    input wire [WIDTH-1:0] wdata,
+    input wire rclk,
+    input wire renc,
+    input wire [ADDR_WIDTH-1:0] raddr,
+    output reg [WIDTH-1:0] rdata
+);
+    reg [WIDTH-1:0] mem [0:DEPTH-1];
+
+    always @(posedge wclk) begin
+        if (wenc) begin
+            mem[waddr] <= wdata;
+        end
+    end
+
+    always @(posedge rclk) begin
+        if (renc) begin
+            rdata <= mem[raddr];
+        end
+    end
+endmodule
+
+module gray_to_bin #(parameter SIZE = 4)(
+    input [SIZE-1:0] gray,
+    output reg [SIZE-1:0] binary
+);
+    integer i;
+    always @* begin
+        binary[SIZE-1] = gray[SIZE-1];
+        for (i = SIZE-2; i >= 0; i=i-1) begin
+            binary[i] = binary[i+1] ^ gray[i];
+        end
+    end
+endmodule
+
+module bin_to_gray #(parameter SIZE = 4)(
+    input [SIZE-1:0] binary,
+    output [SIZE-1:0] gray
+);
+    assign gray = (binary >> 1) ^ binary;
+endmodule
+
+module asyn_fifo #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16,
+    parameter ADDR_WIDTH = 4
+)(
+    input wire wclk,
+    input wire wrstn,
+    input wire winc,
+    input wire [WIDTH-1:0] wdata,
+    output wire wfull,
+    input wire rclk,
+    input wire rrstn,
+    input wire rinc,
+    output wire [WIDTH-1:0] rdata,
+    output wire rempty
+);
+    reg [ADDR_WIDTH:0] wptr_bin, rptr_bin;
+    reg [ADDR_WIDTH:0] wptr_gray, rptr_gray;
+    reg [ADDR_WIDTH:0] wq2_rptr_gray, rq2_wptr_gray;
+
+    wire [ADDR_WIDTH-1:0] waddr, raddr;
+
+    wire [ADDR_WIDTH:0] wptr_gray_next, rptr_gray_next;
+    reg [ADDR_WIDTH:0] wptr_gray_sync, rptr_gray_sync;
+
+    bin_to_gray #(.SIZE(ADDR_WIDTH+1)) wbin2gray (.binary(wptr_bin), .gray(wptr_gray_next));
+    bin_to_gray #(.SIZE(ADDR_WIDTH+1)) rbin2gray (.binary(rptr_bin), .gray(rptr_gray_next));
+
+    gray_to_bin #(.SIZE(ADDR_WIDTH+1)) rgray2bin (.gray(rq2_wptr_gray), .binary(wq2_rptr_bin));
+    gray_to_bin #(.SIZE(ADDR_WIDTH+1)) wgray2bin (.gray(wq2_rptr_gray), .binary(rq2_wptr_bin));
+
+    assign wfull = ((wptr_gray_next == {~rptr_gray_sync[ADDR_WIDTH], rptr_gray_sync[ADDR_WIDTH-1:0]}));
+    assign rempty = (rptr_gray_next == wptr_gray_sync);
+
+    assign waddr = wptr_bin[ADDR_WIDTH-1:0];
+    assign raddr = rptr_bin[ADDR_WIDTH-1:0];
+
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            wptr_bin <= 0;
+            wptr_gray <= 0;
+            wq2_rptr_gray <= 0;
+        end else if (winc && !wfull) begin
+            wptr_bin <= wptr_bin + 1;
+            wptr_gray <= wptr_gray_next;
+        end
+    end
+
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            rptr_bin <= 0;
+            rptr_gray <= 0;
+            rq2_wptr_gray <= 0;
+        end else if (rinc && !rempty) begin
+            rptr_bin <= rptr_bin + 1;
+            rptr_gray <= rptr_gray_next;
+        end
+    end
+
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            wq2_rptr_gray <= 0;
+            wptr_gray_sync <= 0;
+        end else begin
+            wq2_rptr_gray <= rptr_gray_sync;
+            wptr_gray_sync <= wptr_gray;
+        end
+    end
+
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            rq2_wptr_gray <= 0;
+            rptr_gray_sync <= 0;
+        end else begin
+            rq2_wptr_gray <= wptr_gray_sync;
+            rptr_gray_sync <= rptr_gray;
+        end
+    end
+
+    dual_port_ram #(
+        .WIDTH(WIDTH),
+        .DEPTH(DEPTH),
+        .ADDR_WIDTH(ADDR_WIDTH)
+    ) fifo_rom (
+        .wclk(wclk),
+        .wenc(winc && !wfull),
+        .waddr(waddr),
+        .wdata(wdata),
+        .rclk(rclk),
+        .renc(rinc && !rempty),
+        .raddr(raddr),
+        .rdata(rdata)
+    );
+endmodule
+```

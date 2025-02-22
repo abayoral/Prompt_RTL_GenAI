@@ -1,0 +1,81 @@
+```verilog
+module radix2_div (
+    input clk,
+    input rst,
+    input sign,
+    input [7:0] dividend,
+    input [7:0] divisor,
+    input opn_valid,
+    output reg res_valid,
+    output reg [15:0] result
+);
+
+    reg [8:0] SR; // 9-bit to hold the shifted dividend and quotient bits
+    reg [7:0] abs_dividend, abs_divisor;
+    reg [7:0] NEG_DIVISOR;
+    reg [3:0] cnt;
+    reg start_cnt;
+    wire [8:0] subtract_result;
+    wire [15:0] quotient_remainder;
+    wire carry_out;
+
+    // Function to return absolute value of a number
+    function [7:0] abs;
+        input [7:0] val;
+        if (val[7]) // If sign bit is 1
+            abs = (~val + 1);
+        else
+            abs = val;
+    endfunction
+
+    // Subtract operation
+    assign {carry_out, subtract_result} = {SR[8:1], SR[0]} - {1'b0, NEG_DIVISOR};
+
+    // Combine remainder and quotient for the result
+    assign quotient_remainder = {SR[7:0], dividend[7]};
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            SR <= 9'd0;
+            cnt <= 4'd0;
+            start_cnt <= 1'b0;
+            res_valid <= 1'b0;
+            result <= 16'd0;
+        end else begin
+            if (opn_valid && !start_cnt && !res_valid) begin
+                abs_dividend <= abs(dividend);
+                abs_divisor <= abs(divisor);
+                NEG_DIVISOR <= ~abs_divisor + 1; // Calculate -divisor
+                SR <= {1'b0, abs_dividend}; // Initialize Shift Register with abs dividend
+                cnt <= 4'd1; // Counter starts at 1
+                start_cnt <= 1'b1; // Start the division process
+            end else if (start_cnt) begin
+                if (cnt < 4'd8) begin
+                    SR <= carry_out ? subtract_result : {SR[7:0], 1'b0}; // Shift and conditionally subtract
+                    if (carry_out) 
+                        SR[0] <= 1'b1; // Set LSB based on result
+                    cnt <= cnt + 1'b1;
+                end else begin
+                    start_cnt <= 1'b0; // Division done
+                    if (sign && (dividend[7] ^ divisor[7])) begin
+                        // Adjust quotient for signed division
+                        result[7:0] <= ~SR[7:0] + 1;
+                    end else begin
+                        result[7:0] <= SR[7:0];
+                    end
+                    if (sign && dividend[7]) begin
+                        // Adjust remainder for signed division
+                        result[15:8] <= ~SR[8:1] + 1;
+                    end else begin
+                        result[15:8] <= SR[8:1];
+                    end
+                    res_valid <= 1'b1; // Result is valid
+                end
+            end else if (res_valid) begin
+                res_valid <= 1'b0; // Clear result valid flag after result is read
+            end
+        end
+    end
+
+endmodule
+```

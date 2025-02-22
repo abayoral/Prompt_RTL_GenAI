@@ -1,12 +1,5 @@
-// You are given a module my_dff with two inputs and one output (that implements a D flip-flop). 
-// Instantiate three of them, then chain them together to make a shift register of length 3. 
-// The clk port needs to be connected to all instances.
+You have been provided with a pre-defined module named `my_dff`, which implements the functionality of a D flip-flop. This module has three ports: an input called `clk`, another input named `d`, and an output termed `q`. Your task is to utilize this D flip-flop module to construct a shift register. Specifically, you are required to instantiate three instances of `my_dff` and arrange them in a sequential chain such that the output of one flip-flop feeds into the input of the next. This configuration effectively creates a shift register with a length of three flip-flops.
 
-// The module provided to you is: 
+To successfully achieve this, you'll need to ensure that each of these `my_dff` instances are properly instantiated within the top-level module, which is named `top_module`. This module itself has three ports — `clk`, `d`, and `q` — mirroring the ports of the `my_dff` module. The clock signal (`clk`) needs to be connected to the corresponding `clk` port on each of the three D flip-flop instances so that they all operate synchronously based on the input clock. The data input (`d`) to the shift register is the `d` port of `top_module`, and the final output of the shift register (after passing through the three flip-flops) should be connected to the `q` port of `top_module`.
 
-module my_dff ( input clk, input d, output q );
-
-
-module top_module ( input clk, input d, output q );
-	//Insert your code here
-endmodule
+In summary, you need to write the necessary Verilog code within the `top_module` to declare these three D flip-flop instances, connect them in series to form a three-stage shift register, ensure that all `clk` ports are driven by the common input clock, and appropriately map the input and output ports of `top_module` to the first input and last output in the sequence, respectively.

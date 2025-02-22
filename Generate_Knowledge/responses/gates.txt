@@ -9,13 +9,13 @@ module top_module(
     output out_xnor,
     output out_anotb
 );
-    // Logic gate implementations
-    assign out_and = a & b;
-    assign out_or = a | b;
-    assign out_xor = a ^ b;
-    assign out_nand = ~(a & b);
-    assign out_nor = ~(a | b);
-    assign out_xnor = ~(a ^ b);
-    assign out_anotb = a & ~b;
+    // Logic gates implementation
+    assign out_and = a & b;       // AND gate
+    assign out_or = a | b;        // OR gate
+    assign out_xor = a ^ b;       // XOR gate
+    assign out_nand = ~(a & b);   // NAND gate
+    assign out_nor = ~(a | b);    // NOR gate
+    assign out_xnor = ~(a ^ b);   // XNOR gate
+    assign out_anotb = a & ~b;    // A AND NOT B gate
 endmodule
 ```

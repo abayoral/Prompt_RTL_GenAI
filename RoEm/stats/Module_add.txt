@@ -1,9 +1,0 @@
-RoEm/modules/Module_add.v:11: error: Unknown module type: add16
-RoEm/modules/Module_add.v:19: error: Unknown module type: add16
-3 error(s) during elaboration.
-*** These modules were missing:
-        add16 referenced 2 times.
-***
-Module file path: RoEm/modules/Module_add.v
-Testbench file path: hdlbits_testbenches/Module_add_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'RoEm/simulations/Module_add_sim', 'RoEm/modules/Module_add.v', 'hdlbits_testbenches/Module_add_0_tb.v']' returned non-zero exit status 3.

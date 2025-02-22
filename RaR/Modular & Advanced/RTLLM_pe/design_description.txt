@@ -1,26 +1,18 @@
-Please act as a professional verilog designer.
+As a specialist in Verilog design, you're tasked with developing a Verilog module that acts as a Multiplying Accumulator (MAC) for 32-bit integers. This involves creating a module named `pe` that will repeatedly multiply two 32-bit input operands, `a` and `b`, and cumulatively store the results in an output register labeled `c` during each cycle of the clock.
 
-Implement a Multiplying Accumulator for 32bit integer. In the MAC_PE, there is a register that stores the partial sum (the intermediate accumulation result), and in each cycle, the result of “a multiplied by b” will be accumulated in this register, and the “c” shows the value of the register.
+To further delineate the requirements, the MAC module should encompass the following components and adhere to these criteria:
 
-Module name:  
-    pe   
+**Inputs:**
+- `clk`: This is the clock signal, which is central to synchronizing the operations within the module. It determines the timing intervals for state transitions in the register.
+- `rst`: Serving as a reset signal, it, when asserted (i.e., activated by setting it to a high state), should initialize the accumulator `c` to a zero state, effectively clearing any previous data. When deactivated (i.e., set to low), it allows the accumulator to continue aggregating values.
+- `a` & `b`: These represent the two 32-bit input operands that will be multiplied during each operational cycle. They serve as the source of the multiplication operation.
 
-Input ports:
-    clk: Clock signal used for synchronous operations.
-    rst: Reset signal. Defined as 1 for reset and 0 for reset signal inactive.
-    a: 32-bit input operand A.
-    b: 32-bit input operand B.
+**Outputs:**
+- `c`: This 32-bit output port is responsible for holding and displaying the cumulative product of successive multiplication operations. The value of `c` depends on the state of `rst`: when `rst` is active, `c` resets to zero. In the absence of a reset signal, `c` is updated with the accumulated totals, adding the current multiplication result of `a` and `b` to its existing value.
 
-Output ports:
-    c: 32-bit output representing the accumulated result.
+**Implementation Particulars:**
+- The MAC's operations should be encapsulated within an always block that listens to the positive edges of the `clk` and `rst` signals. This setup ensures that both the resetting of the accumulator and the accumulation of products are executed predictably and synchronously.
+- Upon encountering a positive edge in `rst`, the module must reset the register `c` to zero, thereby wiping any previous accumulations clean.
+- Conversely, when `rst` is not active, each positive edge of `clk` should trigger the module to compute the product of `a` and `b`, add this new product to the current total in `c`, and subsequently update `c` to reflect this new value. This continuous accumulation process forms the cornerstone of the MAC's operational function.
 
-Implementation:
-The module implements a parallel multiplier and accumulator using registers and an always block. It multiplies the input operands and accumulates the result into an output register.
-Accumulator Register:
-The module includes a register, c, to store the accumulated result.
-On the positive edge of the clock signal (clk) or the positive edge of the reset signal (rst), the module updates the register.
-If the reset signal (rst) is high, indicating a reset condition, the register (c) is set to 0. If the reset signal (rst) is low, the register (c) is updated by adding the product of the input operands (a and b) to its current value.
-Multiplication and Accumulation:
-Inside the always block, the module performs the multiplication and accumulation operation. If the reset signal (rst) is high, the register (c) is set to 0. If the reset signal (rst) is low, the module adds the product of the input operands (a and b) to the register (c).
-
-Give me the complete code.
+By adhering strictly to these specifications, the Verilog module will efficiently execute its purpose as a multiplying accumulator for 32-bit integers, with accurate operations rooted in the synchronization of relevant signals and conditions.

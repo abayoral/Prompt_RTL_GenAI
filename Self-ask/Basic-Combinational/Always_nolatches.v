@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // Suppose you're building a circuit to process scancodes from a PS/2 keyboard for a game. 
 // Given the last two bytes of scancodes received, you need to indicate whether one of the 
 // arrow keys on the keyboard have been pressed. This involves a fairly simple mapping, 

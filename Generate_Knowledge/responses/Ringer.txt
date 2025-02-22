@@ -6,8 +6,8 @@ module top_module (
     output motor         // Vibrate
 );
 
-    assign ringer = ring & ~vibrate_mode;
-    assign motor = ring & vibrate_mode;
+    assign ringer = ring & ~vibrate_mode; // The ringer is on when there is an incoming call and the phone is not in vibrate mode.
+    assign motor = ring & vibrate_mode;   // The motor is on when there is an incoming call and the phone is in vibrate mode.
 
 endmodule
 ```

@@ -1,15 +1,30 @@
-module my_dff ( input clk, input d, output q );
-    reg q_reg;
+```verilog
+module my_dff ( input clk, input d, output reg q );
     always @(posedge clk) begin
-        q_reg <= d;
+        q <= d;
     end
-    assign q = q_reg;
 endmodule
 
 module top_module ( input clk, input d, output q );
     wire q1, q2;
 
-    my_dff dff1 ( .clk(clk), .d(d), .q(q1) );
-    my_dff dff2 ( .clk(clk), .d(q1), .q(q2) );
-    my_dff dff3 ( .clk(clk), .d(q2), .q(q) );
+    // Instantiate and chain three my_dff modules to create a shift register
+    my_dff dff1 ( 
+        .clk(clk), 
+        .d(d), 
+        .q(q1) 
+    );
+
+    my_dff dff2 ( 
+        .clk(clk), 
+        .d(q1), 
+        .q(q2) 
+    );
+
+    my_dff dff3 ( 
+        .clk(clk), 
+        .d(q2), 
+        .q(q) 
+    );
 endmodule
+```

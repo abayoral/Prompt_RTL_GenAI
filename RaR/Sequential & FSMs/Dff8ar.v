@@ -1,14 +1,8 @@
-// Create 8 D flip-flops with active high asynchronous reset. All DFFs should be triggered by the positive edge of clk.
+As a senior Digital Design Engineer at a prominent hardware design company, you've been assigned a critical task that involves developing a Verilog module for an advanced product. This module is crucial to your company maintaining its reputation in the competitive computer hardware industry. Specifically, you're required to create a design featuring 8 D flip-flops, each equipped with an active high asynchronous reset mechanism. These flip-flops should be configured to trigger on the positive edge of a clock signal (clk). It's important to consider that the primary distinction between implementing synchronous and asynchronous resets lies in the sensitivity list of the Verilog code. Given this context, you must structure a Verilog module with the following inputs and outputs: 
 
-// Hint: The only difference in code between synchronous and asynchronous reset flip-flops is in the sensitivity list.
+- An input `clk`, functioning as the clock driver for the flip-flops.
+- An input `areset`, which serves as the active high asynchronous reset for the flip-flops.
+- An 8-bit input vector `d`, which provides the data inputs to each of the flip-flops.
+- An 8-bit output vector `q`, which provides the data outputs from each of the flip-flops. 
 
-module top_module (
-    input clk,
-    input areset,   // active high asynchronous reset
-    input [7:0] d,
-    output [7:0] q
-);
-
-	// Insert your code here
-
-endmodule
+This is a professional challenge that leans heavily on your expertise in digital logic design and mastery of Verilog coding. Your task is not just to write functioning Verilog code but to write efficient, readable, and reliable code that will perform under the stringent conditions of real-world applications. This work will be a part of the `top_module` and it is essential to ensure that the active high asynchronous reset characteristic is accurately implemented and verified.

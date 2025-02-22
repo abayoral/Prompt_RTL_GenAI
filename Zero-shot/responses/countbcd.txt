@@ -1,39 +1,61 @@
+```verilog
 module top_module (
     input clk,
     input reset,   // Synchronous active-high reset
     output [3:1] ena,
     output [15:0] q);
 
-    reg [15:0] counter;
+    reg [3:0] digit0, digit1, digit2, digit3;
     
-    always @(posedge clk or posedge reset) begin
+    always @(posedge clk) begin
         if (reset) begin
-            counter <= 16'h0000; // Reset the count
-            ena <= 3'b000;
-        end
-        else begin
-            if (counter[3:0] == 4'hA) begin    // If ones digit reaches 10
-                counter[3:0] <= 4'h0;  // Reset ones digit
-                ena[1] <= 1'b1;    // Enable tens digit to increment
+            digit0 <= 4'b0000;
+            digit1 <= 4'b0000;
+            digit2 <= 4'b0000;
+            digit3 <= 4'b0000;
+        end else begin
+            // Increment the ones digit
+            if (digit0 == 4'b1001) begin
+                digit0 <= 4'b0000;
+                // Enable tens digit
+                ena[1] <= 1;
+                // Increment the tens digit
+                if (digit1 == 4'b1001) begin
+                    digit1 <= 4'b0000;
+                    // Enable hundreds digit
+                    ena[2] <= 1;
+                    // Increment the hundreds digit
+                    if (digit2 == 4'b1001) begin
+                        digit2 <= 4'b0000;
+                        // Enable thousands digit
+                        ena[3] <= 1;
+                        // Increment the thousands digit
+                        if (digit3 == 4'b1001) begin
+                            digit3 <= 4'b0000;
+                        end else begin
+                            digit3 <= digit3 + 1;
+                        end
+                    end else begin
+                        digit2 <= digit2 + 1;
+                    end
+                end else begin
+                    digit1 <= digit1 + 1;
+                end
+            end else begin
+                digit0 <= digit0 + 1;
             end
             
-            if (counter[7:4] == 4'hA && ena[1] == 1'b1) begin   // If tens digit reaches 10 and enabled
-                counter[7:4] <= 4'h0;  // Reset tens digit
-                ena[2] <= 1'b1;    // Enable hundreds digit to increment
-            end
-            
-            if (counter[11:8] == 4'hA && ena[2] == 1'b1) begin  // If hundreds digit reaches 10 and enabled
-                counter[11:8] <= 4'h0;  // Reset hundreds digit
-                ena[3] <= 1'b1;    // Enable thousands digit to increment
-            end
-
-            if (counter[15:12] == 4'hA && ena[3] == 1'b1)    // If thousands digit reaches 10 and enabled
-                counter[15:12] <= 4'h0;  // Reset thousands digit
-            
-            counter <= counter + 1;  // Increment the counter
+            // Reset enable lines after increment is handled
+            ena[1] <= 0;
+            ena[2] <= 0;
+            ena[3] <= 0;
         end
     end
-
-    assign q = counter;  // Assign counter to output q
+    
+    assign q[3:0] = digit0;
+    assign q[7:4] = digit1;
+    assign q[11:8] = digit2;
+    assign q[15:12] = digit3;
 
 endmodule
+```

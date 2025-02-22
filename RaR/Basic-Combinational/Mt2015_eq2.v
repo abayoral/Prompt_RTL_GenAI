@@ -1,7 +1,11 @@
-// Create a circuit that has two 2-bit inputs A[1:0] and B[1:0], and produces an output z. 
-// The value of z should be 1 if A = B, otherwise z should be 0.
+As a senior Digital Design Engineer at a prominent hardware design company, you are entrusted with the responsibility of developing a critical Verilog module that will play an integral role in the functionality of a next-generation product. The success and reliability of this module are crucial for sustaining the esteemed reputation of your company in the highly competitive computer hardware industry.
 
+Your task involves designing a digital circuit using Verilog, which accepts two 2-bit binary inputs, denoted as A[1:0] and B[1:0]. These inputs represent binary numbers, where each consists of two bits. The primary objective of this circuit is to compare these two inputs and generate a single-bit output, labeled as z.
 
-module top_module ( input [1:0] A, input [1:0] B, output z ); 
-	// Insert your code here
-endmodule
+The functionality of the circuit is straightforward yet critical: the output z should be asserted as 1 (true) only when the two inputs A and B are exactly equal in value, indicating a perfect match between the two 2-bit binary numbers. In any other scenario, where A and B are not equal, the output z should be 0 (false).
+
+Your approach should ensure that the comparison is efficient and accurate, considering edge cases and ensuring that the code is optimized for hardware implementation. Furthermore, the module is to be structured correctly within a Verilog code framework, denoted with the module name `top_module`, which includes the necessary port declaration for inputs A and B, and the output z.
+
+Considerations such as ensuring low-power consumption, minimal propagation delay, and resource-efficient implementation should be taken into account to maintain high performance and cost-effectiveness. The logic of the circuit must be rigorously tested and verified to meet industry standards and ensure it performs reliably under various operational conditions.
+
+Draft the Verilog code to capture this logic, keeping in mind best practices for modularity and scalability, as it might need to be integrated into larger systems. The 'top_module' should be precise in its syntax and semantically correct to ensure flawless implementation within the larger hardware design project.

@@ -1,18 +1,16 @@
 ```verilog
 module top_module (
     input clk,
-    input reset,
+    input reset,  // This reset input is synchronous and activates on a high signal
     output reg [3:0] q
 );
 
-    // Process block that triggers on every rising edge of clock signal
+    // Process to handle synchronous reset and counter logic
     always @(posedge clk) begin
         if (reset) begin
-            // If reset is asserted, set the counter to 0
-            q <= 4'b0000;
+            q <= 4'b0000;  // Reset counter to zero
         end else begin
-            // Otherwise, increment the counter
-            q <= q + 1;
+            q <= q + 1;   // Increment counter
         end
     end
 

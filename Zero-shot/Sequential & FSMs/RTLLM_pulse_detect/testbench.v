@@ -16,11 +16,13 @@ module pulse_detect_tb;
 
   // Generate clock
   initial begin
-	clk=0;
-	forever #5 clk=~clk;
+    clk = 0;
+    forever #5 clk = ~clk;
   end
 
   integer error = 0;
+  integer total_tests = 0; // Counter for total test cases
+
   initial begin
       // Initialize inputs
       #10;
@@ -28,17 +30,18 @@ module pulse_detect_tb;
       data_in = 0;
       #28;
       rst_n = 1;
-      #10      data_in = 0;
-      #10      data_in = 0;  
-      #10      data_in = 0;
-      #10      data_in = 1;
-      #10      data_in = 0;
-      #10      data_in = 1;
-      #10      data_in = 0;
-      #10      data_in = 1;
-      #10      data_in = 1;
-      #10      data_in = 0;
+      #10 data_in = 0;
+      #10 data_in = 0;  
+      #10 data_in = 0;
+      #10 data_in = 1;
+      #10 data_in = 0;
+      #10 data_in = 1;
+      #10 data_in = 0;
+      #10 data_in = 1;
+      #10 data_in = 1;
+      #10 data_in = 0;
       #10;
+
       // Finish simulation
       $finish;
   end
@@ -46,32 +49,48 @@ module pulse_detect_tb;
   initial begin
     #5;
     #10;
+    total_tests = total_tests + 1;
     error = (data_out == 0) ? error : error+1;
     #10;
+    total_tests = total_tests + 1;
     error = (data_out == 0) ? error : error+1;
     #10;
+    total_tests = total_tests + 1;
     error = (data_out == 0) ? error : error+1;
     #10;
+    total_tests = total_tests + 1;
     error = (data_out == 0) ? error : error+1;
     #10;
+    total_tests = total_tests + 1;
     error = (data_out == 0) ? error : error+1;
     #10;
+    total_tests = total_tests + 1;
     error = (data_out == 0) ? error : error+1;
     #10;
+    total_tests = total_tests + 1;
     error = (data_out == 0) ? error : error+1;
     #10;
+    total_tests = total_tests + 1;
     error = (data_out == 0) ? error : error+1;
     #10;
-    error = (data_out == 1) ? error : error+1;
-    // $display("%b,%b,%b", data_in, data_out, dut.pulse_level1);//1
+    total_tests = total_tests + 1;
+    error = (data_out == 1) ? error : error+1; // Expect pulse detected (1)
     #20;
+    total_tests = total_tests + 1;
     error = (data_out == 1) ? error : error+1;
     #10;
+
+    // Final test result summary
+    $display("=========== Test Summary ===========");
+    $display("Total Tests Run: %d", total_tests);
+    $display("Total Failures: %d", error);
+
     if (error == 0) begin
-        $display("===========Your Design Passed===========");
+        $display("=========== Your Design Passed ===========");
     end
     else begin
-    $display("===========Error===========");
+        $display("=========== Test completed with %d / %d failures ===========", error, total_tests);
     end
   end
+
 endmodule

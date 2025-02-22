@@ -1,0 +1,3 @@
+./simv -l run.log
+=========== Test completed with           X/20 failures ===========
+testbench.v:70: $finish called at 265000 (1ps)

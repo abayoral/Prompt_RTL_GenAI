@@ -1,26 +1,23 @@
-Please act as a professional Verilog designer.
+As an experienced Verilog designer working with digital logic design systems, your task is to develop a Verilog module named "comparator_4bit." This module will function as a 4-bit comparator utilizing combinational logic to evaluate and compare two 4-bit binary numbers. Let's delve into the specifics of your assignment.
 
-Implement a module of a 4-bit comparator with multiple bit-level comparators in combinational logic.
+Module Objective:
+You are tasked with creating a "comparator_4bit" module that compares two 4-bit inputs, A and B. The comparison should determine and output whether A is greater than, equal to, or less than B.
 
-Module name:  
-    comparator_4bit               
-Input ports:
-    A [3:0]: First 4-bit input operand (binary number to compare).
-    B [3:0]: Second 4-bit input operand (binary number to compare).
-Output ports:
-    A_greater: 1-bit output indicating if A is greater than B.
-    A_equal: 1-bit output indicating if A is equal to B.
-    A_less: 1-bit output indicating if A is less than B.
+Input Ports:
+1. **A[3:0]**: Represents the 4-bit binary input operand, designated as the first number for the comparison.
+2. **B[3:0]**: Represents the 4-bit binary input operand, designated as the second number for the comparison.
 
-Implementation:
-Comparison Logic: The module compares the two 4-bit binary numbers A and B using combinational logic.
-- A subtraction operation is performed: A - B. The result of this subtraction helps determine whether A is greater than, equal to, or less than B.
-- Carry Generation: If a borrow occurs during the subtraction, A is less than B (A_less).
-- If no borrow occurs and the result of subtraction is non-zero, A is greater than B (A_greater).
-- If A and B are equal, the result of subtraction is zero (A_equal).
+Output Ports:
+1. **A_greater**: A single-bit output that indicates if operand A is greater than operand B. Outputs a logic high (1) if true.
+2. **A_equal**: A single-bit output that indicates if operands A and B are equivalent. Outputs a logic high (1) if true.
+3. **A_less**: A single-bit output that indicates if operand A is less than operand B. Outputs a logic high (1) if true.
 
-Output Encoding: The outputs (A_greater, A_equal, A_less) are mutually exclusive, ensuring only one of the three outputs is high (1) at any given time.
+Implementation Details:
+- **Comparison Logic**: Implement the logic to compare the inputs A and B by essentially performing the arithmetic subtraction of A - B. The outcome of this subtraction directly influences the determination of the outputs:
+  - The detection of a borrow during the subtraction implies that A is less than B, activating `A_less`.
+  - Conversely, absence of a borrow and a non-zero result from subtraction implies that A is greater than B, activating `A_greater`.
+  - If the subtraction yields a zero result, it asserts that A is equal to B, activating `A_equal`.
+  
+- **Output Encoding**: The resulting logic for outputs A_greater, A_equal, and A_less should ensure exclusivity, meaning only one of these outputs can be active (set to logic level 1) at any given time.
 
-Give me the complete code.
-
- 
+Your task is to comprehensively code this logic in Verilog. Focus not only on the correct implementation setup but also ensure code clarity and adherence to design conventions to establish a robust and efficient module.

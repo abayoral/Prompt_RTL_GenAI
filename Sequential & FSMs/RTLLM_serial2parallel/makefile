@@ -1,4 +1,5 @@
 .PHONY: vcs sim clean
+
 TEST_DESIGN = serial2parallel
 
 vcs:

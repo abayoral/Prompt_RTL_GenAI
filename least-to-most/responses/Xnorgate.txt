@@ -4,6 +4,7 @@ module top_module(
     input b, 
     output out );
 
+    // XNOR is the logical negation of XOR
     assign out = ~(a ^ b);
 
 endmodule

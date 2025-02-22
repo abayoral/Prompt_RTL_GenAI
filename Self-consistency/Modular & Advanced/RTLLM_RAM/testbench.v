@@ -33,6 +33,8 @@ module tb_RAM;
     always #((CLK_PERIOD)/2) clk = ~clk;
 
     integer error = 0;
+    integer total_tests = 0; // Counter for total test cases
+
     // Initial block for stimulus generation
     initial begin
         // Initialize inputs
@@ -44,12 +46,15 @@ module tb_RAM;
             write_data = 0;
             read_en = 0;
             read_addr = 0;
+
             // Wait for a few clock cycles
             #((CLK_PERIOD) * 5);
+
             // Release reset
             rst_n = 0;
             #((CLK_PERIOD) * 2);
             rst_n = 1;
+
             // Write operation
             write_en = 1;
             write_addr = 3'b000;
@@ -57,24 +62,31 @@ module tb_RAM;
             #((CLK_PERIOD) * 1);
             write_en = 0;
             #((CLK_PERIOD) * 1);
-            
+
             // Read operation
+            total_tests = total_tests + 1;
             read_en = 1;
             read_addr = 3'b000;
             #((CLK_PERIOD) * 1);
-            // $display("read_data = %b", read_data); 
-            error = (read_data == write_data) ? error : error+1;
+            error = (read_data == write_data) ? error : error + 1;
             read_en = 0;
+
+            total_tests = total_tests + 1;
             #((CLK_PERIOD) * 1);
-            // $display("read_data = %b", read_data); 
-            error = (read_data == 0) ? error : error+1;
+            error = (read_data == 0) ? error : error + 1;
         end
+
+        // Final test result summary
+        $display("=========== Test Summary ===========");
+        $display("Total Tests Run: %d", total_tests);
+        $display("Total Failures: %d", error);
+
         if (error == 0) begin
-            $display("===========Your Design Passed===========");
+            $display("=========== Your Design Passed ===========");
+        end else begin
+            $display("=========== Test completed with %d / %d failures ===========", error, total_tests);
         end
-        else begin
-        $display("===========Error===========", error);
-        end
+
         // Finish simulation
         $finish;
     end

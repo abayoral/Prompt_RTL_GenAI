@@ -2,19 +2,31 @@
 module top_module(
     input in,
     input [3:0] state,
-    output [3:0] next_state,
-    output out);
+    output reg [3:0] next_state,
+    output reg out
+);
 
+    // State parameters
     parameter A=4'b0001, B=4'b0010, C=4'b0100, D=4'b1000;
 
-    // State transition logic: Derive an equation for each state flip-flop.
-    assign next_state[A] = (state[A] & ~in) | (state[C] & ~in);
-    assign next_state[B] = (state[A] & in) | (state[D] & in);
-    assign next_state[C] = (state[B] & ~in) | (state[D] & ~in);
-    assign next_state[D] = (state[C] & in);
+    // State transition logic
+    always @(*) begin
+        case (state)
+            A: next_state = in ? B : A;
+            B: next_state = in ? B : C;
+            C: next_state = in ? D : A;
+            D: next_state = in ? B : C;
+            default: next_state = 4'bx; // Handle invalid states (for safety)
+        endcase
+    end
 
-    // Output logic: 
-    assign out = state[D];
+    // Output logic
+    always @(*) begin
+        case (state)
+            D: out = 1;
+            default: out = 0;
+        endcase
+    end
 
 endmodule
 ```

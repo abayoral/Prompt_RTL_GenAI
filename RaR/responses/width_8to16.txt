@@ -1,0 +1,42 @@
+```verilog
+module width_8to16 (
+    input wire clk,
+    input wire rst_n,
+    input wire valid_in,
+    input wire [7:0] data_in,
+    output reg valid_out,
+    output reg [15:0] data_out
+);
+
+    reg [7:0] buffer;            // Temporary storage for the first 8-bit data
+    reg first_data_received;     // Flag to indicate the first data has been received
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset condition
+            valid_out <= 0;
+            data_out <= 16'd0;
+            buffer <= 8'd0;
+            first_data_received <= 0;
+        end else begin
+            if (valid_in) begin
+                if (!first_data_received) begin
+                    // Store the first 8-bit data in the buffer
+                    buffer <= data_in;
+                    first_data_received <= 1;
+                end else begin
+                    // Combine buffer and current data input to form 16-bit output
+                    data_out <= {buffer, data_in};
+                    valid_out <= 1;  // Output is valid after the second data
+                    first_data_received <= 0; // Reset the flag to start new conversion
+                end
+            end else begin
+                // valid_out remains clear if no valid input is present
+                valid_out <= 0;
+            end
+        end
+    end
+endmodule
+```
+
+This code implements the `width_8to16` module that reliably captures two consecutive 8-bit inputs and combines them into a 16-bit output, with appropriate signaling for output validity one clock cycle after the second input is valid. The `buffer` register stores the first 8-bit input until the second input is received, at which point the two are concatenated, and `data_out` and `valid_out` are updated accordingly. The module responds to an active-low reset by clearing the stored data.

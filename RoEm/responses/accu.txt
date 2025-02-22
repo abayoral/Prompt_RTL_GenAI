@@ -1,0 +1,47 @@
+```verilog
+module accu (
+    input clk,
+    input rst_n,
+    input [7:0] data_in,
+    input valid_in,
+    output reg valid_out,
+    output reg [9:0] data_out
+);
+
+    // Define registers for accumulation and counting
+    reg [9:0] sum;
+    reg [1:0] count;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Active low reset: Initialize registers
+            sum <= 10'b0;
+            count <= 2'b0;
+            valid_out <= 1'b0;
+            data_out <= 10'b0;
+        end else begin
+            if (valid_in) begin
+                // Keep accumulating inputs until 4 valid inputs are received
+                sum <= sum + data_in;
+                count <= count + 1'b1;
+                
+                if (count == 2'd3) begin
+                    // On the fourth valid input, set the outputs
+                    data_out <= sum + data_in;
+                    valid_out <= 1'b1;
+                    // Reset the sum and count for the next cycle
+                    sum <= 10'b0;
+                    count <= 2'b0;
+                end else begin
+                    // Ensure valid_out is low until the fourth input
+                    valid_out <= 1'b0;
+                end
+            end else begin
+                // Ensure valid_out remains low if valid_in is not set
+                valid_out <= 1'b0;
+            end
+        end
+    end
+
+endmodule
+```

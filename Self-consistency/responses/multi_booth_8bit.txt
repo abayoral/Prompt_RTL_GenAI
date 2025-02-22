@@ -1,0 +1,47 @@
+module multi_booth_8bit (
+    input wire clk,
+    input wire reset,
+    input wire [7:0] a,
+    input wire [7:0] b,
+    output reg [15:0] p,
+    output reg rdy
+);
+    reg [15:0] multiplicand;
+    reg [15:0] multiplier;
+    reg [4:0] ctr; // 5-bit counter for up to 16 cycles
+    reg [15:0] acc; // Accumulator for the product
+    reg [2:0] booth_q; // Booth's encoding bits
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            // Reset state
+            ctr <= 5'b0;
+            acc <= 16'b0;
+            multiplier <= {{8{a[7]}}, a}; // Sign-extend input 'a'
+            multiplicand <= {{8{b[7]}}, b}; // Sign-extend input 'b'
+            booth_q <= 3'b0;
+            p <= 16'b0;
+            rdy <= 1'b0;
+        end else begin
+            if (ctr < 16) begin
+                booth_q <= {acc[0], booth_q[2:1]}; // Update Booth's bits
+
+                // Booth's evaluation: check the last two bits of booth_q
+                case (booth_q[2:0])
+                    3'b001, 3'b010: acc <= acc + multiplicand; // Add
+                    3'b101, 3'b110: acc <= acc - multiplicand; // Subtract
+                    default: acc <= acc; // No operation
+                endcase
+
+                // Arithmetic shift right (acc and booth_q as one unit)
+                {acc, booth_q[2:0]} <= {acc[15], acc, booth_q[2]};
+
+                // Increment cycle counter
+                ctr <= ctr + 1;
+            end else begin
+                p <= acc; // Final product
+                rdy <= 1'b1; // Indicate ready
+            end
+        end
+    end
+endmodule

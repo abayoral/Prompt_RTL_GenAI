@@ -1,29 +1,13 @@
-// We want to create a timer that:
+The task at hand involves developing a finite-state machine (FSM) that controls a timer based on a specific sequence detected in a serial data input. The timer commences its operation following the steps outlined below:
 
-// First, is started when a particular pattern (1101) is detected,
-// Second, shifts in 4 more bits to determine the duration to delay,
-// Third, waits for the counters to finish counting, and
-// Fourth, notifies the user and waits for the user to acknowledge the timer.
-// Fifth, In this problem, implement just the finite-state machine that controls the timer. The data path (counters and some comparators) are not included here.
+1. **Detection of Sequence**: The FSM must continuously monitor a serial data input for the occurrence of a specific binary pattern, namely "1101". Once this pattern is detected, it triggers the timer to start its process.
 
-// The serial data is available on the data input pin. When the pattern 1101 is received, the state machine must then assert output shift_ena for exactly 4 clock cycles.
+2. **Bit Shifting**: After the detection of the "1101" pattern, the FSM is required to enable a functionality, indicated by asserting the output signal `shift_ena`, for exactly four clock cycles. This action signifies the shifting in of four additional bits, which determines the duration for which the timer should delay.
 
-// After that, the state machine asserts its counting output to indicate it is waiting for the counters, and waits until input done_counting is high.
+3. **Counting Phase**: Following the bit-shifting phase, the FSM transitions to a state where it asserts an output signal named `counting`, indicating that it is in a waiting state for the counters to complete their counting operation. This state is maintained until an input signal named `done_counting` becomes high, signifying that the counting process has finished.
 
-// At that point, the state machine must assert done to notify the user the timer has timed out, and waits until input ack is 1 before being reset to look for the next occurrence of the start sequence (1101).
+4. **Notification of Timer Completion**: Once the counting is completed, the FSM should assert another output signal called `done`, to notify the user that the timer has concluded its operation. At this point, the FSM must wait for user acknowledgment, denoted by the input signal `ack` becoming high, before it can reset.
 
-// The state machine should reset into a state where it begins searching for the input sequence 1101.
+5. **Reset and Restart**: Upon receiving the acknowledgment (`ack`), the FSM should reset itself and transition back to the initial state, ready to search for the next occurrence of the "1101" start sequence in the input data.
 
-module top_module (
-    input clk,
-    input reset,      // Synchronous reset
-    input data,
-    output shift_ena,
-    output counting,
-    input done_counting,
-    output done,
-    input ack );
-
-    // Insert your code here
-
-endmodule
+This implementation involves defining the various states and transitions of the FSM within a Verilog module. The primary task is to construct the logic that allows the FSM to progress through these stages, properly handling the serial data inputs, and managing the state transitions based on specified conditions and inputs like `done_counting` and `ack`. The FSM needs to be synchronized with the system clock (`clk`) and should also respond to the `reset` signal, which initializes the FSM to its starting state, ensuring readiness for detecting the sequence anew after each complete cycle.

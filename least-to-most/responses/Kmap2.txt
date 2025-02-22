@@ -5,9 +5,16 @@ module top_module(
     input c,
     input d,
     output out
-); 
+);
 
-    assign out = (~c & ~d) | (~a & ~d) | (a & c) | (b & ~d);
+    // Simplify the K-map into SOP form
+    // We have the following minterms: 
+    // m(0), m(1), m(3), m(4), m(7), m(9), m(11), m(13), m(14)
+
+    // Sum of products form (SOP):
+    // = a'b'c'd' + a'b'cd' + a'b'cd + a'bc'd' + a'bcd' + ab'c'd' + ab'cd + abc'd + abc'd'
+
+    assign out = (~a & ~b & ~d) | (~a & ~c & d) | (~b & c & d) | (a & ~b & c) | (a & ~c & ~d);
 
 endmodule
 ```

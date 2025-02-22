@@ -1,0 +1,48 @@
+```verilog
+module freq_divbyfrac (
+    input wire clk,       // Input clock signal
+    input wire rst_n,     // Active low reset
+    output reg clk_div    // Output divided clock signal
+);
+
+    // Define parameters for counting
+    localparam MUL2_DIV_CLK = 7; // Total period count for 3.5x division
+    localparam COUNT_HIGH = 4;   // Clock high period count
+    localparam COUNT_LOW = 3;    // Clock low period count
+
+    reg [2:0] counter;           // 3-bit counter to track the clock count
+    reg clk_half_period;         // Intermediate clock with half cycle
+
+    // Reset the counter and intermediate clock
+    always @(negedge rst_n or posedge clk) begin
+        if (!rst_n) begin
+            counter <= 3'b000;
+            clk_half_period <= 1'b0;
+            clk_div <= 1'b0;
+        end else begin
+            // Update counter
+            if (counter == MUL2_DIV_CLK - 1) begin
+                counter <= 3'b000;
+            end else begin
+                counter <= counter + 1;
+            end
+
+            // Generate clk_half_period with 3:4 phase shift
+            if (counter < COUNT_HIGH)
+                clk_half_period <= 1'b1;
+            else
+                clk_half_period <= 1'b0;
+
+            // Generate final clk_div by phase-shifting and combining the clock halves
+            if (counter == 0 || counter == COUNT_LOW) begin
+                clk_div <= 1'b1;
+            end else if (counter == COUNT_HIGH || counter == MUL2_DIV_CLK - 1) begin
+                clk_div <= 1'b0;
+            end
+        end
+    end
+
+endmodule
+```
+
+This Verilog module `freq_divbyfrac` uses the given configuration and logic to divide the input clock by a factor of 3.5. The implementation cycles through 7 states and utilizes phase shifting by creating an intermediate half-period clock, then combines it to form the final output clock. The reset logic ensures that the clock cycles reset properly, maintaining the desired frequency division.

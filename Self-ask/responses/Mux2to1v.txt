@@ -4,6 +4,7 @@ module top_module(
     input sel,
     output [99:0] out );
 
+    // Using the ternary operator for the multiplexer
     assign out = sel ? b : a;
     
 endmodule

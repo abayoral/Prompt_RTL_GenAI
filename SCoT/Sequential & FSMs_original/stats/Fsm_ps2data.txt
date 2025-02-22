@@ -1,0 +1,7 @@
+least-to-most/modules/Fsm_ps2data.v:8: syntax error
+least-to-most/modules/Fsm_ps2data.v:8: error: Invalid module instantiation
+least-to-most/modules/Fsm_ps2data.v:9: syntax error
+least-to-most/modules/Fsm_ps2data.v:9: error: Invalid module instantiation
+Module file path: least-to-most/modules/Fsm_ps2data.v
+Testbench file path: hdlbits_testbenches/Fsm_ps2data_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'least-to-most/simulations/Fsm_ps2data_sim', 'least-to-most/modules/Fsm_ps2data.v', 'hdlbits_testbenches/Fsm_ps2data_0_tb.v']' returned non-zero exit status 4.

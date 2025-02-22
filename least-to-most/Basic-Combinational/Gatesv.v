@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // You are given a four-bit input vector in[3:0]. 
 //We want to know some relationships between each bit and its neighbour:
 

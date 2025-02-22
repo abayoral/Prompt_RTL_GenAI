@@ -1,24 +1,7 @@
-// You are provided with a BCD one-digit adder named bcd_fadd that adds 
-// two BCD digits and carry-in, and produces a sum and carry-out.
+As a senior Digital Design Engineer working at a leading hardware design company, you have been entrusted with a crucial task that has significant implications for the company's reputation and the successful development of a next-generation product. You are required to create a Verilog module that forms an integral part of this product's architecture. This circuit will function as a 100-digit BCD (Binary-Coded Decimal) ripple-carry adder by utilizing an already defined BCD one-digit adder, referred to as `bcd_fadd`. The `bcd_fadd` module is capable of adding two single-digit BCD numbers along with an additional carry-in bit, producing a summed BCD digit and a carry-out bit as output.
 
-module bcd_fadd (
-    input [3:0] a,
-    input [3:0] b,
-    input     cin,
-    output   cout,
-    output [3:0] sum );
-    
-// Instantiate 100 copies of bcd_fadd to create a 100-digit BCD ripple-carry adder. 
-//Your adder should add two 100-digit BCD numbers (packed into 400-bit vectors) 
-//and a carry-in to produce a 100-digit sum and carry out.
+Your objective is to extend this functionality by instantiating 100 copies of the `bcd_fadd` module within another Verilog module named `top_module`. This module is designed to handle two 100-digit BCD numbers, each packed into a 400-bit vector (since each BCD digit requires 4 bits), and a single carry-in bit. The final output should be a 400-bit vector representing the 100-digit sum and a carry-out bit, reflecting any overflow beyond the 100-digit capacity.
 
+Given the repetitive nature of this task, you are encouraged to consider utilizing an instance array or generate statement to efficiently instantiate the 100 copies of the adder. An appropriate implementation should ensure that each subsequent digit's computation correctly incorporates the carry-out from the previous stage.
 
-// Hint: An instance array or generate statement would be useful here.
-
-module top_module( 
-    input [399:0] a, b,
-    input cin,
-    output cout,
-    output [399:0] sum );
-    // Insert your cod here
-endmodule
+This project is a critical component of the hardware design workflow, and success in developing a reliable, efficient implementation will enhance the hardware company's standing as a leader in innovative digital design solutions. As you undertake this project, carefully consider the implications of ripple carry on propagation delay, power consumption, and overall performance, as these factors will be vital to the integrity and competitiveness of the end product.

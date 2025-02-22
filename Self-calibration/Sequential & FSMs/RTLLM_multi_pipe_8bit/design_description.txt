@@ -1,51 +1,30 @@
-Please act as a professional verilog designer.
+You are being tasked with creating a Verilog module named `multi_pipe_8bit`, designed to implement the functionality of an unsigned 8-bit multiplier using pipeline processing. This module should operate synchronously based on a clock signal (`clk`) and should include an active-low reset signal (`rst_n`). The module should also use an input enable signal (`mul_en_in`) to control the multiplication process, and it should generate an output enable signal (`mul_en_out`) and a 16-bit product output (`mul_out`).
 
-Implement the design of unsigned 8bit multiplier based on pipelining processing. It utilizes a clock signal (clk), an active-low reset signal (rst_n), an input enable signal (mul_en_in), and provides an output enable signal (mul_en_out) and the product output (mul_out) of size 16 bits.
+To set up the context of the module: 
 
-Module name:  
-    multi_pipe_8bit 
+- **Inputs**: 
+  - `clk`: This is the clock signal required for synchronous operations.
+  - `rst_n`: An active-low reset signal that initializes or resets the module when it is pulled low (0). When not in reset (1), normal operations proceed.
+  - `mul_en_in`: This signal enables the multiplication operation.
+  - `mul_a` and `mul_b`: These are the 8-bit multiplicand and multiplier inputs, respectively.
 
-Input ports:
-    clk: Clock signal used for synchronous operation.
-    rst_n: Active-low reset signal. Defined as 0 for chip reset and 1 for reset signal inactive.
-    mul_en_in: Input enable signal that controls the multiplication operation.
-    mul_a: Input signal representing the multiplicand with a data width of 8 bits.
-    mul_b: Input signal representing the multiplier with a data width of 8 bits.
+- **Outputs**:
+  - `mul_en_out`: A signal to indicate if the multiplication operation is currently active.
+  - `mul_out`: A 16-bit output signal representing the product of the multiplication.
 
-Output ports:
-    mul_en_out: Output enable signal indicating if the multiplication operation is enabled.
-    mul_out: Product output signal with a data width of 16 bits.
+**Implementation Details**:
+- **Pipelining**: You are required to design the multiplier using a pipelined architecture. This means that the operation is broken down into stages, where each part of the process (from input handling to final product calculation) can be processed in parallel at different stages of the clock cycle to optimize performance.
+  
+- **Input Control**: The design should include logic to capture and store the input enable signal (`mul_en_in`) in a register. On each clock cycle, this signal should be sampled and stored in `mul_en_out_reg`, which will determine the status of `mul_en_out`.
 
-Implementation:
-The module utilizes a pipeline architecture to improve performance. It consists of several key components:
-Input Control:
-The module includes an input enable signal, mul_en_in, which controls the multiplication operation.
-On the positive edge of the clock signal, the module samples the input enable signal and stores it in a register, mul_en_out_reg.
-The output enable signal, mul_en_out, is derived from the most significant bit of mul_en_out_reg, indicating whether the multiplication operation is enabled.
+- **Input Registers**: You will utilize registers such as `mul_a_reg` and `mul_b_reg` to store the input multiplicand and multiplier. These registers should update only when `mul_en_in` is active.
 
-Input Registers:
-The module includes registers, mul_a_reg and mul_b_reg, to store the input multiplicand and multiplier, respectively.
-On the positive edge of the clock signal, the module samples the input values and stores them in the corresponding registers.
-The registers are only updated when the input enable signal is active.
+- **Partial Product Generation**: The module must generate partial products by executing bitwise operations between the multiplicand and bits of the multiplier. Logical conditions or assignments should help select appropriate bits of the multiplicand. These partial products should be assigned to a set of wires labeled `temp`.
 
-Partial Product Generation:
-The module generates partial products by performing bitwise operations between the multiplicand and the individual bits of the multiplier.
-It uses conditional assignments to select the appropriate bits from the multiplicand based on the multiplier bits.
-The partial products are stored in a set of wires, temp, with each wire representing a different bit position.
+- **Partial Sum Calculation**: The partial products need to be systematically added to form intermediate sums. This should involve using another set of registers, `sum`, each updating with a new value on the clock's rising edge.
 
-Partial Sum Calculation:
-The module performs addition operations on the partial products to calculate partial sums.
-It uses a set of registers, sum, to store the intermediate sum values.
-Each register corresponds to a group of partial products and is updated on the positive edge of the clock signal.
+- **Final Product Calculation**: The aggregated value of all partial sums will give the final product, stored in `mul_out_reg`. 
 
-Final Product Calculation:
-The module sums up all the partial sums to obtain the final product.
-It uses a register, mul_out_reg, to store the accumulated sum.
-On the positive edge of the clock signal, the register is updated with the sum of all partial sums.
+- **Output Assignment**: Depending on the state of the `mul_en_out` signal, the module should output either the calculated product (`mul_out_reg`) or zero.
 
-Output Assignment:
-The module assigns the output product value, mul_out, based on the output enable signal and the value in mul_out_reg.
-If the output enable signal is active, indicating a valid product, the value in mul_out_reg is assigned to mul_out.
-Otherwise, mul_out is set to 0.
-
-Give me the complete code.
+Your task is to develop the complete Verilog code implementing these functionalities, ensuring that the module operates correctly based on the described architecture and control flow. Within the code, consider state transitions, conditional statements, and potential edge cases, especially concerning reset behavior and data propagations through pipeline stages.

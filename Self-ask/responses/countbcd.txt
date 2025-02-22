@@ -1,86 +1,70 @@
-Understood. Here is the Verilog code for the 4-digit BCD counter:
+Thank you for the clarification. I will proceed with creating the Verilog module for the 4-digit BCD counter with the specified behavior.
 
 ```verilog
 module top_module (
     input clk,
     input reset,   // Synchronous active-high reset
     output [3:1] ena,
-    output [15:0] q
-);
+    output reg [15:0] q);
 
-    wire [3:0] digit_ones, digit_tens, digit_hundreds, digit_thousands;
-    wire ena_ones, ena_tens, ena_hundreds;
-    
-	// Ones place counter
-    bcd_counter ones (
-        .clk(clk),
-        .reset(reset),
-        .enable(1'b1),
-        .q(digit_ones),
-        .carry_out(ena_ones)
-    );
-    
-	// Tens place counter
-    bcd_counter tens (
-        .clk(clk),
-        .reset(reset),
-        .enable(ena_ones),
-        .q(digit_tens),
-        .carry_out(ena_tens)
-    );
-    
-	// Hundreds place counter
-    bcd_counter hundreds (
-        .clk(clk),
-        .reset(reset),
-        .enable(ena_tens),
-        .q(digit_hundreds),
-        .carry_out(ena_hundreds)
-    );
-    
-	// Thousands place counter
-    bcd_counter thousands (
-        .clk(clk),
-        .reset(reset),
-        .enable(ena_hundreds),
-        .q(digit_thousands)
-    );
-
-    assign ena[1] = ena_ones;
-    assign ena[2] = ena_tens;
-    assign ena[3] = ena_hundreds;
-    
-    assign q = {digit_thousands, digit_hundreds, digit_tens, digit_ones};
-
-endmodule
-
-module bcd_counter (
-    input clk,
-    input reset,
-    input enable,
-    output reg [3:0] q,
-    output reg carry_out
-);
-
+    // Digit 0: ones
     always @(posedge clk) begin
         if (reset) begin
-            q <= 4'd0;
-            carry_out <= 1'b0;
-        end        
-        else if (enable) begin
-            if (q == 4'd9) begin
-                q <= 4'd0;
-                carry_out <= 1'b1;
-            end
-            else begin
-                q <= q + 1'b1;
-                carry_out <= 1'b0;
-            end
-        end
-        else begin
-            carry_out <= 1'b0;
+            q[3:0] <= 4'd0;
+        end else begin
+            if (q[3:0] == 4'd9)
+                q[3:0] <= 4'd0;
+            else
+                q[3:0] <= q[3:0] + 4'd1;
         end
     end
+
+    // Digit 1: tens
+    always @(posedge clk) begin
+        if (reset) begin
+            q[7:4] <= 4'd0;
+        end else begin
+            if (ena[1]) begin
+                if (q[7:4] == 4'd9)
+                    q[7:4] <= 4'd0;
+                else
+                    q[7:4] <= q[7:4] + 4'd1;
+            end
+        end
+    end
+
+    // Digit 2: hundreds
+    always @(posedge clk) begin
+        if (reset) begin
+            q[11:8] <= 4'd0;
+        end else begin
+            if (ena[2]) begin
+                if (q[11:8] == 4'd9)
+                    q[11:8] <= 4'd0;
+                else
+                    q[11:8] <= q[11:8] + 4'd1;
+            end
+        end
+    end
+
+    // Digit 3: thousands
+    always @(posedge clk) begin
+        if (reset) begin
+            q[15:12] <= 4'd0;
+        end else begin
+            if (ena[3]) begin
+                if (q[15:12] == 4'd9)
+                    q[15:12] <= 4'd0;
+                else
+                    q[15:12] <= q[15:12] + 4'd1;
+            end
+        end
+    end
+
+    // Enable signals
+    assign ena[1] = (q[3:0] == 4'd9);
+    assign ena[2] = (q[7:4] == 4'd9) && ena[1];
+    assign ena[3] = (q[11:8] == 4'd9) && ena[2];
 
 endmodule
 ```

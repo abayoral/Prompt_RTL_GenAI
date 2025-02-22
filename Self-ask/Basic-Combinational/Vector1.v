@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 //Build a combinational circuit that splits an input half-word (16 bits, [15:0] ) 
 // into lower [7:0] and upper [15:8] bytes.
 

@@ -1,31 +1,11 @@
-// Build a gshare branch predictor with 7-bit pc and 7-bit global history, hashed (using xor) into a 7-bit index. This index accesses a 128-entry table of two-bit saturating counters. The branch predictor should contain a 7-bit global branch history register.
+You are tasked with designing and implementing a gshare branch predictor characterized by a specific configuration and behavioral requirements. The main structure involves a 7-bit program counter (PC) and a 7-bit global branch history register, combined and hashed using an XOR operation to produce a 7-bit index. This index is used to access a table of 128 two-bit saturating counters, referred to as the Pattern History Table (PHT), to make branch predictions. The global history register maintains a record of the outcomes of the last seven branches. 
 
-// The branch predictor has two sets of interfaces: One for doing predictions and one for doing training. The prediction interface is used in the processor's Fetch stage to ask the branch predictor for branch direction predictions for the instructions being fetched. Once these branches proceed down the pipeline and are executed, the true outcomes of the branches become known. The branch predictor is then trained using the actual branch direction outcomes.
+This branch predictor system is required to support two distinct operational interfaces: one for issuing predictions and another for updating or 'training' the predictor based on actual branch outcomes.
 
-// When a branch prediction is requested (predict_valid = 1) for a given pc, the branch predictor produces the predicted branch direction and state of the branch history register used to make the prediction. The branch history register is then updated (at the next positive clock edge) for the predicted branch.
+1. **Prediction Interface**: This part of the interface is activated during the processor's Fetch stage. When a prediction request is made (`predict_valid = 1`), the predictor must determine and output the anticipated direction (taken or not taken) of a branch instruction corresponding to a given PC. Along with this prediction, it should also output the state of the branch history register that was used to arrive at this prediction. After issuing a prediction, the history register should be updated based on the direction predicted for the branch.
 
-// When training for a branch is requested (train_valid = 1), the branch predictor is told the pc and branch history register value for the branch that is being trained, as well as the actual branch outcome and whether the branch was a misprediction (needing a pipeline flush). Update the pattern history table (PHT) to train the branch predictor to predict this branch more accurately next time. In addition, if the branch being trained is mispredicted, also recover the branch history register to the state immediately after the mispredicting branch completes execution.
+2. **Training Interface**: This function is engaged when the processor later discovers the real outcome of the branch. A training request (`train_valid = 1`) provides the necessary information such as the PC of the branch, its actual outcome (taken or not taken), and whether a misprediction occurred. If a branch was mispredicted, the training process must adjust the branch history register to represent its state immediately following the execution of the errant branch, thereby ensuring the branch predictor improves future accuracy. Furthermore, if training and prediction operations overlap for the same index within the same clock cycle, the training operation is primary; it updates the PHT and potentially corrects the history register, given that the prediction becomes obsolete.
 
-// If training for a misprediction and a prediction (for a different, younger instruction) occurs in the same cycle, both operations will want to modify the branch history register. When this happens, training takes precedence, because the branch being predicted will be discarded anyway. If training and prediction of the same PHT entry happen at the same time, the prediction sees the PHT state before training because training only modifies the PHT at the next positive clock edge. The following timing diagram shows the timing when training and predicting PHT entry 0 at the same time. The training request at cycle 4 changes the PHT entry state in cycle 5, but the prediction request in cycle 4 outputs the PHT state at cycle 4, without considering the effect of the training request in cycle 4.
+The system also includes an asynchronous reset (`areset`), which, when activated, initializes all PHT entries to a 'weakly not-taken' state (represented by the value 2'b01) and clears the global history register.
 
-// areset is an asynchronous reset that clears the entire PHT to 2b'01 (weakly not-taken). It also clears the global history register to 0.
-
-module top_module(
-    input clk,
-    input areset,
-
-    input  predict_valid,
-    input  [6:0] predict_pc,
-    output predict_taken,
-    output [6:0] predict_history,
-
-    input train_valid,
-    input train_taken,
-    input train_mispredicted,
-    input [6:0] train_history,
-    input [6:0] train_pc
-);
-
-	// Insert your code here
-
-endmodule
+Based on this specification, design and implement the necessary logic within your module to meet these requirements, ensuring to handle all potential timing and precedent scenarios carefully.

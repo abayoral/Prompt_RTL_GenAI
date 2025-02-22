@@ -1,7 +1,0 @@
-CoT/modules/7458.v:29: error: 'top_module' has already been declared in this scope.
-CoT/modules/7458.v:1:      : It was declared here as a module.
-CoT/modules/7458.v:41: error: Module top_module was already declared here: CoT/modules/7458.v:1
-
-Module file path: CoT/modules/7458.v
-Testbench file path: hdlbits_testbenches/7458_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/7458_sim', 'CoT/modules/7458.v', 'hdlbits_testbenches/7458_0_tb.v']' returned non-zero exit status 2.

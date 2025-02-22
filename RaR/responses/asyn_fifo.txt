@@ -1,0 +1,113 @@
+```verilog
+module asyn_fifo #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16
+)(
+    input               wclk,
+    input               rclk,
+    input               wrstn,
+    input               rrstn,
+    input               winc,
+    input               rinc,
+    input  [WIDTH-1:0]  wdata,
+    output reg          wfull,
+    output reg          rempty,
+    output [WIDTH-1:0]  rdata
+);
+
+    // Calculate address width
+    localparam ADDR_WIDTH = $clog2(DEPTH);
+
+    // Dual-port RAM implementation
+    reg [WIDTH-1:0] mem [0:DEPTH-1];
+    reg [ADDR_WIDTH-1:0] waddr, raddr;
+    reg [ADDR_WIDTH:0] wbin, rbin, wbin_next, rbin_next;
+    reg [ADDR_WIDTH:0] wgray, rgray, wgray_next, rgray_next;
+    
+    // Synchronizers for gray pointers
+    reg [ADDR_WIDTH:0] rq1_wgray, rq2_wgray;
+    reg [ADDR_WIDTH:0] wq1_rgray, wq2_rgray;
+
+    // Write operation
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            wbin <= 0;
+            wgray <= 0;
+        end else if (winc && !wfull) begin
+            mem[waddr] <= wdata;
+            wbin <= wbin_next;
+            wgray <= wgray_next;
+        end
+    end
+
+    // Read operation
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            rbin <= 0;
+            rgray <= 0;
+            rempty <= 1'b1;
+        end else if (rinc && !rempty) begin
+            raddr <= rbin[ADDR_WIDTH-1:0];
+            rbin <= rbin_next;
+            rgray <= rgray_next;
+        end
+    end
+
+    // Binary to Gray conversion
+    function [ADDR_WIDTH:0] bin2gray;
+        input [ADDR_WIDTH:0] bin;
+        bin2gray = (bin >> 1) ^ bin;
+    endfunction
+
+    // Next state logic for write pointer
+    always @* begin
+        wbin_next = wbin + (winc & ~wfull);
+        wgray_next = bin2gray(wbin_next);
+        waddr = wbin[ADDR_WIDTH-1:0];
+    end
+
+    // Next state logic for read pointer
+    always @* begin
+        rbin_next = rbin + (rinc & ~rempty);
+        rgray_next = bin2gray(rbin_next);
+        raddr = rbin[ADDR_WIDTH-1:0];
+    end
+
+    // Synchronize write gray pointer to read domain
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            rq1_wgray <= 0;
+            rq2_wgray <= 0;
+        end else begin
+            rq1_wgray <= wgray;
+            rq2_wgray <= rq1_wgray;
+        end
+    end
+    
+    // Synchronize read gray pointer to write domain
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            wq1_rgray <= 0;
+            wq2_rgray <= 0;
+        end else begin
+            wq1_rgray <= rgray;
+            wq2_rgray <= wq1_rgray;
+        end
+    end
+
+    // Read data from FIFO
+    assign rdata = mem[raddr];
+
+    // Check if FIFO is full
+    always @* begin
+        wfull = (wgray_next == {~wq2_rgray[ADDR_WIDTH:ADDR_WIDTH-1], wq2_rgray[ADDR_WIDTH-2:0]});
+    end
+
+    // Check if FIFO is empty
+    always @* begin
+        rempty = (rgray_next == rq2_wgray);
+    end
+
+endmodule
+```
+This Verilog code implements an asynchronous FIFO with dual-port RAM, handle clock domain crossing using gray codes, and configurable parameters for data width and depth.

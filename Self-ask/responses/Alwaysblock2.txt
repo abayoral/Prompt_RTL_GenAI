@@ -1,24 +1,24 @@
 ```verilog
-// synthesis verilog_input_version verilog_2001
 module top_module(
     input clk,
     input a,
     input b,
     output wire out_assign,
     output reg out_always_comb,
-    output reg out_always_ff   );
+    output reg out_always_ff
+    );
 
-    // XOR using assign statement
+    // Using an assign statement
     assign out_assign = a ^ b;
 
-    // XOR using combinational always block
+    // Using a combinational always block
     always @(*) begin
         out_always_comb = a ^ b;
     end
 
-    // XOR using clocked always block (rising edge)
+    // Using a clocked always block
     always @(posedge clk) begin
-        out_always_ff = a ^ b;
+        out_always_ff <= a ^ b;
     end
 
 endmodule

@@ -1,0 +1,74 @@
+To design the "edge_detect" module with the specified requirements, we will follow a structured approach:
+
+### Chain of Thought:
+
+1. **Understand the Requirements**:
+    - We need to detect both rising and falling edges of the input signal `a`.
+    - We have a clock `clk` for synchronization and an active-low reset `rst_n`.
+    - Outputs `rise` and `down` should indicate rising and falling edges respectively and should be high for one clock cycle after the edge is detected.
+
+2. **Determine the Inputs and Outputs**:
+    - Inputs: `clk`, `rst_n`, `a`
+    - Outputs: `rise`, `down`
+
+3. **Define Intermediate Signals**:
+    - A register `prev_a` is needed to hold the previous state of the signal `a` to determine if an edge has occurred.
+
+4. **Structuring the Module**:
+    - Start with the module declaration specifying the inputs and outputs.
+    - Use an always block triggered on the rising edge of `clk` or when `rst_n` is asserted.
+    - Inside this block:
+      - Check if `rst_n` is low. If it is, reset `prev_a`, `rise`, and `down`.
+      - Otherwise, compare the current and previous states of `a` to determine edge transitions:
+        - Set `rise` high if a rising edge (0 to 1) is detected.
+        - Set `down` high if a falling edge (1 to 0) is detected.
+      - Store the current state of `a` in `prev_a` for future edge detection.
+
+5. **Writing the Verilog Code**:
+
+```verilog
+module edge_detect (
+    input wire clk,
+    input wire rst_n,
+    input wire a,
+    output reg rise,
+    output reg down
+);
+    // Register to hold the previous state of the input
+    reg prev_a;
+    
+    // Edge detection logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset logic
+            prev_a <= 1'b0;
+            rise <= 1'b0;
+            down <= 1'b0;
+        end else begin
+            // Detect rising edge
+            if (a && !prev_a) begin
+                rise <= 1'b1;
+            end else begin
+                rise <= 1'b0;
+            end
+            
+            // Detect falling edge
+            if (!a && prev_a) begin
+                down <= 1'b1;
+            end else begin
+                down <= 1'b0;
+            end
+
+            // Update the previous state register
+            prev_a <= a;
+        end
+    end
+endmodule
+```
+
+### Explanation:
+
+- **Reset Logic**: On reset (`rst_n` low), all outputs and `prev_a` are initialized to `0`.
+- **Rising Edge Detection**: If `a` transitions from `0` to `1` (i.e., `a` is `1` and `prev_a` was `0`), `rise` is set to `1` for one clock cycle.
+- **Falling Edge Detection**: If `a` transitions from `1` to `0` (i.e., `a` is `0` and `prev_a` was `1`), `down` is set to `1` for one clock cycle.
+- **State Update**: `prev_a` is updated with the current value of `a` at each clock cycle to be used in the next cycle.

@@ -1,5 +1,6 @@
 module top_module (
     input [7:0] in,
-    output parity); 
-    assign parity = ^in;
+    output parity
+); 
+    assign parity = ^in; // XOR all bits of 'in' together to produce the parity bit.
 endmodule

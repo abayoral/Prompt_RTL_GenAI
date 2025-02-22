@@ -1,0 +1,21 @@
+```verilog
+module comparator_4bit (
+    input [3:0] A,    // First 4-bit input
+    input [3:0] B,    // Second 4-bit input
+    output A_greater, // Output is 1 if A > B
+    output A_equal,   // Output is 1 if A == B
+    output A_less     // Output is 1 if A < B
+);
+
+    wire [3:0] diff;     // Wire to hold the difference A - B
+    wire borrow;         // Wire to detect if a borrow occurs in subtraction
+
+    assign {borrow, diff} = A - B; // Subtracting B from A to determine the relationship
+
+    // Conditional logic for each output
+    assign A_greater = (borrow == 0) && (diff != 4'b0000); // No borrow and non-zero result indicates A > B
+    assign A_equal = (diff == 4'b0000);                    // Result is zero indicates A == B
+    assign A_less = (borrow == 1);                         // Borrow indicates A < B
+
+endmodule
+```

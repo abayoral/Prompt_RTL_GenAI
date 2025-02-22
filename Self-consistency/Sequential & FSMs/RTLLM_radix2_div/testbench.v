@@ -25,6 +25,7 @@ module radix2_div_tb;
 
     integer i;
     integer error = 0;
+    integer total_tests = 0; // Counter for total test cases
     reg [7:0] a_test [0:7];
     reg [7:0] b_test [0:7];
     reg [15:0] expected_result [0:7];
@@ -32,14 +33,14 @@ module radix2_div_tb;
 
     initial begin
         // Initialize test vectors
-        a_test[0] = 8'd100; b_test[0] = 8'd10; sign_test[0] = 0; expected_result[0] = {8'd0, 8'd10}; 
-        a_test[1] = -8'd100; b_test[1] = 8'd10; sign_test[1] = 1; expected_result[1] = {8'd0, -8'd10};
-        a_test[2] = 8'd100; b_test[2] = -8'd10; sign_test[2] = 1; expected_result[2] = {8'd0, -8'd10};
-        a_test[3] = -8'd100; b_test[3] = -8'd10; sign_test[3] = 1; expected_result[3] = {8'd0, 8'd10};
-        a_test[4] = 8'd123; b_test[4] = 8'd123; sign_test[4] = 0; expected_result[4] = {8'd0, 8'd1};
-        a_test[5] = 8'd0; b_test[5] = 8'd123; sign_test[5] = 0; expected_result[5] = {8'd0, 8'd0};
-        a_test[6] = 8'd123; b_test[6] = 8'd251; sign_test[6] = 0; expected_result[6] = {8'd123, 8'd0};
-        a_test[7] = 8'd255; b_test[7] = 8'd7; sign_test[7] = 0; expected_result[7] = {8'd3, 8'd36};
+        a_test[0] = 8'd100;  b_test[0] = 8'd10;   sign_test[0] = 0; expected_result[0] = {8'd0, 8'd10}; 
+        a_test[1] = -8'd100; b_test[1] = 8'd10;   sign_test[1] = 1; expected_result[1] = {8'd0, -8'd10};
+        a_test[2] = 8'd100;  b_test[2] = -8'd10;  sign_test[2] = 1; expected_result[2] = {8'd0, -8'd10};
+        a_test[3] = -8'd100; b_test[3] = -8'd10;  sign_test[3] = 1; expected_result[3] = {8'd0, 8'd10};
+        a_test[4] = 8'd123;  b_test[4] = 8'd123;  sign_test[4] = 0; expected_result[4] = {8'd0, 8'd1};
+        a_test[5] = 8'd0;    b_test[5] = 8'd123;  sign_test[5] = 0; expected_result[5] = {8'd0, 8'd0};
+        a_test[6] = 8'd123;  b_test[6] = 8'd251;  sign_test[6] = 0; expected_result[6] = {8'd123, 8'd0};
+        a_test[7] = 8'd255;  b_test[7] = 8'd7;    sign_test[7] = 0; expected_result[7] = {8'd3, 8'd36};
 
         // Generate clock signal
         clk = 0;
@@ -55,6 +56,8 @@ module radix2_div_tb;
         rst = 0;
 
         for (i = 0; i < 8; i = i + 1) begin
+            total_tests = total_tests + 1; // Increment test count
+
             // Apply test vectors
             dividend = a_test[i];
             divisor = b_test[i];
@@ -77,11 +80,15 @@ module radix2_div_tb;
             #10;
         end
 
-        // Display final result
+        // Final test result summary
+        $display("=========== Test Summary ===========");
+        $display("Total Tests Run: %d", total_tests);
+        $display("Total Failures: %d", error);
+
         if (error == 0) begin
-            $display("===========Your Design Passed===========");
+            $display("=========== Your Design Passed ===========");
         end else begin
-            $display("===========Failed===========", error);
+            $display("=========== Test completed with %d / %d failures ===========", error, total_tests);
         end
 
         $finish;

@@ -1,9 +1,0 @@
-CoT/modules/Module_addsub.v:18: error: Unknown module type: add16
-CoT/modules/Module_addsub.v:26: error: Unknown module type: add16
-3 error(s) during elaboration.
-*** These modules were missing:
-        add16 referenced 2 times.
-***
-Module file path: CoT/modules/Module_addsub.v
-Testbench file path: hdlbits_testbenches/Module_addsub_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/Module_addsub_sim', 'CoT/modules/Module_addsub.v', 'hdlbits_testbenches/Module_addsub_0_tb.v']' returned non-zero exit status 3.

@@ -1,7 +1,6 @@
 ```verilog
 module top_module( 
-    input a, 
-    input b,
+    input a, b,
     output out_and,
     output out_or,
     output out_xor,

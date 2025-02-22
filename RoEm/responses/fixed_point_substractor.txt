@@ -1,0 +1,57 @@
+```verilog
+module fixed_point_subtractor #(parameter Q = 8, parameter N = 16)(
+    input wire [N-1:0] a,
+    input wire [N-1:0] b,
+    output reg [N-1:0] c
+);
+
+    reg [N-1:0] res;
+
+    // Generate sign and absolute value components
+    function [N-1:0] abs;
+        input [N-1:0] x;
+        begin
+            if (x[N-1] == 1'b1)
+                abs = ~x + 1'b1; // Two's complement to calculate absolute value
+            else
+                abs = x;
+        end
+    endfunction
+
+    function sign;
+        input [N-1:0] x;
+        begin
+            sign = x[N-1];
+        end
+    endfunction
+
+    always @(*) begin
+        // Default is zero for res
+        res = {N{1'b0}};
+
+        if (sign(a) == sign(b)) begin
+            // If both are same sign, simple subtraction
+            res = a - b;
+        end else begin
+            // If different signs
+            if (abs(a) >= abs(b)) begin
+                // a has greater or equal magnitude
+                res = abs(a) - abs(b);
+                if (sign(a))
+                    res = ~res + 1'b1; // Reapply sign if a was negative
+            end else begin
+                // b has greater magnitude
+                res = abs(b) - abs(a);
+                if (sign(b))
+                    res = ~res + 1'b1; // Reapply sign if b was negative
+            end
+        end
+
+        // Assign result to output
+        c = res;
+    end
+
+endmodule
+```
+
+This Verilog module named `fixed_point_subtractor` performs fixed-point arithmetic subtraction, considering both integer and fractional components. The design honors the precision demands and accommodates different operand signs while properly handling edge cases like achieving a zero outcome with a specific sign bit.

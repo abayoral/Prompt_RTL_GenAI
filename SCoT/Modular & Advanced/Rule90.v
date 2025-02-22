@@ -1,38 +1,9 @@
-// Rule 90 is a one-dimensional cellular automaton with interesting properties.
+The task revolves around implementing Rule 90, a type of one-dimensional cellular automaton, within a Verilog module. In such automata, each cell in a linear array can be either on (1) or off (0), and the future state of any cell is determined by the XOR operation applied to its current neighboring cells. Specifically, you're asked to simulate a 512-cell setup, named `q[511:0]`, which represents the entire array of cells within the automaton.
 
-// The rules are simple. There is a one-dimensional array of cells (on or off). At each time step, the next state of each cell is the XOR of the cell's two current neighbours. A more verbose way of expressing this rule is the following table, where a cell's next state is a function of itself and its two neighbours:
+For each clock cycle, the module should compute and advance to the next state of the system, meaning that each cell updates its state according to the XOR rule based on its left and right neighbors. To clarify further, the transition table provided outlines how a cell’s future state depends on its current state and the states of its neighboring cells, with different combinations of neighbor states leading to specific on or off results for the next cycle.
 
-// Left	Center	Right	Center's next state
-// 1	1	1	0
-// 1	1	0	1
-// 1	0	1	0
-// 1	0	0	1
-// 0	1	1	1
-// 0	1	0	0
-// 0	0	1	1
-// 0	0	0	0
-// (The name "Rule 90" comes from reading the "next state" column: 01011010 is decimal 90.)
+You're also prompted to handle a loading operation: when the `load` signal is high, the system should initialize the states of all 512 cells based on the `data[511:0]` input, essentially resetting the cellular array to a new starting configuration.
 
+Boundary conditions simplify the problem slightly, as we're told to assume that the cells immediately outside the formal array—essentially `q[-1]` and `q[512]`—are always zero. This means that these boundaries, which do not actually exist in the physical array, are virtually padded with zeros and play a role only during the computation of the first and last cells' next states.
 
-// In this circuit, create a 512-cell system (q[511:0]), and advance by one time step each clock cycle. The load input indicates the state of the system should be loaded with data[511:0]. Assume the boundaries (q[-1] and q[512]) are both zero (off).
-
-// Hint: For an initial state of q[511:0] = 1, the first few iterations are:
-//        1
-//       10
-//      101
-//     1000
-//    10100
-//   100010
-//  1010101
-// 10000000
-// This forms half of a Sierpiński triangle.
-
-module top_module(
-    input clk,
-    input load,
-    input [511:0] data,
-    output [511:0] q ); 
-
-    // Insert your code here
-
-endmodule
+An understanding of Rule 90 can be visualized through a series of iterations that result in a pattern reminiscent of half a Sierpiński triangle, as demonstrated by the example of initial conditions and subsequent state evolutions provided. In your code, you need to encapsulate this rule, the initialization via the load signal, and adhere to the role of both boundaries to adequately simulate the described cellular automaton within the constraints of the Verilog module.

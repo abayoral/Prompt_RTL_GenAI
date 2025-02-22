@@ -5,9 +5,15 @@ module top_module(
     output [99:1] out_any,
     output [99:0] out_different );
 
-    assign out_both = in[98:0] & in[99:1];
+    // Assign out_both such that each bit indicates if the corresponding bit and its neighbor to the left are both '1'
+    assign out_both = in[99:1] & in[98:0];
+
+    // Assign out_any such that each bit indicates if either the corresponding bit or its neighbour to the right is '1'
     assign out_any = in[99:1] | in[98:0];
-    assign out_different = in ^ {in[0], in[99:1]};
+
+    // Assign out_different such that each bit indicates if the corresponding bit is different from its neighbour to the left.
+    // Treat the vector as wrapping, thus in[99]'s neighbour to the left is in[0].
+    assign out_different = in ^ {in[0], in[99:1]}; 
 
 endmodule
 ```

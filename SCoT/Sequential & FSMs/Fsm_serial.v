@@ -1,14 +1,7 @@
-// In many (older) serial communications protocols, each data byte is sent along with a start bit and a stop bit, to help the receiver delimit bytes from the stream of bits. One common scheme is to use one start bit (0), 8 data bits, and 1 stop bit (1). The line is also at logic 1 when nothing is being transmitted (idle).
+In serial communication protocols, particularly older ones, the transmission of each data byte is often accompanied by additional bits, specifically a start bit and a stop bit, to ensure that the receiving end can accurately distinguish one byte from another within a continuous stream of bits. A commonly used configuration in these protocols involves a start bit with a logic value of 0, followed by the 8 data bits of the byte, and ending with a stop bit with a logic value of 1. Moreover, when no data is actively being sent, the communication line remains at a logic level of 1, indicating an idle state.
 
-// Design a finite state machine that will identify when bytes have been correctly received when given a stream of bits. It needs to identify the start bit, wait for all 8 data bits, then verify that the stop bit was correct. If the stop bit does not appear when expected, the FSM must wait until it finds a stop bit before attempting to receive the next byte.
+The task is to design a finite state machine (FSM) that can effectively monitor and process this stream of bits to determine when a complete byte has been properly received. The FSM's purpose is to correctly identify the start bit, sequentially receive the 8 data bits that follow, and verify the presence and correctness of the stop bit expected to follow the data bits. If the FSM detects that the stop bit is missing or does not match the expected logic value of 1, it must not proceed to interpret the subsequent bits as the start of a new byte. Instead, it should remain in a state that waits for the appearance of a valid stop bit before initiating the reception process for the next potential byte segment.
 
-module top_module(
-    input clk,
-    input in,
-    input reset,    // Synchronous reset
-    output done
-); 
+In addition to implementing this logic, the module must include necessary facilities to synchronize its operation with a clock signal (`clk`) and allow for a synchronous reset (`reset`) that can initialize or clear the state machine's condition as required. The output (`done`) should indicate when a byte has been successfully received, meaning the start, data, and stop bits have all been correctly identified and verified.
 
-	// Insert your code here
-
-endmodule
+Develop a hardware implementation in a module named `top_module` using appropriate state transitions and logic constructs, ensuring that the FSM operates efficiently and maintains the integrity of byte reception despite potential input anomalies until a proper stop condition is achieved.

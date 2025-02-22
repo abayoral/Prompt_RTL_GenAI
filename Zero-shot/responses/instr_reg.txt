@@ -1,0 +1,47 @@
+```verilog
+module instr_reg (
+    input wire clk,
+    input wire rst_n, // Active low reset
+    input wire [1:0] fetch,
+    input wire [7:0] data,
+    output reg [2:0] ins,
+    output reg [4:0] ad1,
+    output reg [7:0] ad2
+);
+
+    reg [7:0] ins_p1; // Register to store instruction fetched from the first source
+    reg [7:0] ins_p2; // Register to store instruction fetched from the second source
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Active low reset: initialize registers to zero
+            ins_p1 <= 8'b0;
+            ins_p2 <= 8'b0;
+        end else begin
+            case (fetch)
+                2'b01: begin
+                    // Fetch from first source
+                    ins_p1 <= data;
+                end
+                2'b10: begin
+                    // Fetch from second source
+                    ins_p2 <= data;
+                end
+                default: begin
+                    // Maintain the current state if neither source is fetched
+                    ins_p1 <= ins_p1;
+                    ins_p2 <= ins_p2;
+                end
+            endcase
+        end
+    end
+
+    always @(*) begin
+        // Output the processed fields
+        ins = ins_p1[7:5]; // High 3 bits as opcode
+        ad1 = ins_p1[4:0]; // Low 5 bits as register address
+        ad2 = ins_p2;      // Full 8-bit data from second fetch source
+    end
+
+endmodule
+```

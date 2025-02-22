@@ -5,15 +5,12 @@ module top_module (
     output wire o2,
     output wire o1,
     output wire o0
-); 
+); // Module body starts after module declaration
 
-    // Assign the input vector to the output vector
-    assign outv = vec;
-    
-    // Split the input vector into individual bits and assign to outputs
-    assign o0 = vec[0];
-    assign o1 = vec[1];
-    assign o2 = vec[2];
+    assign outv = vec; // Assign the 3-bit input vector to the 3-bit output vector
+    assign o0 = vec[0]; // Connect o0 to the input vector's position 0
+    assign o1 = vec[1]; // Connect o1 to the input vector's position 1
+    assign o2 = vec[2]; // Connect o2 to the input vector's position 2
 
 endmodule
 ```

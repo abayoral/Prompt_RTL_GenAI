@@ -1,14 +1,1 @@
-// Create 8 D flip-flops with active high synchronous reset. The flip-flops must be reset to 0x34 rather than zero. All DFFs should be triggered by the negative edge of clk.
-
-// Hint: Resetting a register to '1' is sometimes called "preset"
-
-module top_module (
-    input clk,
-    input reset,
-    input [7:0] d,
-    output [7:0] q
-);
-
-	// Insert your code here
-
-endmodule
+You are serving as a senior Digital Design Engineer at a premier hardware design firm. You have been assigned the task of creating a vital Verilog module for an innovative, next-generation product. The success of this module is integral to sustaining your company's esteemed status in the competitive computer hardware industry. The module you're required to design involves the implementation of 8 D flip-flops. Each of these flip-flops must include an active high synchronous reset feature. Unlike a typical reset, these flip-flops should not be initialized to zero; instead, they need to reset to a specific binary value of 0x34. Moreover, these D flip-flops should be edge-triggered, specifically by the negative edge of a clock signal, denoted as 'clk'. Being aware that resetting a register to '1' rather than zero is often referred to as "presetting," how would you proceed to code this module, ensuring that it meets the described specifications? Your assigned module must take three inputs: the clock signal (clk), the reset signal (reset), and an 8-bit data input (d), while providing an 8-bit data output (q). How would you structure the code inside the given module format to achieve these functionalities?

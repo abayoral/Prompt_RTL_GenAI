@@ -1,43 +1,38 @@
 ```verilog
-module add16 (
-    input [15:0] a,
-    input [15:0] b,
-    input cin,
-    output [15:0] sum,
-    output cout
-);
-    assign {cout, sum} = a + b + cin;
-endmodule
-
 module top_module(
     input [31:0] a,
     input [31:0] b,
     input sub,
     output [31:0] sum
 );
-    wire [31:0] b_xor_sub;
-    wire cout_lower;
-    
-    // XOR b with sub to conditionally invert the bits of b
-    assign b_xor_sub = b ^ {32{sub}};
-    
-    // First 16-bit adder for lower part
-    add16 lower_adder (
-        .a(a[15:0]),
-        .b(b_xor_sub[15:0]),
-        .cin(sub),
-        .sum(sum[15:0]),
-        .cout(cout_lower)
-    );
-    
-    // Second 16-bit adder for upper part
-    add16 upper_adder (
-        .a(a[31:16]),
-        .b(b_xor_sub[31:16]),
-        .cin(cout_lower),
-        .sum(sum[31:16]),
-        .cout()
-    );
+// Intermediate wires
+wire [15:0] sum_lower, sum_upper;
+wire cout_lower, cout_upper;
+wire [31:0] b_xor_sub;
+
+// 32-bit wide XOR gate to conditionally invert b
+assign b_xor_sub = b ^ {32{sub}};
+
+// Instantiate the first 16-bit adder (lower half)
+add16 adder_lower (
+    .a(a[15:0]),
+    .b(b_xor_sub[15:0]),
+    .cin(sub),
+    .sum(sum_lower),
+    .cout(cout_lower)
+);
+
+// Instantiate the second 16-bit adder (upper half)
+add16 adder_upper (
+    .a(a[31:16]),
+    .b(b_xor_sub[31:16]),
+    .cin(cout_lower),
+    .sum(sum_upper),
+    .cout(cout_upper)
+);
+
+// Assign the complete 32-bit sum output
+assign sum = {sum_upper, sum_lower};
 
 endmodule
 ```

@@ -1,38 +1,42 @@
+```verilog
+module add16 (
+    input [15:0] a,
+    input [15:0] b,
+    input cin,
+    output [15:0] sum,
+    output cout
+);
+    assign {cout, sum} = a + b + cin;
+endmodule
+
 module top_module(
     input [31:0] a,
     input [31:0] b,
     input sub,
     output [31:0] sum
 );
-    wire [31:0] binv;
-    wire [15:0] sum1, sum2;
-    wire c1, c2;
+    wire [31:0] b_xor;
+    wire cout1, cout2;
+    
+    // XOR b with sub for 32 bits
+    assign b_xor = b ^ {32{sub}};
+    
+    // Instantiate two 16-bit adders
+    add16 adder1 (
+        .a(a[15:0]),
+        .b(b_xor[15:0]),
+        .cin(sub),
+        .sum(sum[15:0]),
+        .cout(cout1)
+    );
 
-    assign binv = b ^ {32{sub}};
-   
-    add16 adder1(.a(a[15:0]),
-                 .b(binv[15:0]),
-                 .cin(sub),
-                 .sum(sum1),
-                 .cout(c1));
-
-    add16 adder2(.a(a[31:16]),
-                 .b(binv[31:16]),
-                 .cin(c1),
-                 .sum(sum2),
-                 .cout(c2));
-
-    assign sum = {sum2, sum1};
-
-endmodule
-
-module add16 ( 
-    input [15:0] a, 
-    input [15:0] b, 
-    input cin, 
-    output [15:0] sum, 
-    output cout );
-   
-   // An implementation of the adder is omitted, as the problem statement assumes it's already given.
+    add16 adder2 (
+        .a(a[31:16]),
+        .b(b_xor[31:16]),
+        .cin(cout1),
+        .sum(sum[31:16]),
+        .cout(cout2)
+    );
 
 endmodule
+```

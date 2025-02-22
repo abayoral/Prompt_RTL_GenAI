@@ -1,16 +1,7 @@
-//The 7400-series integrated circuits are a series of digital chips with a few gates each. 
-//The 7420 is a chip with two 4-input NAND gates.
+Imagine you are a senior Digital Design Engineer at a prominent hardware design company, renowned for pushing the boundaries of digital chip technology. You have been handed the crucial responsibility of creating a pivotal Verilog module essential for the success of an upcoming, next-generation hardware product. The accurate development and reliable performance of this module are vital, as it plays a key role in upholding your company's esteemed reputation in the competitive technology market.
 
-// Create a module with the same functionality as the 7420 chip. It has 8 inputs and 2 outputs.
+Among the challenges you face, you draw inspiration from the venerable 7400-series integrated circuits, known for their simplicity and widespread use in digital electronics. Specifically, your task involves replicating the functionality of the 7420 chip, which is renowned for containing two independent 4-input NAND gates. This chip comprises a total of eight input pins and two output pins, corresponding to the two NAND gates.
 
-//Hint: You need to drive two signals (p1y and p2y) with a value.
+Your objective is to design a Verilog module titled `top_module` that precisely mirrors the operation of the 7420 chip. This entails defining eight input signals (p1a, p1b, p1c, p1d, p2a, p2b, p2c, p2d), which will serve as inputs for the NAND gates, and two output signals (p1y and p2y), which will output the results of these NAND operations.
 
-module top_module ( 
-    input p1a, p1b, p1c, p1d,
-    output p1y,
-    input p2a, p2b, p2c, p2d,
-    output p2y );
-
-    // Insert your code here
-
-endmodule
+Your approach should focus on appropriately using logical operations within Verilog to ensure that the outputs accurately reflect the expected behavior of two 4-input NAND gates, thus facilitating seamless integration into the larger product framework. What strategies and considerations should you bear in mind as you embark upon crafting this foundational piece of digital design?

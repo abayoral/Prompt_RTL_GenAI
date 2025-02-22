@@ -1,0 +1,27 @@
+The provided Verilog module is generally correct in terms of syntax and functionality, though there are a few improvements and considerations that can be made:
+
+1. **Output Declaration**: For binary outputs, it's a good practice to declare them as single-bit ([0:0]) to make it explicitly clear that they are 1-bit wide.
+2. **Redundancy in Conditional Statements**: The usage of a ternary operator to assign 1-bit outputs for boolean conditions is redundant. Logical expressions naturally evaluate to a 1-bit value.
+
+Here's the corrected and improved version of the Verilog code:
+
+```verilog
+module comparator_3bit (
+    input [2:0] A, 
+    input [2:0] B,
+    output wire A_greater, 
+    output wire A_equal, 
+    output wire A_less
+);
+
+    // Combinational logic for 3-bit comparator
+    assign A_greater = (A > B);
+    assign A_equal   = (A == B);
+    assign A_less    = (A < B);
+
+endmodule
+```
+
+### Key Considerations:
+- **Output `wire`**: Given that the outputs will be driven by combinational logic, explicitly declaring them as `wire` is good practice, although simply declaring them as `output` would automatically make them wires.
+- **Efficient Code**: Removing unnecessary ternary operators results in cleaner and more efficient code, while maintaining clarity.

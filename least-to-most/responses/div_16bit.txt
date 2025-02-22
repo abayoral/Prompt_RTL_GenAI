@@ -1,0 +1,38 @@
+```verilog
+module div_16bit(
+    input [15:0] A, // dividend
+    input [7:0] B,  // divisor
+    output reg [15:0] result, // quotient
+    output reg [15:0] odd     // remainder
+);
+
+    integer i;
+    reg [16:0] dividend;  // extended register to hold shifted dividend
+    reg [15:0] temp;      // temporary register for calculation
+    
+    always @(*) begin
+        // Initialize the dividend with the input A
+        dividend = {1'b0, A}; // Zero-extend the most significant bit
+        result = 0;           // Initialize result (quotient) to zero
+        temp = 0;             // Initialize temporary remainder to zero
+
+        // Perform bitwise division
+        for (i = 15; i >= 0; i = i - 1) begin
+            // Shift left temp and append the next highest bit of dividend
+            temp = {temp[14:0], dividend[i]};
+           
+            // If temp divisor is greater or equal than B, subtract B and set quotient bit
+            if (temp >= B) begin
+                temp = temp - B;
+                result[i] = 1'b1;
+            end
+        end
+
+        // After finishing the loop, temp will hold the remainder
+        odd = temp;
+    end
+
+endmodule
+```
+
+This Verilog module implements a 16-bit division process using combinational logic. The module extracts bits from the dividend, compares them with the divisor, and updates the quotient and remainder accordingly. The logic is organized into a single always block that uses a loop to iterate through all bits of the dividend, implementing the division algorithm.

@@ -1,24 +1,21 @@
-Please act as a professional Verilog designer.
+As a seasoned Verilog designer, your task is to construct a Verilog module that functions as a 3-bit comparator. This module is designed to compare two given binary numbers and outputs specific signals based on the comparison results. Here are the detailed specifications for the implementation:
 
-Implement a module of a 3-bit comparator for comparing binary numbers.
+Module Name:
+- `comparator_3bit`: This is the identifier of the module you are tasked to create. Ensure that it comprehensively encapsulates the functionality of comparing two 3-bit numbers.
 
-Module name:  
-    comparator_3bit               
-Input ports:
-    A [2:0]: First 3-bit input operand (the first binary number to compare).
-    B [2:0]: Second 3-bit input operand (the second binary number to compare).
-Output ports:
-    A_greater: 1-bit output indicating if A is greater than B.
-    A_equal: 1-bit output indicating if A is equal to B.
-    A_less: 1-bit output indicating if A is less than B.
+Input Ports:
+- `A[2:0]`: This is the first input, a 3-bit wide signal that represents the first binary number to be compared. The notation `[2:0]` indicates that the binary number consists of three bits, indexed from 2 down to 0.
+- `B[2:0]`: This serves as the second input, also a 3-bit wide signal, representing the second binary number for the comparison task.
 
-Implementation:
-Comparison Logic: The module compares the two 3-bit binary numbers A and B using combinational logic.
-- The outputs A_greater, A_equal, and A_less are determined based on the comparison of A and B.
-- A_greater is set to 1 if A > B, A_equal is set to 1 if A == B, and A_less is set to 1 if A < B.
+Output Ports:
+- `A_greater`: A 1-bit output signal that should be asserted high (set to 1) when the binary number represented by A is greater than the one represented by B. Conversely, it should be low (0) if A is not greater than B.
+- `A_equal`: A 1-bit output signal that indicates equality between A and B. It is asserted (set to 1) if A is equal to B; otherwise, it remains low (0).
+- `A_less`: This 1-bit output signal indicates that A is less than B when asserted high (1). It should remain low (0) if A is not less than B.
 
-Output Encoding: The outputs are mutually exclusive, meaning only one of the three outputs will be high (1) at any given time, based on the comparison results.
+Implementation Details:
+- You are to utilize combinational logic to achieve the comparison of the two 3-bit binary numbers A and B. The logic must be robust and efficient, ensuring that the correct comparison result is obtained and reflected in the output ports.
+- The outputs, `A_greater`, `A_equal`, and `A_less`, are mutually exclusive. This means only one of these outputs can be high (1) at any given time, corresponding to the relative comparison outcome of the inputs A and B.
+- Consider all possible input scenarios for A and B to ensure that your design captures all logical pathways for setting the outputs correctly.
 
-Give me the complete code.
-
- 
+Request:
+- You are required to provide the complete Verilog code for the described module. This code will instantiate the module with the appropriate input and output ports, and implement the logic necessary to perform the described comparison and generate the desired outputs based on the comparison results.

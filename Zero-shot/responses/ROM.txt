@@ -1,0 +1,29 @@
+```verilog
+module ROM (
+    input [7:0] addr,
+    output reg [15:0] dout
+);
+
+    // Memory array of 256 locations, each 16 bits wide
+    reg [15:0] mem [0:255];
+
+    // Initial block to load fixed data into ROM
+    initial begin
+        mem[0] = 16'hA0A0;
+        mem[1] = 16'hB1B1;
+        mem[2] = 16'hC2C2;
+        mem[3] = 16'hD3D3;
+        // Initialize other locations as needed. For now, let's default them to zero.
+        integer i;
+        for (i = 4; i < 256; i = i + 1) begin
+            mem[i] = 16'h0000;
+        end
+    end
+
+    // Always block to update Dout based on the address input
+    always @(*) begin
+        dout = mem[addr];
+    end
+
+endmodule
+```

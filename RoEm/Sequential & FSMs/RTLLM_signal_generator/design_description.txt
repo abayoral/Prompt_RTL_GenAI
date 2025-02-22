@@ -1,29 +1,29 @@
-Please act as a professional verilog designer.
+As a professional Verilog designer, your task is to create a module named "signal_generator" which will produce a sequence of digital signals that create a triangle wave pattern. The waveform is represented by a 5-bit output signal called "wave", which will need to oscillate between the binary values corresponding to 0 and 31. Here's a detailed breakdown of the requirements:
 
-Implement a Triangle Wave signal generator module that generates a waveform by incrementing and decrementing a 5-bit signal named "wave". The waveform cycles between 0 and 31, which is incremented or decremented by 1.
+1. **Module Definition**:
+   - The module should be named `signal_generator`.
 
+2. **Input Ports**:
+   - `clk`: This is the clock signal of the circuit, crucial for synchronizing operations.
+   - `rst_n`: An active-low reset signal. This means when `rst_n` is set to 0, the module should reset, and when it is 1, the reset is inactive.
 
-Module name:  
-    signal_generator 
-                 
-Input ports:
-    clk: Clock signal used for synchronous operation.
-    rst_n: Active-low reset signal. Defined as 0 for reset and 1 for reset signal inactive.
+3. **Output Ports**:
+   - `wave`: A 5-bit output that represents the current value of the triangle wave. As a 5-bit signal, it should be able to represent values from 0 to 31.
 
-Output ports:
-    wave: 5-bit output waveform signal representing the generated waveform.
+4. **State and Waveform Logic**:
+   - The module requires a state management mechanism to determine the waveform's behavior. 
+   - **State Register**: This register determines whether to increment or decrement the `wave`.
+   - **Wave Register**: A 5-bit register to store the current waveform value.
 
-Implementation:
-State and Waveform Generation:
-The module includes a register, state, used to control the state of the waveform generation.
-The module also includes a register, wave, with a width of 5 bits, which represents the generated waveform.
-The state and waveform registers are updated in the always block, triggered on the positive edge of the clock signal (posedge clk) or the negative edge of the reset signal (negedge rst_n).
-On reset, indicated by ~rst_n, the state register is cleared to 0, and the wave register is cleared to 0.
-The waveform generation is controlled using a case statement based on the current state:
-If the state is 0, the waveform (wave) is incremented by 1.
-If the waveform reaches 31 (wave == 31), the state is transitioned to 1.
-If the state is 1, the waveform is decremented by 1.
-If the waveform reaches 0 (wave == 0), the state is transitioned back to 0.
-The waveform generation continues to cycle between 0 and 31 based on the state transitions.
+5. **Clock and Reset Operation**:
+   - Updates should occur on each positive edge of the clock `clk`.
+   - If `rst_n` is low (`0`), both the state and wave registers should reset to `0`.
 
-Give me the complete code.
+6. **Waveform Generation**:
+   - Use a state machine approach, potentially implemented with a case statement, to switch between states.
+   - **State 0**: The output (`wave`) should increase by 1 each clock cycle.
+   - Transition from state 0 to state 1 when `wave` reaches the maximum value of `31`.
+   - **State 1**: The output (`wave`) should decrease by 1 each clock cycle.
+   - Transition back to state 0 when `wave` decreases to `0`.
+
+This configuration ensures that the output signal `wave` continually oscillates between 0 and 31, creating a triangle waveform pattern. Now, proceed to craft the Verilog code that implements this behavior in accordance with the described specifications.

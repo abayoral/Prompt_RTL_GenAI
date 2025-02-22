@@ -1,0 +1,38 @@
+```verilog
+module parallel2serial (
+    input clk,
+    input rst_n,
+    input [3:0] d,
+    output reg valid_out,
+    output reg dout
+);
+
+    reg [1:0] cnt; // 2-bit counter to track position in the 4-bit sequence
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt <= 2'b0;       // Reset counter
+            dout <= 1'b0;      // Reset serial output
+            valid_out <= 1'b0; // Reset valid signal
+        end else begin
+            if (cnt == 2'b0) begin
+                dout <= d[3]; // Output MSB first
+                valid_out <= 1'b1; // Valid output available
+            end else if (cnt == 2'b1) begin
+                dout <= d[2]; // Output next MSB
+            end else if (cnt == 2'b10) begin
+                dout <= d[1]; // Output bit next to LSB
+            end else if (cnt == 2'b11) begin
+                dout <= d[0]; // Output LSB
+                cnt <= 2'b0;   // Reset counter after LSB
+                valid_out <= 1'b0; // Done sending the 4 bits
+            end
+            
+            if (cnt != 2'b11) begin
+                cnt <= cnt + 2'b1; // Increment counter
+            end
+        end
+    end
+endmodule
+```
+This code effectively takes the 4-bit input data `d` and converts it into a serial data stream, with appropriate handling for the `valid_out` signal and reset conditions. The counter `cnt` ensures that the correct bit is output on each clock cycle.

@@ -1,70 +1,98 @@
-To design the FSM for the PS/2 mouse protocol byte stream, we need to create an FSM with four states. The states will manage the process of identifying and signaling the reception of a complete 3-byte message. The states are:
+To design this finite state machine (FSM) for identifying message boundaries in the PS/2 mouse protocol, we will analyze and outline the states first:
 
-1. **IDLE**: The initial state that looks for the first byte of a message, which is indicated by `in[3] = 1`.
-2. **BYTE1**: Indicates that the first byte has been received.
-3. **BYTE2**: Indicates that the second byte has been received.
-4. **DONE**: Indicates that three bytes have been received and asserts the `done` signal.
+### Chain of Thought:
 
-The key points to address are:
-- The FSM starts in the `IDLE` state.
-- Transition to the `BYTE1` state occurs when `in[3] = 1`.
-- Subsequent states (`BYTE2` and `DONE`) follow in order after receiving each byte.
-- The `DONE` state asserts the `done` signal and then transitions back to `IDLE` to look for the start of the next message.
+1. **Understand the Problem**:
+    - We need to detect the start of a message and indicate when a full message (3 bytes) has been received.
+    - The first byte of a message is identified by in[3] being 1.
+    - After identifying the first byte, we must track two additional bytes to complete the message.
 
-Here’s the Verilog implementation:
+2. **Define the States**:
+    - **IDLE**: Wait for in[3] to be high to detect the start of a message.
+    - **BYTE1**: Detected the start of a message; waiting for the second byte.
+    - **BYTE2**: Received the second byte; waiting for the third byte.
+    - **DONE**: Received all three bytes of the message; assert done.
+
+3. **Determine Inputs and Outputs**:
+    - Inputs: `clk`, `in[7:0]` (though we only use `in[3]`), `reset`.
+    - Output: `done` (asserted for one cycle after the third byte).
+
+4. **Structure the Module**:
+    - Use an enumerated state definition for clarity and readability.
+    - Use an always block to handle state transitions on the rising edge of `clk`.
+    - Implement logic to assert `done` in the `DONE` state and reset it otherwise.
+
+5. **Implementation Details**:
+    - Use a synchronous reset.
+    - Return to `IDLE` after signaling `done`.
+
+### Writing the Verilog Code:
 
 ```verilog
 module top_module(
     input clk,
     input [7:0] in,
     input reset,    // Synchronous reset
-    output done
+    output reg done // Register to hold the done signal
 );
 
     // State definitions
-    typedef enum logic [1:0] {
-        IDLE = 2'b00,
+    typedef enum reg [1:0] {
+        IDLE  = 2'b00,
         BYTE1 = 2'b01,
         BYTE2 = 2'b10,
-        DONE = 2'b11
+        DONE  = 2'b11
     } state_t;
 
-    state_t state, next_state;
+    state_t current_state, next_state;
 
     // State transition logic (combinational)
-    always_comb begin
-        case (state)
-            IDLE: if (in[3] == 1'b1) next_state = BYTE1;
-                  else next_state = IDLE;
-            BYTE1: next_state = BYTE2;
-            BYTE2: next_state = DONE;
-            DONE: next_state = IDLE;
-            default: next_state = IDLE;
+    always @(*) begin
+        case (current_state)
+            IDLE: begin
+                if (in[3] == 1'b1)
+                    next_state = BYTE1;
+                else
+                    next_state = IDLE;
+            end
+            BYTE1: begin
+                next_state = BYTE2;
+            end
+            BYTE2: begin
+                next_state = DONE;
+            end
+            DONE: begin
+                next_state = IDLE;
+            end
+            default: begin
+                next_state = IDLE;
+            end
         endcase
     end
 
     // State flip-flops (sequential)
-    always_ff @(posedge clk) begin
+    always @(posedge clk) begin
         if (reset)
-            state <= IDLE;
+            current_state <= IDLE;
         else
-            state <= next_state;
+            current_state <= next_state;
     end
 
     // Output logic
-    assign done = (state == DONE);
+    always @(posedge clk) begin
+        if (reset)
+            done <= 1'b0;
+        else if (current_state == DONE)
+            done <= 1'b1;
+        else
+            done <= 1'b0;
+    end
 
 endmodule
 ```
 
 ### Explanation:
-1. **State Definitions**: We define the states using `typedef enum logic`.
-2. **State Transition Logic**: 
-   - From `IDLE`, we move to `BYTE1` if `in[3]` is `1`.
-   - From `BYTE1`, we move to `BYTE2`.
-   - From `BYTE2`, we move to `DONE`.
-   - From `DONE`, we move back to `IDLE`.
-3. **State Flip-Flops**: Sequential logic updates the current state based on the next state. If the reset signal is asserted, the state is reset to `IDLE`.
-4. **Output Logic**: The `done` signal is asserted when the FSM is in the `DONE` state. 
-
-This FSM handles the PS/2 mouse byte stream by identifying message boundaries and signaling the completion of message reception.
+- We used a 2-bit `state_t` type for state enumeration, which enhances readability.
+- The `always` block responds to rising edges of `clk` and processes state transitions based on `next_state`.
+- The `done` signal is set when the FSM enters the `DONE` state and is reset on all other states or when `reset` is asserted.
+- This FSM waits for `in[3]` to indicate a message start in the `IDLE` state. After capturing this first byte, it proceeds through `BYTE1` and `BYTE2`, and then signals `done` in the `DONE` state.

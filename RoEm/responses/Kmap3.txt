@@ -7,7 +7,14 @@ module top_module(
     output out
 );
 
-    assign out = (c & b) | (c & a) | (c & d) | (c & ~d & ~b) | (~c & a & b);
+    // Simplifying the K-map:
+    // The terms we need to cover are:
+    // - a'b + ab + ab' + c'd' + cd + cd' 
+
+    // Final simplified expression (sum-of-products) is:
+    // out = (a + c'd) (b + c) (b' + d')
+
+    assign out = (a & c & ~d) | (b & c) | (~b & ~d);
 
 endmodule
 ```

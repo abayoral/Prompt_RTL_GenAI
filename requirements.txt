@@ -1,5 +1,7 @@
 openai==0.28
 anthropic
-transformers
-torch
-pandas
+transformers==4.31.0  # Specify a version compatible with your torch version
+torch==2.0.1          # Adjust if a newer version aligns with your system
+pandas==1.5.3         # A stable version for Python 3.9
+numpy<2               # Ensure compatibility with your NumPy-dependent libraries
+urllib3<2             # Compatible with LibreSSL 2.8.3

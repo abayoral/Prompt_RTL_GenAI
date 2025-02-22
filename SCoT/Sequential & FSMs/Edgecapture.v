@@ -1,14 +1,1 @@
-// For each bit in a 32-bit vector, capture when the input signal changes from 1 in one clock cycle to 0 the next. "Capture" means that the output will remain 1 until the register is reset (synchronous reset).
-
-// Each output bit behaves like a SR flip-flop: The output bit should be set (to 1) the cycle after a 1 to 0 transition occurs. The output bit should be reset (to 0) at the positive clock edge when reset is high. If both of the above events occur at the same time, reset has precedence. In the last 4 cycles of the example waveform below, the 'reset' event occurs one cycle earlier than the 'set' event, so there is no conflict here.
-
-module top_module (
-    input clk,
-    input reset,
-    input [31:0] in,
-    output [31:0] out
-);
-
-	// Insert your code here
-
-endmodule
+Consider a 32-bit vector and the need to monitor each individual bit within this vector over successive clock cycles. The task is to identify when a bit in the vector transitions from a high state (1) in the current clock cycle to a low state (0) in the subsequent clock cycle. Upon detecting such a transition from 1 to 0 for any bit, the corresponding output bit in a separate 32-bit output vector should be set to high (1) and remain high. This status is maintained until a reset signal conditions that output bit to return to a low state (0). This logic is akin to an SR (Set-Reset) flip-flop, where the setting of the bit is triggered by the specific transition event, and resetting is controlled by a synchronous reset signal. In the presence of simultaneous reset and set conditions, precedence is given to the reset operation, ensuring that the affected output bit is reset. Consider how this behavior can be implemented in a hardware description language (HDL) module, which incorporates the input clock signal, reset control, and the vector handling logic within a specified design framework. How would this be approached within a module that conforms to the outlined specifications, taking into account synchronous logic and precedence rules as described?

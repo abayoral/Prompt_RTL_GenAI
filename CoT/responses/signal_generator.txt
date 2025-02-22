@@ -1,0 +1,63 @@
+To implement the "Triangle Wave Signal Generator," we'll create a Verilog module named `signal_generator`. This module features a 5-bit output signal `wave` that oscillates between the values 0 and 31, creating a triangle wave pattern over time. The functioning of the module is synchronized with a clock signal and includes a reset mechanism to initialize the state.
+
+Here's the Verilog code based on your specifications:
+
+```verilog
+module signal_generator (
+    input wire clk,     // Clock signal
+    input wire rst_n,   // Active-low reset signal
+    output reg [4:0] wave  // 5-bit triangle wave output
+);
+
+    // State register: 0 for incrementing, 1 for decrementing
+    reg state;
+
+    // Waveform generation logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset: Initialize wave and state to 0
+            wave <= 5'b00000;
+            state <= 1'b0;
+        end else begin
+            if (state == 1'b0) begin
+                // Increment mode
+                if (wave == 5'd31) begin
+                    // Peak reached; switch to decrement mode
+                    state <= 1'b1;
+                    wave <= wave - 1'b1;
+                end else begin
+                    // Increment wave
+                    wave <= wave + 1'b1;
+                end
+            end else begin
+                // Decrement mode
+                if (wave == 5'd0) begin
+                    // Valley reached; switch to increment mode
+                    state <= 1'b0;
+                    wave <= wave + 1'b1;
+                end else begin
+                    // Decrement wave
+                    wave <= wave - 1'b1;
+                end
+            end
+        end
+    end
+
+endmodule
+```
+
+### Explanation:
+
+- **Module Declaration**: The `signal_generator` module is declared with inputs `clk` and `rst_n`, and an output `wave`.
+  
+- **State Register**: A register `state` is used to determine the waveform's operation mode: incrementing (`state = 0`) or decrementing (`state = 1`).
+
+- **Waveform Generation Logic**: This is implemented inside an `always` block that triggers on the rising edge of `clk` or the falling edge of `rst_n`.
+  
+  - **Reset Condition**: When `rst_n` is low, both `wave` and `state` are initialized to 0, causing the waveform generation to start from zero.
+  
+  - **Incrementing Waveform**: When `state` is 0, `wave` increments by 1 until it reaches 31. At this point, `state` changes to 1, and `wave` starts decrementing.
+  
+  - **Decrementing Waveform**: When `state` is 1, `wave` decrements by 1 until it reaches 0. At this point, `state` reverts to 0, and `wave` starts incrementing again.
+
+This design efficiently generates a triangle wave pattern by toggling between incrementing and decrementing states as per the specified conditions.

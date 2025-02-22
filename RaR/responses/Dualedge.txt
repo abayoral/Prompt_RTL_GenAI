@@ -5,23 +5,24 @@ module top_module (
     output reg q
 );
 
-    reg q_posedge, q_negedge;
+    reg q_pos, q_neg;
 
+    // Positive edge triggered flip-flop
     always @(posedge clk) begin
-        q_posedge <= d;
+        q_pos <= d;
     end
 
+    // Negative edge triggered flip-flop
     always @(negedge clk) begin
-        q_negedge <= d;
+        q_neg <= d;
     end
 
-    always @(posedge clk or negedge clk) begin
-        if (clk) begin
-            q <= q_posedge;
-        end else begin
-            q <= q_negedge;
-        end
+    // Logic to combine results on both edges
+    always @(*) begin
+        q = clk ? q_neg : q_pos;
     end
 
 endmodule
 ```
+
+In this design, two separate flip-flops handle the positive and negative edges of the clock signal separately. One stores the value on the positive edge (`q_pos`), and the other on the negative edge (`q_neg`). The output `q` is then selected based on the current state of the `clk`. If `clk` is high, the value from the negative edge (`q_neg`) is presented; if `clk` is low, the value from the positive edge (`q_pos`) is shown. This configuration effectively mimics a dual-edge triggered flip-flop by combining the outputs of the two edge-triggered flip-flops.

@@ -1,0 +1,89 @@
+Certainly! To create a comprehensive `instr_reg` module as described, we will focus on defining the necessary inputs, outputs, and internal logic guided by the fetch signal and the reset conditions. Below, I have provided the Verilog module with detailed comments explaining each part of the implementation:
+
+```verilog
+module instr_reg (
+    input wire clk,           // Clock signal
+    input wire rst,           // Active low reset signal
+    input wire [1:0] fetch,   // Control signal for fetching the instruction
+    input wire [7:0] data,    // 8-bit data input representing the instruction
+    output reg [2:0] ins,     // Opcode output from the high 3 bits of the instruction
+    output reg [4:0] ad1,     // Register address from the low 5 bits of the instruction
+    output reg [7:0] ad2      // Complete 8-bit data output
+);
+
+    reg [7:0] ins_p1;         // 8-bit register for holding instruction from register source
+    reg [7:0] ins_p2;         // 8-bit register for holding instruction from RAM/ROM source
+
+    // This always block triggers on the rising edge of the clock or when reset goes low
+    always @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            // Reset condition: Initialize both registers to zero
+            ins_p1 <= 8'b00000000;
+            ins_p2 <= 8'b00000000;
+        end else begin
+            // Fetch logic based on the 'fetch' control signal
+            case (fetch)
+                2'b01: begin
+                    // Fetch instruction from register source
+                    ins_p1 <= data;
+                end
+                2'b10: begin
+                    // Fetch instruction from RAM/ROM source
+                    ins_p2 <= data;
+                end
+                default: begin
+                    // Retain current values (do nothing)
+                    ins_p1 <= ins_p1;
+                    ins_p2 <= ins_p2;
+                end
+            endcase
+        end
+    end
+
+    // Output logic to set ins, ad1, and ad2 based on the stored instructions
+    always @(*) begin
+        // Set outputs based on the content of ins_p1 and ins_p2
+        case (fetch)
+            2'b01: begin
+                // Output based on instruction from register source
+                ins = ins_p1[7:5];
+                ad1 = ins_p1[4:0];
+                ad2 = 8'b00000000; // ad2 not relevant in this mode
+            end
+            2'b10: begin
+                // Output based on instruction from RAM/ROM source
+                ins = ins_p2[7:5];
+                ad1 = 5'b00000;   // ad1 not relevant in this mode
+                ad2 = ins_p2;
+            end
+            default: begin
+                // Default case, maintain current or safe values
+                ins = 3'b000;
+                ad1 = 5'b00000;
+                ad2 = 8'b00000000;
+            end
+        endcase
+    end
+
+endmodule
+```
+
+### Explanation:
+
+1. **Inputs and Outputs:**
+   - Inputs include the clock signal (`clk`), active low reset (`rst`), fetch control signal (`fetch`), and data input (`data`).
+   - Outputs are divided into `ins`, `ad1`, and `ad2` based on how the data is processed.
+
+2. **Internal Registers:**
+   - `ins_p1` and `ins_p2` hold instructions fetched from different sources as dictated by the `fetch` signal.
+
+3. **Reset Functionality:**
+   - On reset (`rst` is low), both instruction registers are set to zero, ensuring known stable states.
+
+4. **Fetch Logic:**
+   - The `fetch` signal controls how data is loaded into `ins_p1` and `ins_p2`. `01` loads into `ins_p1`, and `10` loads into `ins_p2`.
+
+5. **Output Assignment:**
+   - The outputs `ins`, `ad1`, and `ad2` are derived from the appropriate register content based on the `fetch` signal.
+
+This code implementation should conform precisely to the provided requirements and ensures that the instruction register module functions correctly as part of a CPU architecture.

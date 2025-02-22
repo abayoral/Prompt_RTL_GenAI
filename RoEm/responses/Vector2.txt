@@ -3,10 +3,11 @@ module top_module(
     input [31:0] in,
     output [31:0] out );
 
-    assign out[31:24] = in[7:0];
-    assign out[23:16] = in[15:8];
-    assign out[15:8] = in[23:16];
-    assign out[7:0] = in[31:24];
+    // Reversing the byte order
+    assign out[31:24] = in[7:0];    // Assign the rightmost byte to the leftmost position
+    assign out[23:16] = in[15:8];   // Assign the second byte from the right to the second position from the left
+    assign out[15:8]  = in[23:16];  // Assign the third byte from the right to the third position from the left
+    assign out[7:0]   = in[31:24];  // Assign the leftmost byte to the rightmost position
 
 endmodule
 ```

@@ -5,26 +5,22 @@ module top_module (
     output reg down,
     output reg right,
     output reg up
-); 
+);
 
     always @(*) begin
-        // Default values
-        left = 1'b0;
-        down = 1'b0;
-        right = 1'b0;
+        // Default assignment
         up = 1'b0;
-        
+        down = 1'b0;
+        left = 1'b0;
+        right = 1'b0;
+
+        // Case statement to determine the pressed arrow key
         case (scancode)
-            16'he06b: left = 1'b1;
-            16'he072: down = 1'b1;
-            16'he074: right = 1'b1;
-            16'he075: up = 1'b1;
-            default: begin
-                left = 1'b0;
-                down = 1'b0;
-                right = 1'b0;
-                up = 1'b0;
-            end
+            16'he06b: left = 1'b1;   // left arrow
+            16'he072: down = 1'b1;   // down arrow
+            16'he074: right = 1'b1;  // right arrow
+            16'he075: up = 1'b1;     // up arrow
+            // No need for a default, all outputs are already defaulted to 0
         endcase
     end
 

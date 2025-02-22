@@ -1,5 +1,13 @@
 ```verilog
-module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );
+module add16 (
+    input [15:0] a,
+    input [15:0] b,
+    input cin,
+    output [15:0] sum,
+    output cout
+);
+
+    assign {cout, sum} = a + b + cin;
 
 endmodule
 
@@ -8,29 +16,26 @@ module top_module(
     input [31:0] b,
     output [31:0] sum
 );
-	wire cout_lower;
-	wire [15:0] sum_lower, sum_upper;
-	
-	// First 16-bit adder for the lower bits
-	add16 lower_adder (
-		.a(a[15:0]),
-		.b(b[15:0]),
-		.cin(1'b0),
-		.sum(sum_lower),
-		.cout(cout_lower)
-	);
-	
-	// Second 16-bit adder for the upper bits
-	add16 upper_adder (
-		.a(a[31:16]),
-		.b(b[31:16]),
-		.cin(cout_lower),
-		.sum(sum_upper),
-		.cout()
-	);
-	
-	// Combine the results
-	assign sum = {sum_upper, sum_lower};
-	
+
+    wire cout_low;  // Wire to connect the carry-out from the lower 16-bit adder to the carry-in of the upper 16-bit adder
+
+    // Instantiate the lower 16-bit adder
+    add16 lower_adder (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum[15:0]),
+        .cout(cout_low)
+    );
+
+    // Instantiate the upper 16-bit adder
+    add16 upper_adder (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(cout_low),
+        .sum(sum[31:16]),
+        .cout()  // Carry-out is ignored for the overall 32-bit sum
+    );
+
 endmodule
 ```

@@ -6,15 +6,14 @@ module top_module (
 );
 
     reg [31:0] prev_in;
-    
+
     always @(posedge clk) begin
         if (reset) begin
-            out <= 32'b0;
+            out <= 32'b0; // Synchronous reset of the output register
+        end else begin
+            out <= out | (prev_in & ~in); // Set output to 1 when there is a 1 to 0 transition
         end
-        else begin
-            out <= out | (prev_in & ~in);
-        end
-        prev_in <= in;
+        prev_in <= in; // Update previous input state
     end
 
 endmodule

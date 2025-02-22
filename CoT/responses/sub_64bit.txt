@@ -1,0 +1,61 @@
+To design a 64-bit subtractor module in Verilog that detects overflow conditions, we'll follow these steps in our chain of thought:
+
+### Chain of Thought:
+
+1. **Understand the Requirements**:
+    - Perform a subtraction operation between two 64-bit signed integers: `A - B`.
+    - Provide a 64-bit output `result` representing the subtraction's result.
+    - Set an `overflow` signal to 1 when an overflow condition is detected, and 0 otherwise.
+
+2. **Overflow Detection**:
+    - Overflow in signed subtraction occurs under two conditions:
+        1. A positive `A` minus a negative `B` results in a negative `result` (positive overflow).
+        2. A negative `A` minus a positive `B` results in a positive `result` (negative overflow).
+
+3. **Determine the Inputs and Outputs**:
+    - Inputs: `A[63:0]`, `B[63:0]`
+    - Outputs: `result[63:0]`, `overflow`
+
+4. **Define Intermediate Signals**:
+    - The computation includes the subtraction itself and checking the signs of `A`, `B`, and `result`.
+
+5. **Structuring the Module**:
+    - Start with the module declaration, specifying the inputs and outputs.
+    - Perform subtraction operation to produce `result`.
+    - Use bitwise operations to check for overflow conditions:
+        - Use the sign bit (MSB) for overflow detection.
+        - Implement logic to check if there's an overflow.
+
+6. **Write the Verilog Code**:
+    - Implement the module according to the requirements.
+
+### Verilog Code:
+
+```verilog
+module sub_64bit (
+    input wire [63:0] A,
+    input wire [63:0] B,
+    output wire [63:0] result,
+    output wire overflow
+);
+    // Perform subtraction
+    assign result = A - B;
+
+    // Detect overflow
+    // Positive overflow: (A[63] == 0) and (B[63] == 1) and (result[63] == 1)
+    // Negative overflow: (A[63] == 1) and (B[63] == 0) and (result[63] == 0)
+    assign overflow = ((~A[63] & B[63] & result[63]) |
+                       (A[63] & ~B[63] & ~result[63]));
+
+endmodule
+```
+
+### Explanation:
+
+- The `result` is computed by directly subtracting `B` from `A`, taking advantage of Verilog's handling of signed arithmetic when the sign bits are appropriately interpreted.
+- The `overflow` signal is determined by checking the conditions for overflow using the sign bits:
+  - A positive overflow is detected if `A` is positive, `B` is negative, and `result` is negative.
+  - A negative overflow is detected if `A` is negative, `B` is positive, and `result` is positive.
+- By bitwise checking these conditions, the `overflow` signal is correctly set according to the subtraction result. 
+
+This module captures the required logic for performing a 64-bit subtraction with overflow detection.

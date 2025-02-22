@@ -3,6 +3,7 @@ module top_module (
     input [7:0] in,
     output parity
 ); 
-    assign parity = ^in; // XOR all bits to compute even parity
+    // Compute the even parity bit by XOR-ing all 8 input bits
+    assign parity = in[0] ^ in[1] ^ in[2] ^ in[3] ^ in[4] ^ in[5] ^ in[6] ^ in[7];
 endmodule
 ```

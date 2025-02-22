@@ -1,0 +1,64 @@
+```verilog
+module pulse_detect(
+    input wire clk,
+    input wire rst_n,
+    input wire data_in,
+    output reg data_out
+);
+
+// Define the state encoding
+typedef enum reg [1:0] {
+    STATE_IDLE = 2'b00,
+    STATE_DETECT_0_TO_1 = 2'b01,
+    STATE_DETECT_1_TO_0 = 2'b10
+} state_t;
+
+// Internal state register to track the current state
+reg [1:0] state;
+reg [1:0] next_state;
+
+// State Machine with Combinational and Sequential Logic
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        // Asynchronous reset logic
+        state <= STATE_IDLE;
+        data_out <= 1'b0;
+    end else begin
+        // On the positive edge of clk, update state and outputs
+        state <= next_state;
+        
+        // Output logic based on the state
+        if (state == STATE_DETECT_1_TO_0) begin
+            data_out <= 1'b1; // Pulse detected, set data_out high
+        end else begin
+            data_out <= 1'b0;
+        end
+    end
+end
+
+// Combinational logic to determine the next state
+always @(*) begin
+    case (state)
+        STATE_IDLE: begin
+            if (data_in == 1'b1) begin
+                next_state = STATE_DETECT_0_TO_1;
+            end else begin
+                next_state = STATE_IDLE;
+            end
+        end
+        STATE_DETECT_0_TO_1: begin
+            if (data_in == 1'b0) begin
+                next_state = STATE_DETECT_1_TO_0;
+            end else begin
+                next_state = STATE_DETECT_0_TO_1;
+            end
+        end
+        STATE_DETECT_1_TO_0: begin
+            next_state = STATE_IDLE; // Pulse detected, return to idle
+        end
+        default: next_state = STATE_IDLE;
+    endcase
+end
+
+endmodule
+```

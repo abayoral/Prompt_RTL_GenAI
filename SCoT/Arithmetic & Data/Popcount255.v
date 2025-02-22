@@ -1,10 +1,3 @@
-// A "population count" circuit counts the number of '1's in an input vector. 
-// Build a population count circuit for a 255-bit input vector.
+The objective of this task is to design and develop a "population count" circuit within a Verilog module. A "population count" circuit is a type of digital logic circuit that calculates the number of '1' bits, also known as the Hamming weight, within a given input vector. In this specific challenge, the input vector provided is 255 bits wide, denoted as `input [254:0] in`, which means you will be analyzing a collection of binary digits that range from bit position 0 to bit position 254. The desired output, specified as `output [7:0] out`, is an 8-bit value, capable of representing a count from 0 to 255, which indicates the total number of '1' bits present in the input vector. 
 
-// Hint: So many things to add... How about a for loop?
-
-module top_module( 
-    input [254:0] in,
-    output [7:0] out );
-    // Insert your code here
-endmodule
+Your task involves implementing logic that efficiently computes this population count. Although the hint provided mentions a "for loop," suggesting an iterative approach to traverse through the input vector in order to tally up the number of '1' bits, other techniques may also be applicable depending on design preferences, efficiency requirements, or hardware constraints. The goal is to accomplish accurate counting while considering implementation simplicity, resource utilization, and potential synthesis requirements. Consider various strategies, such as parallelization or hierarchical counting schemes, that could effectively fulfill the requirements of this problem within a digital design context.

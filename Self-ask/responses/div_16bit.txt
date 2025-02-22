@@ -1,0 +1,44 @@
+```verilog
+module div_16bit(
+    input [15:0] A,  // 16-bit dividend
+    input [7:0] B,   // 8-bit divisor
+    output [15:0] result, // 16-bit quotient
+    output [15:0] odd     // 16-bit remainder
+);
+
+    reg [15:0] quotient;
+    reg [15:0] remainder;
+    reg [15:0] dividend; 
+    reg [7:0] divisor;
+    integer i;
+    
+    always @(*) begin
+        // Initialize
+        dividend = A;
+        divisor = B;
+        quotient = 16'b0;
+        remainder = 16'b0;
+        
+        // Check for divisor being zero to avoid division by zero
+        if (divisor != 0) begin
+            // Process division using combinational logic
+            for (i = 15; i >= 0; i = i - 1) begin
+                // Left shift remainder to add new bit
+                remainder = {remainder[14:0], dividend[i]};
+                
+                if (remainder[15:8] >= divisor) begin
+                    remainder[15:8] = remainder[15:8] - divisor;
+                    quotient[i] = 1;
+                end else begin
+                    quotient[i] = 0;
+                end
+            end
+        end
+        
+        // Assign the result to the outputs
+        assign result = quotient;
+        assign odd = remainder;
+    end
+    
+endmodule
+```

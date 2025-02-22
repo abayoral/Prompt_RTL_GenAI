@@ -1,3 +1,5 @@
+Thank you for the clarification. Here is the Verilog module for the described 4-bit shift register with asynchronous reset, synchronous load, and enable.
+
 ```verilog
 module top_module(
     input clk,
@@ -7,14 +9,12 @@ module top_module(
     input [3:0] data,
     output reg [3:0] q); 
 
-    always@(posedge clk or posedge areset) begin
+    always @(posedge clk or posedge areset) begin
         if (areset) begin
             q <= 4'b0000;
-        end
-        else if (load) begin
+        end else if (load) begin
             q <= data;
-        end
-        else if (ena) begin
+        end else if (ena) begin
             q <= {1'b0, q[3:1]};
         end
     end

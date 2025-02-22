@@ -1,0 +1,39 @@
+```verilog
+module parallel2serial (
+    input wire clk,
+    input wire rst_n,
+    input wire [3:0] d,
+    output reg valid_out,
+    output reg dout
+);
+
+    reg [1:0] cnt; // 2-bit counter to cycle through the 4 bits
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset condition: initialize counter and outputs
+            cnt <= 2'd0;
+            dout <= 1'b0;
+            valid_out <= 1'b0;
+        end else begin
+            // Output the current bit based on counter position
+            case (cnt)
+                2'd0: dout <= d[3]; // MSB
+                2'd1: dout <= d[2];
+                2'd2: dout <= d[1];
+                2'd3: dout <= d[0]; // LSB
+            endcase
+
+            // Increment counter and only activate valid_out when serial data is available
+            if (cnt < 2'd3) begin
+                cnt <= cnt + 2'd1;
+                valid_out <= 1'b1;
+            end else begin
+                // All bits processed, reset counter for next sequence
+                cnt <= 2'd0;
+            end
+        end
+    end
+
+endmodule
+```

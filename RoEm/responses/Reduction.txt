@@ -1,6 +1,9 @@
+```verilog
 module top_module (
     input [7:0] in,
     output parity
 ); 
-    assign parity = ^in; // XOR all bits to get the even parity
+    // Compute even parity by XOR-ing all 8 bits in the input
+    assign parity = ^in;
 endmodule
+```

@@ -4,9 +4,16 @@ module andgate (output out, input a, input b, input c, input d, input e);
 endmodule
 
 module top_module (input a, input b, input c, output out);
-    wire intermediate;
+    wire w_and;
+    wire one, zero;
     
-    andgate inst1 (.out(intermediate), .a(1'b1), .b(1'b1), .c(a), .d(b), .e(c));
-    assign out = ~intermediate;
+    // Constants used since the AND gate requires 5 inputs
+    assign one = 1'b1;
+    assign zero = 1'b0;
+    
+    // Reuse andgate to perform NAND operation
+    andgate inst1 (w_and, a, b, c, one, one); // This should effectively be a 3-input AND gate.
+    assign out = ~w_and; // Invert the output to form NAND
+    
 endmodule
 ```

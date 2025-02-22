@@ -1,3 +1,15 @@
+module add16 (
+    input [15:0] a, 
+    input [15:0] b, 
+    input cin, 
+    output [15:0] sum, 
+    output cout
+);
+
+    assign {cout, sum} = a + b + cin;
+
+endmodule
+
 module top_module(
     input [31:0] a,
     input [31:0] b,
@@ -5,18 +17,28 @@ module top_module(
     output [31:0] sum
 );
 
-    wire [31:0] b_xor_sub;
+    wire [31:0] b_xor;
     wire cout1, cout2;
-    wire [15:0] sum1, sum2, sum3, sum4;
 
-    // 32-bit wide XOR gate to invert b when sub is 1
-    assign b_xor_sub = b ^ {32{sub}};
+    // XOR b with sub replicated 32 times
+    assign b_xor = b ^ {32{sub}};
 
-    // Instantiate the 16-bit adders
-    add16 U1 (a[15:0], b_xor_sub[15:0], sub, sum1, cout1);
-    add16 U2 (a[31:16], b_xor_sub[31:16], cout1, sum2, cout2);
+    // First 16-bit adder
+    add16 adder1 (
+        .a(a[15:0]),
+        .b(b_xor[15:0]),
+        .cin(sub),
+        .sum(sum[15:0]),
+        .cout(cout1)
+    );
 
-    // Combine the results
-    assign sum = {sum2, sum1};
+    // Second 16-bit adder
+    add16 adder2 (
+        .a(a[31:16]),
+        .b(b_xor[31:16]),
+        .cin(cout1),
+        .sum(sum[31:16]),
+        .cout(cout2)
+    );
 
 endmodule

@@ -1,14 +1,15 @@
 module top_module (
     input [7:0] a, b, c, d,
-    output [7:0] min);
-
+    output [7:0] min
+);
+    // Intermediate results for two-way comparisons
     wire [7:0] min_ab, min_cd;
 
-    // Two-way min circuits
+    // Two-way min circuit using the conditional operator
     assign min_ab = (a < b) ? a : b;
     assign min_cd = (c < d) ? c : d;
 
-    // Four-way min circuit
+    // Final two-way min circuit to find the minimum of min_ab and min_cd
     assign min = (min_ab < min_cd) ? min_ab : min_cd;
 
 endmodule

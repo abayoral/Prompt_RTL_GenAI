@@ -1,26 +1,26 @@
 ```verilog
-// synthesis verilog_input_version verilog_2001
-module top_module(
-    input clk,
-    input a,
-    input b,
+module xor_module (
+    input  wire clk,
+    input  wire a,
+    input  wire b,
     output wire out_assign,
-    output reg out_always_comb,
-    output reg out_always_ff
+    output reg  out_always_comb,
+    output reg  out_always_ff
 );
 
-    // Assign statement implementation
+    // Method 1: Using 'assign' statement
     assign out_assign = a ^ b;
 
-    // Combinational always block implementation
+    // Method 2: Using 'combinational always block'
     always @(*) begin
         out_always_comb = a ^ b;
     end
 
-    // Clocked always block implementation
+    // Method 3: Using 'clocked always block'
     always @(posedge clk) begin
-        out_always_ff = a ^ b;
+        out_always_ff <= a ^ b;
     end
 
 endmodule
 ```
+This Verilog module implements the XOR gate using three distinct methods as requested. Each method efficiently processes the logical XOR operation using different approaches within the given 'xor_module'.

@@ -1,0 +1,4 @@
+./simv -l run.log
+** VVP Stop(0) **
+** Flushing output streams.
+make: *** [sim] Terminated: 15

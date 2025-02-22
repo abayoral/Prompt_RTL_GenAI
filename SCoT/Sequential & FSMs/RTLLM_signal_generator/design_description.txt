@@ -1,29 +1,28 @@
-Please act as a professional verilog designer.
+You are a highly skilled Verilog designer specializing in digital design, and your task is to create a Triangle Wave signal generator module using Verilog HDL. The goal is to design a module named `signal_generator` that outputs a triangular waveform by alternately incrementing and decrementing a 5-bit signal labeled as "wave." Here's a more detailed breakdown of what is required:
 
-Implement a Triangle Wave signal generator module that generates a waveform by incrementing and decrementing a 5-bit signal named "wave". The waveform cycles between 0 and 31, which is incremented or decremented by 1.
+**Module Functionality:**
+- **Waveform Characteristics:** The triangle waveform should smoothly oscillate between the values 0 and 31, with each step altering the waveform value by 1. After reaching 31, it should decrement back to 0, and then repeat this cycle indefinitely.
+- **State Management:** Your design should employ a simple state machine with at least two states. One state is responsible for the incrementing phase of the waveform, and another state for the decrementing phase. This is crucial for oscillating between the upper and lower limits of the waveform.
 
+**Port Information:**
+- **Inputs:**
+  - `clk`: A clock signal that provides timing for sequential operations, ensuring that changes occur synchronously.
+  - `rst_n`: An active-low reset signal. When it is asserted low (0), it initializes or resets the state of the module, clearing any data held and prepared for normal operation once the reset is deactivated (1).
 
-Module name:  
-    signal_generator 
-                 
-Input ports:
-    clk: Clock signal used for synchronous operation.
-    rst_n: Active-low reset signal. Defined as 0 for reset and 1 for reset signal inactive.
+- **Outputs:**
+  - `wave`: A 5-bit wide signal that serves as the output, holding the current value of the waveform at any given moment during its generation cycle.
 
-Output ports:
-    wave: 5-bit output waveform signal representing the generated waveform.
+**Implementation Details:**
+- **Registers and State Variables:**
+  - **state Register:** Used to track the current phase of the waveform generation (incrementing or decrementing).
+  - **wave Register:** A 5-bit register that stores the current value of the waveform.
 
-Implementation:
-State and Waveform Generation:
-The module includes a register, state, used to control the state of the waveform generation.
-The module also includes a register, wave, with a width of 5 bits, which represents the generated waveform.
-The state and waveform registers are updated in the always block, triggered on the positive edge of the clock signal (posedge clk) or the negative edge of the reset signal (negedge rst_n).
-On reset, indicated by ~rst_n, the state register is cleared to 0, and the wave register is cleared to 0.
-The waveform generation is controlled using a case statement based on the current state:
-If the state is 0, the waveform (wave) is incremented by 1.
-If the waveform reaches 31 (wave == 31), the state is transitioned to 1.
-If the state is 1, the waveform is decremented by 1.
-If the waveform reaches 0 (wave == 0), the state is transitioned back to 0.
-The waveform generation continues to cycle between 0 and 31 based on the state transitions.
+- **Behavior on Reset:**
+  - When a negative edge is detected on the `rst_n` signal, both `state` and `wave` registers should be initialized to 0, setting the module in a known starting condition to begin waveform generation once active.
 
-Give me the complete code.
+- **Waveform Generation Logic:**
+  - Utilize a continuous loop (case statement) within an always block triggered on the positive edge of the `clk` or the negative edge of `rst_n`.
+  - Implement logic to increment `wave` by 1 during the increment state and switch state when `wave` reaches 31.
+  - Implement logic to decrement `wave` by 1 during the decrement state and revert state when `wave` reaches 0.
+
+**Expected Code Output:** Provide all necessary Verilog code to establish the module’s behavior, including module declarations, port mappings, internal logic for state management, and descriptions of the actions required in each possible state scenario. Your expertise might suggest optimizations or enhancements for maintaining reliable triangular waveform generation over time, considering edge cases and potential pitfalls in state transitions.

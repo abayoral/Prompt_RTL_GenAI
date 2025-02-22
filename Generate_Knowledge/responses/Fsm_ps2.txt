@@ -5,43 +5,48 @@ module top_module(
     input reset,    // Synchronous reset
     output reg done
 );
-    // States
-    typedef enum logic [1:0] {
-        IDLE = 2'b00,
-        BYTE_1 = 2'b01,
-        BYTE_2 = 2'b10,
-        DONE = 2'b11
-    } state_t;
 
-    state_t current_state, next_state;
+    reg [1:0] state, next_state;
+    
+    // State encoding
+    localparam WAIT = 2'd0;
+    localparam BYTE1 = 2'd1;
+    localparam BYTE2 = 2'd2;
+    localparam BYTE3 = 2'd3;
 
     // State transition logic (combinational)
     always @(*) begin
-        case (current_state)
-            IDLE: begin
+        case (state)
+            WAIT: begin
                 if (in[3] == 1'b1)
-                    next_state = BYTE_1;
+                    next_state = BYTE1;
                 else
-                    next_state = IDLE;
+                    next_state = WAIT;
             end
-            BYTE_1: next_state = BYTE_2;
-            BYTE_2: next_state = DONE;
-            DONE: next_state = IDLE;
-            default: next_state = IDLE;
+            BYTE1: next_state = BYTE2;
+            BYTE2: next_state = BYTE3;
+            BYTE3: next_state = WAIT;
         endcase
     end
 
     // State flip-flops (sequential)
     always @(posedge clk) begin
-        if (reset)
-            current_state <= IDLE;
-        else
-            current_state <= next_state;
+        if (reset) 
+            state <= WAIT;
+        else 
+            state <= next_state;
     end
-
-    // Output logic (combinational)
-    always @(*) begin
-        done = (current_state == DONE);
+    
+    // Output logic
+    always @(posedge clk) begin
+        if (reset)
+            done <= 1'b0;
+        else begin
+            if (state == BYTE3)
+                done <= 1'b1;
+            else
+                done <= 1'b0;
+        end
     end
 
 endmodule

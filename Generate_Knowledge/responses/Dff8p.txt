@@ -8,9 +8,8 @@ module top_module (
 
     always @(negedge clk) begin
         if (reset) begin
-            q <= 8'h34;  // Reset to 0x34
-        end
-        else begin
+            q <= 8'h34;  // Reset value to 0x34
+        end else begin
             q <= d;
         end
     end

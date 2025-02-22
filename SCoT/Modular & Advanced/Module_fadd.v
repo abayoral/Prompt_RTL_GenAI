@@ -1,32 +1,22 @@
-// you are given a module add16 that performs a 16-bit addition. You must instantiate two of them to create a 32-bit adder. 
-// One add16 module computes the lower 16 bits of the addition result, 
-// while the second add16 module computes the upper 16 bits of the result. 
-// Your 32-bit adder does not need to handle carry-in (assume 0) or carry-out (ignored).
+You have been tasked with creating a 32-bit adder using the provided 16-bit addition module `add16`. This module is designed to perform addition on 16-bit wide operands. To achieve the desired goal of a 32-bit wide adder implementation, you will need to instantiate two separate `add16` modules. 
 
-// Connect the add16 modules together as shown in the diagram below. The provided module add16 has the following declaration:
+Here's how you should think about organizing the 32-bit adder:
+1. **Lower 16 Bits Addition:**
+   - Utilize the first `add16` instance to calculate the sum of the lower 16 bits of the two 32-bit input vectors `a` and `b`. 
+   - Inputs for this module will be `a[15:0]` and `b[15:0]`. 
+   - The `cin` (carry input) for this initial addition should be zero as there is no carry-in from a previous addition.
 
-module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );
+2. **Upper 16 Bits Addition:**
+   - The second `add16` instance will handle the upper 16 bits of the inputs `a` and `b`. 
+   - Inputs for this module will be `a[31:16]` and `b[31:16]`.
+   - The key point is how you manage the `cin` for this module: it should take the `cout` from the first `add16` instance, ensuring any carry from the lower 16 bits is propagated.
 
-// Within each add16, 16 full adders (module add1, not provided) are instantiated to actually perform the addition. 
-// You must write the full adder module that has the following declaration:
+3. **Output Assembly:**
+   - The results from both `add16` instances should be combined to form the full 32-bit sum. 
+   - The sum output from the first module should populate the lower half `[15:0]` of the 32-bit sum, whereas the result from the second module should populate the upper half `[31:16]`.
 
-module add1 ( input a, input b, input cin, output sum, output cout );
+Note that while creating your solution, you need not worry about handling any specific carry-out signal for the overall 32-bit addition since it's considered irrelevant (i.e., the task specifies that carry-out can be ignored).
 
-// Recall that a full adder computes the sum and carry-out of a+b+cin.
+Also, keep in mind that the `add16` module inherently utilizes 16 full adders, each defined by a separate module `add1`. Your task will also involve writing the definition for this `add1` module, which should take two single-bit inputs and a carry-in to produce the appropriate single-bit sum and carry-out, reflecting a typical full adder behavior.
 
-// In summary, there are three modules in this design:
-
-// Hint: top_module — Your top-level module that contains two of...
-// add16, provided — A 16-bit adder module 
-// add1 — A 1-bit full adder module.
-// If your submission is missing a module add1, 
-// you will get an error message that says Error (12006): Node instance "user_fadd[0].a1" instantiates undefined entity "add1".
-
-module top_module (
-    input [31:0] a,
-    input [31:0] b,
-    output [31:0] sum
-    // Insert your code here
-);//
-
-endmodule
+Your top-level module, named `top_module`, must effectively orchestrate these components, linking them together to accurately compute the 32-bit sum as described.

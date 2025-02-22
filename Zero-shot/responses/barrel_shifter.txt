@@ -1,0 +1,53 @@
+```verilog
+module barrel_shifter(
+    input [7:0] in,
+    input [2:0] ctrl,
+    output [7:0] out
+);
+
+    wire [7:0] stage1, stage2, stage3;
+
+    // First stage: shift by 4 bits
+    mux2X1 mux4_0 (.d0(in[0]), .d1(in[4]), .s(ctrl[2]), .y(stage1[0]));
+    mux2X1 mux4_1 (.d0(in[1]), .d1(in[5]), .s(ctrl[2]), .y(stage1[1]));
+    mux2X1 mux4_2 (.d0(in[2]), .d1(in[6]), .s(ctrl[2]), .y(stage1[2]));
+    mux2X1 mux4_3 (.d0(in[3]), .d1(in[7]), .s(ctrl[2]), .y(stage1[3]));
+    mux2X1 mux4_4 (.d0(in[4]), .d1(in[0]), .s(ctrl[2]), .y(stage1[4]));
+    mux2X1 mux4_5 (.d0(in[5]), .d1(in[1]), .s(ctrl[2]), .y(stage1[5]));
+    mux2X1 mux4_6 (.d0(in[6]), .d1(in[2]), .s(ctrl[2]), .y(stage1[6]));
+    mux2X1 mux4_7 (.d0(in[7]), .d1(in[3]), .s(ctrl[2]), .y(stage1[7]));
+
+    // Second stage: shift by 2 bits
+    mux2X1 mux2_0 (.d0(stage1[0]), .d1(stage1[2]), .s(ctrl[1]), .y(stage2[0]));
+    mux2X1 mux2_1 (.d0(stage1[1]), .d1(stage1[3]), .s(ctrl[1]), .y(stage2[1]));
+    mux2X1 mux2_2 (.d0(stage1[2]), .d1(stage1[4]), .s(ctrl[1]), .y(stage2[2]));
+    mux2X1 mux2_3 (.d0(stage1[3]), .d1(stage1[5]), .s(ctrl[1]), .y(stage2[3]));
+    mux2X1 mux2_4 (.d0(stage1[4]), .d1(stage1[6]), .s(ctrl[1]), .y(stage2[4]));
+    mux2X1 mux2_5 (.d0(stage1[5]), .d1(stage1[7]), .s(ctrl[1]), .y(stage2[5]));
+    mux2X1 mux2_6 (.d0(stage1[6]), .d1(stage1[0]), .s(ctrl[1]), .y(stage2[6]));
+    mux2X1 mux2_7 (.d0(stage1[7]), .d1(stage1[1]), .s(ctrl[1]), .y(stage2[7]));
+
+    // Third stage: shift by 1 bit
+    mux2X1 mux1_0 (.d0(stage2[0]), .d1(stage2[1]), .s(ctrl[0]), .y(stage3[0]));
+    mux2X1 mux1_1 (.d0(stage2[1]), .d1(stage2[2]), .s(ctrl[0]), .y(stage3[1]));
+    mux2X1 mux1_2 (.d0(stage2[2]), .d1(stage2[3]), .s(ctrl[0]), .y(stage3[2]));
+    mux2X1 mux1_3 (.d0(stage2[3]), .d1(stage2[4]), .s(ctrl[0]), .y(stage3[3]));
+    mux2X1 mux1_4 (.d0(stage2[4]), .d1(stage2[5]), .s(ctrl[0]), .y(stage3[4]));
+    mux2X1 mux1_5 (.d0(stage2[5]), .d1(stage2[6]), .s(ctrl[0]), .y(stage3[5]));
+    mux2X1 mux1_6 (.d0(stage2[6]), .d1(stage2[7]), .s(ctrl[0]), .y(stage3[6]));
+    mux2X1 mux1_7 (.d0(stage2[7]), .d1(stage2[0]), .s(ctrl[0]), .y(stage3[7]));
+
+    // Final output
+    assign out = stage3;
+
+endmodule
+
+module mux2X1 (
+    input d0, 
+    input d1, 
+    input s, 
+    output y
+);
+    assign y = s ? d1 : d0;
+endmodule
+```

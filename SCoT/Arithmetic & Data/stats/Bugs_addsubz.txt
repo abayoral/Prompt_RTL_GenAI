@@ -1,0 +1,8 @@
+hdlbits_testbenches/Bugs_addsubz_0_tb.v:18: error: Unknown module type: top_module
+2 error(s) during elaboration.
+*** These modules were missing:
+        top_module referenced 1 times.
+***
+Module file path: RaR/modules/Bugs_addsubz.v
+Testbench file path: hdlbits_testbenches/Bugs_addsubz_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Bugs_addsubz_sim', 'RaR/modules/Bugs_addsubz.v', 'hdlbits_testbenches/Bugs_addsubz_0_tb.v']' returned non-zero exit status 2.

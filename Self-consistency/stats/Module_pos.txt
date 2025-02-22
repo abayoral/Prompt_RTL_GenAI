@@ -1,8 +1,0 @@
-Self-consistency/modules/Module_pos.v:10: error: Unknown module type: mod_a
-2 error(s) during elaboration.
-*** These modules were missing:
-        mod_a referenced 1 times.
-***
-Module file path: Self-consistency/modules/Module_pos.v
-Testbench file path: hdlbits_testbenches/Module_pos_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Self-consistency/simulations/Module_pos_sim', 'Self-consistency/modules/Module_pos.v', 'hdlbits_testbenches/Module_pos_0_tb.v']' returned non-zero exit status 2.

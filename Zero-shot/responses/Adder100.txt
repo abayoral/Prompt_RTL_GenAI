@@ -5,6 +5,7 @@ module top_module(
     output cout,
     output [99:0] sum );
 
+    // Use a single behavioral statement to add a, b, and cin
     assign {cout, sum} = a + b + cin;
 
 endmodule

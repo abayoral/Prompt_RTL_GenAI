@@ -1,9 +1,10 @@
 ```verilog
 module top_module(
-    output zero
+    output wire out
 );
 
-    assign zero = 0; // Continuously assign the value 0 to the output 'zero'
+    // Assign a constant value of 0 to the output.
+    assign out = 1'b0;
 
 endmodule
 ```

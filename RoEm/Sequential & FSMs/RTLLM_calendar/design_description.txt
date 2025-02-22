@@ -1,23 +1,18 @@
-Please act as a professional verilog designer.
+Imagine you are a seasoned Verilog designer with expertise in digital logic design. Your task is to outline and implement a digital module for a perpetual calendar, which operates on fundamental digital timing principles such as counting and overflow handling. This module, named "calendar," is required to act as a timekeeping mechanism that counts seconds, minutes, and hours in a 24-hour format, starting from an initial state where Secs, Mins, and Hours are all set to zero.
 
-Implement a module of perpetual calendar. The starting value of Secs, Mins, and Hours are all 0. Both Secs and Mins loop continuously from 0 to 59. When Secs=59, Min increases by 1 at the next cycle, and when Min=59 && Secs=59, Hours increases by 1 at the next cycle. Hours is counted from the 0-23 cycle.
+Inputs and Outputs:
+- The primary inputs include a clock signal (CLK), which drives the timing logic, and a reset signal (RST), which is used to reset the clock values to their initial state when activated.
+- The outputs are three 6-bit signals named Hours, Mins, and Secs, each representing the current count or time in hours, minutes, and seconds respectively.
 
-Module name:  
-    calendar  
-                 
-Input ports:
-    CLK: Clock input
-    RST: Active high reset signal
+Operational Mechanics:
+- The Secs (seconds) count progresses from 0 to 59. Upon reaching 59, it resets to 0 on the next clock cycle, triggering an increment in Mins (minutes).
+- The Mins count behaves similarly, resetting from 59 to 0 when both it and Secs hit their maximum values, which in turn increments the Hours count.
+- The Hours count cycles through a 24-hour format, incrementing from 0 to 23 and resetting back to 0 after reaching 23 when both Mins and Secs are at their maximum for the cycle.
 
-Output ports:
-    Hours: 6-bit output representing the current hours
-    Mins: 6-bit output representing the current minutes
-    Secs: 6-bit output representing the current seconds
-
-Implementation:
-The calendar module uses three always blocks to update the values of seconds, minutes, and hours based on the clock signal and reset signal.
-The first always block triggers on the positive edge of the clock signal (posedge CLK) or the positive edge of the reset signal (posedge RST). It checks if the reset signal is active (RST) and sets the seconds value (Secs) to 0. If the seconds value is 59, it wraps around and sets the seconds value to 0. Otherwise, it increments the seconds value by 1.
-The second always block also triggers on the positive edge of the clock signal or the positive edge of the reset signal. It handles the minutes value (Mins). If the reset signal is active, it sets the minutes value to 0. If both the minutes and seconds values are 59, it wraps around and sets the minutes value to 0. If the seconds value is 59, it increments the minutes value by 1. Otherwise, it keeps the minutes value unchanged.
-The third always block triggers on the positive edge of the clock signal or the positive edge of the reset signal. It handles the hours value (Hours). If the reset signal is active, it sets the hours value to 0. If the hours, minutes, and seconds values are all at their maximum (23, 59, and 59 respectively), it wraps around and sets the hours value to 0. If the minutes and seconds values are both 59, it increments the hours value by 1. Otherwise, it keeps the hours value unchanged.
-
-Give me the complete code.
+Design Implementation:
+- The design requires three separate always blocks, each sensitive to the positive edge of the CLK and RST signals.
+- The first always block handles the logic for the Secs output. It checks for the active-high reset condition to initialize the seconds count and manages the increment and reset logic as described.
+- The second always block manages the Mins count, ensuring it follows the logic dictated by both the seconds roll-over and reset conditions.
+- The third always block manages the Hours count, maintaining correct time progression in the context of 24-hour cycles.
+  
+You are tasked with translating this detailed operational logic into Verilog, taking into account proper control structures and signal transformations, to deliver a functioning perpetual clock system. Draft the complete Verilog code for this clock mechanism.

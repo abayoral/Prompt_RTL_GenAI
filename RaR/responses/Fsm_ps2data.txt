@@ -1,85 +1,84 @@
 ```verilog
-module top_module(
+module ps2_packet_parser(
     input clk,
-    input [7:0] in,
-    input reset,    // Synchronous reset
+    input reset,
+    input [7:0] in_byte,
+    input byte_received,
     output reg [23:0] out_bytes,
-    output reg done); //
+    output reg done
+);
 
-    // State enumeration
+    // State encoding
     typedef enum reg [1:0] {
-        IDLE = 2'b00,
-        BYTE1 = 2'b01,
-        BYTE2 = 2'b10,
-        BYTE3 = 2'b11
+        WAIT_FOR_START = 2'b00,
+        BYTE_1_RECV = 2'b01,
+        BYTE_2_RECV = 2'b10
     } state_t;
     
-    state_t state, next_state;
-    reg [23:0] message_reg;
+    reg state_t current_state, next_state;
+    reg [23:0] shift_reg;  // To hold the 3-byte message
     
-    // State transition logic (FSM)
+    // State transition logic
     always @(posedge clk or posedge reset) begin
         if (reset) begin
-            state <= IDLE;
-        end
-        else begin
-            state <= next_state;
+            current_state <= WAIT_FOR_START;
+            shift_reg <= 24'd0;
+            done <= 1'b0;
+        end else begin
+            current_state <= next_state;
+            if (byte_received) begin
+                case (next_state)
+                    WAIT_FOR_START: shift_reg <= {16'd0, in_byte};
+                    BYTE_1_RECV: shift_reg <= {shift_reg[15:0], in_byte};
+                    BYTE_2_RECV: shift_reg <= {shift_reg[15:0], in_byte};
+                endcase
+            end
+            if (next_state == WAIT_FOR_START) begin
+                done <= (current_state == BYTE_2_RECV) && byte_received;
+            end else begin
+                done <= 1'b0;
+            end
         end
     end
-
-    // Next state and output logic
+    
+    // Next state logic
     always @(*) begin
-        // Default values
-        done = 0;
-        next_state = state;
-        
-        case (state)
-            IDLE: begin
-                if (in[3] == 1) begin
-                    next_state = BYTE1;
+        case (current_state)
+            WAIT_FOR_START: begin
+                if (byte_received && in_byte[3] == 1) begin
+                    next_state = BYTE_1_RECV;
+                end else begin
+                    next_state = WAIT_FOR_START;
                 end
             end
-            BYTE1: begin
-                next_state = BYTE2;
+            BYTE_1_RECV: begin
+                if (byte_received) begin
+                    next_state = BYTE_2_RECV;
+                end else begin
+                    next_state = BYTE_1_RECV;
+                end
             end
-            BYTE2: begin
-                next_state = BYTE3;
+            BYTE_2_RECV: begin
+                if (byte_received) begin
+                    next_state = WAIT_FOR_START;
+                end else begin
+                    next_state = BYTE_2_RECV;
+                end
             end
-            BYTE3: begin
-                next_state = IDLE;
-                done = 1;
+            default: begin
+                next_state = WAIT_FOR_START;
             end
         endcase
     end
-
-    // Datapath to accumulate bytes
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            message_reg <= 24'b0;
-            out_bytes <= 24'b0;
-        end
-        else begin
-            case (next_state)
-                IDLE: begin
-                    // Clear message register in IDLE state
-                    message_reg <= 24'b0;
-                end
-                BYTE1: begin
-                    message_reg[23:16] <= in;
-                end
-                BYTE2: begin
-                    message_reg[15:8] <= in;
-                end
-                BYTE3: begin
-                    message_reg[7:0] <= in;
-                    out_bytes <= {message_reg[23:8], in};
-                end
-            endcase
-
-            if (done) begin
-                out_bytes <= message_reg;
-            end
+    
+    // Output logic
+    always @(posedge clk) begin
+        if (done) begin
+            out_bytes <= shift_reg;
         end
     end
+
 endmodule
 ```
+
+This Verilog module defines a finite state machine that identifies the start of a 3-byte message by detecting when the most significant 3rd bit of the incoming data byte is high. The module contains a shift register to store the bytes and asserts the `done` signal when a complete 3-byte message is detected, thereby outputting the complete message via `out_bytes`. The synchronous reset allows the module to start in the `WAIT_FOR_START` state, ensuring that the FSM correctly identifies the beginning of a new message after a reset.

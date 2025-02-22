@@ -1,29 +1,31 @@
 ```verilog
-module fixed_point_subtractor #(parameter Q = 8, parameter N = 16) (
-    input wire [N-1:0] a,
-    input wire [N-1:0] b,
-    output reg [N-1:0] c
+module fixed_point_subtractor #(parameter N = 16, parameter Q = 8) (
+    input  wire [N-1:0] a,
+    input  wire [N-1:0] b,
+    output reg  [N-1:0] c
 );
+    // Internal register to hold result
+    reg signed [N:0] temp_res; // Using N+1 bits for handling overflow/underflow
 
-    // Internal register for storing the result
-    reg [N-1:0] res;
-
-    // Extend sign for correct subtraction
-    wire signed [N:0] ext_a = {a[N-1], a};
-    wire signed [N:0] ext_b = {b[N-1], b};
-
+    // Perform subtraction
     always @(*) begin
-        // Perform subtraction
-        res[N-1:0] = ext_a - ext_b;
+        // Sign-extend both operands
+        reg signed [N:0] a_ext;
+        reg signed [N:0] b_ext;
+        a_ext = {a[N-1], a}; // Extend with sign bit
+        b_ext = {b[N-1], b}; // Extend with sign bit
 
-        // Assign result
-        c = res[N-1:0];
+        // Compute result
+        temp_res = a_ext - b_ext;
 
-        // Handle the zero case explicitly: If result is zero, set sign bit to 0
-        if (res[N-1:0] == 0) begin
-            c[N-1] = 0;
-        end
+        // Handle sign of zero output
+        if (temp_res[N:0] == 0)
+            c = 0; // Explicitly set to zero
+        else
+            c = temp_res[N-1:0]; // Assign the result considering N bits
     end
 
 endmodule
 ```
+
+This code implements a fixed-point subtraction module with specified precision. The sign handling, including the explicit setting of the zero output, is adhered to by extending the operands for arithmetic operations and considering the sign bit correctly. The result is stored in a signed register of size `N+1` to accommodate potential overflow during the computation.

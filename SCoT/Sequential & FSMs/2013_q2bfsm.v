@@ -1,21 +1,9 @@
-// Consider a finite state machine that is used to control some type of motor. The FSM has inputs x and y, which come from the motor, and produces outputs f and g, which control the motor. There is also a clock input called clk and a reset input called resetn.
+Consider the design of a finite state machine (FSM) that is tasked with controlling a specific type of motor. This FSM is characterized by its inputs and outputs: it takes two motor-derived inputs, labeled as 'x' and 'y', while providing two outputs, denoted as 'f' and 'g', which are used to control the motor's operation. Additionally, the FSM is influenced by a clock signal, referred to as 'clk', and a reset signal, known as 'resetn', which is active when low.
 
-// The FSM has to work as follows. As long as the reset input is asserted, the FSM stays in a beginning state, called state A. When the reset signal is de-asserted, then after the next clock edge the FSM has to set the output f to 1 for one clock cycle. Then, the FSM has to monitor the x input. When x has produced the values 1, 0, 1 in three successive clock cycles, then g should be set to 1 on the following clock cycle. While maintaining g = 1 the FSM has to monitor the y input. If y has the value 1 within at most two clock cycles, then the FSM should maintain g = 1 permanently (that is, until reset). But if y does not become 1 within two clock cycles, then the FSM should set g = 0 permanently (until reset).
+The operation of this FSM must adhere to a particular sequence and logic. Initially, the FSM remains in a specific starting state, termed state A, as long as the reset input 'resetn' is asserted (held low). This means that during the reset condition, the FSM does not progress to any other state and its outputs remain in their initial conditions. Upon de-assertion (release to high) of the 'resetn' signal and following the next edge of the clock signal, the FSM transitions out of state A. At this point, it must set the output 'f' to 1, but this condition should only persist for a single clock cycle before reverting.
 
-// Implement the FSM
+Following this brief assertion of 'f', the FSM's role shifts to monitoring the input 'x'. The FSM is required to observe a specific sequence in 'x': the values should appear in the order 1, then 0, and finally 1, over three consecutive clock cycles. If this sequence is detected, the FSM will set the output 'g' to 1 in the succeeding clock cycle. 
 
-// Hint: The FSM does not begin to monitor the x input until the cycle after f is 1.
+Once 'g' is set to 1, the FSM begins monitoring the input 'y'. This observation spans at most two clock cycles. The FSM needs to determine whether 'y' reaches a value of 1 within this two-cycle window. If 'y' registers a 1 in this timeframe, the FSM should maintain 'g' at 1 indefinitely (until the FSM is reset via the resetn input). Conversely, if 'y' fails to achieve a value of 1 within these two cycles, the FSM must set 'g' to 0, where it will remain until another reset is issued.
 
-module top_module (
-    input clk,
-    input resetn,    // active-low synchronous reset
-    input x,
-    input y,
-    output f,
-    output g
-); 
-
-	// Insert your code here
-
-endmodule
-
+The goal is to implement this FSM in Verilog, including the necessary logic to transition between states based on the inputs, the timing synchronized with the clock, and the appropriate conditions dictated by the reset signal. This entails writing the FSM's state transition diagram, identifying all states, and defining transition conditions and output actions based on the problem description. Be mindful of how signals are synchronized and the use of state encoding to identify different states such as the initial state A, monitoring states, and possible end states for output control. Furthermore, remember that the FSM does not begin processing input 'x' until after the output 'f' has been asserted for the one clock cycle as specified.

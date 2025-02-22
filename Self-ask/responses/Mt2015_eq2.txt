@@ -1,5 +1,7 @@
+There is no need to use a reg type for the output 'z' in this module, as it can be assigned using continuous assignment. Let's proceed with implementing the module using a continuous assignment:
+
 ```verilog
-module top_module (input [1:0] A, input [1:0] B, output z); 
+module top_module ( input [1:0] A, input [1:0] B, output z ); 
     assign z = (A == B) ? 1'b1 : 1'b0;
 endmodule
 ```

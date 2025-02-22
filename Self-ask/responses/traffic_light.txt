@@ -1,0 +1,95 @@
+```verilog
+module traffic_light (
+    input wire rst_n,
+    input wire clk,
+    input wire pass_request,
+    output reg [7:0] clock,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+// Define states
+typedef enum reg [1:0] {
+    IDLE = 2'b00,
+    S1_RED = 2'b01,
+    S2_YELLOW = 2'b10,
+    S3_GREEN = 2'b11
+} state_t;
+
+// Parameters for timing
+localparam GREEN_TIME = 8'd60;
+localparam YELLOW_TIME = 8'd5;
+localparam RED_TIME = 8'd10;
+localparam MIN_GREEN_TIME = 8'd10;
+
+// Internal signals
+reg [1:0] state;
+reg [7:0] cnt;
+
+// State transition logic
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        state <= IDLE;
+        cnt <= 8'd0;
+    end else begin
+        case (state)
+            IDLE: begin
+                state <= S1_RED;
+                cnt <= RED_TIME;
+            end
+            S1_RED: begin
+                if (cnt == 8'd0) begin
+                    state <= S3_GREEN;
+                    cnt <= GREEN_TIME;
+                end else begin
+                    cnt <= cnt - 8'd1;
+                end
+            end
+            S2_YELLOW: begin
+                if (cnt == 8'd0) begin
+                    state <= S1_RED;
+                    cnt <= RED_TIME;
+                end else begin
+                    cnt <= cnt - 8'd1;
+                end
+            end
+            S3_GREEN: begin
+                if (cnt == 8'd0) begin
+                    state <= S2_YELLOW;
+                    cnt <= YELLOW_TIME;
+                end else if (pass_request && cnt > MIN_GREEN_TIME) begin
+                    cnt <= MIN_GREEN_TIME;
+                end else begin
+                    cnt <= cnt - 8'd1;
+                end
+            end
+            default: begin
+                state <= IDLE;
+            end
+        endcase
+    end
+end
+
+// Output logic
+always @(*) begin
+    red = 1'b0;
+    yellow = 1'b0;
+    green = 1'b0;
+    case (state)
+        S1_RED: red = 1'b1;
+        S2_YELLOW: yellow = 1'b1;
+        S3_GREEN: green = 1'b1;
+        default: begin
+            red = 1'b0;
+            yellow = 1'b0;
+            green = 1'b0;
+        end
+    endcase
+end
+
+// Assign clock output to counter value
+assign clock = cnt;
+
+endmodule
+```

@@ -1,12 +1,9 @@
-//Build a combinational circuit that splits an input half-word (16 bits, [15:0] ) 
-// into lower [7:0] and upper [15:8] bytes.
+Imagine you hold the esteemed position of a senior Digital Design Engineer at a leading firm known for its innovative hardware solutions. As part of your role, you are presented with an essential responsibility: to develop a crucial Verilog module for a next-generation product under your company's portfolio. The stakes are high as the success of this module will play a pivotal role in maintaining and possibly enhancing the company's esteemed reputation in the competitive hardware industry.
 
-`default_nettype none     // Disable implicit nets. Reduces some types of bugs.
-module top_module( 
-    input wire [15:0] in,
-    output wire [7:0] out_hi,
-    output wire [7:0] out_lo );
+The specific task involves designing a combinational circuit in Verilog, which efficiently processes a 16-bit input referred to as a half-word, indexed from [15:0]. Your goal is to dissect this input into two distinct 8-bit segments. The first segment is the 'lower byte,' consisting of the bits ranging from [7:0], and the second segment is the 'upper byte,' encompassing the bits from [15:8].
 
-// Insert your code here
+You must ensure that your design adheres to the highest standards of clarity, efficiency, and correctness, guided by the principle of setting `default_nettype none` to prevent implicit net declarations, thereby minimizing potential errors. This method not only underscores your commitment to precision but also aligns with best practices for reducing certain bugs in hardware design.
 
-endmodule
+Your task is to detail the implementation within the specified module, named `top_module`, which precisely and effectively separates the input half-word into its respective upper and lower bytes. The outputs, named `out_hi` and `out_lo`, must represent these separated components and should be designed to reflect the specified 8-bit widths. 
+
+Craft your solution with great care, mindful that the impact of this work extends beyond immediate technical success to influence the overall standing and reputation of your employer within the market. Ensure comprehensive testing and validation to uphold your company’s dominant position in the industry and progress to a promising future.

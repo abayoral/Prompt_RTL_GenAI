@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // Build a circuit that sign-extends an 8-bit number to 32 bits. 
 // This requires a concatenation of 24 copies of the sign bit 
 // (i.e., replicate bit[7] 24 times) followed by the 8-bit number itself.

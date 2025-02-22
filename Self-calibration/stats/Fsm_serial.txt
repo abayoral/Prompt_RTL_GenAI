@@ -1,7 +1,0 @@
-Self-calibration/modules/Fsm_serial.v:9: syntax error
-Self-calibration/modules/Fsm_serial.v:9: error: Invalid module instantiation
-Self-calibration/modules/Fsm_serial.v:17: syntax error
-Self-calibration/modules/Fsm_serial.v:17: error: Invalid module instantiation
-Module file path: Self-calibration/modules/Fsm_serial.v
-Testbench file path: hdlbits_testbenches/Fsm_serial_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Self-calibration/simulations/Fsm_serial_sim', 'Self-calibration/modules/Fsm_serial.v', 'hdlbits_testbenches/Fsm_serial_0_tb.v']' returned non-zero exit status 4.

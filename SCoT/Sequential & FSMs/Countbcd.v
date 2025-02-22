@@ -1,13 +1,9 @@
-// Build a 4-digit BCD (binary-coded decimal) counter. Each decimal digit is encoded using 4 bits: q[3:0] is the ones digit, q[7:4] is the tens digit, etc. For digits [3:1], also output an enable signal indicating when each of the upper three digits should be incremented.
+The task at hand requires the design and construction of a 4-digit binary-coded decimal (BCD) counter using digital logic and the Verilog HDL (Hardware Description Language). In this system, each decimal digit, ranging from 0 to 9, is represented by a 4-bit binary sequence, also known as BCD encoding. The binary sequence for these digits is stored in the 16-bit output wire `q`, where the following layout is used: `q[3:0]` corresponds to the least significant digit, which is the 'ones' digit of the decimal representation; `q[7:4]` corresponds to the 'tens' digit; `q[11:8]` represents the 'hundreds' digit; and `q[15:12]` is the most significant 'thousands' digit.
 
-// You may want to instantiate or modify some one-digit decade counters.
+The counter is expected to increment with each clock cycle (`clk`), starting from zero after being reset. The reset is a synchronous, active-high input signal, which means that whenever the `reset` is high, the counter should reinitialize its count to zero on the next clock cycle.
 
-module top_module (
-    input clk,
-    input reset,   // Synchronous active-high reset
-    output [3:1] ena,
-    output [15:0] q);
+Furthermore, the task requires the generation of enable signals for certain upper digits—specifically the tens, hundreds, and thousands positions—which indicates when each of these should be incremented. Thus, the module must output three enable signals, `ena[3]`, `ena[2]`, and `ena[1]`, each of which should be asserted or de-asserted appropriately as the counter operates. These enable signals imply a cascading behavior of counting—for instance, the tens digit should only increment when the ones digit rolls over from 9 back to 0.
 
-    // Insert your code here
+To achieve this, design considerations may include the need to instantiate or modify individual one-digit decade counters that handle 0 through 9 counting cycles. Such modules might handle the carry logic, ensuring that each digit properly manages its own incremental process and the enabling of the next higher digit.
 
-endmodule
+The module declaration and initial framework provided allows for the insertion of customized logic within the `top_module`, which orchestrates how the counters for each digit are instantiated and interact with one another, correlating with the enable signals and their respective clock and reset controls.

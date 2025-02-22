@@ -2,14 +2,17 @@ module top_module(
     input clk,
     input reset,    // Active-high synchronous reset to 32'h1
     output reg [31:0] q
-); 
+);
 
-	always @(posedge clk) begin
-		if (reset)
-			q <= 32'h1;
-		else begin
-			q <= {q[30:0], q[31] ^ q[21] ^ q[1] ^ q[0]};
-		end
-	end
+    always @(posedge clk) begin
+        if (reset) begin
+            q <= 32'h1;
+        end else begin
+            // Calculate the feedback tap
+            wire feedback = q[31] ^ q[21] ^ q[1] ^ q[0];
+            // Shift left by one and assign the feedback to the lowest bit
+            q <= {q[30:0], feedback};
+        end
+    end
 
 endmodule

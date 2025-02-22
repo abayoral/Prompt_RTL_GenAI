@@ -1,3 +1,4 @@
+```verilog
 module top_module (
     input clk,
     input reset,
@@ -5,12 +6,15 @@ module top_module (
 
     always @(posedge clk) begin
         if (reset) begin
-            q <= 4'b0001; // Reset counter to 1
-        end else if (q == 4'b1010) begin
-            q <= 4'b0001; // Reset to 1 after reaching 10
-        end else begin
-            q <= q + 1;
+            q <= 4'd1; // Synchronous reset
+        end
+        else if (q == 4'd10) begin
+            q <= 4'd1; // Reset to 1 after reaching 10
+        end
+        else begin
+            q <= q + 1'b1; // Increment the counter
         end
     end
 
 endmodule
+```

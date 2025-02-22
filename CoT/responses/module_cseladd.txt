@@ -1,47 +1,87 @@
-Chain of Thought:
+To construct a carry-select adder using three instances of the provided `add16` module and a custom-built 16-bit 2-to-1 multiplexer, we need to follow these steps:
 
-    Understand the Requirements:
-        We are tasked to build a 32-bit carry-select adder from three 16-bit adders (add16).
-        The inputs are two 32-bit numbers (a, b) and the output is a 32-bit result (sum).
-        To achieve this, two add16 modules compute the sum of the lower and upper 16 bits of a and b with a carry-in of 0 and 1 respectively.
-        Then depending on the carry-out of the lower 16 bits, a 3rd add16 module selects the correct sum of the upper 16-bits.
+1. **Understand the Requirement**:
+    - The carry-select adder breaks down the addition of two 32-bit numbers into smaller chunks to expedite the process.
+    - We will divide the 32-bit addition into two 16-bit blocks.
+    - The carry-in for the lower 16 bits will be fed directly, while the upper 16 bits will be calculated using two add16 instances, assuming both carry-in possibilities (0 and 1).
 
-    Determine the Inputs and Outputs:
-        Inputs: a[31:0], b[31:0]
-        Output: sum[31:0]
+2. **Determine the Inputs and Outputs**:
+    - Inputs: Two 32-bit numbers `a` and `b`.
+    - Intermediate carry output from the first add16 block.
+    - Two 16-bit sums from the second and third add16 blocks depending on the possible carries.
+    - Outputs: The 32-bit sum.
 
-    Define Intermediate Signals:
-        We need intermediates to store the summed results of the lower and upper 16-bits depending on the carry-in value.
-        We also need an intermediate for the carry-out of the lower 16-bits adders.
+3. **Define Intermediate Signals**:
+    - Intermediate signals for carries and sums.
 
-    Structuring the Module:
-        Start with the module declaration and instantiation of the 16-bit adder modules.
-        Use wire declarations to handle the intermediate signals.
-        Use the selected output of the 16-bit adder modules for the final 32-bit sum.
+4. **Structuring the Module**:
+    - Instantiate three `add16` modules.
+    - The first `add16` instance handles the lower 16 bits.
+    - The second and third `add16` instances compute the upper 16 bits assuming carry-in of 0 and 1.
+    - Use a 16-bit 2-to-1 multiplexer to select the correct upper 16-bit sum based on the carry-out from the first instance.
 
-    Writing the Verilog Code:
+5. **Writing the Verilog Code**:
 
-verilog
+```verilog
 module top_module(
     input [31:0] a,
     input [31:0] b,
     output [31:0] sum
 );
-    wire [15:0] lower_sum_0, lower_sum_1, upper_sum_0, upper_sum_1;
-    wire lower_cout_0, lower_cout_1, upper_cout_0, upper_cout_1;
-    wire [15:0] upper_sum;
 
-    // Compute the sum of lower and upper 16 bits with carry-in 0
-    add16 add_lower_0 (.a(a[15:0]), .b(b[15:0]), .cin(1'b0), .sum(lower_sum_0), .cout(lower_cout_0));
-    add16 add_upper_0 (.a(a[31:16]), .b(b[31:16]), .cin(lower_cout_0), .sum(upper_sum_0), .cout(upper_cout_0));
+    wire [15:0] sum_low, sum_high_0, sum_high_1;
+    wire carry_out_low, carry_out_high_0, carry_out_high_1;
 
-    // Compute the sum of lower and upper 16 bits with carry-in 1
-    add16 add_lower_1 (.a(a[15:0]), .b(b[15:0]), .cin(1'b1), .sum(lower_sum_1), .cout(lower_cout_1));
-    add16 add_upper_1 (.a(a[31:16]), .b(b[31:16]), .cin(lower_cout_1), .sum(upper_sum_1), .cout(upper_cout_1));
+    // Instantiate the first add16 for the lower 16 bits
+    add16 adder_low (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum_low),
+        .cout(carry_out_low)
+    );
 
-    // Select the correct upper sum based on carry of lower
-    assign upper_sum = lower_cout_0 ? upper_sum_1 : upper_sum_0;
+    // Instantiate the second add16 for the upper 16 bits with carry-in of 0
+    add16 adder_high_0 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b0),
+        .sum(sum_high_0),
+        .cout(carry_out_high_0)
+    );
 
-    // Concatenate the lower and upper 16 bits to get 32-bit sum
-    assign sum = {upper_sum, lower_sum_0};
+    // Instantiate the third add16 for the upper 16 bits with carry-in of 1
+    add16 adder_high_1 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b1),
+        .sum(sum_high_1),
+        .cout(carry_out_high_1)
+    );
+
+    // Use a 16-bit 2-to-1 multiplexer to select the correct sum for the upper bits
+    mux_16to1 mux_high (
+        .A(sum_high_0),
+        .B(sum_high_1),
+        .sel(carry_out_low),
+        .Y(sum[31:16])
+    );
+
+    // The final sum combines the lower sum and the selected upper sum
+    assign sum[15:0] = sum_low;
+
 endmodule
+
+// 16-bit 2-to-1 multiplexer module
+module mux_16to1 (
+    input wire [15:0] A,
+    input wire [15:0] B,
+    input wire sel,
+    output wire [15:0] Y
+);
+    // Multiplexer logic: Y is B if sel is high, A if sel is low
+    assign Y = (sel) ? B : A;
+endmodule
+```
+
+In this implementation, the low bits are calculated using a direct `add16` instance while the upper bits are prepared for both possibilities of carry-in, and the correct sum is selected by a multiplexer based on the carry-out from the lower bits.

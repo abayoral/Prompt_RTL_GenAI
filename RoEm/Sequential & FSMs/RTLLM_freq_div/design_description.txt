@@ -1,31 +1,23 @@
-Please act as a professional verilog designer.
+You have been provided with a scenario in which you need to utilize your expertise as a professional Verilog designer. The task requires you to develop a frequency divider to handle an input clock signal operating at 100MHz and generate three distinct output clock signals with frequencies of 50MHz, 10MHz, and 1MHz. Let's delve into each portion of the requirements to ensure clarity and comprehensive understanding before you begin writing the code.
 
-Implement a frequency divider that the input clock frequency of 100MHz signal, and the outputs are 3 clock frequencies: 50MHz, 10MHz, 1MHz.
+Module Definition and Naming:
+- The module is to be named `freq_div`, indicating that it is dedicated to frequency division tasks.
 
-Module name:  
-    freq_div      
+Input Specifications:
+- There are two main input ports required for this module:
+  1. `CLK_in`: This is the incoming clock signal, specifically at a frequency of 100MHz, which serves as the basis for generating the outputs.
+  2. `RST`: This is the reset signal, utilized to initialize or reset the state of the output clocks and any counters or logic used within the module.
 
-Input ports:
-    CLK_in: Input clock signal
-    RST: Reset signal
+Output Specifications:
+- You are required to produce three output clock signals:
+  1. `CLK_50`: This output should oscillate at 50MHz, which is half the frequency of `CLK_in`. This effectively involves dividing the input frequency by 2.
+  2. `CLK_10`: This output should operate at 10MHz, representing a division of the input frequency by 10.
+  3. `CLK_1`: This output must have a frequency of 1MHz, requiring you to divide the input frequency by 100.
 
-Output ports:
-    CLK_50: Output clock signal with a frequency of CLK_in divided by 2.
-    CLK_10: Output clock signal with a frequency of CLK_in divided by 10.
-    CLK_1: Output clock signal with a frequency of CLK_in divided by 100.
+Implementation Methodology:
+- The module should employ counters to achieve the desired frequency division for each output clock signal:
+  1. For generating `CLK_50`, a simple toggle operation on `CLK_50` is required on every positive edge of `CLK_in`, unless a reset condition (`RST`) is asserted, setting `CLK_50` to a low state.
+  2. For generating `CLK_10`, a counter named `cnt_10` should be used: On each positive edge of `CLK_in`, if `RST` is not active, this counter increments until it reaches 4. Upon reaching 4, `CLK_10` is toggled, and `cnt_10` is reset. If `RST` is active, both `CLK_10` and `cnt_10` are reset.
+  3. For generating `CLK_1`, the process is similar using a counter `cnt_100`: On each positive edge of `CLK_in`, if `RST` is not active, the counter increments until it reaches 49, at which point `CLK_1` is toggled and `cnt_100` is reset. If `RST` is engaged, both `CLK_1` and `cnt_100` are reset.
 
-Implementation:
-The module uses three counters to divide the input clock frequency. 
-CLK_50 generation:
-On every positive edge of CLK_in or RST, if RST is active, CLK_50 is set to 0.
-Otherwise, CLK_50 is toggled by inverting its current value.
-CLK_10 generation:
-On every positive edge of CLK_in or RST, if RST is active, CLK_10 is set to 0, and the counter cnt_10 is reset to 0.
-If the counter cnt_10 reaches a value of 4, CLK_10 is toggled by inverting its current value, and the counter cnt_10 is reset to 0.
-Otherwise, the counter cnt_10 is incremented by 1.
-CLK_1 generation:
-On every positive edge of CLK_in or RST, if RST is active, CLK_1 is set to 0, and the counter cnt_100 is reset to 0.
-If the counter cnt_100 reaches a value of 49, CLK_1 is toggled by inverting its current value, and the counter cnt_100 is reset to 0.
-Otherwise, the counter cnt_100 is incremented by 1.
-
-Give me the complete code.
+Carefully consider synchronization, signal integrity, and potential race conditions as you prepare to write Verilog code that fulfills these requirements. The goal is to ensure that the module functions accurately and efficiently across all designated frequencies as per the outlined logic.

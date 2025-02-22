@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // Given a 100-bit input vector [99:0], reverse its bit ordering
 
 // Hint: A for loop (in a combinational always block or generate block) would be useful here. 

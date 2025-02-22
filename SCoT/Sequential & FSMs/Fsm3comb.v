@@ -1,30 +1,17 @@
-// The following is the state transition table for a Moore state machine with one input, one output, and four states. Use the following state encoding: A=2'b00, B=2'b01, C=2'b10, D=2'b11.
+The problem presented involves designing the combinational logic necessary for a Moore state machine with specific state and output behavior, as described by a given transition table. Here are the key elements you need to consider:
 
-// Implement only the state transition logic and output logic (the combinational logic portion) for this state machine. Given the current state (state), compute the next_state and output (out) based on the state transition table.
+1. **State Encoding:** Four states are to be represented using 2-bit binary codes as follows: State A is `2'b00`, State B is `2'b01`, State C is `2'b10`, and State D is `2'b11`.
 
-//	 	 	  Next state
+2. **Inputs and Outputs:** The state machine has a single binary input represented as `in`, and outputs two primary variables: `next_state` (a 2-bit signal reflecting the next state the machine transitions into) and `out` (a single-bit signal indicating the output associated with the current state).
 
-//	State					Output
-//			in=0	in=1
-//	A		A		B		0
-//	B		C		B		0
-//	C		A		D		0
-//	D		C		B		1
+3. **State Transition Table:**
+   - **State A:** When the machine is in State A and the input `in` is 0, it remains in State A; if `in` is 1, it transitions to State B. The output in State A is 0.
+   - **State B:** From State B, if `in` is 0, the machine transitions to State C; if `in` is 1, it remains in State B. The output in State B is 0.
+   - **State C:** In State C, a 0 at the input will transition the machine back to State A, while a 1 will transition it to State D. The output in State C is 0.
+   - **State D:** When in State D, if `in` is 0, the state transitions to State C; if `in` is 1, it changes to State B. The output in State D is 1.
 
-module top_module(
-    input in,
-    input [1:0] state,
-    output [1:0] next_state,
-    output out); //
+4. **Design Tasks:**
+   - You need to design the **state transition logic**, which involves determining the `next_state` based on the current `state` and the input `in`, according to the rules specified in the transition table.
+   - Design the **output logic**, where the `out` output should be generated based on the current state (not the input) since it's a Moore machine. This means that `out` remains constant throughout a state, irrespective of the input changes, until a state transition occurs.
 
-    parameter A=0, B=1, C=2, D=3;
-
-    // Insert your code below
-
-    // State transition logic: next_state = f(state, in)
-
-    // Output logic:  out = f(state) for a Moore state machine
-
-endmodule
-
-
+The task is to complete this combinational logic portion in a Verilog module called `top_module`. Your main goal is to ensure the logic accurately reflects the described behavior and transitions according to the specified conditions for both state transitions and output management.

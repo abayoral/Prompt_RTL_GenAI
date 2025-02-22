@@ -1,8 +1,0 @@
-Self-ask/modules/Bugs_nand3.v:8: error: Unknown module type: nandgate
-2 error(s) during elaboration.
-*** These modules were missing:
-        nandgate referenced 1 times.
-***
-Module file path: Self-ask/modules/Bugs_nand3.v
-Testbench file path: hdlbits_testbenches/Bugs_nand3_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Self-ask/simulations/Bugs_nand3_sim', 'Self-ask/modules/Bugs_nand3.v', 'hdlbits_testbenches/Bugs_nand3_0_tb.v']' returned non-zero exit status 2.

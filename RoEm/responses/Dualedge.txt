@@ -2,21 +2,22 @@
 module top_module (
     input clk,
     input d,
-    output q
+    output reg q
 );
 
-    reg q_pos;
-    reg q_neg;
+    reg q_pos, q_neg;
 
     always @(posedge clk) begin
-        q_pos <= d;
+        q_pos <= d; // Positive edge triggered flip-flop
     end
-    
+
     always @(negedge clk) begin
-        q_neg <= d;
+        q_neg <= d; // Negative edge triggered flip-flop
     end
-    
-    assign q = clk ? q_pos : q_neg;
+
+    always @(*) begin
+        q = clk ? q_pos : q_neg; // Multiplex between the two flip-flops
+    end
 
 endmodule
 ```

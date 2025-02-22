@@ -21,7 +21,8 @@ instr_reg uut (
     .ad2(ad2)
 );
 
-integer error;
+integer error = 0;
+integer total_tests = 0; // Counter for total test cases
 integer expected_ins;
 integer expected_ad1;
 integer expected_ad2;
@@ -42,6 +43,7 @@ initial begin
     #10;
 
     // Perform fetch operation 1 from register
+    total_tests = total_tests + 1;
     fetch = 2'b01;
     #5;
     data = 8'b01011100;
@@ -53,28 +55,32 @@ initial begin
     // Check the values
     if (ins !== expected_ins) begin
         error = error + 1; 
-        $display("Failed at fetch operation 1: clk=%d, ins=%b (expected %d)", clk, ins, expected_ins);
+        $display("Failed at fetch operation 1: clk=%d, ins=%b (expected %b)", clk, ins, expected_ins);
     end
 
     if (ad1 !== expected_ad1) begin
         error = error + 1; 
-        $display("Failed at fetch operation 1: clk=%d, ad1=%b (expected %d)", clk, ad1, expected_ad1);
+        $display("Failed at fetch operation 1: clk=%d, ad1=%b (expected %b)", clk, ad1, expected_ad1);
     end
 
     if (ad2 !== expected_ad2) begin
         error = error + 1; 
-        $display("Failed at fetch operation 1: clk=%d, ad2=%b (expected %d)", clk, ad2, expected_ad2);
+        $display("Failed at fetch operation 1: clk=%d, ad2=%b (expected %b)", clk, ad2, expected_ad2);
     end
 
-    // Additional test cases can be added here
+    // Additional test cases can be added here, with total_tests incremented
 
-    // Finish simulation and display total errors
+    // Final test result summary
+    $display("=========== Test Summary ===========");
+    $display("Total Tests Run: %d", total_tests);
+    $display("Total Failures: %d", error);
+
     if (error == 0) begin
-            $display("=========== Your Design Passed ===========");
-            end
-    else begin
-        $display("=========== Test completed with %d failures ===========", error);
+        $display("=========== Your Design Passed ===========");
+    end else begin
+        $display("=========== Test completed with %d / %d failures ===========", error, total_tests);
     end
+
     $finish;
 end
 

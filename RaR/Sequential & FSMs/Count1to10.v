@@ -1,10 +1,9 @@
-// Make a decade counter that counts 1 through 10, inclusive. The reset input is synchronous, and should reset the counter to 1.
+As a senior Digital Design Engineer at a prominent hardware design company, you have been given a significant task that involves developing a crucial Verilog module for a cutting-edge product. The completion and performance of this module are of utmost importance as it directly affects the company's standing and reliability within the competitive computer hardware industry.
 
-module top_module (
-    input clk,
-    input reset,
-    output [3:0] q);
+Your specific task requires you to design a decade counter—a specialized digital counter that operates within a predetermined range. The objective is to create a counter that counts sequentially from 1 through 10, inclusive. This means that upon reaching the count of 10, the counter should loop back to 1 on the subsequent count cycle. It is essential to ensure that the counter increments by one with each clock pulse.
 
-    // Insert your code here
+An important aspect of the design is the implementation of a synchronous reset feature. When a reset signal is activated, it should synchronously reset the counter back to the starting count of 1, regardless of its current value, but this reset should happen in alignment with the clock signal. This is crucial to ensure the counter's proper operation within synchronous digital systems.
 
-endmodule
+Your task is to complete the Verilog code for the specified module "top_module." The module accepts a clock signal input ('clk'), which drives the counter, and a reset signal input ('reset'), which reinitializes the counter value to 1 when activated. The output ('q') should be a 4-bit wide signal representing the current count in binary format.
+
+Given the significance of this module's function in the next-generation product's development, careful attention must be paid to design accuracy, code efficiency, and overall compliance with digital design best practices. Your expertise in Verilog coding and digital logic design is crucial for the successful implementation of this decade counter module.

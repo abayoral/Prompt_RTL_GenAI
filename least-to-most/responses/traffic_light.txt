@@ -1,0 +1,124 @@
+```verilog
+module traffic_light (
+    input wire rst_n,
+    input wire clk,
+    input wire pass_request,
+    output reg [7:0] clock,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+    typedef enum logic [1:0] {IDLE, S1_RED, S2_YELLOW, S3_GREEN} state_t;
+    state_t state, next_state;
+
+    reg [7:0] cnt;
+    reg ped_button_active;
+    
+    // Parameters for each light duration
+    localparam RED_DURATION = 10;
+    localparam YELLOW_DURATION = 5;
+    localparam GREEN_DURATION = 60;
+    localparam PEDESTRIAN_GREEN_REMAINING = 10;
+
+    // State transition and output logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= IDLE;
+            cnt <= 0;
+            red <= 1'b0;
+            yellow <= 1'b0;
+            green <= 1'b0;
+            ped_button_active <= 1'b0;
+        end else begin
+            state <= next_state;
+            case (state)
+                IDLE: begin
+                    cnt <= RED_DURATION;
+                    red <= 1'b1;
+                    yellow <= 1'b0;
+                    green <= 1'b0;
+                    if (cnt == 0)
+                        next_state <= S3_GREEN;
+                end
+                
+                S1_RED: begin
+                    if (cnt == 0) begin
+                        next_state <= S3_GREEN;
+                        cnt <= GREEN_DURATION;
+                    end else begin
+                        cnt <= cnt - 1;
+                    end
+                end
+
+                S2_YELLOW: begin
+                    if (cnt == 0) begin
+                        next_state <= S1_RED;
+                        cnt <= RED_DURATION;
+                    end else begin
+                        cnt <= cnt - 1;
+                    end
+                end
+                
+                S3_GREEN: begin
+                    if (cnt == 0) begin
+                        next_state <= S2_YELLOW;
+                        cnt <= YELLOW_DURATION;
+                    end else if (pass_request && cnt > PEDESTRIAN_GREEN_REMAINING) begin
+                        cnt <= PEDESTRIAN_GREEN_REMAINING;
+                    end else begin
+                        cnt <= cnt - 1;
+                    end
+                end
+            endcase
+        end
+    end
+    
+    // Determine next state logic
+    always @(*) begin
+        case (state)
+            IDLE: next_state = S1_RED;
+            S1_RED: next_state = (cnt == 0) ? S3_GREEN : S1_RED;
+            S2_YELLOW: next_state = (cnt == 0) ? S1_RED : S2_YELLOW;
+            S3_GREEN: next_state = (cnt == 0) ? S2_YELLOW : S3_GREEN;
+            default: next_state = IDLE;
+        endcase
+    end
+
+    // Output logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            red <= 1'b0;
+            yellow <= 1'b0;
+            green <= 1'b0;
+        end else begin
+            case (state)
+                S1_RED:  begin
+                    red <= 1'b1;
+                    yellow <= 1'b0;
+                    green <= 1'b0;
+                end
+                S2_YELLOW: begin
+                    red <= 1'b0;
+                    yellow <= 1'b1;
+                    green <= 1'b0;
+                end
+                S3_GREEN: begin
+                    red <= 1'b0;
+                    yellow <= 1'b0;
+                    green <= 1'b1;
+                end
+            endcase
+        end
+    end
+
+    // Output the current counter value to the clock output
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            clock <= 8'd0;
+        else
+            clock <= cnt;
+    end
+
+endmodule
+```

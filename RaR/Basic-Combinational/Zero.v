@@ -1,6 +1,1 @@
-//Build a circuit with no inputs and one output that outputs a constant 0
-module top_module(
-    output zero
-);// Module body starts after semicolon
-
-endmodule
+As a senior Digital Design Engineer working at a prominent hardware design company, your expertise and creativity are being leveraged for a high-stakes project involving the development of a critical Verilog module. This module is integral to a next-generation product that is pivotal to sustaining and enhancing your company's standing in the competitive computer hardware industry. Your task is to design a hardware circuit using Verilog - a hardware description language commonly used for digital design and modeling. The specific challenge in front of you is to create a circuit that has no input signals and a singular output signal. The requirement is that this single output must consistently provide a constant digital '0' value. This is a fundamental task, yet crucial as it sets the groundwork for further complex system designs by ensuring reliability and performance. Once you define the module name, `top_module`, and its intended output, you will need to thoughtfully construct the internal logic of the circuit that maintains a stable zero output indefinitely. Consider any implications of propagation delays or synthesis optimizations, as the seamless operation of this module is essential for the overall system integrity.

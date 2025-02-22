@@ -7,12 +7,21 @@ module sub_64bit(
 );
 
     wire [63:0] B_neg;
-    assign B_neg = ~B + 1; // Two's complement to represent -B
+    wire [63:0] sum_AB_negative;
+    wire A_sign, B_sign, result_sign;
+
+    // Negate B to perform subtraction as addition of two's complement
+    assign B_neg = ~B + 1;
     assign result = A + B_neg;
 
-    // Checking for overflow: 
-    // Overflow occurs if A[63] == B_neg[63] and result[63] != A[63]
-    assign overflow = (A[63] == B_neg[63]) && (result[63] != A[63]);
+    // Extract the sign bits
+    assign A_sign = A[63];
+    assign B_sign = B[63];
+    assign result_sign = result[63];
+
+    // Detect overflow condition
+    assign overflow = (A_sign & ~B_sign & ~result_sign) | (~A_sign & B_sign & result_sign);
 
 endmodule
 ```
+This Verilog module implements a 64-bit subtractor with overflow detection by negating `B` and adding it to `A`. The overflow is detected by checking the sign bits of the operands and the result.

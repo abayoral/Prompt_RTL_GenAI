@@ -1,4 +1,30 @@
 ```verilog
+module top_module (
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+    wire carry_out;
+
+    // Instance of the lower 16 bits adder
+    add16 lower_add16 (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum[15:0]),
+        .cout(carry_out)
+    );
+
+    // Instance of the upper 16 bits adder
+    add16 upper_add16 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(carry_out),
+        .sum(sum[31:16]),
+        .cout()
+    );
+endmodule
+
 module add16 (
     input [15:0] a,
     input [15:0] b,
@@ -7,52 +33,33 @@ module add16 (
     output cout
 );
     wire [15:0] carry;
-    
-    add1 fa0  (a[0],  b[0],  cin,    sum[0],  carry[0] );
-    add1 fa1  (a[1],  b[1],  carry[0], sum[1],  carry[1] );
-    add1 fa2  (a[2],  b[2],  carry[1], sum[2],  carry[2] );
-    add1 fa3  (a[3],  b[3],  carry[2], sum[3],  carry[3] );
-    add1 fa4  (a[4],  b[4],  carry[3], sum[4],  carry[4] );
-    add1 fa5  (a[5],  b[5],  carry[4], sum[5],  carry[5] );
-    add1 fa6  (a[6],  b[6],  carry[5], sum[6],  carry[6] );
-    add1 fa7  (a[7],  b[7],  carry[6], sum[7],  carry[7] );
-    add1 fa8  (a[8],  b[8],  carry[7], sum[8],  carry[8] );
-    add1 fa9  (a[9],  b[9],  carry[8], sum[9],  carry[9] );
-    add1 fa10 (a[10], b[10], carry[9], sum[10], carry[10] );
-    add1 fa11 (a[11], b[11], carry[10], sum[11], carry[11] );
-    add1 fa12 (a[12], b[12], carry[11], sum[12], carry[12] );
-    add1 fa13 (a[13], b[13], carry[12], sum[13], carry[13] );
-    add1 fa14 (a[14], b[14], carry[13], sum[14], carry[14] );
-    add1 fa15 (a[15], b[15], carry[14], sum[15], carry[15] );
+    genvar i;
 
-    assign cout = carry[15];
-endmodule
+    generate
+        for (i = 0; i < 16; i = i + 1) begin: adder_chain
+            if (i == 0) begin
+                // First bit addition
+                add1 adder (
+                    .a(a[i]),
+                    .b(b[i]),
+                    .cin(cin),
+                    .sum(sum[i]),
+                    .cout(carry[i])
+                );
+            end else begin
+                // Subsequent bit additions
+                add1 adder (
+                    .a(a[i]),
+                    .b(b[i]),
+                    .cin(carry[i-1]),
+                    .sum(sum[i]),
+                    .cout(carry[i])
+                );
+            end
+        end
+    endgenerate
 
-module top_module (
-    input [31:0] a,
-    input [31:0] b,
-    output [31:0] sum
-);
-    wire cout16;
-
-    // Instantiate the first 16-bit adder for lower 16 bits
-    add16 lower_add16 (
-        .a(a[15:0]),
-        .b(b[15:0]),
-        .cin(1'b0),       // No carry-in for the lower 16 bits
-        .sum(sum[15:0]),
-        .cout(cout16)
-    );
-
-    // Instantiate the second 16-bit adder for upper 16 bits
-    add16 upper_add16 (
-        .a(a[31:16]),
-        .b(b[31:16]),
-        .cin(cout16),     // Carry from the lower 16 bits
-        .sum(sum[31:16]),
-        .cout()           // We don't care about the final carry-out
-    );
-
+    assign cout = carry[15]; // The carry out from the last full adder
 endmodule
 
 module add1 (
@@ -62,7 +69,7 @@ module add1 (
     output sum,
     output cout
 );
-    assign sum = a ^ b ^ cin;
-    assign cout = (a & b) | (a & cin) | (b & cin);
+    assign sum = a ^ b ^ cin;     // Sum calculation
+    assign cout = (a & b) | (b & cin) | (a & cin); // Carry-out calculation
 endmodule
 ```

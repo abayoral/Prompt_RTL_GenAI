@@ -7,9 +7,11 @@ module top_module(
     output out
 );
 
-// Simplified Expression from K-map: out = a'b + ab' + cd + c'd'
+    // Based on the given Karnaugh map, we simplify the expression.
+    // Simplified sum-of-products (SOP) form:
+    // F(a, b, c, d) = b'd' + a'c' + ac
 
-assign out = (~a & b) | (a & ~b) | (c & d) | (~c & ~d);
+    assign out = (~b & ~d) | (~a & ~c) | (a & c);
 
 endmodule
 ```

@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // Design a 1-12 counter with the following inputs and outputs:
 
 // Reset Synchronous active-high reset that forces the counter to 1

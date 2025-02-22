@@ -1,14 +1,10 @@
 ```verilog
-module mod_a (input in1, input in2, output out);
-
-endmodule
-
-module top_module ( input a, input b, output out );
-    // Instantiate module mod_a
+module top_module(input a, input b, output out);
+    // Instance of mod_a
     mod_a instance_name (
-        .in1(a), 
-        .in2(b), 
-        .out(out)
+        .in1(a),  // Connect top-level input a to mod_a's in1
+        .in2(b),  // Connect top-level input b to mod_a's in2
+        .out(out) // Connect mod_a's out to top-level output out
     );
 endmodule
 ```

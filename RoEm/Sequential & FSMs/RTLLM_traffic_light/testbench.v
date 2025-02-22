@@ -10,6 +10,7 @@ module tb_traffic_light;
   wire yellow;
   wire green;
   integer i;
+  
   // Instantiate the module
   traffic_light uut (
     .clk(clk), 
@@ -27,7 +28,9 @@ module tb_traffic_light;
   end
 
   integer error = 0;
+  integer total_tests = 0; // Counter for total test cases
   integer clock_cnt;
+
   // Test sequence
   initial begin
     clk = 0; // Initialize clock
@@ -40,39 +43,59 @@ module tb_traffic_light;
     rst_n = 1;
     #30;
     
-    // test red
+    // Test red
+    total_tests = total_tests + 1;
     $display("At time %t, clock = %d, red = %b, yellow = %b, green = %b", 
                $time, clock, red, yellow, green);
-    error = (red==1)&&(yellow==0)&&(green==0) ?error :error+1;
+    error = (red==1)&&(yellow==0)&&(green==0) ? error : error+1;
+    
     #100;
-    // test green
+
+    // Test green
+    total_tests = total_tests + 1;
     $display("At time %t, clock = %d, red = %b, yellow = %b, green = %b", 
                $time, clock, red, yellow, green);
-    error = (red==0)&&(yellow==0)&&(green==1) ?error :error+1;
+    error = (red==0)&&(yellow==0)&&(green==1) ? error : error+1;
+    
     #600;
-    // test yellow
+
+    // Test yellow
+    total_tests = total_tests + 1;
     $display("At time %t, clock = %d, red = %b, yellow = %b, green = %b", 
                $time, clock, red, yellow, green);
-    error = (red==0)&&(yellow==1)&&(green==0) ?error :error+1;
+    error = (red==0)&&(yellow==1)&&(green==0) ? error : error+1;
+    
     #150;
+    total_tests = total_tests + 1;
     $display("At time %t, clock = %d, red = %b, yellow = %b, green = %b", 
                $time, clock, red, yellow, green);
+    
     clock_cnt = clock;
-    // test pass_request
+
+    // Test pass_request
     #30;
+    total_tests = total_tests + 1;
     $display("At time %t, clock = %d, red = %b, yellow = %b, green = %b", 
                $time, clock, red, yellow, green);
-    error = (clock!=(clock_cnt+3)) ?error :error+1;
+    error = (clock != (clock_cnt + 3)) ? error : error+1;
+    
     pass_request = 1;
     #10;
+
+    total_tests = total_tests + 1;
     $display("At time %t, clock = %d, red = %b, yellow = %b, green = %b", 
                $time, clock, red, yellow, green);
-    error = (clock==10)&&(green==1) ?error :error+1;
+    error = (clock == 10)&&(green == 1) ? error : error+1;
+
+    // Final test result summary
+    $display("=========== Test Summary ===========");
+    $display("Total Tests Run: %d", total_tests);
+    $display("Total Failures: %d", error);
+
     if (error == 0) begin
-      $display("===========Your Design Passed===========");
-    end
-    else begin
-    $display("===========Failed===========", error);
+      $display("=========== Your Design Passed ===========");
+    end else begin
+      $display("=========== Test completed with %d / %d failures ===========", error, total_tests);
     end
 
     $finish; // End of test

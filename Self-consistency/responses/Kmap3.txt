@@ -3,7 +3,11 @@ module top_module(
     input b,
     input c,
     input d,
-    output out  
-); 
-    assign out = (~a & d & ~c) | ((a | ~d) & b & ~c) | (a & b & c);
+    output out
+);
+
+    // Simplified expression from the K-map: ab + c'd'
+
+    assign out = (a & b) | (~c & ~d);
+
 endmodule

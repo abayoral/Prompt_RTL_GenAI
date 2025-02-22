@@ -6,11 +6,14 @@ module top_module(
     output f   // one output
 );
 
-	// Sum-of-Products form: f = x3'x2x1' + x3'x2x1 + x3x2'x1 + x3x2x1
-    assign f = (~x3 & x2 & ~x1) | // row 2
-               (~x3 & x2 & x1)  | // row 3
-               (x3 & ~x2 & x1)  | // row 5
-               (x3 & x2 & x1);    // row 7
+    // Implement the logical expression based on the truth table
+    // f = (~x3 & x2 & ~x1) | (~x3 & x2 & x1) | (x3 & ~x2 & x1) | (x3 & x2 & x1);
+    
+    // Use the assign statement to describe the sum-of-products
+    assign f = (~x3 & x2 & ~x1) | 
+               (~x3 & x2 & x1)  | 
+               (x3 & ~x2 & x1)  | 
+               (x3 & x2 & x1);
 
 endmodule
 ```

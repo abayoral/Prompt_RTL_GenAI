@@ -1,7 +1,12 @@
+No additional clarification is needed as the function of the Verilog module is clearly described as a one-bit wide, 2-to-1 multiplexer. I will proceed to create the module.
+
 ```verilog
 module top_module( 
-    input a, b, sel,
-    output out ); 
+    input a, 
+    input b, 
+    input sel,
+    output out 
+);
 
     assign out = sel ? b : a;
 

@@ -1,11 +1,14 @@
 ```verilog
-module andgate ( output out, input a, input b, input c, input d, input e );
-    assign out = a & b & c & d & e;
+module andgate (output out, input a, input b, input c, input d, input e);
+    assign out = a & b & c & d & e; // This is a 5-input AND gate
 endmodule
 
 module top_module (input a, input b, input c, output out);
     wire and_out;
-    andgate inst1 ( .out(and_out), .a(a), .b(b), .c(c), .d(1'b1), .e(1'b1) );
-    assign out = ~and_out;
+
+    andgate inst1 (and_out, a, b, c, 1'b1, 1'b1); // Use two tied HIGH inputs for the unused inputs of the AND gate
+
+    assign out = ~and_out; // Invert the output to create a NAND gate
+
 endmodule
 ```

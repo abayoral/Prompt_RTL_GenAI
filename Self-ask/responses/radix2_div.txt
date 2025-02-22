@@ -1,0 +1,75 @@
+```verilog
+module radix2_div (
+    input wire clk,
+    input wire rst,
+    input wire sign,
+    input wire [7:0] dividend,
+    input wire [7:0] divisor,
+    input wire opn_valid,
+    output reg res_valid,
+    output reg [15:0] result
+);
+
+    reg [15:0] SR; // Shift register holding the dividend and intermediate values
+    reg [7:0] NEG_DIVISOR; // Negative version of divisor for subtraction
+    reg [3:0] cnt; // Counter for 8 iterations
+    reg start_cnt; // Start counting to initiate operations
+
+    wire [7:0] abs_dividend;
+    wire [7:0] abs_divisor;
+    wire [7:0] neg_divisor;
+    wire carry_out;
+    
+    // Calculate absolute values if signed operation is required
+    assign abs_dividend = (sign && dividend[7]) ? (~dividend + 8'd1) : dividend;
+    assign abs_divisor = (sign && divisor[7]) ? (~divisor + 8'd1) : divisor;
+    assign neg_divisor = ~abs_divisor + 8'd1;
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            SR <= 16'd0;
+            cnt <= 4'd0;
+            start_cnt <= 1'b0;
+            res_valid <= 1'b0;
+            result <= 16'd0;
+        end else begin
+            if (opn_valid && !res_valid) begin
+                // Initialize operation
+                SR <= {abs_dividend, 8'd0}; // Shift register initialized with dividend, shifted
+                NEG_DIVISOR <= neg_divisor;
+                cnt <= 4'd1;
+                start_cnt <= 1'b1;
+                res_valid <= 1'b0;
+            end else if (start_cnt) begin
+                // Division step
+                if (cnt == 4'd8) begin
+                    // Division complete
+                    start_cnt <= 1'b0;
+                    res_valid <= 1'b1;
+                    result <= SR; // Upper 8-bits are remainder, Lower 8-bits are quotient
+                end else begin
+                    // Perform subtraction and shift operations
+                    {carry_out, SR[15:8]} = SR[15:8] + NEG_DIVISOR;
+                    SR <= {SR[14:0], ~carry_out}; // shift left & place result bit
+                    cnt <= cnt + 1;
+                end
+            end
+        end
+    end
+
+    always @(*) begin
+        if (sign) begin
+            // Handle signed result adjustments for negative dividend result re-adjustment
+            if (dividend[7] ^ divisor[7]) begin
+                // If signs differ, quotient must be negative
+                result[7:0] = 8'hFF - result[7:0] + 8'd1;
+            end
+            if (dividend[7]) begin
+                // If dividend was negative, remainder must match the sign
+                result[15:8] = 8'hFF - result[15:8] + 8'd1;
+            end
+        end
+    end
+
+endmodule
+```

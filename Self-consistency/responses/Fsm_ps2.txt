@@ -2,56 +2,55 @@ module top_module(
     input clk,
     input [7:0] in,
     input reset,    // Synchronous reset
-    output reg done); 
+    output done);   // Output done signal
 
     // State encoding
-    typedef enum logic [1:0] {
-        S_IDLE       = 2'b00,
-        S_BYTE1      = 2'b01,
-        S_BYTE2      = 2'b10,
-        S_BYTE3      = 2'b11
+    typedef enum reg [1:0] {
+        WAIT_FOR_START = 2'b00,
+        BYTE_1         = 2'b01,
+        BYTE_2         = 2'b10,
+        DONE           = 2'b11
     } state_t;
+    
+    state_t current_state, next_state;
 
-    state_t state, next_state;
-
-    // State transition logic (combinational)
+    // State transition logic
     always @(*) begin
-        case(state)
-            S_IDLE: begin
-                if (in[3])
-                    next_state = S_BYTE1;
-                else
-                    next_state = S_IDLE;
+        case (current_state)
+            WAIT_FOR_START: begin
+                // Wait for a byte with bit[3]=1
+                if (in[3] == 1'b1) begin
+                    next_state = BYTE_1;
+                end else begin
+                    next_state = WAIT_FOR_START;
+                end
             end
-            S_BYTE1: begin
-                next_state = S_BYTE2;
+            BYTE_1: begin
+                // We've received the first byte of the message
+                next_state = BYTE_2;
             end
-            S_BYTE2: begin
-                next_state = S_BYTE3;
+            BYTE_2: begin
+                // We've received the second byte of the message
+                next_state = DONE;
             end
-            S_BYTE3: begin
-                next_state = S_IDLE;
+            DONE: begin
+                // Signal the done, then immediately transition to WAIT_FOR_START
+                next_state = WAIT_FOR_START;
             end
-            default: next_state = S_IDLE;
+            default: next_state = WAIT_FOR_START;
         endcase
     end
 
     // State flip-flops (sequential)
-    always @(posedge clk) begin
-        if (reset)
-            state <= S_IDLE;
-        else
-            state <= next_state;
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= WAIT_FOR_START;
+        end else begin
+            current_state <= next_state;
+        end
     end
 
     // Output logic
-    always @(posedge clk) begin
-        if (reset)
-            done <= 0;
-        else if (state == S_BYTE3)
-            done <= 1;
-        else
-            done <= 0;
-    end
+    assign done = (current_state == DONE);
 
 endmodule

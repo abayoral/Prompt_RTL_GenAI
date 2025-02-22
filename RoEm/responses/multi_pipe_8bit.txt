@@ -1,0 +1,63 @@
+```verilog
+module multi_pipe_8bit (
+    input clk,
+    input rst_n,
+    input mul_en_in,
+    input [7:0] mul_a,
+    input [7:0] mul_b,
+    output reg mul_en_out,
+    output reg [15:0] mul_out
+);
+
+    // Registers to hold the inputs and enable signal
+    reg [7:0] mul_a_reg, mul_b_reg;
+    reg mul_en_reg;
+
+    // Registers for intermediate sums and final product
+    reg [15:0] sum_reg[7:0];
+    reg [15:0] mul_out_reg;
+
+    integer i;
+
+    // Reset logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            mul_en_reg <= 0;
+            mul_en_out <= 0;
+            mul_a_reg <= 0;
+            mul_b_reg <= 0;
+            mul_out_reg <= 0;
+            for (i = 0; i < 8; i = i + 1) begin
+                sum_reg[i] <= 0;
+            end
+        end else begin
+            // Update enable signals and registers
+            mul_en_reg <= mul_en_in;
+            mul_en_out <= mul_en_reg;
+
+            if (mul_en_in) begin
+                mul_a_reg <= mul_a;
+                mul_b_reg <= mul_b;
+            end
+            
+            // Compute and store partial products
+            for (i = 0; i < 8; i = i + 1) begin
+                sum_reg[i] <= (mul_b_reg[i]) ? (mul_a_reg << i) : 16'b0;
+            end
+            
+            // Accumulate sums to form the final product
+            if (mul_en_reg) begin
+                mul_out_reg = sum_reg[0] + sum_reg[1] + sum_reg[2] + sum_reg[3] +
+                              sum_reg[4] + sum_reg[5] + sum_reg[6] + sum_reg[7];
+            end else begin
+                mul_out_reg <= 0;
+            end
+
+            // Assign output
+            mul_out <= mul_out_reg;
+        end
+    end
+
+endmodule
+```
+This Verilog code represents an 8-bit unsigned multiplier implemented with a pipelined architecture. It accepts an 8-bit multiplicand and multiplier, computes partial products and accumulates them to generate a 16-bit product, using enable and reset signals to control the operation flow.

@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // you are provided with the same module add16 as the previous exercise, 
 // which adds two 16-bit numbers with carry-in and produces a carry-out and 16-bit sum. 
 // You must instantiate three of these to build the carry-select adder, 

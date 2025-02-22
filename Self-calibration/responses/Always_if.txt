@@ -1,15 +1,23 @@
+The provided Verilog module appears mostly correct, but there are a couple of stylistic improvements and best practice recommendations that can be applied:
+
+1. Ensure that ports and signals are declared in a clear and consistent manner.
+2. Use `wire` explicitly for clarity, even though it is not strictly necessary for port outputs.
+3. Make sure to use consistent naming conventions for inputs and outputs.
+4. Protect against latches in case of more complex conditions, though in this case, your procedural block should be fine.
+
+Here is the revised version of the code:
+
 ```verilog
-// synthesis verilog_input_version verilog_2001
-module top_module(
-    input a,
-    input b,
-    input sel_b1,
-    input sel_b2,
+module top_module (
+    input wire a,         // Declare explicitly as wire for better readability
+    input wire b,         // Declare explicitly as wire for better readability
+    input wire sel_b1,    // Declare explicitly as wire for better readability
+    input wire sel_b2,    // Declare explicitly as wire for better readability
     output wire out_assign,
-    output reg out_always   
+    output reg out_always
 );
 
-    // Using assign statements
+    // Using assign statement
     assign out_assign = (sel_b1 && sel_b2) ? b : a;
 
     // Using procedural if statement
@@ -23,3 +31,8 @@ module top_module(
 
 endmodule
 ```
+
+Key points to note:
+- Wires don't need explicit declaration in module ports (`input` and `output`), but declaring them as `input wire` or `output wire` is a best practice for clarity.
+- The procedural block will not infer any unintended latch as it covers both the true and false conditions of the `if` statement.
+- Comments were added for consistency and to maintain readability.

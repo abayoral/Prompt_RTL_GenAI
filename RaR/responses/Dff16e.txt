@@ -1,22 +1,21 @@
 ```verilog
-module top_module (
-    input clk,
-    input resetn,
-    input [1:0] byteena,
-    input [15:0] d,
+module dff_array_16 (
+    input wire clk,
+    input wire resetn,
+    input wire [15:0] d,
+    input wire [1:0] byteena,
     output reg [15:0] q
 );
 
     always @(posedge clk) begin
         if (!resetn) begin
-            q <= 16'b0; // Synchronous reset to 0 when resetn is low
-        end
-        else begin
-            if (byteena[1]) begin
-                q[15:8] <= d[15:8]; // Write upper byte
-            end
+            q <= 16'b0;
+        end else begin
             if (byteena[0]) begin
-                q[7:0] <= d[7:0]; // Write lower byte
+                q[7:0] <= d[7:0];
+            end
+            if (byteena[1]) begin
+                q[15:8] <= d[15:8];
             end
         end
     end

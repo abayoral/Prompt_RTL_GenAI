@@ -1,20 +1,19 @@
-Please act as a professional verilog designer.
+As a skilled Verilog designer with proficiency up to October 2023, we invite you to envision and develop a Verilog module titled "edge_detect" with specific requirements as outlined below:
 
-Implement a module for edge detection. There is a slowly changing 1-bit signal a. When "a" changes from 0 to 1, the indicating signal rise is 1. When "a" changes from 1 to 0, the falling edge of signal a is shown, the indicating signal down is 1. rise or down will be set to 1 on the next clock when the corresponding edge appears, and then return to 0 until the corresponding edge appears again.
+Objective:
+The primary aim is to architect a hardware module that can efficiently identify both rising and falling edges of a slowly varying 1-bit input signal, labeled 'a'. Upon recognizing these transitions, the module should generate distinct output signals—identified as 'rise' for a rising edge and 'down' for a falling edge—to indicate the nature of the transition observed in signal 'a'.
 
-Module name:  
-    edge_detect      
+Input Ports Overview:
+1. **clk**: This signal serves as the clock input for the module. The edge detection algorithm is expected to be synchronous with the positive edges of this clock, ensuring all output alterations are executed in a precise, clock-synchronized manner.
+2. **rst_n**: This signal functions as an active low reset input. When asserted (held low), it should reset all states and outputs of the module, allowing for a clean initialization or re-initialization.
+3. **a**: This 1-bit input signal is the subject of edge detection. The module continuously observes changes in this signal to identify rising and falling edges.
 
-Input ports:
-    clk: Clock signal.
-    rst_n: Reset signal (active low).
-    a: Input signal.
+Output Ports Overview:
+1. **rise**: This 1-bit output signal is intended to signal a rising edge in the input signal 'a'. The signal should be driven high (1) when the transition from low (0) to high (1) is detected in 'a', remain high for the duration of one clock cycle, and subsequently return to low (0) until another rising edge is detected.
+2. **down**: Similarly, this 1-bit output signal should indicate a falling edge in the input signal 'a'. It should be driven high (1) upon detecting a transition from high (1) to low (0) in 'a', remain high for the following clock cycle, and then revert to low (0) once another falling edge is captured.
 
-Output ports:
-    rise: Output signal indicating a rising edge.
-    down: Output signal indicating a falling edge.
-
-Implementation:
-The edge_detect module detects rising and falling edges in the input signal a and generates corresponding output signals rise and down. The rising and falling edges are detected on the positive edge of the clock signal clk. If a rising edge is detected, the rise output signal is set to 1. If a falling edge is detected, the down output signal is set to 1. Otherwise, both output signals are set to 0. These output signals are synchronized with the clock and remain set to 1 until the corresponding edge appears again.
-
-Give me the complete code.
+Implementation Discussion:
+- The module should reliably detect transitions in the input signal 'a' on the rising edge of the clock signal 'clk' and emit appropriate outputs.
+- Utilizing registers may be essential to store the previous state of the input signal 'a', enabling the detection of edges by comparison with its current state.
+- The implementation must cater to the active low reset functionality ('rst_n'), providing the capability to reset the system to a known initial state at any point.
+- Outputs 'rise' and 'down' need to be transiently set high for a single clock cycle upon edge detection, automatically reverting to low thereafter, thereby ensuring the module's readiness for subsequent transition detections.

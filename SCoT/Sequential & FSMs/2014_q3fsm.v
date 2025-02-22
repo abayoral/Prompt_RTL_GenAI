@@ -1,14 +1,7 @@
-// Consider a finite state machine with inputs s and w. Assume that the FSM begins in a reset state called A, as depicted below. The FSM remains in state A as long as s = 0, and it moves to state B when s = 1. Once in state B the FSM examines the value of the input w in the next three clock cycles. If w = 1 in exactly two of these clock cycles, then the FSM has to set an output z to 1 in the following clock cycle. Otherwise z has to be 0. The FSM continues checking w for the next three clock cycles, and so on. The timing diagram below illustrates the required values of z for different values of w.
+Imagine you are tasked with designing a finite state machine (FSM) that controls an output signal based on two input signals, s and w. The FSM kicks off its operation in a default reset state labeled as A, and it stays in this state as long as the input signal s is equal to 0. However, when s becomes 1, the FSM transitions from state A to a new state B. Once the FSM enters state B, it begins to monitor the input signal w over the course of the next three consecutive clock cycles. The FSM's main job in this phase is to count how many times the input w is set to 1 during these three cycles. If, by the end of these three cycles, the FSM has observed that w was equal to 1 exactly twice, it will react by setting an output signal z to 1 during the very next clock cycle. If this specific condition is not met, meaning w equals 1 either fewer or more than two times, then the output z will be set to 0 instead.
 
-// Use as few states as possible. Note that the s input is used only in state A, so you need to consider just the w input.
+After deciding the value of z based on the above conditions, the FSM does not halt but rather continues to monitor the input w, repeating the same three-clock-cycle evaluation process indefinitely, or until new instructions are provided. Notably, it is important to remember that the input signal s plays a role only when the FSM is in state A, serving as the trigger to move out of this state. Throughout the operation in state B, the only input the FSM is concerned with is w.
 
-module top_module (
-    input clk,
-    input reset,   // Synchronous reset
-    input s,
-    input w,
-    output z
-);
-	// Insert your code here
+The goal of this task is to conceptualize and implement this FSM with an efficient use of resources—specifically, to design it using the fewest number of states possible while achieving the described functionality. Following this operational logic is a timing diagram that outlines the expected behavior of the output z based on varying sequences of input w during the FSM's operation, providing a visual aid for understanding the timing requirements of the output state changes.
 
-endmodule
+You are to write a module in Verilog that effectively incorporates these requirements, managing inputs and generating the appropriate output based on the described rules. Your task involves writing the Verilog code within a given framework that defines the inputs and output, as well as a synchronous reset to initialize the FSM. Remember, the challenge is to keep the FSM design as simple and streamlined as possible, minimizing the number of states while fulfilling the task's conditions.

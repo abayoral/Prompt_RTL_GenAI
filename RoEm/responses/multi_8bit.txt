@@ -1,0 +1,24 @@
+```verilog
+module multi_8bit (
+    input [7:0] A,   // 8-bit multiplicand
+    input [7:0] B,   // 8-bit multiplier
+    output reg [15:0] product  // 16-bit product
+);
+
+    integer i; // Loop index
+    reg [15:0] A_extended; // 16-bit extension of A for shifting
+
+    always @(*) begin
+        product = 0; // Initialize product to zero
+        A_extended = A; // Initialize extended A with the multiplicand value
+
+        // Perform shift-and-add multiplication
+        for (i = 0; i < 8; i = i + 1) begin
+            if (B[i]) begin
+                product = product + (A_extended << i);
+            end 
+        end
+    end
+
+endmodule
+```

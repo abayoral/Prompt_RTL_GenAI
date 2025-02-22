@@ -1,0 +1,51 @@
+```verilog
+module accu (
+    input wire clk,
+    input wire rst_n,
+    input wire [7:0] data_in,
+    input wire valid_in,
+    output reg valid_out,
+    output reg [9:0] data_out
+);
+
+    // Internal signals
+    reg [9:0] sum;
+    reg [1:0] data_count;
+
+    // Synchronous logic for accumulation and output
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset state
+            sum <= 10'd0;
+            data_count <= 2'd0;
+            valid_out <= 1'b0;
+            data_out <= 10'd0;
+        end
+        else begin
+            if (valid_in) begin
+                // Accumulate data and count valid inputs
+                sum <= sum + data_in;
+                data_count <= data_count + 1;
+
+                // Check if the fourth valid data has been accumulated
+                if (data_count == 2'd3) begin
+                    // Output the result and set valid_out
+                    data_out <= sum + data_in; // Add the current data_in to sum
+                    valid_out <= 1'b1;
+
+                    // Reset the accumulation state for the next sequence
+                    sum <= 10'd0;
+                    data_count <= 2'd0;
+                end
+                else begin
+                    valid_out <= 1'b0;
+                end
+            end
+            else begin
+                // If valid_in is not asserted, ensure valid_out is low
+                valid_out <= 1'b0;
+            end
+        end
+    end
+endmodule
+```

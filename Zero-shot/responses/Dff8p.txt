@@ -1,4 +1,4 @@
-```
+```verilog
 module top_module (
     input clk,
     input reset,
@@ -7,10 +7,10 @@ module top_module (
 );
 
     always @(negedge clk) begin
-        if (reset)
-            q <= 8'h34;
-        else
-            q <= d;
+        if (reset) 
+            q <= 8'h34; // Reset asynchronous, active high, to 0x34
+        else 
+            q <= d; // Load input d into output q
     end
 
 endmodule

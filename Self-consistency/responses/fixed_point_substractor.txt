@@ -1,0 +1,46 @@
+module fixed_point_subtractor #(parameter Q = 8, parameter N = 16)(
+    input  wire [N-1:0] a,
+    input  wire [N-1:0] b,
+    output reg  [N-1:0] c
+);
+
+    // Internal signal for the result
+    reg signed [N-1:0] res;
+
+    // Internal wires for sign detection
+    wire sign_a = a[N-1];
+    wire sign_b = b[N-1];
+
+    // Absolute values of a and b (ignoring the sign bit)
+    wire [N-1:0] abs_a = sign_a ? (~a + 1'b1) : a;
+    wire [N-1:0] abs_b = sign_b ? (~b + 1'b1) : b;
+
+    always @(*) begin
+        if (sign_a == sign_b) begin
+            // Both inputs have the same sign
+            res = a - b;
+        end else if (sign_a == 1'b0 && sign_b == 1'b1) begin
+            // a is positive, b is negative
+            if (abs_a >= abs_b) begin
+                res = abs_a - abs_b; // Result is positive
+            end else begin
+                res = -(abs_b - abs_a); // Result is negative
+            end
+        end else if (sign_a == 1'b1 && sign_b == 1'b0) begin
+            // a is negative, b is positive
+            if (abs_a >= abs_b) begin
+                res = -(abs_a - abs_b); // Result is negative
+            end else begin
+                res = abs_b - abs_a; // Result is positive
+            end
+        end
+
+        // Handle zero result with explicit zero sign
+        if (res == {N{1'b0}}) begin
+            c = {1'b0, {N-1{1'b0}}}; // Ensure c is positive zero
+        end else begin
+            c = res;
+        end
+    end
+
+endmodule

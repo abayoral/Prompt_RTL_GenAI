@@ -1,35 +1,10 @@
-// The following is the state transition table for a Moore state machine with one input, one output, and four states. Use the following one-hot state encoding: A=4'b0001, B=4'b0010, C=4'b0100, D=4'b1000.
+The task involves designing the combinational logic part of a Moore state machine using one-hot encoding. You are provided with a state transition table that specifies the transitions between states based on a single input value, as well as the corresponding output for each state. The states are encoded as follows: state A as 4'b0001, state B as 4'b0010, state C as 4'b0100, and state D as 4'b1000. Your objective is to derive the logic equations for both the state transitions and the output, relying solely on this encoding scheme.
 
-// Derive state transition and output logic equations by inspection assuming a one-hot encoding. Implement only the state transition logic and output logic (the combinational logic portion) for this state machine. (The testbench will test with non-one hot inputs to make sure you're not trying to do something more complicated).
+To clarify, the state transition table expresses the machine's behavior as follows:
 
-//	 	 	  Next state
+- When in state A (encoded as 4'b0001) and the input is 0, the next state is A; if the input is 1, the next state is B. The output in state A is 0.
+- When in state B (encoded as 4'b0010) and the input is 0, the next state transitions to C; if the input is 1, it remains in state B. The output in state B is 0.
+- When in state C (encoded as 4'b0100) and the input is 0, the machine returns to state A; with input 1, it progresses to state D. The output in state C is 0.
+- When in state D (encoded as 4'b1000) and the input is 0, the transition leads to state C; if the input is 1, it goes to state B. Importantly, the output in state D is 1.
 
-//	State					Output
-//			in=0	in=1
-//	A		A		B		0
-//	B		C		B		0
-//	C		A		D		0
-//	D		C		B		1
-
-// Hint: Logic equations for one-hot state transition logic can be derived by looking at in-edges of the state transition diagram.
-
-module top_module(
-    input in,
-    input [3:0] state,
-    output [3:0] next_state,
-    output out); //
-
-    parameter A=0, B=1, C=2, D=3;
-
-    // Insert your code below
-
-    // State transition logic: Derive an equation for each state flip-flop.
-    assign next_state[A] = ...;
-    assign next_state[B] = ...;
-    assign next_state[C] = ...;
-    assign next_state[D] = ...;
-
-    // Output logic: 
-    assign out = ...;
-
-endmodule
+The logic equations you need to derive should dictate how the machine transitions from one state to another based on the current state and input, as well as how it produces the correct output based on the present state. The hint provided suggests focusing on the in-edges of the state transition diagram, meaning you should analyze which earlier states transition into a given next state based on the received input. Note that the test environment expects you to handle non-one-hot inputs properly, implying the solution should be robust enough to address erroneous input encoding by focusing solely on legitimate state entries within the one-hot scheme.

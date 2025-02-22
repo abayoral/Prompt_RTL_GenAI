@@ -1,16 +1,9 @@
-// Create a 100-bit binary ripple-carry adder by instantiating 100 full adders. 
-// The adder adds two 100-bit numbers and a carry-in to produce a 100-bit sum and carry out. 
-// To encourage you to actually instantiate full adders, 
-// also output the carry-out from each full adder in the ripple-carry adder. 
-// cout[99] is the final carry-out from the last full adder, and is the carry-out you usually see.
+As a senior Digital Design Engineer at a prominent hardware design company, you have been assigned a mission-critical task to develop a Verilog module for an upcoming and highly anticipated next-generation product. This particular module is of paramount importance because its successful implementation will play a decisive role in safeguarding and enhancing your company's esteemed reputation in the competitive computer hardware industry.
 
-// Hint: There are many full adders to instantiate. An instance array or generate statement would help here.
+The objective you need to accomplish is to construct a 100-bit binary ripple-carry adder using Verilog. This adder will be designed by instantiating a chain of 100 full adders. The purpose of the ripple-carry adder is to perform the addition of two 100-bit binary numbers, along with an additional carry-in input, to generate a corresponding 100-bit sum output along with a final carry-out.
 
-module top_module( 
-    input [99:0] a, b,
-    input cin,
-    output [99:0] cout,
-    output [99:0] sum );
+To meet the design criteria and to adhere to best practices in hardware design, you are required not only to create the full adder units but also to ensure that each full adder in the ripple-carry sequence provides its carry-out output. This will be essential for the functionality and debugging purposes of the design. Specifically, the carry-out from the last full adder, denoted as cout[99], should reflect the final carry-out typically associated with a ripple-carry adder in operational scenarios.
 
-    // Insert your code here
-endmodule
+To efficiently manage and instantiate the numerous full adders required for this task, you might consider utilizing Verilog constructs such as an instance array or a generate statement. These tools are particularly useful in streamlining the process, optimizing your code structure, and achieving scalable designs.
+
+In summary, your task involves creating a Verilog module labeled `top_module` with inputs comprising two 100-bit vectors, `a` and `b`, and a single bit carry-in `cin`. The outputs should include a 100-bit vector `sum` representing the result of the addition, and a 100-bit vector `cout` capturing the carry-out values from each full adder in the sequence, with `cout[99]` representing the critical final carry-out bit.

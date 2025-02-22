@@ -3,14 +3,14 @@
 module top_module(
     input a, 
     input b,
-    output wire out_assign,       // Output signal using assign statement
-    output reg out_alwaysblock    // Output signal using always block
+    output wire out_assign,
+    output reg out_alwaysblock
 );
 
-    // Implement AND gate using assign statement
+    // Method 1: Using an assign statement
     assign out_assign = a & b;
 
-    // Implement AND gate using a combinational always block
+    // Method 2: Using a combinational always block
     always @(*) begin
         out_alwaysblock = a & b;
     end

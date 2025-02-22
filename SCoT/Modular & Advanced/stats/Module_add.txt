@@ -1,0 +1,13 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Test 3 passed!
+Test 4 passed!
+Test 5 passed!
+Test 6 passed!
+All tests passed!
+hdlbits_testbenches/Module_add_0_tb.v:109: $finish called at 14000 (10ps)
+Module file path: RaR/modules/Module_add.v
+Testbench file path: hdlbits_testbenches/Module_add_0_tb.v
+Compilation successful. Executable created at RaR/simulations/Module_add_sim
+Simulation completed successfully.

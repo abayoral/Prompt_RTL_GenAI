@@ -1,16 +1,7 @@
-// Assume that you have two 8-bit 2's complement numbers, a[7:0] and b[7:0]. These numbers are added to produce s[7:0]. Also compute whether a (signed) overflow has occurred.
+// Suppose you have two 8-bit 2's complement binary numbers represented by a[7:0] and b[7:0]. Your task is to add these two binary numbers to produce a resultant 8-bit binary number labeled as s[7:0]. Additionally, you need to determine if a signed overflow occurs during this addition operation. 
 
-// Hint: A signed overflow occurs when adding two positive numbers produces a negative result, or adding two negative numbers produces a positive result. There are several methods to detect overflow: It could be computed by comparing the signs of the input and output numbers, or derived from the carry-out of bit n and n-1.
+// Remember, a signed overflow is a specific condition in binary arithmetic involving 2's complement representation. It occurs when the sum of two positive numbers results in a negative value or when the sum of two negative numbers yields a positive value. In 2's complement arithmetic, the most significant bit (MSB) acts as a sign indicator—0 indicating a positive number and 1 indicating a negative number. 
 
-module top_module (
-    input [7:0] a,
-    input [7:0] b,
-    output [7:0] s,
-    output overflow
-); //
- 
- 	// Insert your code below
-    // assign s = ...
-    // assign overflow = ...
+// To detect an overflow, consider the following strategies: You may check the signs of the input numbers a and b and the resulting sum s. If both input numbers have the same sign, but the sum has a different sign, then an overflow has occurred. Alternatively, you can use a logic-based approach involving the carry-out from the n-th and (n-1)-th bits. Specifically, an overflow occurs if there is a carry into the sign bit that is not equal to the carry out of the sign bit.
 
-endmodule
+// Create a module named `top_module` in Verilog that accomplishes the above tasks. This module should take two 8-bit inputs, `a` and `b`, and produce an 8-bit output `s` and a single-bit `overflow` signal. The `overflow` signal should be active (for example, set to 1) when a signed overflow is detected and inactive (set to 0) otherwise. Provide the necessary logic to calculate `s` and to determine if an overflow condition exists based on the given behavior of 2's complement arithmetic. Make sure to implement the solution correctly within the body of the module using appropriate Verilog syntax.

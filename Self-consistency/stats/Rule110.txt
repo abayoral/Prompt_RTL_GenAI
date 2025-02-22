@@ -1,4 +1,0 @@
-Self-consistency/modules/Rule110.v:1: error: Variable declaration in unnamed block requires SystemVerilog.
-Module file path: Self-consistency/modules/Rule110.v
-Testbench file path: hdlbits_testbenches/Rule110_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Self-consistency/simulations/Rule110_sim', 'Self-consistency/modules/Rule110.v', 'hdlbits_testbenches/Rule110_0_tb.v']' returned non-zero exit status 1.

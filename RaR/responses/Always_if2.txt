@@ -1,27 +1,43 @@
 ```verilog
-// synthesis verilog_input_version verilog_2001
-module top_module (
-    input      cpu_overheated,
-    output reg shut_off_computer,
-    input      arrived,
-    input      gas_tank_empty,
-    output reg keep_driving  ); //
+module ControlSystem (
+    input wire clk,             // System clock
+    input wire reset,           // Synchronous reset
+    input wire overheating,     // High when the system overheats
+    input wire at_destination,  // High when the vehicle has reached its destination
+    input wire gas_empty,       // High when the gas tank is empty
+    output reg shut_down,       // High to shut down the computer
+    output reg stop_driving     // High to stop driving the vehicle
+);
 
-    // Fix the bug in the following code
-    
-    always @(*) begin
-        if (cpu_overheated)
-            shut_off_computer = 1;
-        else
-            shut_off_computer = 0;
+// Always block for shut_down logic
+always @(posedge clk or posedge reset) begin
+    if (reset) begin
+        shut_down <= 1'b0;
+    end else begin
+        // Shut down the system if overheating is detected
+        if (overheating) begin
+            shut_down <= 1'b1;
+        end else begin
+            shut_down <= 1'b0;
+        end
     end
+end
 
-    always @(*) begin
-        if (arrived || gas_tank_empty)
-            keep_driving = 0;
-        else
-            keep_driving = 1;
+// Always block for stop_driving logic
+always @(posedge clk or posedge reset) begin
+    if (reset) begin
+        stop_driving <= 1'b0;
+    end else begin
+        // Stop driving if at the destination or gas tank is empty
+        if (at_destination || gas_empty) begin
+            stop_driving <= 1'b1;
+        end else begin
+            stop_driving <= 1'b0;
+        end
     end
+end
 
 endmodule
 ```
+
+This module defines the `ControlSystem` that meets the specified requirements by ensuring no latches are formed and the functionality criteria are met. The module properly reacts to overheating, stopping the computer systems, and reacts to either reaching a destination or running out of fuel by stopping the driving operations.

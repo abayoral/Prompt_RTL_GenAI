@@ -1,0 +1,102 @@
+```verilog
+module traffic_light(
+    input wire rst_n,
+    input wire clk,
+    input wire pass_request,
+    output reg [7:0] clock,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+    // State parameters
+    parameter IDLE = 2'b00;
+    parameter S1_RED = 2'b01;
+    parameter S2_YELLOW = 2'b10;
+    parameter S3_GREEN = 2'b11;
+
+    // Internal state registers
+    reg [1:0] state, next_state;
+    reg [7:0] cnt;
+
+    // Internal registers for pedestrian light (not requested but implied)
+    reg p_red, p_yellow, p_green;
+
+    // State transition always block
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= IDLE;
+        end else begin
+            state <= next_state;
+        end
+    end
+
+    // Counter management always block
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt <= 8'b0;
+            clock <= 8'b0;
+        end else if (state == next_state) begin
+            cnt <= cnt + 1'b1;
+            clock <= cnt;
+        end else begin
+            cnt <= 8'b0;
+            clock <= 8'b0;
+        end
+    end
+
+    // Next state and output logic
+    always @(*) begin
+        // Default assignments
+        next_state = state;
+        red = 1'b0;
+        yellow = 1'b0;
+        green = 1'b0;
+
+        case (state)
+            IDLE: begin
+                next_state = S1_RED;
+            end
+
+            S1_RED: begin
+                red = 1'b1;
+                if (cnt == 8'd10) begin
+                    next_state = S3_GREEN;
+                end else begin
+                    next_state = S1_RED;
+                end
+            end
+
+            S2_YELLOW: begin
+                yellow = 1'b1;
+                if (cnt == 8'd5) begin
+                    next_state = S1_RED;
+                end else begin
+                    next_state = S2_YELLOW;
+                end
+            end
+
+            S3_GREEN: begin
+                green = 1'b1;
+                if (!pass_request || cnt >= 8'd50) begin
+                    if (cnt == 8'd60 || (pass_request && cnt >= 8'd50 && cnt < 8'd60)) begin
+                        next_state = S2_YELLOW;
+                    end else begin
+                        next_state = S3_GREEN;
+                    end
+                end else if (pass_request && cnt < 8'd50) begin
+                    if (cnt >= (8'd60 - 8'd10)) begin
+                        next_state = S2_YELLOW;
+                    end else begin
+                        next_state = S3_GREEN;
+                    end
+                end
+            end
+
+            default: begin
+                next_state = IDLE;
+            end
+        endcase
+    end
+endmodule
+```

@@ -1,16 +1,15 @@
 ```verilog
-module andgate (output out, input a, input b, input c, input d, input e);
+module andgate ( output out, input a, input b, input c, input d, input e );
     assign out = a & b & c & d & e;
 endmodule
 
 module top_module (input a, input b, input c, output out);
     wire and_out;
-    wire vcc = 1'b1;  // Constant high signal
-    wire gnd = 1'b0;  // Constant low signal
-
-    andgate inst1 (.out(and_out), .a(a), .b(b), .c(c), .d(vcc), .e(vcc));
     
-    assign out = ~and_out; // NAND gate
-
+    // Using the 5-input AND gate with the last two inputs as logic high (1)
+    andgate inst1 ( .out(and_out), .a(a), .b(b), .c(c), .d(1'b1), .e(1'b1) );
+    
+    // Implementing the NAND gate by negating the output of the AND gate
+    assign out = ~and_out;
 endmodule
 ```

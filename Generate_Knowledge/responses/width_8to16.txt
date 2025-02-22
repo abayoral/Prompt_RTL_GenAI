@@ -1,0 +1,42 @@
+```verilog
+module width_8to16 (
+    input wire clk,
+    input wire rst_n,
+    input wire valid_in,
+    input wire [7:0] data_in,
+    output reg valid_out,
+    output reg [15:0] data_out
+);
+    
+    reg [7:0] data_high; // To store the first 8-bit input temporarily
+    reg stored_data_flag; // To indicate if the high byte has been stored
+    
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset all outputs and internal registers
+            data_out <= 16'b0;
+            valid_out <= 1'b0;
+            data_high <= 8'b0;
+            stored_data_flag <= 1'b0;
+        end else begin
+            if (valid_in) begin
+                if (!stored_data_flag) begin
+                    // Store the first 8-bit data as the high byte of the output
+                    data_high <= data_in;
+                    stored_data_flag <= 1'b1;
+                    valid_out <= 1'b0; // Output is not valid yet
+                end else begin
+                    // Combine the stored high byte with the new low byte and signal valid output
+                    data_out <= {data_high, data_in};
+                    valid_out <= 1'b1;
+                    stored_data_flag <= 1'b0;
+                end
+            end else begin
+                // If input data is not valid, do not update outputs
+                valid_out <= 1'b0;
+            end
+        end
+    end
+endmodule
+```
+This Verilog module performs the required conversion from 8-bit to 16-bit data, ensuring outputs are synchronized and valid according to the input signals and conditions specified. The logic handles the storage and concatenation of the input data, properly managing the output's validity state.

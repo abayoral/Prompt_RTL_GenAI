@@ -4,6 +4,7 @@ module top_module(
     input [7:0] sel,
     output out );
 
+    // Use variable indexing to select the appropriate bit from 'in' based on 'sel'
     assign out = in[sel];
 
 endmodule

@@ -4,6 +4,7 @@ module top_module(
     input b, 
     output out );
 
+    // XNOR operation is the inverse of XOR
     assign out = ~(a ^ b);
 
 endmodule

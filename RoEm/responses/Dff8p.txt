@@ -6,11 +6,12 @@ module top_module (
     output reg [7:0] q
 );
 
+    // Synchronous reset active-high D Flip-Flops with negative edge clock trigger
     always @(negedge clk) begin
         if (reset) begin
-            q <= 8'h34;  // Reset to the value 0x34
+            q <= 8'h34; // Reset to 0x34
         end else begin
-            q <= d;
+            q <= d; // Capture input on negative clock edge
         end
     end
 

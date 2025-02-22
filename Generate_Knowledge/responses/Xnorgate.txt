@@ -4,8 +4,8 @@ module top_module(
     input b, 
     output out );
 
-// Implement XNOR gate
-assign out = ~(a ^ b);
+    // XNOR operation on inputs a and b
+    assign out = ~(a ^ b);
 
 endmodule
 ```

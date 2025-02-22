@@ -1,27 +1,13 @@
-// Suppose you are designing a circuit to control a cellphone's ringer and vibration motor. 
-// Whenever the phone needs to ring from an incoming call (input ring), your circuit must either 
-// turn on the ringer (output ringer = 1) or the motor (output motor = 1), but not both. 
-// If the phone is in vibrate mode (input vibrate_mode = 1), turn on the motor. Otherwise, turn on the ringer.
+Assume you are a seasoned Digital Design Engineer working at a highly respected hardware design firm. You have been assigned the critical task of creating a Verilog module that will play an essential role in the development of an advanced, next-generation product. The success of this particular module is vital for upholding the esteemed reputation of your company within the competitive computer hardware industry. 
 
-// Try to use only assign statements, to see whether you can translate a problem description into a collection of logic gates.
+Imagine you are working on the design of a digital circuit responsible for managing the ringer and vibration motor of a cell phone. When an incoming call is detected (indicated by the input signal `ring`), your circuit needs to decide between activating the phone's ringer (setting the output `ringer` to logical 1) or turning on the vibration motor (setting the output `motor` to logical 1), but importantly, it should not enable both simultaneously. 
 
-// Design hint: When designing circuits, one often has to think of the problem "backwards", 
-// starting from the outputs then working backwards towards the inputs. This is often the opposite 
-// of how one would think about a (sequential, imperative) programming problem, where one would look 
-// at the inputs first then decide on an action (or output). For sequential programs, one would 
-// often think "If (inputs are ___ ) then (output should be ___ )". On the other hand, hardware 
-// designers often think "The (output should be ___ ) when (inputs are ___ )".
-// For this particular problem, one should be thinking "The motor is on when ___", rather than "If (vibrate mode) then ___".
+If the phone is set to vibrate mode, as indicated by the input signal `vibrate_mode` being set to 1, your circuit should enable the vibration motor instead of the ringer. Conversely, if the vibrate mode is not active, the ringer should be activated.
 
-module top_module (
-    input ring,
-    input vibrate_mode,
-    output ringer,       // Make sound
-    output motor         // Vibrate
-);
+The challenge is to implement this logic using Verilog, particularly focusing on utilizing assign statements. This involves translating the given problem description into a network of logic gates, ensuring the logic is accurately represented in hardware language. 
 
-	// Insert your code here
+Consider approaching this problem with a mindset often used in hardware design which focuses on the desired state of outputs first and then traces back to the inputs that cause these states. Unlike traditional sequential programming approaches where the sequence of events is thought of as "If (inputs are ___), then (outputs should be ___)", in hardware design, the mindset shifts towards "The (output should be ___) when (inputs are ___)", starting from the desired condition of outputs and reasoning back to the necessary conditions of inputs.
 
-endmodule
+In this scenario, reframe your logic thinking by considering conditions such as "The motor is active under the condition that ___" instead of framing it sequentially with "If the phone is in vibrate mode, then ___". 
 
-
+In summary, translate this logic into a Verilog module using the assign statement methodology, ensuring that only one output is active at any time based on the input conditions, reflecting the operational needs of a phone's ringer and vibration system. Your task is to structure and implement this logic efficiently within the constraints of hardware design principles.

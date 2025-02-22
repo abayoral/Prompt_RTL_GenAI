@@ -1,0 +1,7 @@
+least-to-most/modules/Module_pos.v:10: error: Module definition top_module cannot nest into module mod_a.
+hdlbits_testbenches/Module_pos_0_tb.v:3: error: Module definition top_module_tb cannot nest into module mod_a.
+hdlbits_testbenches/Module_pos_0_tb.v:403: syntax error
+I give up.
+Module file path: least-to-most/modules/Module_pos.v
+Testbench file path: hdlbits_testbenches/Module_pos_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'least-to-most/simulations/Module_pos_sim', 'least-to-most/modules/Module_pos.v', 'hdlbits_testbenches/Module_pos_0_tb.v']' returned non-zero exit status 4.

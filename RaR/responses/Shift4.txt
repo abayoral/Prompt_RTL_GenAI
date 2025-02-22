@@ -1,23 +1,23 @@
 ```verilog
 module top_module(
-    input clk,
-    input areset,  // async active-high reset to zero
-    input load,
-    input ena,
-    input [3:0] data,
-    output reg [3:0] q); 
+    input clk,           // Clock input
+    input areset,        // Asynchronous active-high reset to zero
+    input load,          // Synchronous load control signal
+    input ena,           // Enable signal for shifting operation
+    input [3:0] data,    // 4-bit data input for loading into the shift register
+    output reg [3:0] q   // 4-bit output representing the shift register's contents
+);
 
-    always @(posedge clk or posedge areset) begin
-        if (areset) begin
-            q <= 4'b0000;
-        end
-        else if (load) begin
-            q <= data;
-        end
-        else if (ena) begin
-            q <= {1'b0, q[3:1]};
-        end
+always @(posedge clk or posedge areset) begin
+    if (areset) begin
+        q <= 4'b0000;  // Asynchronous reset: set contents to zero
+    end else if (load) begin
+        q <= data;     // Synchronous load: load data into the shift register
+    end else if (ena) begin
+        q <= {1'b0, q[3:1]};  // Shift right with MSB set to zero
     end
+    // If neither load nor enable, keep the previous state
+end
 
 endmodule
 ```

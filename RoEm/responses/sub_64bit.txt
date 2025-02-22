@@ -1,0 +1,21 @@
+```verilog
+module sub_64bit(
+    input signed [63:0] A,
+    input signed [63:0] B,
+    output reg signed [63:0] result,
+    output reg overflow
+);
+
+always @(*) begin
+    // Perform the subtraction
+    result = A - B;
+    
+    // Detect overflow
+    // Positive overflow: A positive, B negative, and result negative
+    // Negative overflow: A negative, B positive, and result positive
+    overflow = ((A[63] == 0 && B[63] == 1 && result[63] == 1) ||
+                (A[63] == 1 && B[63] == 0 && result[63] == 0));
+end
+
+endmodule
+```

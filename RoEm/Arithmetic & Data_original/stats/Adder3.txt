@@ -1,0 +1,10 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Test 3 passed!
+All tests passed!
+hdlbits_testbenches/Adder3_0_tb.v:75: $finish called at 8000 (10ps)
+Module file path: CoT/modules/Adder3.v
+Testbench file path: hdlbits_testbenches/Adder3_0_tb.v
+Compilation successful. Executable created at CoT/simulations/Adder3_sim
+Simulation completed successfully.

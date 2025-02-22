@@ -1,11 +1,9 @@
-// Implement a Mealy-type finite state machine that recognizes the sequence "101" on an input signal named x. Your FSM should have an output signal, z, that is asserted to logic-1 when the "101" sequence is detected. Your FSM should also have an active-low asynchronous reset. You may only have 3 states in your state machine. Your FSM should recognize overlapping sequences.
+Design and implement a Mealy-type finite state machine (FSM) that is programmed to detect and recognize the specific sequence "101" from a continuous binary input signal referred to as 'x'. Your FSM should activate an output signal named 'z' to logic level '1' precisely at the moment when the sequence "101" is successfully identified within the input, ensuring the FSM can detect overlapping sequences.
 
-module top_module (
-    input clk,
-    input aresetn,    // Asynchronous active-low reset
-    input x,
-    output z ); 
+The FSM must be constructed with exactly three distinct states. This constraint requires you to carefully design the state transitions and outputs, ensuring that the logic remains evident and accurate across all states.
 
-    // Insert your code here
+Additionally, your state machine must incorporate an asynchronous reset feature. This reset should be active low, meaning that whenever the reset signal 'aresetn' is held at a low logic level, the FSM will return to its initial state, irrespective of any clock edge. It is critical to integrate this reset effectively so that it can swiftly return the FSM to a defined start condition without delay when the reset signal is asserted.
 
-endmodule
+You are tasked with writing the Verilog module to achieve this functionality. The module designated as `top_module` should include the relevant input and output specification, utilizing 'clk' as a clock input to synchronize state transitions, 'aresetn' as the asynchronous reset input, 'x' as the data input, and 'z' as the output. Make sure the FSM is implemented adhering to these specifications and remember to account for all possible input scenarios to ensure robust and correct sequence detection.
+
+Finally, compose and insert the internal logic within the `top_module` to accomplish this task.

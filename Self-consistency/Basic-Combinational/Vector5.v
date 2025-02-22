@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
  //Given five 1-bit signals (a, b, c, d, and e), compute all 25 pairwise one-bit comparisons 
  // in the 25-bit output vector. The output should be 1 if the two bits being compared are equal.
 

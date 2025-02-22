@@ -1,0 +1,96 @@
+```verilog
+module multi_pipe_8bit(
+    input wire clk,
+    input wire rst_n,
+    input wire mul_en_in,
+    input wire [7:0] mul_a,
+    input wire [7:0] mul_b,
+    output reg mul_en_out,
+    output reg [15:0] mul_out
+);
+
+    reg [7:0] mul_a_reg;
+    reg [7:0] mul_b_reg;
+    
+    reg [15:0] partial_product [0:7]; 
+    reg [15:0] sum_stage_1 [0:3]; 
+    reg [15:0] sum_stage_2 [0:1];
+    reg [15:0] final_product;
+    
+    reg mul_en_stage_1, mul_en_stage_2, mul_en_stage_3;
+    
+    // Reset and input capture logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            mul_a_reg <= 8'b0;
+            mul_b_reg <= 8'b0;
+            mul_en_stage_1 <= 1'b0;
+        end else if (mul_en_in) begin
+            mul_a_reg <= mul_a;
+            mul_b_reg <= mul_b;
+            mul_en_stage_1 <= mul_en_in;
+        end
+    end
+    
+    // Calculate partial products in first pipeline stage
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            partial_product[0] <= 16'b0;
+            partial_product[1] <= 16'b0;
+            partial_product[2] <= 16'b0;
+            partial_product[3] <= 16'b0;
+            partial_product[4] <= 16'b0;
+            partial_product[5] <= 16'b0;
+            partial_product[6] <= 16'b0;
+            partial_product[7] <= 16'b0;
+            mul_en_stage_2 <= 1'b0;
+        end else begin
+            partial_product[0] <= mul_b_reg[0] ? {8'b0, mul_a_reg} : 16'b0;
+            partial_product[1] <= mul_b_reg[1] ? {7'b0, mul_a_reg, 1'b0} : 16'b0;
+            partial_product[2] <= mul_b_reg[2] ? {6'b0, mul_a_reg, 2'b0} : 16'b0;
+            partial_product[3] <= mul_b_reg[3] ? {5'b0, mul_a_reg, 3'b0} : 16'b0;
+            partial_product[4] <= mul_b_reg[4] ? {4'b0, mul_a_reg, 4'b0} : 16'b0;
+            partial_product[5] <= mul_b_reg[5] ? {3'b0, mul_a_reg, 5'b0} : 16'b0;
+            partial_product[6] <= mul_b_reg[6] ? {2'b0, mul_a_reg, 6'b0} : 16'b0;
+            partial_product[7] <= mul_b_reg[7] ? {1'b0, mul_a_reg, 7'b0} : 16'b0;
+            mul_en_stage_2 <= mul_en_stage_1;
+        end
+    end
+    
+    // Sum partial products in second pipeline stage
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            sum_stage_1[0] <= 16'b0;
+            sum_stage_1[1] <= 16'b0;
+            sum_stage_1[2] <= 16'b0;
+            sum_stage_1[3] <= 16'b0;
+            mul_en_stage_3 <= 1'b0;
+        end else if (mul_en_stage_2) begin
+            sum_stage_1[0] <= partial_product[0] + partial_product[1];
+            sum_stage_1[1] <= partial_product[2] + partial_product[3];
+            sum_stage_1[2] <= partial_product[4] + partial_product[5];
+            sum_stage_1[3] <= partial_product[6] + partial_product[7];
+            mul_en_stage_3 <= mul_en_stage_2;
+        end
+    end
+    
+    // Final sum and output in third pipeline stage
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            sum_stage_2[0] <= 16'b0;
+            sum_stage_2[1] <= 16'b0;
+            final_product <= 16'b0;
+            mul_en_out <= 1'b0;
+        end else if (mul_en_stage_3) begin
+            sum_stage_2[0] <= sum_stage_1[0] + sum_stage_1[1];
+            sum_stage_2[1] <= sum_stage_1[2] + sum_stage_1[3];
+            mul_en_out <= mul_en_stage_3;
+            final_product <= sum_stage_2[0] + sum_stage_2[1];
+            mul_out <= final_product;
+        end else begin
+            mul_en_out <= 1'b0;
+        end
+    end
+
+endmodule
+```

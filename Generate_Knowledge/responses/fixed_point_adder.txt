@@ -1,0 +1,46 @@
+```verilog
+module fixed_point_adder #(parameter Q = 8, parameter N = 16)(
+    input [N-1:0] a,
+    input [N-1:0] b,
+    output reg [N-1:0] c
+);
+    
+    reg signed [N:0] a_ext;
+    reg signed [N:0] b_ext;
+    reg signed [N:0] res;
+
+    always @(*) begin
+        // Sign extend the operands to (N+1) bits for handling overflow
+        a_ext = {a[N-1], a};
+        b_ext = {b[N-1], b};
+
+        // Check the signs of the inputs
+        if (a[N-1] == b[N-1]) begin
+            // Same signs, perform addition
+            res = a_ext + b_ext;
+        end else begin
+            // Different signs, perform subtraction
+            if (a_ext > b_ext)
+                res = a_ext - b_ext;
+            else
+                res = b_ext - a_ext;
+        end
+
+        // Assign the truncated result back to output
+        c = res[N-1:0];
+        
+        // Overflow management, ensure no overflow for signed operation
+        if (res[N] != res[N-1]) begin
+            // Handle overflow
+            if (res[N]) begin
+                // Negative overflow, saturate to most negative value
+                c = {1'b1, {N-1{1'b0}}};
+            end else begin
+                // Positive overflow, saturate to most positive value
+                c = {1'b0, {N-1{1'b1}}};
+            end
+        end
+    end
+
+endmodule
+```

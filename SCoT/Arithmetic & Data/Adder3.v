@@ -1,17 +1,1 @@
-// Make 3 instances of full-adder to create a 3-bit binary ripple-carry adder. 
-// The adder adds two 3-bit numbers and a carry-in to produce a 3-bit sum and carry out. 
-// To encourage you to actually instantiate full adders, also output the carry-out from 
-// each full adder in the ripple-carry adder. cout[2] is the final carry-out from the last 
-// full adder, and is the carry-out you usually see.
-
-module top_module( 
-    input [2:0] a, b,
-    input cin,
-    output [2:0] cout,
-    output [2:0] sum );
-
-    // Insert your code here
-
-endmodule
-
-
+The task requires creating a 3-bit binary ripple-carry adder using three instances of a full-adder module. The goal is to add two 3-bit binary numbers, `a` and `b`, each represented as 3-bit inputs, along with an additional input indicating an initial carry-in, denoted as `cin`. The ripple-carry adder should generate a 3-bit sum, represented by the output `sum`, and a series of carry-out signals. These carry-out signals, indicated by the output array `cout`, should include the carry-out result from each individual full-adder within the design. Specifically, each of the three carry-out signals corresponds to the output of one of the full adders in this sequential circuit. The last carry-out, `cout[2]`, represents the final carry resulting from the addition and is typically regarded as the overall carry-out of the addition operation. The implementation should clearly demonstrate the instantiation and connection of three full-adder modules that collectively perform the complete arithmetic operation. Ensure the internal wiring correctly propagates both the sum and intermediate carry-out signals across the individual full adders, ultimately reflecting the cumulative result of the 3-bit addition combined with the initial carry-in. The main challenge here is to effectively model the ripple effect of the carries and exhibit a structured approach to interconnect the full adder instances within the top module framework.

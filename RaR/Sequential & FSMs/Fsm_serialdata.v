@@ -1,23 +1,13 @@
-// Assume you have a finite state machine that will identify when bytes have been correctly received when given a stream of bits. It needs to identify the start bit, wait for all 8 data bits, then verify that the stop bit was correct. If the stop bit does not appear when expected, the FSM must wait until it finds a stop bit before attempting to receive the next byte.
-// Now that you have a finite state machine that can identify when bytes are correctly received in a serial bitstream, add a datapath that will output the correctly-received data byte. out_byte needs to be valid when done is 1, and is don't-care otherwise.
+Imagine that you are an experienced Digital Design Engineer working at a top-tier hardware design company, where you have been entrusted with the critical responsibility of designing a Verilog module integral to an upcoming, cutting-edge product. Completing this module successfully is crucial to uphold the esteemed reputation of your computer hardware company within the industry.
 
-// Note that the serial protocol sends the least significant bit first.
+Within your scope of work, you are dealing with a finite state machine (FSM) designed to accurately discern when bytes have been received correctly from a continuous stream of bits. This FSM is engineered to detect a start bit, subsequently track the reception of the 8 data bits, and finally verify the integrity of the stop bit. In the instance where the stop bit does not appear as anticipated, the FSM must enter a state of waiting until a correct stop bit is identified, before proceeding to process the next byte.
 
-// Hint: The serial bitstream needs to be shifted in one bit at a time, then read out in parallel.
+Now, your task expands beyond merely recognizing the integrity of bytes. You must integrate a datapath into this FSM that will enable the output of these correctly-received byte data. The data output through `out_byte` should only be considered valid when the `done` signal is asserted (i.e., when `done` is high), and under any other circumstances, the value of `out_byte` is considered irrelevant or "don't-care."
 
+Crucially, it's important to remember that the serial protocol in use sends bits starting with the least significant bit first, implying a specific bit order that must be managed during processing. 
 
-module top_module(
-    input clk,
-    input in,
-    input reset,    // Synchronous reset
-    output [7:0] out_byte,
-    output done
-); //
+Consider that this byte information is streamed serially, and thus, the bitstream must be controlled—shifted in one bit at a time—and subsequently, converted to a parallel form to be effectively outputted. 
 
-	// Insert your code below
-	
-    // Use FSM from Fsm_serial
+Given these requirements and context, your challenge is to adaptively manage this FSM and datapath within the constraints of Verilog, considering synchronous reset operations, in order to deliver a robust solution that fulfills the outlined task. The interface includes inputs for the clock (`clk`), data stream (`in`), and a reset signal (`reset`), while providing outputs of a byte (`out_byte`) and a completion signal (`done`).  
 
-    // New: Datapath to latch input bits.
-
-endmodule
+As you move forward to implement your design using the module template provided, make sure to utilize and possibly enhance the existing FSM code referred to as `Fsm_serial`, while you simultaneously devise a mechanism for the new datapath that will appropriately latch and output the incoming bits.

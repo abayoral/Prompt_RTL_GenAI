@@ -1,24 +1,9 @@
-// The PS/2 mouse protocol sends messages that are three bytes long. However, within a continuous byte stream, it's not obvious where messages start and end. The only indication is that the first byte of each three byte message always has bit[3]=1 (but bit[3] of the other two bytes may be 1 or 0 depending on data).
+The task at hand involves designing a finite state machine (FSM) for detecting and confirming the boundaries of messages within a byte stream that adheres to the PS/2 mouse protocol. In this protocol, every message is exactly three bytes long, but the continuous nature of the byte stream does not provide explicit delimiters to identify the beginning or end of each message. The primary guideline for detecting the start of a new message is that the first byte always has the fourth bit (bit[3]) set to 1. This specific bit configuration differentiates it from the other two bytes that follow it, which may or may not have bit[3] set.
 
-// We want a finite state machine that will search for message boundaries when given an input byte stream. The algorithm we'll use is to discard bytes until we see one with bit[3]=1. We then assume that this is byte 1 of a message, and signal the receipt of a message once all 3 bytes have been received (done).
+Considering the FSM design, the goal is to build a system capable of monitoring the input byte stream, which is characterized by the single bit input `in[3]`, and determining when a complete three-byte message has been successfully received. The FSM must discard incoming bytes until it encounters a byte with bit[3] equal to 1, marking the start of a new message. Once this initial byte is identified, the FSM should track the collection of the next two sequential bytes, thereby marking the completion of a three-byte message.
 
-// The FSM should signal done in the cycle immediately after the third byte of each message was successfully received.
+The FSM should feature distinct states reflecting the progression through the message. Upon the successful receipt of the third byte, the FSM should immediately signal that the entire message has been received by asserting the `done` output for only one clock cycle. This precise timing is crucial for the correct operation of the FSM.
 
-// Although in[7:0] is a byte, the FSM only has one input: in[3].
-// You need ~4 states. Three states likely wouldn't work because one of them needs to assert done, and done is asserted for only one cycle for each received message.
+The architecture of the FSM may require approximately four states to effectively manage the message detection and signaling process. At least one state is needed to issue the `done` signal, keeping in mind that the `done` output should be active for solely a single cycle, which ensures the FSM can promptly reset and prepare to detect subsequent messages in the stream.
 
-module top_module(
-    input clk,
-    input [7:0] in,
-    input reset,    // Synchronous reset
-    output done); //
-
-    // Insert your code below
-
-    // State transition logic (combinational)
-
-    // State flip-flops (sequential)
- 
-    // Output logic
-
-endmodule
+The FSM should also incorporate synchronous reset capability, ensuring it can reset its state in a controlled manner if necessary. The emphasis on correctly managing the sequential progression of states and ensuring timely `done` assertions defines the core challenge of this FSM design task.

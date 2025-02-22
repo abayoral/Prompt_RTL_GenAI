@@ -1,9 +1,21 @@
-module add16 ( input [15:0] a, input [15:0] b, input cin, output [15:0] sum, output cout);
-    // Your logic here
+```verilog
+module add16 (
+    input [15:0] a,
+    input [15:0] b,
+    input cin,
+    output [15:0] sum,
+    output cout
+);
+// Logic for 16-bit adder with carry-in and carry-out should be implemented here.
 endmodule
 
-module mux2to1_16bit(input [15:0] in0, input [15:0] in1, input sel, output [15:0] out_value);
-  assign out_value = sel ? in1 : in0;
+module mux2_16bit(
+    input [15:0] in0,
+    input [15:0] in1,
+    input sel,
+    output [15:0] out
+);
+    assign out = sel ? in1 : in0;
 endmodule
 
 module top_module(
@@ -11,20 +23,47 @@ module top_module(
     input [31:0] b,
     output [31:0] sum
 );
-    wire [15:0] add16_1_sum;
-    wire [15:0] add16_2_sum;
-    wire [15:0] add16_3_sum;
-    wire add16_1_cout;
-    wire add16_2_cout;
-    wire add16_3_cout;
-    wire sel;
 
-    add16 add16_1( a[15:0],  b[15:0], 1'b0, add16_1_sum, add16_1_cout);
-    add16 add16_2( a[15:0],  b[15:0], 1'b1, add16_2_sum, add16_2_cout);
-    add16 add16_3( a[31:16], b[31:16], add16_1_cout, add16_3_sum, add16_3_cout);
+    wire [15:0] sum0, sum1, sum2;
+    wire cout0, cout1, cout2, cout_sel;
 
-    assign sel = add16_2_cout;
+    // First adder adding lower 16 bits
+    add16 adder0 (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum0),
+        .cout(cout0)
+    );
 
-    mux2to1_16bit mux1(add16_1_sum, add16_2_sum, sel, sum[15:0]);
-    mux2to1_16bit mux2(add16_3_sum, add16_3_sum, sel, sum[31:16]);
+    // Second adder adding upper 16 bits assuming carry from lower 16 bits is 0
+    add16 adder1 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b0),
+        .sum(sum1),
+        .cout(cout1)
+    );
+
+    // Third adder adding upper 16 bits assuming carry from lower 16 bits is 1
+    add16 adder2 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b1),
+        .sum(sum2),
+        .cout(cout2)
+    );
+
+    // Mux to select the correct upper 16-bit sum based on the carry-out from adder0
+    mux2_16bit sum_mux (
+        .in0(sum1),
+        .in1(sum2),
+        .sel(cout0),
+        .out(sum[31:16])
+    );
+
+    // Set the total sum result
+    assign sum[15:0] = sum0;
+
 endmodule
+```

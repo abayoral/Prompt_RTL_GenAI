@@ -1,3 +1,4 @@
+```verilog
 module top_module (
     input too_cold,
     input too_hot,
@@ -8,13 +9,14 @@ module top_module (
     output fan
 ); 
 
-    // Heater is on when in heating mode and too_cold is true, otherwise it's off
+    // Heater logic: Turn on if in heating mode and too cold
     assign heater = mode & too_cold;
-    
-    // Air conditioner is on when in cooling mode and too_hot is true, otherwise it's off
+
+    // Air Conditioner logic: Turn on if in cooling mode and too hot
     assign aircon = ~mode & too_hot;
 
-    // Fan is on when either heater or air conditioner is on, or when fan_on is true
-    assign fan = (heater | aircon) | fan_on;
-    
+    // Fan logic: Turn on if either heater or aircon is on, or if fan_on is requested
+    assign fan = heater | aircon | fan_on;
+
 endmodule
+```

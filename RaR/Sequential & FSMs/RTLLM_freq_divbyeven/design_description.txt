@@ -1,24 +1,20 @@
-Please act as a professional verilog designer.
+Can you, using your expertise as an experienced Verilog designer, draft the entire Verilog code for a module named `freq_diveven`? This module's primary purpose is to function as a frequency divider that scales down an input clock signal by dividing it by specific even numbers. The key mechanism of this module is to produce a clock output with a lower frequency by changing its state only after a predetermined count of input cycles, governed by a parameter labeled `NUM_DIV`. Below are detailed requirements and specifications for the design that need to be considered:
 
-Frequency divider that divides the input clock frequency by even numbers. This module generates a divided clock signal by toggling its output every specified number of input clock cycles.
+Input Ports:
+- `clk`: This is the incoming clock signal which is to be divided by the module.
+- `rst_n`: This is an active-low reset signal, tasked with initializing or resetting the module's internal states whenever needed.
 
-Module name: 
-    freq_diveven
+Output Ports:
+- `clk_div`: This is the resulting output clock signal with a lower frequency, obtained after the input clock is divided by the specified even number.
 
-Input ports:
-    clk: Input clock signal that will be divided.
-    rst_n: Active-low reset signal to initialize the module.
+Implementation Details:
+- The module should include a counter (`cnt`) which monitors and counts the cycles of the input clock.
+- The parameter `NUM_DIV` dictates the division ratio, and it is specified to be an even number for the purposes of this module.
+- When the reset signal (`rst_n`) is asserted low, it is expected that both the counter and `clk_div` signal should be reset to zero, clearing any previous state.
+- For each rising edge of the input clock (`clk`), if the counter's value is below half of `NUM_DIV - 1`, the counter should increment, but this should occur without changing the state of the `clk_div` output.
+- When the counter completes its defined cycle, as dictated by the `NUM_DIV` value, it should reset to zero, allowing the `clk_div` output to toggle state, thereby achieving the reduction in frequency as required by the even division.
 
-Output ports:
-    clk_div: Divided clock output signal.
+Additional Consideration:
+- The counter must be designed as a 4-bit register (`cnt`) that keeps track of the number of input clock cycles up to the specified threshold.
 
-Implementation:
-    The frequency divider uses a counter (`cnt`) to count the number of clock cycles. The `NUM_DIV` parameter specifies the division factor, which must be an even number.
-    - When the reset signal (`rst_n`) is low, the counter and the divided clock signal (`clk_div`) are initialized to zero.
-    - On each positive edge of the input clock (`clk`), if the counter is less than half of `NUM_DIV - 1`, the counter increments without changing the divided clock output.
-    - When the counter reaches the specified limit, it resets to zero and toggles the `clk_div` output signal, effectively dividing the frequency of the input clock by the even number specified by `NUM_DIV`.
-
-Counter:
-    - The counter is a 4-bit register (`cnt`) that tracks the number of clock cycles.
-
-Give me the complete code.
+Given these functional requirements and conditions, could you please write a thorough and structured Verilog implementation for the `freq_diveven` module, ensuring compliance with the described design and operational criteria?

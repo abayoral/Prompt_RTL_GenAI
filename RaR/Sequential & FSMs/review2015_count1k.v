@@ -1,10 +1,5 @@
-// Build a counter that counts from 0 to 999, inclusive, with a period of 1000 cycles. The reset input is synchronous, and should reset the counter to 0.
+Imagine you are a senior Digital Design Engineer at a renowned hardware design firm, tasked with an essential project that could significantly impact your company's standing as a leader in the computer hardware industry. You have been assigned to develop a vital Verilog module for an upcoming product that promises to set new standards in the market. The functionality and reliability of this module are critical, as it plays a crucial role in the overall success of the product, and by extension, the company's reputation.
 
-module top_module (
-    input clk,
-    input reset,
-    output [9:0] q);
+Your specific assignment is to construct a digital counter using Verilog—a hardware description language integral to the design and modeling of electronic systems. This counter should effectively count from 0 to 999, including both endpoints, thereby completing a full cycle of 1000 counts before resetting back to 0 and beginning the sequence anew. A pivotal aspect of this challenge involves implementing a synchronous reset feature—this means that when the reset input is activated, the counter must precisely return to 0 in alignment with the clock signal, ensuring precise and predictable timing behavior.
 
-    // Insert your code here
-
-endmodule
+As you embark on this task, you need to define the parameters and behavior of this Verilog module. The module, named `top_module`, will entail several core components: an input clock signal (`clk`), a synchronous reset signal (`reset`), and a 10-bit output vector (`q`) that represents the current count value. Your expertise in digital design will be crucial in determining how to efficiently manage the incrementing of the count, handle the synchronous reset operation, and ensure that the output accurately reflects the intended count values between 0 and 999 as specified.

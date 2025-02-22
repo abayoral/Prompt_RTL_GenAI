@@ -1,0 +1,15 @@
+Mismatch at index 0: Inputs = [0, 01], Generated = [00, 0], Reference = [10, 0]
+Mismatch at index 1: Inputs = [1, 11], Generated = [11, 1], Reference = [01, 1]
+Mismatch at index 2: Inputs = [1, 01], Generated = [10, 0], Reference = [01, 0]
+Test 3 passed!
+Mismatch at index 4: Inputs = [1, 01], Generated = [10, 0], Reference = [01, 0]
+Mismatch at index 5: Inputs = [0, 01], Generated = [00, 0], Reference = [10, 0]
+Test 6 passed!
+Test 7 passed!
+Test 8 passed!
+5 mismatches out of 9 total tests.
+hdlbits_testbenches/Fsm3comb_0_tb.v:134: $finish called at 18000 (10ps)
+Module file path: RaR/modules/Fsm3comb.v
+Testbench file path: hdlbits_testbenches/Fsm3comb_0_tb.v
+Compilation successful. Executable created at RaR/simulations/Fsm3comb_sim
+Simulation completed successfully.

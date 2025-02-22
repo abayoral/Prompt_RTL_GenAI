@@ -1,20 +1,24 @@
-Please act as a professional verilog designer.
+Assume the role of an experienced Verilog designer and provide guidance on the task of implementing a Verilog module specifically designed for edge detection functionality. The task involves creating a Verilog module that is capable of detecting transitions within a slowly changing 1-bit input signal, denoted as `a`. The module, named `edge_detect`, should be able to recognize two specific types of transitions: when `a` changes from a logic level 0 to a logic level 1 (known as a rising edge), and when it changes from 1 to 0 (known as a falling edge). 
 
-Implement a module for edge detection. There is a slowly changing 1-bit signal a. When "a" changes from 0 to 1, the indicating signal rise is 1. When "a" changes from 1 to 0, the falling edge of signal a is shown, the indicating signal down is 1. rise or down will be set to 1 on the next clock when the corresponding edge appears, and then return to 0 until the corresponding edge appears again.
+The goal is to set up an output signal `rise` that is asserted to logic level 1 when a rising edge is detected, and an output signal `down` that is asserted to logic level 1 when a falling edge occurs. These output signals should be asserted on the next clock cycle after the transition of `a` and should reset to 0 once the corresponding edge detection event has been completed, remaining inactive until the respective edge appears once more.
 
-Module name:  
-    edge_detect      
+The module should be defined with the following logical structure:
+- **Module Name:**
+  - `edge_detect`: This is the primary Verilog module name, encompassing the edge detection logic.
+  
+- **Input Ports:**
+  - `clk`: A clock signal utilized to synchronize the edge detection logic. All changes in input and output states are assessed in accordance with the positive edges of this clock signal.
+  - `rst_n`: An active-low reset signal employed to initialize or reset the state of the module. When low, it resets any state-holding elements in the module.
+  - `a`: A 1-bit input signal, representing the slowly changing data which is monitored for edge transitions.
 
-Input ports:
-    clk: Clock signal.
-    rst_n: Reset signal (active low).
-    a: Input signal.
+- **Output Ports:**
+  - `rise`: A 1-bit output signal that indicates the detection of a rising edge from the input signal `a`. It is asserted based on the occurrence of the signal transition.
+  - `down`: A 1-bit output signal that indicates the detection of a falling edge from the input signal `a`. It, too, is asserted upon the relevant transition detection.
 
-Output ports:
-    rise: Output signal indicating a rising edge.
-    down: Output signal indicating a falling edge.
-
-Implementation:
-The edge_detect module detects rising and falling edges in the input signal a and generates corresponding output signals rise and down. The rising and falling edges are detected on the positive edge of the clock signal clk. If a rising edge is detected, the rise output signal is set to 1. If a falling edge is detected, the down output signal is set to 1. Otherwise, both output signals are set to 0. These output signals are synchronized with the clock and remain set to 1 until the corresponding edge appears again.
-
-Give me the complete code.
+- **Implementation Requirements:**
+  - The module must utilize sequential logic to detect edges based on clock cycles.
+  - At the positive clock edge, the logic should determine whether the input `a` has transitioned from 0 to 1 or from 1 to 0 since the last clock cycle.
+  - The outputs `rise` and `down` should be generated and asserted exclusively on the clock cycle following the transition detection.
+  - These outputs should return to logic level 0 after the cycle in which they are set, unless the next respective edge is detected, ensuring the outputs only signal the appearance of edges once per transition.
+  
+By setting this logic structure, the module will effectively monitor the input signal for specific transitions and generate the appropriate outputs that indicate the type of edge detected.

@@ -1,0 +1,6 @@
+least-to-most/modules/Module_fadd.v:51: error: Index carry[16] is out of range.
+least-to-most/modules/Module_fadd.v:51: error: Index carry[16] is out of range.
+2 error(s) during elaboration.
+Module file path: least-to-most/modules/Module_fadd.v
+Testbench file path: hdlbits_testbenches/Module_fadd_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'least-to-most/simulations/Module_fadd_sim', 'least-to-most/modules/Module_fadd.v', 'hdlbits_testbenches/Module_fadd_0_tb.v']' returned non-zero exit status 2.

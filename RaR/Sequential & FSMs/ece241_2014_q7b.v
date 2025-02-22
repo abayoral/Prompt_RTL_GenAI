@@ -1,25 +1,5 @@
-// From a 1000 Hz clock, derive a 1 Hz signal, called OneHertz, that could be used to drive an Enable signal for a set of hour/minute/second counters to create a digital wall clock. Since we want the clock to count once per second, the OneHertz signal must be asserted for exactly one cycle each second. 
-// Build the frequency divider using modulo-10 (BCD) counters and as few other gates as possible. Also output the enable signals from each of the BCD counters you use (c_enable[0] for the fastest counter, c_enable[2] for the slowest).
+Imagine you are a senior Digital Design Engineer at a leading hardware design company, where you have been given a crucial assignment that involves developing a Verilog module integral to a next-generation product. The reliability of this Verilog module is directly linked to your computer hardware company's standing and reputation within the industry. Your task is to create a digital logic circuit to take a 1000 Hz input clock signal and derive a 1 Hz signal from it. This 1 Hz output signal, named 'OneHertz', will be essential in driving an Enable signal specifically for a collection of hour, minute, and second counters within a digital wall clock configuration. 
 
-// The following BCD counter is provided for you. Enable must be high for the counter to run. Reset is synchronous and set high to force the counter to zero. All counters in your circuit must directly use the same 1000 Hz signal.
+Here's the detailed requirement: The clock should signal changes exactly once every second, meaning the 'OneHertz' signal needs to be asserted for precisely one clock cycle per second, enabling the counters to increment. To achieve this, build a frequency divider using BCD (Binary Coded Decimal) counters, minimizing the use of additional logic gates. You must also ensure that you provide Enable signals from each BCD counter used within your design. These should be labeled explicitly as: c_enable[0] for the counter with the quickest frequency, and c_enable[2] for the counter with the slowest. 
 
-module bcdcount (
-	input clk,
-	input reset,
-	input enable,
-	output reg [3:0] Q
-);
-
-module top_module (
-    input clk,
-    input reset,
-    output OneHertz,
-    output [2:0] c_enable
-); //
-
-	// Insert your code below
-	
-    bcdcount counter0 (clk, reset, c_enable[0]/*, ... */);
-    bcdcount counter1 (clk, reset, c_enable[1]/*, ... */);
-
-endmodule
+A BCD counter module is defined for you with the following characteristics: it requires a high Enable signal to count, and a synchronous Reset signal is to be set high to reset the counter to zero. Importantly, all the counters within your design must operate directly with the provided 1000 Hz clock signal. Your goal is to strategically utilize this module and implement your design within the overarching module 'top_module'. This will include integrating the BCD counters and any necessary additional logic to realize the defined behavior and output requirements.

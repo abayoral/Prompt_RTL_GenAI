@@ -1,3 +1,5 @@
+Thank you for the clarification. I'll proceed with the implementation of the 100-bit ripple-carry adder using 100 full adders.
+
 ```verilog
 module full_adder (
     input a, b, cin,
@@ -10,32 +12,28 @@ module top_module(
     input [99:0] a, b,
     input cin,
     output [99:0] cout,
-    output [99:0] sum
+    output [99:0] sum 
 );
+    genvar i;
     wire [99:0] carry;
 
-    genvar i;
+    assign carry[0] = cin; // Initial carry-in
+
     generate
-        for (i = 0; i < 100; i = i + 1) begin: adder_array
-            if (i == 0) begin
-                full_adder fa (
-                    .a(a[i]), 
-                    .b(b[i]), 
-                    .cin(cin), 
-                    .sum(sum[i]), 
-                    .cout(carry[i])
-                );
-            end else begin
-                full_adder fa (
-                    .a(a[i]), 
-                    .b(b[i]), 
-                    .cin(carry[i-1]), 
-                    .sum(sum[i]), 
-                    .cout(carry[i])
-                );
+        for (i = 0; i < 100; i = i + 1) begin: full_adder_array
+            full_adder fa (
+                .a(a[i]),
+                .b(b[i]),
+                .cin(carry[i]),
+                .sum(sum[i]),
+                .cout(cout[i])
+            );
+            if (i < 99) begin
+                assign carry[i+1] = cout[i];
             end
-            assign cout[i] = carry[i];
         end
     endgenerate
 endmodule
 ```
+
+This implementation creates a full adder for each bit and connects it to the next, passing along the carry-out of each adder as the carry-in of the next. The `cout[99]` acts as the final carry-out of the 100-bit adder.

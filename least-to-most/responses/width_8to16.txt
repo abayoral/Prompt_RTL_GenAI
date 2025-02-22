@@ -1,0 +1,34 @@
+```verilog
+module width_8to16 (
+    input wire clk,
+    input wire rst_n,
+    input wire valid_in,
+    input wire [7:0] data_in,
+    output reg valid_out,
+    output reg [15:0] data_out
+);
+
+    reg [7:0] data_high;  // Register to store the higher 8 bits
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            data_high <= 8'b0;
+            data_out <= 16'b0;
+            valid_out <= 1'b0;
+        end else begin
+            if (valid_in) begin
+                data_high <= data_in;
+                valid_out <= 1'b0;  // valid_out is low after receiving first 8-bit data
+
+                // On the next valid input, we populate data_out and assert valid_out
+                if (valid_out == 1'b0) begin
+                    data_out <= {data_high, data_in};  // Concatenate stored high bits with current input
+                    valid_out <= 1'b1;  // valid_out is high after receiving second 8-bit data
+                end
+            end
+        end
+    end
+
+endmodule
+```
+This module implements a sequential conversion process driven by the clock and reset signals, ensuring functional reset behavior and accommodating verified input for valid data output.

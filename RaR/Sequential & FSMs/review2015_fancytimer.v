@@ -1,28 +1,15 @@
-// We want to create a timer with one input that:
+As a senior Digital Design Engineer at a prestigious hardware design firm, you have been assigned with the critical task of developing a Verilog module that is integral to the success of a next-generation product. This module's success is crucial for preserving your company’s distinguished reputation within the computer hardware industry. Specifically, you are tasked with designing a timer with a single input that operates according to a multi-step sequence. Here's a detailed breakdown of the requirements:
 
-// first, is started when a particular input pattern (1101) is detected,
-// second, shifts in 4 more bits to determine the duration to delay,
-// third, waits for the counters to finish counting, and
-// fourth, notifies the user and waits for the user to acknowledge the timer.
-// fifth, The serial data is available on the data input pin. When the pattern 1101 is received, the circuit must then shift in the next 4 bits, // most-significant-bit first. These 4 bits determine the duration of the timer delay. I'll refer to this as the delay[3:0].
+1. **Detection of Initial Pattern**: The module should monitor a serial data input for a specific binary pattern, "1101". Once this pattern is detected, it triggers the subsequent steps in the sequence.
 
-// After that, the state machine asserts its counting output to indicate it is counting. The state machine must count for exactly (delay[3:0] + 1) * 1000 clock cycles. e.g., delay=0 means count 1000 cycles, and delay=5 means count 6000 cycles. Also output the current remaining time. This should be equal to delay for 1000 cycles, then delay-1 for 1000 cycles, and so on until it is 0 for 1000 cycles. When the circuit isn't counting, the count[3:0] output is don't-care (whatever value is convenient for you to implement).
+2. **Receiving Additional Bits**: After the initial pattern is detected, the module should proceed to shift in the next four bits of data. These bits arrive most-significant-bit first and determine the timer's delay duration, stored as `delay[3:0]`.
 
-// At that point, the circuit must assert done to notify the user the timer has timed out, and waits until input ack is 1 before being reset to look for the next occurrence of the start sequence (1101).
+3. **Counting Cycle Phase**: With the delay determined, the module enters a counting phase. The state machine should assert a `counting` output, signaling that the timer is actively counting. It must count for exactly (delay[3:0] + 1) * 1000 clock cycles. For example, if the delay is 0, it counts 1000 cycles; if the delay is 5, it counts 6000 cycles. The `count` output should show the current remaining time, decrementing every 1000 cycles from the initial delay value to zero.
 
-// The circuit should reset into a state where it begins searching for the input sequence 1101.
+4. **Completion Notification**: Once the counting phase completes, the module should assert a `done` signal, indicating the timer has expired. The system should then wait for an `ack` signal from the user before resetting and resuming its search for the "1101" pattern.
 
-// Hint: It's ok to have all the code in a single module if the components are in their own always blocks, as long as it's clear which blob of code corresponds to which hardware block. Don't merge multiple always blocks together, as that's hard to read and error-prone.
+5. **Initial Reset State**: Upon initialization or reset, the circuit should enter a state where it actively searches for the input pattern "1101". 
 
-module top_module (
-    input clk,
-    input reset,      // Synchronous reset
-    input data,
-    output [3:0] count,
-    output counting,
-    output done,
-    input ack );
+Additionally, consider the implementation guidelines: it is permissible to construct this module in a single block as long as the distinct elements, such as detection, counting, and notification, are separated into individual `always` blocks within the module. This promotes clarity and reduces potential errors, enhancing readability and maintainability of the code.
 
-    // Insert your code here
-
-endmodule
+Considering these specifications, outline the implementation within the provided module skeleton. The key inputs include `clk` for synchronization, a `reset` for initializing the state, and a `data` input to monitor for the pattern. The outputs include `count` for the countdown display, `counting` for the indication of an active count, `done` for signaling completion, and an `ack` input for acknowledging end of timer before reset. Plan the architecture of the state machine to handle these tasks effectively.

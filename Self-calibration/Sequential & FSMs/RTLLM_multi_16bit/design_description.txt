@@ -1,39 +1,27 @@
-Please act as a professional verilog designer.
+As a professional Verilog designer, your task is to implement a digital system design for an unsigned 16-bit multiplier that utilizes the method of shift and accumulate operations for generating its product output, referred to as `yout`. The specific module you're asked to create is named `multi_16bit` and is composed of inputs including clock (`clk`), active-low reset (`rst_n`), a start signal (`start`), and two 16-bit wide inputs representing the multiplicand (`ain`) and the multiplier (`bin`). The system's outputs consist of a 32-bit product (`yout`) and a flag (`done`) signaling the completion of the multiplication task. 
 
-Implement the design of an unsigned 16-bit multiplier. It utilizes shift and accumulate operations to generate the product output (yout). The module also includes control signals such as clock (clk), reset (rst_n), and start (start), along with a completion flag (done) indicating the completion of the multiplication operation.
+In your implementation, you'll need to consider the following procedural logic:
 
-Module name:  
-    multi_16bit  
+1. **Data Bit Control:** 
+    - Ensure updates to a shift count register (`i`) occur at every rising edge of the clock signal (`clk`) or falling edge of the reset signal (`rst_n`).
+    - When the reset signal (`rst_n`) is active (low), the shift count should be initialized to zero.
+    - If the start signal (`start`) is active, update the shift count register (`i`) by incrementing it by one, but only if its current value is less than 17.
+    - If the start signal is inactive (i.e., low), reset the shift count register (`i`) back to zero.
 
-Input ports:
-    clk: Chip clock signal.
-    rst_n: Active-low reset signal. Defined as 0 for chip reset and 1 for reset signal inactive.
-    start: Chip enable signal to initiate the multiplication operation.
-    ain: Input signal representing the multiplicand (a) with a data width of 16 bits.
-    bin: Input signal representing the multiplier (b) with a data width of 16 bits.
+2. **Multiplication Completion Flag Generation:** 
+    - You'll update a completion flag register (`done_r`) at every clock positive edge or upon a falling reset edge.
+    - Under reset conditions (`rst_n` low), ensure the completion flag is set to zero.
+    - Make sure the flag is set to indicate completion (`done_r` = 1) when the shift count register (`i`) equals 16.
+    - When the shift count reaches 17, reset the multiplication completion flag to zero.
 
-Output ports:
-    yout: Product output signal with a data width of 32 bits.
-    done: Chip output flag signal. Defined as 1 indicates the completion of the multiplication operation.
+3. **Shift and Accumulate Operation:** 
+    - Perform necessary operations at positive edges of clock cycles or falling reset edges.
+    - On reset, initialize the multiplicand (`areg`), multiplier (`breg`), and product registers (`yout_r`) to zero.
+    - With the start signal being active, begin the multiplication sequence.
+    - During the initial shift count (`i` = 0), load the multiplicand and multiplier values into their corresponding registers (`areg` and `breg`).
+    - For shift counts in the range of 1 to 16, if the bit at position `i-1` in the multiplicand register is high, update the product register by accumulating a shifted version of the multiplier register, specifically by shifting it left by `i-1` bits and padding with zeros at the least significant bits.
 
-Implementation:
-Data bit control:
-On every positive edge of the clock signal (clk) or the falling edge of the reset signal (rst_n), the shift count register (i) is updated.
-If the reset signal (rst_n) is low, indicating a reset condition, the shift count register (i) is set to 0.
-If the start signal is active (start) and the shift count register (i) is less than 17, the shift count register (i) increments by 1.
-If the start signal is inactive (!start), the shift count register (i) is reset to 0.
-Multiplication completion flag generation:
-On every positive edge of the clock signal (clk) or the falling edge of the reset signal (rst_n), the multiplication completion flag (done_r) is updated.
-If the reset signal (rst_n) is low, the multiplication completion flag (done_r) is set to 0.
-If the shift count register (i) is equal to 16, indicating the completion of the multiplication operation, the multiplication completion flag (done_r) is set to 1.
-If the shift count register (i) is equal to 17, the multiplication completion flag (done_r) is reset to 0.
-Shift and accumulate operation:
-On every positive edge of the clock signal (clk) or the falling edge of the reset signal (rst_n), the module performs the shift and accumulate operation.
-If the reset signal (rst_n) is low, indicating a reset condition, the multiplicand register (areg), multiplier register (breg), and product register (yout_r) are reset to 0.
-If the start signal is active (start), the module starts the multiplication operation.
-When the shift count register (i) is 0, the multiplicand (ain) and multiplier (bin) are stored in the respective registers (areg and breg).
-For shift counts greater than 0 and less than 17, if the bit at position i-1 in the multiplicand register (areg) is high, the product register (yout_r) accumulates the shifted value of the multiplier register (breg) by shifting it left by i-1 positions and appending zeros at the least significant bit positions.
-Output assignment:
-The product output (yout) is assigned the value of the product register (yout_r).
+4. **Output Assignment:** 
+    - At the end of the operation, assign the processed value of the product register (`yout_r`) to your module's product output (`yout`). 
 
-Give me the complete code.
+Please ensure your Verilog coding practices abide by these detailed operational phases and consider appropriate usage of standard Verilog syntax to develop the complete and functional module design for the `multi_16bit` system.

@@ -25,7 +25,10 @@ LIFObuffer uut (
     .FULL(FULL),
     .Clk(Clk)
 );
+
 integer error = 0;
+integer total_tests = 0; // Counter for total test cases
+
 initial begin
     // Initialize Inputs
     dataIn = 4'h0;
@@ -37,12 +40,16 @@ initial begin
     // Wait 100 ns for global reset to finish
     #100;
 
-    // Add stimulus here
+    // Enable and Reset
+    total_tests = total_tests + 1;
     EN = 1'b1;
     Rst = 1'b1;
     #40;
     Rst = 1'b0;
+
+    // Push data into LIFO
     RW = 1'b0;
+    total_tests = total_tests + 1;
     dataIn = 4'h0;
     #20;
     dataIn = 4'h2;
@@ -51,22 +58,35 @@ initial begin
     #20;
     dataIn = 4'h6;
     #20;
+
+    // Read from LIFO
     RW = 1'b1;
     #5;
-    // $display(FULL,EMPTY);
-    error = (FULL && !EMPTY) ? error : error+1;
+
+    // Test FULL and EMPTY condition
+    total_tests = total_tests + 1;
+    error = (FULL && !EMPTY) ? error : error + 1;
+
+    // Test popping values
     #20;
-    // $display(dataOut);
-    error = (dataOut==6) ? error : error+1;
+    total_tests = total_tests + 1;
+    error = (dataOut == 6) ? error : error + 1;
+
     #20;
-    // $display(dataOut);
-    error = (dataOut==4) ? error : error+1;
+    total_tests = total_tests + 1;
+    error = (dataOut == 4) ? error : error + 1;
+
+    // Final test result summary
+    $display("=========== Test Summary ===========");
+    $display("Total Tests Run: %d", total_tests);
+    $display("Total Failures: %d", error);
+
     if (error == 0) begin
-            $display("=========== Your Design Passed ===========");
-            end
-        else begin
-            $display("=========== Test completed with %d/20 failures ===========", error);
+        $display("=========== Your Design Passed ===========");
+    end else begin
+        $display("=========== Test completed with %d / %d failures ===========", error, total_tests);
     end
+
     $finish;
 end
 

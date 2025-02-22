@@ -7,7 +7,10 @@ module top_module(
     output out
 );
 
-    assign out = (~a & b & ~c & ~d) | (a & ~c) | (b & c);
+    // Simplification from the given K-map:
+    // Sum of Products (SOP) form: out = a'b'c + a'bc'd' + abc + ab'c'd'
+    
+    assign out = (~a & ~b & c) | (~a & b & ~c & ~d) | (a & b & c) | (a & ~b & ~c & ~d);
 
 endmodule
 ```

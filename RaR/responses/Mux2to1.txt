@@ -3,6 +3,7 @@ module top_module(
     input a, b, sel,
     output out ); 
 
+    // Using a ternary operator to implement a 2-to-1 multiplexer
     assign out = sel ? b : a;
 
 endmodule

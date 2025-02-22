@@ -1,25 +1,27 @@
 ```verilog
-module full_adder(
+module full_adder (
     input a,
     input b,
     input cin,
     output sum,
     output cout
 );
-    assign {cout, sum} = a + b + cin;
+    assign sum = a ^ b ^ cin;
+    assign cout = (a & b) | (b & cin) | (a & cin);
 endmodule
 
-module top_module(
+module top_module( 
     input [99:0] a, b,
     input cin,
     output [99:0] cout,
-    output [99:0] sum
+    output [99:0] sum 
 );
     wire [99:0] carry;
 
+    // Create 100 full adders using a generate loop
     genvar i;
     generate
-        for(i = 0; i < 100; i = i + 1) begin : adder_stage
+        for (i = 0; i < 100; i = i + 1) begin: ripple_carry_chain
             if (i == 0) begin
                 full_adder fa (
                     .a(a[i]),
@@ -38,9 +40,9 @@ module top_module(
                     .cout(carry[i])
                 );
             end
+            assign cout[i] = carry[i];
         end
     endgenerate
 
-    assign cout = carry;
 endmodule
 ```

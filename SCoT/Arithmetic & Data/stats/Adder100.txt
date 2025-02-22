@@ -1,0 +1,4 @@
+RaR/modules/Adder100.v:1: error: Variable declaration in unnamed block requires SystemVerilog.
+Module file path: RaR/modules/Adder100.v
+Testbench file path: hdlbits_testbenches/Adder100_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Adder100_sim', 'RaR/modules/Adder100.v', 'hdlbits_testbenches/Adder100_0_tb.v']' returned non-zero exit status 1.

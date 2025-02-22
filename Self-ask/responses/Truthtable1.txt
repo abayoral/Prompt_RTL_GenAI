@@ -5,6 +5,12 @@ module top_module(
     input x1,  // three inputs
     output f   // one output
 );
-    assign f = (~x3 & x2 & ~x1) | (~x3 & x2 & x1) | (x3 & ~x2 & x1) | (x3 & x2 & x1);
+
+    // Implementing the truth table using sum-of-products (SOP)
+    assign f = (~x3 & x2 & ~x1) |  // matches row 2
+               (~x3 & x2 & x1)  |  // matches row 3
+               (x3 & ~x2 & x1)  |  // matches row 5
+               (x3 & x2 & x1);     // matches row 7
+
 endmodule
 ```

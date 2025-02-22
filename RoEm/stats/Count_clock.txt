@@ -1,5 +1,0 @@
-RoEm/modules/Count_clock.v:42: syntax error
-RoEm/modules/Count_clock.v:42: error: Malformed conditional expression.
-Module file path: RoEm/modules/Count_clock.v
-Testbench file path: hdlbits_testbenches/Count_clock_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'RoEm/simulations/Count_clock_sim', 'RoEm/modules/Count_clock.v', 'hdlbits_testbenches/Count_clock_0_tb.v']' returned non-zero exit status 2.

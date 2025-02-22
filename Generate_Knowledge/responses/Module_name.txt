@@ -1,12 +1,16 @@
+```verilog
 module mod_a ( 
     output out1, 
     output out2, 
     input in1, 
     input in2, 
     input in3, 
-    input in4 
+    input in4
 );
-
+// Module functionality goes here
+// This is just a placeholder for demonstration purposes
+assign out1 = in1 & in2; // Example logic
+assign out2 = in3 | in4; // Example logic
 endmodule
 
 module top_module ( 
@@ -18,7 +22,8 @@ module top_module (
     output out2
 );
 
-    mod_a instance_mod_a (
+    // Instantiate mod_a and connect by port names
+    mod_a u_mod_a (
         .out1(out1),
         .out2(out2),
         .in1(a),
@@ -28,3 +33,4 @@ module top_module (
     );
 
 endmodule
+```

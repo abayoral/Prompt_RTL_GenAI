@@ -1,16 +1,1 @@
-// Create a 100-bit binary ripple-carry adder by instantiating 100 full adders. 
-// The adder adds two 100-bit numbers and a carry-in to produce a 100-bit sum and carry out. 
-// To encourage you to actually instantiate full adders, 
-// also output the carry-out from each full adder in the ripple-carry adder. 
-// cout[99] is the final carry-out from the last full adder, and is the carry-out you usually see.
-
-// Hint: There are many full adders to instantiate. An instance array or generate statement would help here.
-
-module top_module( 
-    input [99:0] a, b,
-    input cin,
-    output [99:0] cout,
-    output [99:0] sum );
-
-    // Insert your code here
-endmodule
+You are required to design a 100-bit binary ripple-carry adder by directly creating a sequence of 100 full adder components. This ripple-carry adder needs to perform addition on two 100-bit binary numbers and an initial carry-in input, ultimately producing both a 100-bit resultant sum and a carry-out. The carry-out from each individual full adder should also be recorded as part of the output, which will help in tracking the carry propagation through the entire array of full adders. For clarification, note that `cout[99]` represents the final carry-out from the concluding or last full adder in the series, which is the carry-out typically reported to indicate whether an overflow has occurred in this addition process. It is critical to emphasize the instantiation of the full adders, and implementing this can be greatly simplified by using an instance array or a generate statement to automate the repetitive task of creating and connecting multiple full adders. In this context, you need to utilize a programming strategy in your code to succinctly declare and manage the connections between these full adder modules while ensuring they operate in sequence to complete the 100-bit addition operation.

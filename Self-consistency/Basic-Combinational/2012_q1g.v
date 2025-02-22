@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // Consider the function f shown in the Karnaugh map below. Implement this function.
 
          x_1'x_2'	x_1'x_2 	x_1x_2		x_1x_2'

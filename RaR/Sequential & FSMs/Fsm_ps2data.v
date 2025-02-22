@@ -1,27 +1,11 @@
-// The PS/2 mouse protocol sends messages that are three bytes long. However, within a continuous byte stream, it's not obvious where messages start and end. The only indication is that the first byte of each three byte message always has bit[3]=1 (but bit[3] of the other two bytes may be 1 or 0 depending on data).
+Imagine you are a senior Digital Design Engineer at a prominent hardware design company, and one of your key responsibilities is to create an essential Verilog module for an upcoming, cutting-edge product. The delivery and performance of this module are crucial to maintaining your company’s esteemed status within the competitive computer hardware sector.
 
-// We want a finite state machine that will search for message boundaries when given an input byte stream. The algorithm we'll use is to discard bytes until we see one with bit[3]=1. We then assume that this is byte 1 of a message, and signal the receipt of a message once all 3 bytes have been received (done).
+The module you are tasked to develop involves interaction with the PS/2 mouse protocol, which is known to transmit data in messages of precisely three bytes. Within the continuous stream of incoming bytes, it’s not inherently clear where a specific message begins or ends. The only distinguishing factor is that the first byte of each three-byte message consistently has bit[3]=1. For the subsequent two bytes of the message, bit[3] can either be 1 or 0, as this depends on the actual data being transmitted.
 
+The goal is to design a finite state machine (FSM) that will scrutinize this byte stream and accurately identify message boundaries. The method you’ll use involves disregarding bytes until a byte with bit[3]=1 is detected. Upon sensing such a byte, it is presumed to be the initial byte of a new message, and a signal is emitted indicating the completion of receiving a message once all three bytes have been successfully captured.
 
-//Now that you have a state machine that will identify three-byte messages in a PS/2 byte stream, add a datapath that will also output the 24-bit (3 byte) message whenever a packet is received (out_bytes[23:16] is the first byte, out_bytes[15:8] is the second byte, etc.).
+Building upon the existing state machine that effectively discerns three-byte messages within the PS/2 byte stream, the next step is to enhance this framework by incorporating a datapath. This additional functionality will enable the module to output the entire 24-bit message (comprised of the 3 bytes) once a packet is fully received. Here, the output should be structured such that out_bytes[23:16] represents the first byte, out_bytes[15:8] encapsulates the second byte, and out_bytes[7:0] stores the final byte.
 
-// out_bytes needs to be valid whenever the done signal is asserted. You may output anything at other times (i.e., don't-care).
+It's important to note that the output out_bytes must be valid and convey the complete message precisely at the moment when the done signal is asserted. At other times, what is outputted is not critical and can be treated as a don't-care condition.
 
-
-// Hint: Use the FSM from PS/2 packet parser and add a datapath to capture the incoming bytes.
-
-module top_module(
-    input clk,
-    input [7:0] in,
-    input reset,    // Synchronous reset
-    output [23:0] out_bytes,
-    output done); //
-
-    // Insert your code below
-    
-    // FSM from fsm_ps2
-
-    // New: Datapath to store incoming bytes.
-
-endmodule
-
+As a hint to guide your design process, consider utilizing the previously developed FSM tailored for the PS/2 packet parser and integrate a datapath capable of capturing and storing the incoming byte data. This combination will form the core functionality of the top_module you are tasked to implement. Keep in mind to design this module while adhering to a synchronous reset approach.

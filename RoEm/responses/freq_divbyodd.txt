@@ -1,0 +1,56 @@
+```verilog
+module freq_divbyodd #(parameter NUM_DIV = 5) (
+    input wire clk,
+    input wire rst_n,
+    output reg clk_div
+);
+
+    // Check if NUM_DIV is indeed an odd number and greater than 1
+    initial begin
+        if (NUM_DIV % 2 == 0 || NUM_DIV <= 1) begin
+            $display("Error: NUM_DIV must be an odd number greater than 1");
+            $stop;
+        end
+    end
+
+    // Internal signal registers
+    reg [31:0] cnt1, cnt2;
+    reg clk_div1, clk_div2;
+
+    // Counter for positive edge division
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt1 <= 0;
+            clk_div1 <= 0;
+        end else begin
+            if (cnt1 == (NUM_DIV - 1) / 2) begin
+                clk_div1 <= ~clk_div1;
+                cnt1 <= 0;
+            end else begin
+                cnt1 <= cnt1 + 1;
+            end
+        end
+    end
+
+    // Counter for negative edge division
+    always @(negedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt2 <= 0;
+            clk_div2 <= 0;
+        end else begin
+            if (cnt2 == (NUM_DIV - 1) / 2) begin
+                clk_div2 <= ~clk_div2;
+                cnt2 <= 0;
+            end else begin
+                cnt2 <= cnt2 + 1;
+            end
+        end
+    end
+
+    // Combine both divided clocks with OR operation
+    always @(*) begin
+        clk_div = clk_div1 | clk_div2;
+    end
+
+endmodule
+```

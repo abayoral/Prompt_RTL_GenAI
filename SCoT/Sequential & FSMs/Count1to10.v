@@ -1,10 +1,7 @@
-// Make a decade counter that counts 1 through 10, inclusive. The reset input is synchronous, and should reset the counter to 1.
+The task at hand involves designing a Verilog module, which is a hardware description language construct, to create a digital counter capable of counting from 1 to 10. The design is intended to function as a decade counter, meaning it cycles through ten discrete states corresponding to the integer values from 1 to 10. Upon reaching the value of 10, the counter should naturally wrap back around to 1, thus continuously looping through this sequence.
 
-module top_module (
-    input clk,
-    input reset,
-    output [3:0] q);
+A key requirement for this counter is the presence of a synchronous reset mechanism. This means that the reset functionality is directly linked to the clock signal (`clk`), such that the state of the counter is only reset to its initial value (1) at the rising edge of the clock when the reset signal is active. This is distinct from an asynchronous reset, where the counter could be reset independently of the clock signal.
 
-    // Insert your code here
+The question specifies that the counter value `q` should be represented as a 4-bit output vector (`[3:0] q`), allowing it to contain the binary values necessary to represent numbers from 1 to 10. 
 
-endmodule
+To successfully implement this module named `top_module`, one must define logic which accounts for incrementing the counter with each clock pulse, verifying the behavior when the counter reaches the upper limit of 10, handling the reset condition appropriately, and signaling the current state of the counter through the output variable `q`. The implementation details inside the module, including any state variables or logic gates required to achieve this functionality, are to be devised and coded as part of completing the task.

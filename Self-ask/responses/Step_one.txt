@@ -1,6 +1,9 @@
-```verilog
-module top_module( output one );
+Thank you for the confirmation. I'll proceed with the solution.
 
+```verilog
+module top_module(output one);
+
+    // Assign the constant logic high value to the output
     assign one = 1'b1;
 
 endmodule

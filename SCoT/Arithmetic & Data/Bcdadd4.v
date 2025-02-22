@@ -1,24 +1,3 @@
-// You are provided with a BCD (binary-coded decimal) one-digit adder named bcd_fadd that adds two BCD digits and carry-in, and produces a sum and carry-out.
+Consider the task of implementing a digital circuit module in Verilog that extends the functionality of a single binary-coded decimal (BCD) adder. You are given a module, `bcd_fadd`, which can add two BCD one-digit inputs and a carry-in value, then output a sum and a carry-out. BCD is a form of number representation where each decimal digit is encoded using four binary bits. Your goal is to instantiate four instances of this `bcd_fadd` module to create a larger, composite structure known as a 4-digit BCD ripple-carry adder. This extended adder should be capable of taking two 4-digit BCD numbers, which are provided as 16-bit vectors, and an additional carry-in as inputs. It should effectively compute the resulting sum as another 4-digit BCD number and also determine the final carry-out. 
 
-module bcd_fadd (
-    input [3:0] a,
-    input [3:0] b,
-    input     cin,
-    output   cout,
-    output [3:0] sum );
-    
-// Instantiate 4 copies of bcd_fadd to create a 4-digit BCD ripple-carry adder. Your adder should add two 4-digit BCD numbers (packed into 16-bit vectors) and a carry-in to produce a 4-digit sum and carry out.
-
-// Hint: The BCD representation for the 5-digit decimal number 12345 is 20'h12345. This is not the same as 14'd12345 (which is 14'h3039).
-// The circuit is structured just like a binary ripple-carry adder, except the adders are base-10 rather than base-2.
-
-
-module top_module ( 
-    input [15:0] a, b,
-    input cin,
-    output cout,
-    output [15:0] sum );
-
-    // Insert your code here
-
-endmodule
+Be mindful of the difference in number representation explained in the hint: the decimal number 12345 in BCD form is `20'h12345`, indicating each decimal digit is separately encoded in 4 bits, as opposed to a straightforward 14-bit binary encoding like `14'h3039`. This ripple-carry adder behaves similarly to binary versions but is specifically adjusted for decimal (base-10) arithmetic using successive stages of BCD adders. Given the constraints and data available up until October 2023, you are tasked to write the code to connect the individual BCD adder modules appropriately to achieve this functionality in the `top_module`.

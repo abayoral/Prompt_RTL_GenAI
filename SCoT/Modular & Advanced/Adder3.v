@@ -1,17 +1,7 @@
-// Make 3 instances of full-adder to create a 3-bit binary ripple-carry adder. 
-// The adder adds two 3-bit numbers and a carry-in to produce a 3-bit sum and carry out. 
-// To encourage you to actually instantiate full adders, also output the carry-out from 
-// each full adder in the ripple-carry adder. cout[2] is the final carry-out from the last 
-// full adder, and is the carry-out you usually see.
+In the given question, you are tasked with constructing a specific type of digital circuit known as a 3-bit binary ripple-carry adder. This circuit is designed to add two 3-bit binary numbers along with an initial carry-in bit, and as a result, produce a 3-bit binary sum along with a carry-out. The ripple-carry adder should be implemented by making use of three individual full-adder instances.
 
-module top_module( 
-    input [2:0] a, b,
-    input cin,
-    output [2:0] cout,
-    output [2:0] sum );
+To clarify, each full-adder is a fundamental digital building block used to add two single-bit binary numbers and an additional carry-in bit, then producing a single-bit sum and a carry-out bit. Your goal is to connect these full-adders in series, forming a ripple-carry architecture where the carry-out from one full-adder feeds into the carry-in of the next full-adder in the sequence.
 
-    // Insert your code here
+In addition to focusing on correctly computing the 3-bit sum and the final carry-out, which is deemed as `cout[2]` from the last full-adder, there is an important requirement for this implementation: you must also output the carry-out from each of the individual full-adders. These intermediate carry-outs, denoted as `cout[0]` and `cout[1]`, should also be observable, reflecting the internal carry propagation of the ripple-carry adder.
 
-endmodule
-
-
+Given this setup, you should outline and instantiate the full-adder modules, ensuring the interconnected structure properly adheres to the characteristic behavior of ripple-carry adders. Your system's input ports comprise the two 3-bit numbers (`a` and `b`) and an initial carry-in (`cin`). The resulting outputs should then be the 3-bit sum and three carry-out bits, corresponding to each full-adder's output, with `cout[2]` representing the final carry-out. Importantly, devise a plan for module instantiation and interconnection within the main module named `top_module`, adhering to the cascading nature required by the ripple-carry adder design.

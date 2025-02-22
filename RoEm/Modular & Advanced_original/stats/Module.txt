@@ -1,0 +1,29 @@
+Mismatch at index 0: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 1: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 2: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 3: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 4: Inputs = [1, 1], Generated = [z], Reference = [1]
+Mismatch at index 5: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 6: Inputs = [1, 1], Generated = [z], Reference = [1]
+Mismatch at index 7: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 8: Inputs = [1, 1], Generated = [z], Reference = [1]
+Mismatch at index 9: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 10: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 11: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 12: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 13: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 14: Inputs = [0, 0], Generated = [z], Reference = [1]
+Mismatch at index 15: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 16: Inputs = [0, 0], Generated = [z], Reference = [1]
+Mismatch at index 17: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 18: Inputs = [0, 0], Generated = [z], Reference = [1]
+Mismatch at index 19: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 20: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 21: Inputs = [0, 1], Generated = [z], Reference = [0]
+Mismatch at index 22: Inputs = [0, 1], Generated = [z], Reference = [0]
+23 mismatches out of 23 total tests.
+hdlbits_testbenches/Module_0_tb.v:301: $finish called at 46000 (10ps)
+Module file path: CoT/modules/Module.v
+Testbench file path: hdlbits_testbenches/Module_0_tb.v
+Compilation successful. Executable created at CoT/simulations/Module_sim
+Simulation completed successfully.

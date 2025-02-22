@@ -1,0 +1,5 @@
+least-to-most/modules/Rule90.v:16: syntax error
+least-to-most/modules/Rule90.v:16: error: Incomprehensible for loop.
+Module file path: least-to-most/modules/Rule90.v
+Testbench file path: hdlbits_testbenches/Rule90_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'least-to-most/simulations/Rule90_sim', 'least-to-most/modules/Rule90.v', 'hdlbits_testbenches/Rule90_0_tb.v']' returned non-zero exit status 2.

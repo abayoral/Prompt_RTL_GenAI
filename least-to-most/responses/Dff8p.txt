@@ -1,4 +1,4 @@
-```
+```verilog
 module top_module (
     input clk,
     input reset,
@@ -7,10 +7,11 @@ module top_module (
 );
 
     always @(negedge clk) begin
-        if (reset)
-            q <= 8'h34;
-        else
+        if (reset) begin
+            q <= 8'h34; // Reset the flip-flops to 0x34
+        end else begin
             q <= d;
+        end
     end
 
 endmodule

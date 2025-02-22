@@ -27,7 +27,9 @@ module testbench;
     always #5 clk_a = ~clk_a;
     always #10 clk_b = ~clk_b;
 
-    integer error=0;
+    integer error = 0;
+    integer total_tests = 0; // Counter for total test cases
+
     initial begin
         clk_a = 0;
         clk_b = 0;
@@ -37,19 +39,25 @@ module testbench;
         data_in = 0;
         
         #20 arstn = 1; // Release reset
-		#5 brstn = 1; 
+        #5 brstn = 1; 
         #50 data_in = 4; // Set data_in to 4
         #10 data_en = 1; // Enable data
-        // $display(dataout);
         #100;
-        error = (dataout == 4)? error : error+1;
+        
+        // Test case 1
+        total_tests = total_tests + 1;
+        error = (dataout == 4) ? error : error + 1;
+        
         #10 data_en = 0; // Disable data
         #100;
         #50 data_in = 7; // Set data_in to 7
         #10 data_en = 1; // Enable data
-        // $display(dataout);
         #80;
-        error = (dataout == 7)? error : error+1;
+        
+        // Test case 2
+        total_tests = total_tests + 1;
+        error = (dataout == 7) ? error : error + 1;
+        
         #10 data_en = 0; // Disable data
         #100;
         #50;
@@ -58,19 +66,26 @@ module testbench;
         #20 arstn = 1; // Release reset
         #50 data_in = 9; // Set data_in to 9
         #10 data_en = 1; // Enable data
-        // $display(dataout);
         #100;
-        error = (dataout == 9)? error : error+1;
+        
+        // Test case 3
+        total_tests = total_tests + 1;
+        error = (dataout == 9) ? error : error + 1;
+        
         #10 data_en = 0; // Disable data
         #100;
 
-        // Display results
+        // Final test result summary
+        $display("=========== Test Summary ===========");
+        $display("Total Tests Run: %d", total_tests);
+        $display("Total Failures: %d", error);
+
         if (error == 0) begin
-            $display("===========Your Design Passed===========");
+            $display("=========== Your Design Passed ===========");
+        end else begin
+            $display("=========== Test completed with %d / %d failures ===========", error, total_tests);
         end
-        else begin
-        $display("===========Test completed with %d /3 failures===========", error);
-        end
+
         $finish;
     end
 

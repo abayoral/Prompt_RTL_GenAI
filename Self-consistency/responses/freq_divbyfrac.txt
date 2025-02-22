@@ -1,0 +1,45 @@
+module freq_divbyfrac (
+    input wire clk,         // Main input clock
+    input wire rst_n,       // Active low reset
+    output reg clk_div      // Divided clock output
+);
+
+    reg [2:0] counter;      // 3-bit counter, as 2^3 = 8 > 7 (our cycle count)
+    reg clk_div_half;       // Intermediate clock that toggles every 3 or 4 cycles
+    reg clk_div_2x;         // Double frequency clock for phase adjustment
+    
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            counter <= 3'b0;
+            clk_div_half <= 1'b0;
+        end else begin
+            if (counter == 3'd6) begin
+                counter <= 3'b0;
+                clk_div_half <= ~clk_div_half;
+            end else if (counter == 3'd3) begin
+                counter <= counter + 3'd1;
+                clk_div_half <= ~clk_div_half;
+            end else begin
+                counter <= counter + 3'd1;
+            end
+        end
+    end
+    
+    // Double frequency clock generation
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            clk_div_2x <= 1'b0;
+        end else begin
+            clk_div_2x <= ~clk_div_2x;
+        end
+    end
+    
+    // Phase adjustment and combining the clocks
+    always @(posedge clk_div_half or posedge clk_div_2x) begin
+        if (!rst_n) begin
+            clk_div <= 1'b0;
+        end else begin
+            clk_div <= clk_div_half | clk_div_2x;
+        end
+    end
+endmodule

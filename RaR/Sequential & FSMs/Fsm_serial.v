@@ -1,14 +1,9 @@
-// In many (older) serial communications protocols, each data byte is sent along with a start bit and a stop bit, to help the receiver delimit bytes from the stream of bits. One common scheme is to use one start bit (0), 8 data bits, and 1 stop bit (1). The line is also at logic 1 when nothing is being transmitted (idle).
+// As a senior Digital Design Engineer at a reputable hardware design company, you are entrusted with the important responsibility of creating a vital piece of Verilog code for an innovative next-generation product. This particular module you are going to develop holds significant importance, as its successful implementation is crucial for ensuring and upholding the company's esteemed reputation within the computer hardware industry.
 
-// Design a finite state machine that will identify when bytes have been correctly received when given a stream of bits. It needs to identify the start bit, wait for all 8 data bits, then verify that the stop bit was correct. If the stop bit does not appear when expected, the FSM must wait until it finds a stop bit before attempting to receive the next byte.
+// The task involves designing a finite state machine (FSM) that effectively decodes and verifies bytes transmitted via conventional serial communication protocols. These protocols typically transmit data one byte at a time, with each byte comprised of several essential components. Specifically, these older communication schemes include a start bit, a series of data bits, and a stop bit. In this scheme, a data byte is usually framed by a leading start bit (logic 0) and a concluding stop bit (logic 1). The communication line remains at a logic 1 state when idle, indicating no data is being transmitted.
 
-module top_module(
-    input clk,
-    input in,
-    input reset,    // Synchronous reset
-    output done
-); 
+// Your challenge is to implement an FSM that accurately monitors a stream of incoming bits. It must reliably identify the start bit to indicate the beginning of a byte, then proceed to capture and count the subsequent 8 data bits. After these data bits, the FSM needs to confirm the presence of the correct stop bit. However, if the expected stop bit is absent or erroneous, your FSM must have the capability to detect this irregularity. It should not proceed to interpret the next byte until a valid stop bit has been recognized, ensuring the integrity of the data being processed.
 
-	// Insert your code here
+// The module needs to be constructed using the Verilog hardware description language. It will take a clock signal (clk), a bit stream input (in), and a synchronous reset signal (reset) as inputs. Additionally, it must produce a 'done' output signal, indicating the successful reception and verification of a correctly formatted byte.
 
-endmodule
+// Within the framework of your module named `top_module`, you are to define and implement the required FSM logic. This logic should handle state transitions appropriately to recognize correctly formatted data bytes, synchronize with the input stream, and provide feedback through the 'done' signal when a byte is correctly received. Remember that maintaining efficient and reliable operation of this FSM is critical for the success of the product and the company's standing in the market.

@@ -1,0 +1,40 @@
+```verilog
+module fixed_point_adder #(parameter Q = 8, parameter N = 16)(
+    input wire [N-1:0] a,
+    input wire [N-1:0] b,
+    output reg [N-1:0] c
+);
+
+    reg [N:0] extended_a, extended_b, extended_res;
+
+    always @* begin
+        // Extend the inputs to a greater width to handle potential carry or borrow
+        extended_a = {a[N-1], a}; // Sign-extend
+        extended_b = {b[N-1], b}; // Sign-extend
+
+        if (a[N-1] == b[N-1]) begin
+            // Same signs: perform addition
+            extended_res = extended_a + extended_b;
+            // Assign the result to c
+            c = extended_res[N-1:0];
+        end else begin
+            // Different signs: perform subtraction
+            if (extended_a > extended_b) begin
+                extended_res = extended_a - extended_b;
+                c = extended_res[N-1:0];
+            end else begin
+                extended_res = extended_b - extended_a;
+                c = extended_res[N-1:0];
+            end
+        end
+
+        // Handle potential overflow for same sign addition
+        if (a[N-1] == b[N-1] && extended_res[N] != extended_res[N-1]) begin
+            // Overflow detection based on the sign bit and the extended sign bit
+            // Saturate the output to the max positive or negative value possible
+            c = a[N-1] ? {1'b1, {(N-1){1'b0}}} : {1'b0, {(N-1){1'b1}}};
+        end
+    end
+
+endmodule
+```

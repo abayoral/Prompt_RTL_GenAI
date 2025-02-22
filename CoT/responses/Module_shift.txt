@@ -1,44 +1,56 @@
-Chain of Thought:
+To create a shift register of length 3 using the `my_dff` module, we'll instantiate three instances of this module and chain them together. Each flip-flop will pass its output to the input of the next flip-flop in the chain. The clock signal (`clk`) will be connected to all instances. The input `d` will be connected to the first flip-flop, and the output `q` will be the output of the last flip-flop.
 
-1. **Understand the Requirements**:
-   - We need to use three instances of the provided `my_dff` D flip-flop module to create a 3-bit shift register.
-   - Each D flip-flop will capture the value on its data input (`d`) on the rising edge of the clock (`clk`) and hold that value on its output (`q`).
-   - The output of each D flip-flop will be connected to the input of the next D flip-flop in the chain, forming the shift register.
-
-2. **Determine the Inputs and Outputs**:
-   - Input: `clk` (clock), `d` (data input)
-   - Output: `q` (output of the last D flip-flop in the chain)
-
-3. **Define Intermediate Signals**:
-   - We need signals to connect the output of the first flip-flop to the input of the second flip-flop, and the output of the second flip-flop to the input of the third flip-flop.
-
-4. **Structuring the Module**:
-   - Start with the module declaration, specifying the inputs and outputs.
-   - Declare intermediate signals to connect the `q` outputs of the first and second flip-flops to the `d` inputs of the second and third flip-flops.
-   - Instantiate three instances of the `my_dff` module and connect them together to form the shift register.
-
-5. **Writing the Verilog Code**:
-   - Instantiate the three D flip-flops, connect their `clk` ports together, and properly connect their `d` and `q` ports to form a shift register.
-   - The `d` input of the first flip-flop is connected to the module's `d` input.
-   - The `q` output of the third flip-flop is connected to the module's `q` output.
-
-Here is the code:
+Here is the Verilog code to implement the shift register:
 
 ```verilog
-module top_module ( input clk, input d, output q );
-    // Intermediate signals to connect the D flip-flops
+module top_module (
+    input clk, 
+    input d, 
+    output q
+);
+    // Intermediate signals to connect the flip-flops
     wire q1, q2;
 
-    // Instantiate the three D flip-flops
-    my_dff dff1 ( .clk(clk), .d(d), .q(q1) );
-    my_dff dff2 ( .clk(clk), .d(q1), .q(q2) );
-    my_dff dff3 ( .clk(clk), .d(q2), .q(q) );
+    // Instantiate three my_dff modules
+    my_dff dff1 (
+        .clk(clk),
+        .d(d),
+        .q(q1)
+    );
 
+    my_dff dff2 (
+        .clk(clk),
+        .d(q1),
+        .q(q2)
+    );
+
+    my_dff dff3 (
+        .clk(clk),
+        .d(q2),
+        .q(q)
+    );
 endmodule
 ```
 
-In the above code:
-- The first `my_dff` instance captures the input `d` on the rising clock edge and outputs it to `q1`.
-- The second `my_dff` instance captures `q1` on the rising clock edge and outputs it to `q2`.
-- The third `my_dff` instance captures `q2` on the rising clock edge and outputs it to the module's output `q`.
-- This forms a 3-bit shift register as required.
+### Chain of Thought:
+
+1. **Understand the Requirements**:
+   - We need a shift register with a length of 3 using the provided `my_dff` module.
+   - Each D flip-flop captures the input state on a rising edge of `clk`.
+   - The output of each flip-flop feeds into the input of the following flip-flop in the sequence.
+
+2. **Determine the Inputs and Outputs**:
+   - Inputs: `clk`, `d`
+   - Output: `q`
+
+3. **Define Intermediate Signals**:
+   - Use intermediate signals (`q1`, `q2`) to connect the outputs of the first two flip-flops to the inputs of the following flip-flops.
+
+4. **Structuring the Module**:
+   - Instantiate three `my_dff` modules.
+   - Connect the `clk` signal to each `my_dff` instance.
+   - Chain the flip-flops: connect the output of the earlier flip-flop to the input of the next one.
+   - The input `d` goes to the first flip-flop, and the final output `q` is taken from the last flip-flop.
+
+5. **Writing the Verilog Code**:
+   - The Verilog code implements these connections using the instantiated `my_dff` modules and intermediate wires.

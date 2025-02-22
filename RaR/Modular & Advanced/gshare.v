@@ -1,31 +1,13 @@
-// Build a gshare branch predictor with 7-bit pc and 7-bit global history, hashed (using xor) into a 7-bit index. This index accesses a 128-entry table of two-bit saturating counters. The branch predictor should contain a 7-bit global branch history register.
+As a senior Digital Design Engineer at your company, you have been entrusted with the vital task of developing a Verilog module that serves as a gshare branch predictor for a cutting-edge hardware product. This module's performance and reliability are crucial for your organization's standing in the competitive computer hardware industry. Your objective is to construct a gshare branch predictor that operates based on a 7-bit program counter (PC) and a 7-bit global history register, which undergo a bitwise XOR operation to generate a 7-bit index. This index is then utilized to retrieve data from a pattern history table (PHT) composed of 128 two-bit saturating counters. The structure encompasses a 7-bit global branch history register.
 
-// The branch predictor has two sets of interfaces: One for doing predictions and one for doing training. The prediction interface is used in the processor's Fetch stage to ask the branch predictor for branch direction predictions for the instructions being fetched. Once these branches proceed down the pipeline and are executed, the true outcomes of the branches become known. The branch predictor is then trained using the actual branch direction outcomes.
+The branch predictor operates with two distinct sets of interfaces. One interface handles the prediction process, utilized during the Fetch stage of the processor to provide branch direction forecasts for instructions being retrieved. The other interface is responsible for training, updating the predictor's accuracy based on determined branch outcomes as branch instructions are executed throughout the pipeline.
 
-// When a branch prediction is requested (predict_valid = 1) for a given pc, the branch predictor produces the predicted branch direction and state of the branch history register used to make the prediction. The branch history register is then updated (at the next positive clock edge) for the predicted branch.
+When a branch prediction is invoked (signaled by `predict_valid = 1`) for a specific program counter, the predictor must deliver both the anticipated branch direction and the current state of the branch history register utilized for the prediction. Upon the next positive clock edge, the branch history register is updated in response to the forecasted branch.
 
-// When training for a branch is requested (train_valid = 1), the branch predictor is told the pc and branch history register value for the branch that is being trained, as well as the actual branch outcome and whether the branch was a misprediction (needing a pipeline flush). Update the pattern history table (PHT) to train the branch predictor to predict this branch more accurately next time. In addition, if the branch being trained is mispredicted, also recover the branch history register to the state immediately after the mispredicting branch completes execution.
+Conversely, when a training request is made (indicated by `train_valid = 1`), the predictor receives the program counter, the branch history register's value associated with the branch in question, the actual outcome of the branch, and whether there was a misprediction that necessitated a pipeline flush. The objective here is to adjust the PHT to enhance the predictor’s accuracy for similar branches in the future. Further, should the branch have been mispredicted, the predictor must also restore the branch history register to its configuration right after the errant branch's execution concluded.
 
-// If training for a misprediction and a prediction (for a different, younger instruction) occurs in the same cycle, both operations will want to modify the branch history register. When this happens, training takes precedence, because the branch being predicted will be discarded anyway. If training and prediction of the same PHT entry happen at the same time, the prediction sees the PHT state before training because training only modifies the PHT at the next positive clock edge. The following timing diagram shows the timing when training and predicting PHT entry 0 at the same time. The training request at cycle 4 changes the PHT entry state in cycle 5, but the prediction request in cycle 4 outputs the PHT state at cycle 4, without considering the effect of the training request in cycle 4.
+In scenarios where both a training operation for a misprediction and a prediction request for a different, younger instruction occur simultaneously, the training is prioritized as the impending prediction will be rendered moot. When training and predicting the same PHT entry occur concurrently, the prediction accesses the initial PHT state predating the training, since adjustments to the PHT occur at the subsequent positive clock edge. An outlined timing diagram visually portrays how the system manages concurrent training and predictions on PHT entry 0 across cycles, illustrating that a training request in cycle 4 impacts the PHT only by cycle 5, while a simultaneous prediction request in cycle 4 remains unaffected by these changes.
 
-// areset is an asynchronous reset that clears the entire PHT to 2b'01 (weakly not-taken). It also clears the global history register to 0.
+Additionally, the system incorporates an asynchronous reset, denoted as `areset`, which uniformly resets the PHT to a default state of `2'b01` (interpreted as weakly not-taken) while clearing the global history register to zero.
 
-module top_module(
-    input clk,
-    input areset,
-
-    input  predict_valid,
-    input  [6:0] predict_pc,
-    output predict_taken,
-    output [6:0] predict_history,
-
-    input train_valid,
-    input train_taken,
-    input train_mispredicted,
-    input [6:0] train_history,
-    input [6:0] train_pc
-);
-
-	// Insert your code here
-
-endmodule
+Your goal is to integrate this design logic efficiently within the Verilog module, delineated as `top_module`, complete with its respective inputs and outputs. Through this, ensure comprehensive functionality so the branch predictor can accurately provide and adjust branch direction predictions, leveraging both the program counter and branch history register inputs for its operations.

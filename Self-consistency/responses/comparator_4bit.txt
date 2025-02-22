@@ -1,0 +1,20 @@
+module comparator_4bit(
+    input [3:0] A,
+    input [3:0] B,
+    output A_greater,
+    output A_equal,
+    output A_less
+);
+
+    wire [3:0] diff;
+    wire borrow;
+    
+    // Calculate the difference using subtraction (A - B)
+    assign {borrow, diff} = A - B;
+
+    // Determine the outputs based on the subtraction result
+    assign A_greater = ~borrow & |diff;    // If no borrow and diff is non-zero, A is greater
+    assign A_equal = ~borrow & ~|diff;     // If no borrow and diff is zero, A equals B
+    assign A_less = borrow;                // If borrow occurred, A is less
+
+endmodule

@@ -1,0 +1,45 @@
+```verilog
+module accu (
+    input wire clk,
+    input wire rst_n,
+    input wire valid_in,
+    input wire [7:0] data_in,
+    output reg valid_out,
+    output reg [9:0] data_out
+);
+
+    // Internal registers
+    reg [9:0] sum;           // 10-bit register to hold the running total
+    reg [1:0] count;         // 2-bit counter to track the number of valid inputs received
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Active-low reset: initialize the state of the module
+            sum <= 10'b0;
+            valid_out <= 1'b0;
+            count <= 2'b0;
+        end else begin
+            // Default output state update
+            valid_out <= 1'b0;
+
+            // Check for valid input and accumulate
+            if (valid_in) begin
+                // Accumulate the input data
+                sum <= sum + data_in;
+                
+                // Increment the counter
+                count <= count + 1;
+
+                // Check if four valid inputs have been received
+                if (count == 2'd3) begin
+                    data_out <= sum + data_in; // Total sum after the fourth input
+                    sum <= 10'b0;             // Reset sum for next accumulation
+                    count <= 2'b0;            // Reset counter
+                    valid_out <= 1'b1;        // Set valid_out for one cycle
+                end
+            end
+        end
+    end
+
+endmodule
+```

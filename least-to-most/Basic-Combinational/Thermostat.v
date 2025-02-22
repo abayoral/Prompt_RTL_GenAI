@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // A heating/cooling thermostat controls both a heater (during winter) and an air conditioner (during summer). 
 // Implement a circuit that will turn on and off the heater, air conditioning, and blower fan as appropriate.
 

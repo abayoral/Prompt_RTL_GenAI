@@ -5,9 +5,11 @@ module top_module(
     input c,
     input d,
     output out
-); 
+);
 
-    assign out = (~c & ~d) | (~a & ~d) | (a & c) | (b & ~d);
+    // Simplified Sum-of-Products expression:
+    // out = (a' & c' & d') | (b' & d' & c) | (a & b & d) | (a & c' & d')
+    assign out = (~a & ~c & ~d) | (~b & ~c & d) | (a & b & d) | (a & ~c & ~d);
 
 endmodule
 ```

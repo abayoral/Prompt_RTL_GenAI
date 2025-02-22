@@ -1,0 +1,24 @@
+```verilog
+module multi_8bit (
+    input [7:0] A,
+    input [7:0] B,
+    output reg [15:0] product
+);
+    integer i; 
+    reg [15:0] multiplicand;
+    reg [15:0] accumulator;
+    
+    always @* begin
+        multiplicand = {8'b0, A}; // Extend A to 16 bits
+        accumulator = 16'b0; // Initialize accumulator
+
+        for (i = 0; i < 8; i = i + 1) begin
+            // Check if the ith bit of B is set
+            if (B[i])
+                accumulator = accumulator + (multiplicand << i);
+        end
+
+        product = accumulator;
+    end
+endmodule
+```

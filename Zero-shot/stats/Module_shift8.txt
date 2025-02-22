@@ -1,7 +1,0 @@
-Zero-shot/modules/Module_shift8.v:34: syntax error
-Zero-shot/modules/Module_shift8.v:34: error: Incomprehensible case expression.
-Zero-shot/modules/Module_shift8.v:35: syntax error
-Zero-shot/modules/Module_shift8.v:35: error: Incomprehensible case expression.
-Module file path: Zero-shot/modules/Module_shift8.v
-Testbench file path: hdlbits_testbenches/Module_shift8_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Zero-shot/simulations/Module_shift8_sim', 'Zero-shot/modules/Module_shift8.v', 'hdlbits_testbenches/Module_shift8_0_tb.v']' returned non-zero exit status 4.

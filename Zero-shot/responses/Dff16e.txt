@@ -9,13 +9,13 @@ module top_module (
 
     always @(posedge clk) begin
         if (!resetn) begin
-            q <= 16'b0;
+            q <= 16'h0000;  // Reset all flip-flops to 0
         end else begin
-            if (byteena[1]) begin
-                q[15:8] <= d[15:8];
-            end
             if (byteena[0]) begin
-                q[7:0] <= d[7:0];
+                q[7:0] <= d[7:0];  // Update lower byte if enabled
+            end
+            if (byteena[1]) begin
+                q[15:8] <= d[15:8];  // Update upper byte if enabled
             end
         end
     end

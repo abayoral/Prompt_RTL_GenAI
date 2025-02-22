@@ -1,0 +1,98 @@
+To implement a 16-bit unsigned multiplier using the method of shift and accumulate, we will follow the specifications given for module `multi_16bit`. The focus will be on using a sequential logic circuit to perform the shift and accumulate operation by registering inputs and controlling data flow with an internal state machine. Below is the step-by-step chain of thought used to create the module, followed by the Verilog code:
+
+### Chain of Thought:
+
+1. **Understand the Requirements**:
+    - Perform multiplication using shift and add technique, suited for an iterative approach.
+    - Handle inputs `ain` (multiplicand) and `bin` (multiplier) as 16 bits each, resulting in a 32-bit product `yout`.
+    - Use a clock (`clk`), active-low reset (`rst_n`), and a start signal to control operations.
+    - The `done` signal indicates when the multiplication is complete.
+
+2. **Determine the Inputs and Outputs**:
+    - Inputs: `clk`, `rst_n`, `start`, `ain[15:0]`, `bin[15:0]`
+    - Outputs: `yout[31:0]`, `done`
+
+3. **Define Intermediate Signals**:
+    - Registers for internal use: `areg` for multiplicand, `breg` for multiplier, and `yout_r` for accumulating the product.
+    - Counter `i` for shift operations, and a register `done_r` for the completion flag.
+
+4. **Structuring the Module**:
+    - Use always blocks to update registers based on clock edges or reset conditions.
+    - Initialize necessary registers in case of a reset.
+    - Load initial values into registers when `start` is activated.
+    - Accumulate and shift while iterating through each bit of the multiplier.
+    - Manage the completion flag to signal when the operation is finished.
+
+5. **Logic Flow**:
+    - On reset: initialize `areg`, `breg`, `yout_r`, and `i` to 0; clear `done_r`.
+    - On `start`: Initialize multiplication and monitor `i` to control shifts and accumulations.
+    - Accumulate the results in `yout_r`, which shifts and adds `breg` conditionally based on each bit of `areg`.
+    - Signal done when count reaches 16.
+
+6. **Writing the Verilog Code**:
+
+```verilog
+module multi_16bit (
+    input wire clk,
+    input wire rst_n,
+    input wire start,
+    input wire [15:0] ain,
+    input wire [15:0] bin,
+    output reg [31:0] yout,
+    output reg done
+);
+
+    reg [15:0] areg, breg;
+    reg [31:0] yout_r;
+    reg [4:0] i;  // 5 bits to count up to 17
+    reg done_r;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            areg   <= 16'b0;
+            breg   <= 16'b0;
+            yout_r <= 32'b0;
+            i      <= 5'b0;
+            done_r <= 1'b0;
+        end else if (start) begin
+            if (i == 5'b0) begin
+                // Load multiplicand and multiplier at start
+                areg   <= ain;
+                breg   <= bin;
+                yout_r <= 32'b0;
+                done_r <= 1'b0;
+            end else if (i <= 5'b10000) begin
+                // Shift and accumulate process
+                if (areg[i - 1]) 
+                    yout_r <= yout_r + (breg << (i - 1));
+            end
+
+            // Increment shift count
+            if (i < 5'b10001)  // Count only to 16
+                i <= i + 1;
+            else 
+                i <= 5'b0; // Reset i after 16
+
+            // Update done flag
+            if (i == 5'b10000) begin
+                done_r <= 1'b1; // finished
+            end else if (i == 5'b10001) begin
+                done_r <= 1'b0; // reset done after 17
+            end
+        end else begin
+            // Reset conditions when start is low
+            i <= 5'b0;
+            done_r <= 1'b0;
+        end
+    end
+
+    // Assign internal signals to outputs
+    always @(posedge clk) begin
+        yout <= yout_r;
+        done <= done_r;
+    end
+
+endmodule
+```
+
+This code implements a hardware-efficient multiplier using shift and accumulate operations, verifying correct behavior through controlled shift registers and accumulation logic. Each part of the process adheres to the specified requirements using the digital clock and reset controls.

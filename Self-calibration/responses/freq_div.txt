@@ -1,0 +1,75 @@
+The provided Verilog code intends to generate divided clock signals from an input clock, but there are several issues that need addressing to achieve the intended functionality:
+
+1. **Counter Logic Issues**: 
+   - The counter for `CLK_10` should toggle `CLK_10` every 5 clock cycles (counting from 0 to 4) to achieve a toggle rate corresponding to a division by 10.
+   - The counter for `CLK_1` should toggle `CLK_1` every 50 clock cycles (counting from 0 to 49) to achieve a toggle rate corresponding to a division by 100.
+
+2. **Counter Width Needs Correction**:
+   - The counter `cnt_10` should be 3 bits wide to count up to 4.
+   - The counter `cnt_100` should be 6 bits wide to count up to 49 correctly.
+
+3. **Use of Equality Checks**:
+   - Use a proper comparison for toggle points, subtracting 1 from the intended divisor if counting from 0.
+
+Let's correct these issues in the module:
+
+```verilog
+module freq_div(
+    input wire CLK_in,
+    input wire RST,
+    output reg CLK_50,
+    output reg CLK_10,
+    output reg CLK_1
+);
+
+    // Counter for CLK_10 generation
+    reg [2:0] cnt_10; // Correctly using 3 bits for counting up to 4
+
+    // Counter for CLK_1 generation
+    reg [5:0] cnt_100; // Correctly using 6 bits for counting up to 49
+
+    // CLK_50 Generation (Toggle on every positive edge for half of the input clock frequency)
+    always @(posedge CLK_in or posedge RST) begin
+        if (RST) begin
+            CLK_50 <= 0;
+        end else begin
+            CLK_50 <= ~CLK_50;
+        end
+    end
+
+    // CLK_10 Generation (Toggle every 5 CLK_in cycles)
+    always @(posedge CLK_in or posedge RST) begin
+        if (RST) begin
+            cnt_10 <= 0;
+            CLK_10 <= 0;
+        end else begin
+            if (cnt_10 == 4) begin
+                cnt_10 <= 0;
+                CLK_10 <= ~CLK_10;
+            end else begin
+                cnt_10 <= cnt_10 + 1;
+            end
+        end
+    end
+
+    // CLK_1 Generation (Toggle every 50 CLK_in cycles)
+    always @(posedge CLK_in or posedge RST) begin
+        if (RST) begin
+            cnt_100 <= 0;
+            CLK_1 <= 0;
+        end else begin
+            if (cnt_100 == 49) begin
+                cnt_100 <= 0;
+                CLK_1 <= ~CLK_1;
+            end else begin
+                cnt_100 <= cnt_100 + 1;
+            end
+        end
+    end
+
+endmodule
+```
+
+### Additional Notes:
+- No change was required for `CLK_50`, as it correctly toggles on every clock edge for a 50% duty cycle.
+- Ensure that these changes align with the specifications and constraints related to system design requirements, particularly considering any precise timing requirements.

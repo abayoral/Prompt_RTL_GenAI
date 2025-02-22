@@ -1,0 +1,22 @@
+```verilog
+module pe (
+    input wire clk,
+    input wire rst,
+    input wire signed [31:0] a,
+    input wire signed [31:0] b,
+    output reg signed [31:0] c
+);
+
+    // Always block triggered on the rising edge of clk or rst
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            // If reset is high, clear the accumulator
+            c <= 0;
+        end else begin
+            // If reset is low, accumulate the product of a and b
+            c <= c + (a * b);
+        end
+    end
+
+endmodule
+```

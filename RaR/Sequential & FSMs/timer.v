@@ -1,19 +1,22 @@
-// Implement a timer that counts down for a given number of clock cycles, then asserts a signal to indicate that the given duration has elapsed. A good way to implement this is with a down-counter that asserts an output signal when the count becomes 0.
+As a seasoned Digital Design Engineer working for a prominent hardware design company, you have been presented with the challenge of developing a crucial Verilog module that is instrumental to a cutting-edge product under development. The success of this module is of paramount importance, as it could significantly impact the company's standing and influence within the highly competitive computer hardware industry.
 
-// At each clock cycle:
+The task at hand involves creating a timer module in Verilog, where the primary function is to count down from a specified number of clock cycles and then assert a signal to indicate that the duration has elapsed. The module is expected to utilize a down-counter architecture, which behaves by triggering an output signal—termed as the terminal count (tc)—once the counter value reaches zero.
 
-// If load = 1, load the internal counter with the 10-bit data, the number of clock cycles the timer should count before timing out. The counter can be loaded at any time, including when it is still counting and has not yet reached 0.
-// If load = 0, the internal counter should decrement by 1.
+Detailed specifications for the task are as follows:
 
-// The output signal tc ("terminal count") indicates whether the internal counter has reached 0. Once the internal counter has reached 0, it should stay 0 (stop counting) until the counter is loaded again.
+1. **Clock Cycle Operation:**
+   - With every clock cycle, the behavior of the module is dictated by the state of an input signal, `load`.
+   
+2. **Load Functionality:**
+   - When the `load` input is set to 1, the module should immediately capture and store a 10-bit data value into its internal counter. This data value represents the total number of clock cycles that are intended for the countdown.
+   - The module allows for the counter to be reloaded at any point, even if it's already engaged in counting down a prior set of cycles and has not yet reached zero. This ensures flexibility in dynamically adjusting the countdown period.
 
-module top_module(
-	input clk, 
-	input load, 
-	input [9:0] data, 
-	output tc
-);
+3. **Counting Mechanism:**
+   - When `load` is 0, the module transitions into counting mode, decrementing the internal counter by 1 with each successive clock cycle.
+   - No further decrementing should occur once the counter has reached zero, maintaining this state until it is actively reloaded with a new count value.
 
-	// Insert your code here
+4. **Terminal Count Signal:**
+   - The output signal `tc` is pivotal as it signifies the completion of the countdown by asserting high when the counter has run down to zero.
+   - Once asserted, `tc` remains high until a new data value is loaded into the counter, resetting the timer for another countdown cycle.
 
-endmodule
+In summary, your task involves implementing this module, ensuring that it adheres to the outlined specifications and operates reliably under various scenarios. The module's intricate play between loading, counting, and terminal signaling forms the crux of the functionality critical to your company’s strategic hardware project.

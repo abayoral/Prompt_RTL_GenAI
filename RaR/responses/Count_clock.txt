@@ -1,53 +1,77 @@
 ```verilog
-module top_module(
-    input clk,              // Fast-running clock signal
-    input reset,            // Reset signal to reset the clock to 12:00 AM
-    input ena,              // Enable signal that pulses once per second 
-    output reg pm,          // AM/PM indicator (0 for AM, 1 for PM)
-    output reg [7:0] hh,    // Hours in BCD (01-12)
-    output reg [7:0] mm,    // Minutes in BCD (00-59)
-    output reg [7:0] ss);   // Seconds in BCD (00-59)
+module clock_12hour(
+    input wire clk,
+    input wire ena,
+    input wire reset,
+    output reg pm,
+    output reg [3:0] hh_tens,
+    output reg [3:0] hh_units,
+    output reg [3:0] mm_tens,
+    output reg [3:0] mm_units,
+    output reg [3:0] ss_tens,
+    output reg [3:0] ss_units
+);
 
-    // Initialize the clock to 12:00:00 AM
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            hh <= 8'h12;
-            mm <= 8'h00;
-            ss <= 8'h00;
-            pm <= 0;
-        end else if (ena) begin
-            // Increment seconds
-            if (ss == 8'h59) begin
-                ss <= 8'h00;
-                
+// Initial conditions
+initial begin
+    hh_tens = 1;
+    hh_units = 2;
+    mm_tens = 0;
+    mm_units = 0;
+    ss_tens = 0;
+    ss_units = 0;
+    pm = 0; // AM
+end
+
+always @(posedge clk or posedge reset) begin
+    if (reset) begin
+        // Reset to 12:00:00 AM
+        hh_tens <= 1;
+        hh_units <= 2;
+        mm_tens <= 0;
+        mm_units <= 0;
+        ss_tens <= 0;
+        ss_units <= 0;
+        pm <= 0; // AM
+    end else if (ena) begin
+        // Increment seconds
+        if (ss_units == 9) begin
+            ss_units <= 0;
+            if (ss_tens == 5) begin
+                ss_tens <= 0;
                 // Increment minutes
-                if (mm == 8'h59) begin
-                    mm <= 8'h00;
-                    
-                    // Increment hours
-                    if (hh == 8'h12) begin
-                        hh <= 8'h01;
-                        pm <= ~pm;  // Toggle AM/PM
-                    end else if (hh[3:0] == 4'h9) begin
-                        hh[3:0] <= 0;
-                        hh[7:4] <= hh[7:4] + 1;
+                if (mm_units == 9) begin
+                    mm_units <= 0;
+                    if (mm_tens == 5) begin
+                        mm_tens <= 0;
+                        // Increment hours
+                        if (hh_units == 9 || (hh_tens == 1 && hh_units == 2)) begin
+                            hh_tens <= 0;
+                            hh_units <= 1;
+                            // Toggle PM/AM at transition from 11:59 to 12:00
+                            pm <= ~pm;
+                        end else if (hh_units == 8 && hh_tens == 0) begin
+                            hh_units <= 9;
+                        end else if (hh_units == 9 && hh_tens == 0) begin
+                            hh_units <= 0;
+                            hh_tens <= 1;
+                        end else begin
+                            hh_units <= hh_units + 1;
+                        end
                     end else begin
-                        hh <= hh + 8'h01;
+                        mm_tens <= mm_tens + 1;
                     end
-                end else if (mm[3:0] == 4'h9) begin
-                    mm[3:0] <= 0;
-                    mm[7:4] <= mm[7:4] + 1;
                 end else begin
-                    mm <= mm + 8'h01;
+                    mm_units <= mm_units + 1;
                 end
-
-            end else if (ss[3:0] == 4'h9) begin
-                ss[3:0] <= 0;
-                ss[7:4] <= ss[7:4] + 1;
             end else begin
-                ss <= ss + 8'h01;
+                ss_tens <= ss_tens + 1;
             end
+        end else begin
+            ss_units <= ss_units + 1;
         end
     end
+end
+
 endmodule
 ```

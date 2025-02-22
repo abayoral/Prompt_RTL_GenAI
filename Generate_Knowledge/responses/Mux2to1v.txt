@@ -4,7 +4,8 @@ module top_module(
     input sel,
     output [99:0] out );
 
+    // Use the ternary operator to choose between inputs a and b based on sel
     assign out = sel ? b : a;
-
+    
 endmodule
 ```

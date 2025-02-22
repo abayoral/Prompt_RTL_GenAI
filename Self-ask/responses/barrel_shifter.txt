@@ -1,0 +1,45 @@
+```verilog
+module mux2X1 (
+    input wire [7:0] a,
+    input wire [7:0] b,
+    input wire sel,
+    output wire [7:0] y
+);
+    assign y = sel ? b : a;
+endmodule
+
+module barrel_shifter (
+    input wire [7:0] in,
+    input wire [2:0] ctrl,
+    output wire [7:0] out
+);
+    wire [7:0] stage1, stage2, stage3;
+    
+    // Stage 1: Shift by 4 bits based on ctrl[2]
+    mux2X1 mux_stage1 (
+        .a(in),
+        .b({in[3:0], in[7:4]}), // Rotate left by 4 bits
+        .sel(ctrl[2]),
+        .y(stage1)
+    );
+    
+    // Stage 2: Shift by 2 bits based on ctrl[1]
+    mux2X1 mux_stage2 (
+        .a(stage1),
+        .b({stage1[5:0], stage1[7:6]}), // Rotate left by 2 bits
+        .sel(ctrl[1]),
+        .y(stage2)
+    );
+
+    // Stage 3: Shift by 1 bit based on ctrl[0]
+    mux2X1 mux_stage3 (
+        .a(stage2),
+        .b({stage2[6:0], stage2[7]}), // Rotate left by 1 bit
+        .sel(ctrl[0]),
+        .y(stage3)
+    );
+
+    // Connect final stage to output
+    assign out = stage3;
+endmodule
+```

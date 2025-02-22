@@ -3,6 +3,7 @@ module top_module(
     input b, 
     output out );
 
-    assign out = ~(a ^ b);
+// XNOR operation can be implemented by negating the result of a XOR b
+assign out = ~(a ^ b);
 
 endmodule

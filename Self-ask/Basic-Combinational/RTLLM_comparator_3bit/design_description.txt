@@ -1,24 +1,22 @@
-Please act as a professional Verilog designer.
+Please assume the role of a professional Verilog designer tasked with creating a Verilog module that functions as a 3-bit comparator. Specifically, you are required to design the module capable of comparing two 3-bit binary numbers and determining their relational status.
 
-Implement a module of a 3-bit comparator for comparing binary numbers.
+Module Designation:
+- The module should be named `comparator_3bit`.
 
-Module name:  
-    comparator_3bit               
-Input ports:
-    A [2:0]: First 3-bit input operand (the first binary number to compare).
-    B [2:0]: Second 3-bit input operand (the second binary number to compare).
-Output ports:
-    A_greater: 1-bit output indicating if A is greater than B.
-    A_equal: 1-bit output indicating if A is equal to B.
-    A_less: 1-bit output indicating if A is less than B.
+Input Parameters:
+- The input should consist of two operands: 
+  - An operand labeled 'A' which is a 3-bit input vector (`A[2:0]`). This represents the first binary number in the comparison.
+  - An operand labeled 'B' which is a 3-bit input vector (`B[2:0]`). This represents the second binary number to be compared.
 
-Implementation:
-Comparison Logic: The module compares the two 3-bit binary numbers A and B using combinational logic.
-- The outputs A_greater, A_equal, and A_less are determined based on the comparison of A and B.
-- A_greater is set to 1 if A > B, A_equal is set to 1 if A == B, and A_less is set to 1 if A < B.
+Output Parameters:
+- The module should generate three distinct 1-bit outputs:
+  - `A_greater`: This output should be high (1) if, and only if, the binary number represented by 'A' is greater than that represented by 'B'.
+  - `A_equal`: This output should be high (1) if, and only if, the binary number represented by 'A' is equal to 'B'.
+  - `A_less`: This output should be high (1) if, and only if, the binary number represented by 'A' is less than that of 'B'.
 
-Output Encoding: The outputs are mutually exclusive, meaning only one of the three outputs will be high (1) at any given time, based on the comparison results.
+Functional Logic:
+- Implement combinational logic within the module to facilitate the comparison of the numbers 'A' and 'B'. The logic should enable evaluation to determine the relational status (greater than, equal to, or less than) between the two inputs.
+- The logic needs to ensure that the outputs are mutually exclusive, meaning at any given time, precisely one of the outputs (`A_greater`, `A_equal`, `A_less`) should be high, reflecting the accurate relational result of the comparison.
 
-Give me the complete code.
-
- 
+Objective:
+You are requested to provide a complete Verilog code implementation encapsulating the described module that exhibits this functionality. Ensure clarity and precision in adhering to standard Verilog-coding conventions while defining the module, its ports, and its operational logic for comparison.

@@ -4,9 +4,13 @@ module top_module(
     input b,
     input c,
     input d,
-    output out  ); 
-    
-    assign out = (~a & ~c) | (~b & ~c & ~d) | (~a & ~b & d) | (b & c & d) | (a & c & ~d);
+    output out
+);
+
+    // Simplified expression from the K-map: 
+    // out = b'd' + a'cd' + c'd
+
+    assign out = (~b & ~d) | (~a & c & ~d) | (~c & ~d);
 
 endmodule
 ```

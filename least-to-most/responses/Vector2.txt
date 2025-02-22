@@ -3,10 +3,11 @@ module top_module(
     input [31:0] in,
     output [31:0] out );
 
-    assign out[31:24] = in[ 7: 0];
-    assign out[23:16] = in[15: 8];
-    assign out[15: 8] = in[23:16];
-    assign out[ 7: 0] = in[31:24];
+    // Reversing the byte order
+    assign out[31:24] = in[7:0];    // Assign least significant byte to most significant byte
+    assign out[23:16] = in[15:8];   // Assign second least significant byte to second most significant byte
+    assign out[15:8]  = in[23:16];  // Assign second most significant byte to second least significant byte
+    assign out[7:0]   = in[31:24];  // Assign most significant byte to least significant byte
 
 endmodule
 ```

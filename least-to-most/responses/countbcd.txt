@@ -1,39 +1,63 @@
+```verilog
 module top_module (
     input clk,
     input reset,   // Synchronous active-high reset
     output [3:1] ena,
-    output [15:0] q);
+    output [15:0] q
+);
 
-    reg [15:0] counter;
-    
-    always @(posedge clk or posedge reset) begin
+    reg [3:0] ones, tens, hundreds, thousands;
+
+    // One-digit BCD counters for each place value
+    always @(posedge clk) begin
         if (reset) begin
-            counter <= 16'h0000; // Reset the count
-            ena <= 3'b000;
+            ones <= 4'b0000;
+            tens <= 4'b0000;
+            hundreds <= 4'b0000;
+            thousands <= 4'b0000;
         end
         else begin
-            if (counter[3:0] == 4'hA) begin    // If ones digit reaches 10
-                counter[3:0] <= 4'h0;  // Reset ones digit
-                ena[1] <= 1'b1;    // Enable tens digit to increment
-            end
-            
-            if (counter[7:4] == 4'hA && ena[1] == 1'b1) begin   // If tens digit reaches 10 and enabled
-                counter[7:4] <= 4'h0;  // Reset tens digit
-                ena[2] <= 1'b1;    // Enable hundreds digit to increment
-            end
-            
-            if (counter[11:8] == 4'hA && ena[2] == 1'b1) begin  // If hundreds digit reaches 10 and enabled
-                counter[11:8] <= 4'h0;  // Reset hundreds digit
-                ena[3] <= 1'b1;    // Enable thousands digit to increment
-            end
+            // Increment ones
+            if (ones == 4'b1001) begin
+                ones <= 4'b0000;
 
-            if (counter[15:12] == 4'hA && ena[3] == 1'b1)    // If thousands digit reaches 10 and enabled
-                counter[15:12] <= 4'h0;  // Reset thousands digit
-            
-            counter <= counter + 1;  // Increment the counter
+                // Increment tens
+                if (tens == 4'b1001) begin
+                    tens <= 4'b0000;
+
+                    // Increment hundreds
+                    if (hundreds == 4'b1001) begin
+                        hundreds <= 4'b0000;
+
+                        // Increment thousands
+                        if (thousands == 4'b1001) begin
+                            thousands <= 4'b0000;
+                        end
+                        else begin
+                            thousands <= thousands + 1;
+                        end
+                    end
+                    else begin
+                        hundreds <= hundreds + 1;
+                    end
+                end
+                else begin
+                    tens <= tens + 1;
+                end
+            end
+            else begin
+                ones <= ones + 1;
+            end
         end
     end
 
-    assign q = counter;  // Assign counter to output q
+    // Enable signals for other digits
+    assign ena[1] = (ones == 4'b1001);
+    assign ena[2] = ena[1] && (tens == 4'b1001);
+    assign ena[3] = ena[2] && (hundreds == 4'b1001);
+
+    // Concatenate outputs
+    assign q = {thousands, hundreds, tens, ones};
 
 endmodule
+```

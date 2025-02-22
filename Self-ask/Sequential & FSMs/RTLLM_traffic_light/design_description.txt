@@ -1,42 +1,45 @@
-Please act as a professional verilog designer.
+You're requesting assistance from me, trained as a professional Verilog designer, to create a Verilog implementation of a traffic light controller tailored for a specific scenario. The traffic light system you want should manage an array of signals commonly used for vehicular and pedestrian traffic management, including red, yellow, and green indicators, and incorporate a mechanism for pedestrians to influence the traffic flow. Let's break down the elements of this task for clarity:
 
-Implement a traffic light, with red, yellow and green three small indicators and a pedestrian button, under normal circumstances, the motor vehicle lane indicator light according to 60 clock cycles of green, 5 clock cycles of yellow, 10 clock cycles of red. When the pedestrian button is pressed, if the remaining green time is greater than 10 clocks, it is shortened to 10 clocks, and if it is less than 10 clocks, it remains unchanged. The lane light and the sidewalk light should be paired, when the lane light is green or yellow, the sidewalk light is red; When the lane light is red, the sidewalk light is green, and for the sake of simplicity, only the lane light is considered.
+**Scenario:**
+You have a traffic light controlling a motor vehicle lane, where the default cycle for the light is as follows: 60 clock cycles of green, 5 clock cycles of yellow, and 10 clock cycles of red. There should also be a pedestrian button implemented. 
 
-Module name:  
-    traffic_light
+**Pedestrian Button Behavior:**
+The functionality of the pedestrian button must be incorporated such that if it's pressed during the time the green light is active and more than 10 clock cycles remain before the light is scheduled to change, the remainder of the green light's duration should be reduced to 10 clock cycles. If fewer than 10 clock cycles remain when the button is pressed, the duration remains unchanged.
 
-Inputs:
-    rst_n: Reset signal (active low).
-    clk: Clock signal.
-    pass_request: Request signal for allowing vehicles to pass.
+**Light Pairing Logic:**
+The behavior of the pedestrian light is paired with the vehicular signals. When the vehicular traffic light is green or yellow, the pedestrian light remains red. Conversely, when the vehicular light turns red, the pedestrian light switches to green, signifying it's safe for pedestrians to cross.
 
-Outputs:
-    clock[7:0]: An 8-bit output representing the count value of the internal counter.
-    red, yellow, green: Output signals representing the state of the traffic lights.
+**Traffic Light Controller:**
+You will need a Verilog module named `traffic_light`, incorporating a number of inputs and outputs:
+- **Inputs:**
+  - `rst_n`: A reset signal, which is active low.
+  - `clk`: A clock signal, acting as the timing reference for all operations.
+  - `pass_request`: A signal that influences the decision to allow vehicles to pass or not.
 
-Parameters:
-    idle, s1_red, s2_yellow, s3_green: Enumeration values representing different states of the traffic light controller.
+- **Outputs:**
+  - `clock[7:0]`: An 8-bit signal to represent the internal timer's count value, which manages timing for each state.
+  - `red`, `yellow`, `green`: Signals indicating the active traffic light color for vehicles.
 
-Registers and Wires:
-    cnt: A 8-bit register used as an internal counter for timing purposes.
-    state: A 2-bit register representing the current state of the traffic light controller.
-    p_red, p_yellow, p_green: 1-bit registers representing the next values for the red, yellow, and green signals.
+**Parameters and State Management:**
+Parameters will include enumerated states like `idle`, `s1_red`, `s2_yellow`, `s3_green` to categorize different stages of the traffic light's operations.
 
-Implementation:
-The following is the design track we recommend:
-The first always block is responsible for the state transition logic. It uses a case statement to handle different states. Here's a summary of each state:
-idle: Initial state where all signals are set to 0. Transition to s1_red state occurs immediately.
-s1_red: Sets the red signal to 1 and waits for a count of 3 before transitioning to s3_green state. Otherwise, it remains in s1_red state.
-s2_yellow: Sets the yellow signal to 1 and waits for a count of 3 before transitioning to s1_red state. Otherwise, it remains in s2_yellow state.
-s3_green: Sets the green signal to 1 and waits for a count of 3 before transitioning to s2_yellow state. Otherwise, it remains in s3_green state.
-The second always block handles the counting logic of the internal counter (cnt). The counter is decremented by 1 on every positive edge of the clock or negative edge of the reset signal. The counter values are adjusted based on various conditions:
-If (!rst_n), the counter is set to 10.
-If the pass_request signal is active and the green signal is active, the counter is set to 10.
-If the green signal is inactive and the previous green signal (p_green) was active, the counter is set to 60.
-If the yellow signal is inactive and the previous yellow signal (p_yellow) was active, the counter is set to 5.
-If the red signal is inactive and the previous red signal (p_red) was active, the counter is set to 10.
-Otherwise, the counter is decremented normally.
-The assign statement assigns the value of the internal counter (cnt) to the output clock.
-The final always block handles the output signals. It assigns the previous values (p_red, p_yellow, p_green) to the output signals (red, yellow, green) on the positive edge of the clock or negative edge of the reset signal.
+**Counters and State Transitions:**
+The implementation involves registers and wires, particularly:
+- An 8-bit `cnt` register, acting as an internal counter.
+- A 2-bit `state` register to determine the current operational state.
+- Register declarations for previous signal states (`p_red`, `p_yellow`, `p_green`) to track the next values for the red, yellow, and green outputs.
 
-Give me the complete code.
+**Design and Implementation Strategy:**
+1. **State Transition Logic:** An always block is needed to manage state transitions based on the current state and input conditions. For example:
+   - Transition from `idle` to `s1_red`.
+   - Transition from `s1_red` to `s3_green` after 3 counts.
+   - Transition from `s2_yellow` to `s1_red` similarly.
+   - Ensure proper handling of pedestrian requests and standard state transitions.
+
+2. **Counter Logic:** Another always block must adjust the internal counter based on the clock and reset signals:
+   - Count down each clock cycle.
+   - Handle special conditions like a reset, pedestrian button press, or state transition triggering a new countdown period based on the light changing.
+
+3. **Signal Outputs:** A final always block will coordinate updating the actual signal outputs (`red`, `yellow`, `green`) based on current and previous states, ensuring transitions coincide with the countdown logic.
+
+Your directive is to craft all these components into a coherent Verilog code snippet that embodies this traffic light controller design. This comprehensive description aims to guide you through setting up the architecture of the Verilog module inline with these outlined functionalities and constraints.

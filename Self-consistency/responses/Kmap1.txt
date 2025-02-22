@@ -3,9 +3,9 @@ module top_module(
     input b,
     input c,
     output out
-); 
+);
 
-    // Simplified equation from the Karnaugh map
-    assign out = 1;
+    // Simplified expression from the Karnaugh map is always true for any combination of a, b, c.
+    assign out = 1'b1; 
 
 endmodule

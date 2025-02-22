@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // Create a 100-bit binary ripple-carry adder by instantiating 100 full adders. 
 // The adder adds two 100-bit numbers and a carry-in to produce a 100-bit sum and carry out. 
 // To encourage you to actually instantiate full adders, 

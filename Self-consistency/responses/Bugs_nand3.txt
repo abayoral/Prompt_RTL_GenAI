@@ -1,5 +1,15 @@
+module andgate ( output out, input a, input b, input c, input d, input e );
+    assign out = a & b & c & d & e;
+endmodule
+
 module top_module (input a, input b, input c, output out);
     wire and_out;
-    andgate inst1 (and_out, a, b, c, 1'b1, 1'b1); // Use 1'b1 to fill the unused inputs
-    assign out = ~and_out; // NAND operation
+
+    // Instantiate the 5-input AND gate and provide appropriate connections
+    // Since we are implementing a 3-input NAND, tie the extra inputs to logic high (1)
+    andgate inst1 (and_out, a, b, c, 1'b1, 1'b1);
+
+    // Invert the output of the AND gate for NAND behavior
+    assign out = ~and_out;
+
 endmodule

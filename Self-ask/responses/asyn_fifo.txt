@@ -1,0 +1,102 @@
+```verilog
+module asyn_fifo #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16,
+    parameter ADDR_WIDTH = $clog2(DEPTH)
+) (
+    input wire wclk,
+    input wire rclk,
+    input wire wrstn,
+    input wire rrstn,
+    input wire winc,
+    input wire rinc,
+    input wire [WIDTH-1:0] wdata,
+    output wire wfull,
+    output wire rempty,
+    output wire [WIDTH-1:0] rdata
+);
+
+    // Dual-port RAM for data storage
+    reg [WIDTH-1:0] mem [0:DEPTH-1];
+    reg [WIDTH-1:0] rdata_reg;
+    
+    // Write and Read Pointers (Binary and Gray)
+    reg [ADDR_WIDTH:0] wptr, rptr, wptr_gray, rptr_gray;
+    reg [ADDR_WIDTH:0] wq2_rptr, rq2_wptr;  // Synchronized pointers
+
+    // Generate next Gray code
+    function [ADDR_WIDTH:0] bin2gray(input [ADDR_WIDTH:0] b);
+        bin2gray = (b >> 1) ^ b;
+    endfunction
+
+    function [ADDR_WIDTH:0] gray2bin(input [ADDR_WIDTH:0] g);
+        integer i;
+        begin
+            gray2bin[ADDR_WIDTH] = g[ADDR_WIDTH];
+            for (i = ADDR_WIDTH-1; i >= 0; i = i - 1) begin
+                gray2bin[i] = gray2bin[i+1] ^ g[i];
+            end
+        end
+    endfunction
+
+    // Write Pointer Logic
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            wptr <= 0;
+            wptr_gray <= 0;
+        end else if (winc && !wfull) begin
+            wptr <= wptr + 1'b1;
+            wptr_gray <= bin2gray(wptr + 1'b1);
+        end
+    end
+
+    // Read Pointer Logic
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            rptr <= 0;
+            rptr_gray <= 0;
+        end else if (rinc && !rempty) begin
+            rptr <= rptr + 1'b1;
+            rptr_gray <= bin2gray(rptr + 1'b1);
+        end
+    end
+
+    // RAM Write
+    always @(posedge wclk) begin
+        if (winc && !wfull) begin
+            mem[wptr[ADDR_WIDTH-1:0]] <= wdata;
+        end
+    end
+
+    // RAM Read
+    always @(posedge rclk) begin
+        if (rinc && !rempty) begin
+            rdata_reg <= mem[rptr[ADDR_WIDTH-1:0]];
+        end
+    end
+    assign rdata = rdata_reg;
+
+    // Synchronize Read Pointer into Write Clock Domain
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) {wq2_rptr, wq2_rptr[ADDR_WIDTH]} <= 0;
+        else {wq2_rptr[ADDR_WIDTH], wq2_rptr} <= {wq2_rptr[ADDR_WIDTH-1:0], rptr_gray};
+    end
+
+    // Synchronize Write Pointer into Read Clock Domain
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) {rq2_wptr, rq2_wptr[ADDR_WIDTH]} <= 0;
+        else {rq2_wptr[ADDR_WIDTH], rq2_wptr} <= {rq2_wptr[ADDR_WIDTH-1:0], wptr_gray};
+    end
+
+    // Full Flag Logic
+    wire [ADDR_WIDTH:0] wbin = gray2bin(wptr_gray);
+    wire [ADDR_WIDTH:0] rq2_wbin = gray2bin(rq2_wptr);
+    assign wfull = (wbin == {~rq2_wbin[ADDR_WIDTH], rq2_wbin[ADDR_WIDTH-1:0]});
+
+    // Empty Flag Logic
+    wire [ADDR_WIDTH:0] rbin = gray2bin(rptr_gray);
+    wire [ADDR_WIDTH:0] wq2_rbin = gray2bin(wq2_rptr);
+    assign rempty = (rbin == wq2_rbin);
+
+endmodule
+```

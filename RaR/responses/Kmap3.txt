@@ -4,10 +4,15 @@ module top_module(
     input b,
     input c,
     input d,
-    output out 
+    output out
 );
 
-    assign out = (~a & b & ~d) | (~a & b & c) | (a & b) | (a & ~b & ~d);
+    // Simplified logic function derived from the K-map
+    // The simplified Sum-of-Products (SOP) expression is:
+    // out = c'd' + ab + cd
+
+    // Implementing the logic function
+    assign out = (~c & ~d) | (a & b) | (c & d);
 
 endmodule
 ```

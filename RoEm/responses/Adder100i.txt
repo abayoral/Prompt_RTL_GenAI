@@ -1,43 +1,51 @@
 ```verilog
-module full_adder (
+module full_adder(
     input a,
     input b,
     input cin,
     output sum,
     output cout
 );
-    assign {cout, sum} = a + b + cin;
+    assign sum = a ^ b ^ cin; // Sum bit
+    assign cout = (a & b) | (b & cin) | (a & cin); // Carry out
 endmodule
 
-module top_module(
-    input [99:0] a, b,
+module top_module( 
+    input [99:0] a, 
+    input [99:0] b,
     input cin,
     output [99:0] cout,
-    output [99:0] sum
-);  
-    wire [99:0] c;  // Internal carry bits
+    output [99:0] sum 
+);
 
+    wire [99:0] carry; // Intermediate carry signals
+
+    // Generate block to instantiate 100 full adders
+    genvar i;
     generate
-        genvar i;
-        for (i = 0; i < 100; i = i + 1) begin: adders
+        for (i = 0; i < 100; i = i + 1) begin: full_adder_instance
             if (i == 0) begin
-                full_adder fa (
+                // For the first full adder, use the external cin
+                full_adder fa(
                     .a(a[i]),
                     .b(b[i]),
                     .cin(cin),
                     .sum(sum[i]),
-                    .cout(cout[i])
+                    .cout(carry[i])
                 );
             end else begin
-                full_adder fa (
+                full_adder fa(
                     .a(a[i]),
                     .b(b[i]),
-                    .cin(cout[i-1]),
+                    .cin(carry[i-1]),
                     .sum(sum[i]),
-                    .cout(cout[i])
+                    .cout(carry[i])
                 );
             end
         end
     endgenerate
+
+    assign cout = carry; // Connect internal carries to the output
+
 endmodule
 ```

@@ -1,7 +1,0 @@
-Self-consistency/modules/Fsm_serial.v:9: syntax error
-Self-consistency/modules/Fsm_serial.v:9: error: Invalid module instantiation
-Self-consistency/modules/Fsm_serial.v:24: syntax error
-Self-consistency/modules/Fsm_serial.v:24: error: Invalid module instantiation
-Module file path: Self-consistency/modules/Fsm_serial.v
-Testbench file path: hdlbits_testbenches/Fsm_serial_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Self-consistency/simulations/Fsm_serial_sim', 'Self-consistency/modules/Fsm_serial.v', 'hdlbits_testbenches/Fsm_serial_0_tb.v']' returned non-zero exit status 4.

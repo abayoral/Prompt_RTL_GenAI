@@ -1,13 +1,16 @@
 ```verilog
-module mod_a (input in1, input in2, output out);
-    // Internal implementation of mod_a
-endmodule
+module top_module (
+    input wire a,
+    input wire b,
+    output wire out
+);
 
-module top_module (input a, input b, output out);
-    mod_a u_mod_a (
-        .in1(a),    // Connecting top_module port 'a' to mod_a port 'in1'
-        .in2(b),    // Connecting top_module port 'b' to mod_a port 'in2'
-        .out(out)   // Connecting top_module port 'out' to mod_a port 'out'
-    );
+// Instantiate mod_a
+mod_a u_mod_a (
+    .in1(a),    // Connect top_module's 'a' to mod_a's 'in1'
+    .in2(b),    // Connect top_module's 'b' to mod_a's 'in2'
+    .out(out)   // Connect mod_a's 'out' to top_module's 'out'
+);
+
 endmodule
 ```

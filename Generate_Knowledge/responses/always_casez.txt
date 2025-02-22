@@ -4,19 +4,27 @@ module top_module (
     output reg [2:0] pos
 );
 
-always @(*) begin
-    casez (in)
-        8'b00000001: pos = 3'd0;
-        8'b0000001?: pos = 3'd1;
-        8'b000001??: pos = 3'd2;
-        8'b00001???: pos = 3'd3;
-        8'b0001????: pos = 3'd4;
-        8'b001?????: pos = 3'd5;
-        8'b01??????: pos = 3'd6;
-        8'b1???????: pos = 3'd7;
-        default: pos = 3'd0;
-    endcase
-end
+    always @(*) begin
+        if (in[0]) begin
+            pos = 3'd0;
+        end else if (in[1]) begin
+            pos = 3'd1;
+        end else if (in[2]) begin
+            pos = 3'd2;
+        end else if (in[3]) begin
+            pos = 3'd3;
+        end else if (in[4]) begin
+            pos = 3'd4;
+        end else if (in[5]) begin
+            pos = 3'd5;
+        end else if (in[6]) begin
+            pos = 3'd6;
+        end else if (in[7]) begin
+            pos = 3'd7;
+        end else begin
+            pos = 3'd0; // If no bits are high, output zero
+        end
+    end
 
 endmodule
 ```

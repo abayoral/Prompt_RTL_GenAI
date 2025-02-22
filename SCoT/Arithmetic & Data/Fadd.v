@@ -1,9 +1,1 @@
-//Create a full adder. A full adder adds three bits (including carry-in) and produces a sum and carry-out.
-
-module top_module( 
-    input a, b, cin,
-    output cout, sum );
-
-    // Insert your code here
-
-endmodule
+The objective is to design a digital circuit known as a full adder using the Verilog hardware description language. A full adder is an essential component in binary arithmetic and is used to perform the addition of three single-bit binary numbers: two significant bits, 'a' and 'b', and an additional carry-in bit 'cin'. The circuit should be able to compute and provide two outputs: a 'sum' bit and a 'carry-out' bit, 'cout'. The 'sum' output represents the least significant bit of the addition, whereas the 'cout' output, which stands for carry-out, represents any overflow that results from the addition, potentially to be used in subsequent higher-order bit addition operations. Ensuring that the module you create accurately reflects the logic of a full adder will require a precise understanding of binary addition and the propagation of carry bits. The given skeleton of a Verilog module offers the structure within which you must insert the logic necessary to achieve this functionality.

@@ -1,23 +1,23 @@
-Please act as a professional verilog designer.
+Could you provide detailed guidance on how to design and implement a Verilog module specifically for pulse detection? The module should be capable of identifying a pulse characterized by a specific sequence of input changes over clock cycles. Let me offer further clarification on the required functionality and parameters:
 
-Implement a module for pulse detection. The 1-bit input signal data_in is a continuous input, which is triggered by clk. When "data_in" changes from 0 to 1 to 0(3 cycles), this is considered as a "pulse". The indicating signal dataout is 1 at the end cycle of the "pulse", and then returns to 0 until the corresponding pulse appears again. For example, if data_in is 01010(5 cycles), the data_out is 00101.
+1. **Objective of the Module:**
+   - The purpose of the module is to accurately detect a pulse defined as a transition sequence of 0 to 1 to 0 on a 1-bit input signal. The detection should be synchronized with a clock signal and consider each change as lasting for one clock cycle.
 
+2. **Signal and Port Specifications:**
+   - The input port `clk` is the clock signal that governs the timing of the detection process.
+   - The `rst_n` input is an active-low reset signal to initialize or reset the module's internal state.
+   - The `data_in` is a one-bit signal representing the data whose transition needs to be monitored for pulse detection.
+   - The output port `data_out` is a one-bit signal indicating the successful detection of a pulse. This signal should assert to 1 at the end of the pulse detection sequence before returning to 0.
 
-Module name:  
-    pulse_detect
+3. **Timing and Operation Details:**
+   - The module should be prepared to handle continuous input of the `data_in` signal where the state of each input bit is determined on each clock cycle.
+   - The indication of a pulse (changing from 0 to 1 to 0 across three cycles) is needed, and `data_out` should specifically turn to 1 on the last cycle where the transition completes and then reset to 0 immediately after ensuring the indicator is only temporary unless another pulse is detected.
 
-Input ports：
-    clk: Clock signal.
-    rst_n: Reset signal (active low).
-    data_in: One-bit input signal.
+4. **Implementation Components:**
+   - Define a module with the proposed name `pulse_detect` incorporating all necessary input and output ports.
+   - Use a state register to track the stages of pulse detection, ensuring to include logic for initialization and state transitions based on `data_in`.
+   - Implement an always block sensitive to the rising edge of `clk` and the falling edge of `rst_n` where the detection logic should be evaluated and `data_out` adjusted accordingly.
 
-Output ports：
-    data_out: Output signal indicating the presence of pulses.
+By following these functionality specifications, a complete pulse detection module can be drafted that identifies the defined pulse within the input sequence.
 
-Implementation:
-Declare the module pulse_detect with input and output ports as specified in the ports statement.
-Declare a register state to keep track of the current state of the pulse detection process.
-Inside an always block, sensitive to the positive edge of the clk signal and the negative edge of the rst_n signal, implement the logic for pulse detection and output generation.
-In the reset condition (~rst_n), set the state register to the initial state and set the data_out output to 0, indicating no pulse. Continue the detection process for the remaining states. For each state, check the value of data_in and transition to the next state accordingly. If the current state satisfies the last state of a "pulse", set data_out to 1, indicating the end of a pulse. Otherwise, set data_out to 0.
-
-Give me the complete code.
+Please provide the complete Verilog code for the above-defined pulse detection functionality.

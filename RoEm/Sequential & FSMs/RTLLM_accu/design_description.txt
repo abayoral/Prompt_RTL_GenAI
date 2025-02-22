@@ -1,21 +1,21 @@
-Please act as a professional verilog designer.
+You are seeking assistance in constructing a Verilog module named `accu` that functions as a serial input data accumulation system. This design task involves several specified inputs and outputs that must cooperate to achieve the desired functionality. The module will process serial input data streams, accumulating sets of 8-bit input data, and produce outputs only after every set of four inputs has been received and processed. Let's delve into each requirement and objective separately for clarity:
 
-Implement a module to achieve serial input data accumulation output, input is 8bit data. The valid_in will be set to 1 before the first data comes in. Whenever the module receives 4 input data, the data_out outputs 4 received data accumulation results and sets the valid_out to be 1 (will last only 1 cycle).
+**Module Requirements:**
 
-Module name:  
-    accu               
-Input ports:
-	clk: Clock input for synchronization.
-	rst_n: Active-low reset signal.
-	data_in[7:0]: 8-bit input data for addition.
-	valid_in: Input signal indicating readiness for new data.   
-Output ports:
-    valid_out: Output signal indicating when 4 input data accumulation is reached.
-	data_out[9:0]: 10-bit output data representing the accumulated sum.
+- **Clock and Reset Configuration:**
+  - `clk`: Serve as the clock input, ensuring that all operations within the module are synchronized, advancing on each clock cycle.
+  - `rst_n`: An active-low reset input, which when asserted (i.e., set to 0), should initialize the module, resetting its accumulated state and outputs to ensure a fresh start upon deactivation.
 
-Implementation:
-When valid_in is 1, data_in is a valid input. Accumulate four valid input data_in values and calculate the output data_out by adding these four values together. 
-There is no output when there are fewer than four data_in inputs in the interim. Along with the output data_out, a cycle of valid_out=1 will appear as a signal. 
-The valid_out signal is set to 1 when the data_out outputs 4 received data accumulation results. Otherwise, it is set to 0.
+- **Input Data Handling:**
+  - `data_in[7:0]`: An 8-bit wide input port meant to receive individual data elements for processing and accumulation.
+  - `valid_in`: A control signal indicating that the incoming `data_in` is valid for processing. The module should commence the accumulation process only if this signal is high.
 
-Give me the complete code.
+- **Output Data Handling:**
+  - `valid_out`: A 1-cycle pulse output indicating that the module has successfully accumulated four input data items and the resultant sum is ready to be outputted. This signal should toggle to indicate valid `data_out`.
+  - `data_out[9:0]`: A 10-bit wide output to accommodate the sum of the four 8-bit inputs, where the extra width handles potential overflow from summing four 8-bit numbers.
+
+**Desired Functionality and Operation:**
+
+Upon activation with `valid_in` set high, the module will begin accumulating incoming `data_in` values. The accumulated result should only be outputted when exactly four valid inputs have been successfully aggregated. The intermediate states or partial sums should not produce any output or affect the output logic setup. Only when the fourth valid input is received, will `data_out` reflect the cumulative sum of the four inputs, accompanied by the valid indication through a single cycle of `valid_out` set high. Between these complete sets of four inputs, `valid_out` should remain at zero, indicating no valid sum is currently available.
+
+This encapsulation should help you develop the Verilog code necessary to meet the requirements specified, ensuring adherence to digital design principles like input validation, synchronous operation, and proper handling of state transitions.

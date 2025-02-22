@@ -1,36 +1,39 @@
-Please act as a professional Verilog designer.
+As an experienced Verilog designer, you are tasked with creating a Verilog module named `fixed_point_adder` which implements a parameterized fixed-point adder for arithmetic operations characterized by fixed precision. Below are the specific details and parameters you need to consider for this implementation:
 
-Implement a module of a parameterized fixed-point adder for arithmetic operations with fixed precision.
+**Module Details:**
+- **Module Name:** `fixed_point_adder`
 
-Module name:  
-    fixed_point_adder               
-Input parameters:
-    Q: Number of fractional bits (precision).
-    N: Total number of bits, including integer and fractional parts.
-Input ports:
-    a [N-1:0]: First N-bit fixed-point input operand.
-    b [N-1:0]: Second N-bit fixed-point input operand.
-Output ports:
-    c [N-1:0]: N-bit output representing the result of the fixed-point addition.
+**Input Parameters:**
+- **Q (integer):** Represents the number of fractional bits, which directly influences the precision of the fixed-point representation. This parameter dictates how many bits are used after the binary point.
+- **N (integer):** Denotes the total number of bits utilized for each input, which includes both the integer and fractional parts of the fixed-point numbers.
 
-Internal Registers:
-    res [N-1:0]: N-bit register used to store the result of the addition or subtraction.
+**Input Ports:**
+- **a [N-1:0]:** The first input operand in a fixed-point N-bit format. This operand serves as one of the values in the arithmetic operation.
+- **b [N-1:0]:** The second input operand in the same fixed-point N-bit format as `a`. This operand is the other value involved in the arithmetic operation.
 
-Implementation:
-1. Absolute Value Addition:
-    - If the most significant bits (MSBs) of `a` and `b` are the same (both positive or both negative), their absolute values are added.
-    - The MSB of the result is set to match the MSBs of `a` and `b` (sign bit remains consistent).
+**Output Ports:**
+- **c [N-1:0]:** The output port that delivers the result of the fixed-point addition operation. The result should be in the same N-bit fixed-point format to maintain consistency in size and precision.
 
-2. Absolute Value Subtraction:
-    - If the MSBs of `a` and `b` are different (one is positive, the other negative), the larger absolute value is determined.
-    - If `a` is greater than `b`, the result is `a - b` and the MSB of the result is set to 0 (positive).
-    - If `b` is greater than `a`, the result is `b - a`. The MSB of the result is set according to whether the result is zero or negative.
+**Internal Registers:**
+- **res [N-1:0]:** An internal N-bit register used temporarily to store the intermediary or final result of the addition/subtraction operation within the module.
 
-3. Precision:
-    - The operands `a` and `b` consist of integer and fractional parts, with the fractional part determined by parameter `Q`.
-    - The precision is consistent across both inputs and the output to ensure accurate fixed-point arithmetic.
+**Implementation Details:**
+1. **Absolute Value Addition:**
+   - This step is performed when the MSBs (sign bits) of both operands `a` and `b` are identical, indicating that both numbers are either positive or negative.
+   - The absolute values of `a` and `b` are added together. The result's sign bit should be set to match the common sign bit of `a` and `b`, ensuring the continuity of the sign.
 
-4. Overflow Handling:
-    - Overflow is managed internally by observing the MSB to ensure the result fits within the N-bit range.
+2. **Absolute Value Subtraction:**
+   - This occurs when the MSBs of `a` and `b` differ, suggesting that one operand is positive while the other is negative.
+   - Compare the absolute values:
+     - If `a` has a greater absolute value than `b`, compute `a - b`. The resultant MSB should stand as 0, indicating a positive result.
+     - If `b` is greater than `a`, compute `b - a`. The resultant sign should appropriately reflect whether the result is negative or zero.
 
-Give me the complete code.
+3. **Precision Management:**
+   - The fixed-point operands, `a` and `b`, include both integer and fractional components. The fractional component comprises `Q` bits, holding significance for the precision of computations.
+   - Precision consistency needs to be maintained across input operands and the output to guarantee the accuracy of the arithmetic operations.
+
+4. **Overflow Handling:**
+   - Overflow considerations are crucial to ensure that the outcome of the fixed-point operation does not exceed the allocated N-bit range.
+   - Monitor the MSB for overflow indications, making sure the results adhere to the specified N-bit limit.
+
+Your task entails crafting the Verilog code to implement the above requirements without detailing the solution here.

@@ -1,0 +1,58 @@
+```verilog
+module LIFObuffer(
+    input [3:0] dataIn,
+    input RW,
+    input EN,
+    input Rst,
+    input Clk,
+    output reg EMPTY,
+    output reg FULL,
+    output reg [3:0] dataOut
+);
+
+    // Stack memory for storing up to 4 entries of 4 bits each
+    reg [3:0] stack_mem [3:0];
+    reg [1:0] SP; // 2-bit Stack Pointer, can address 0 to 3
+
+    // Initialization
+    initial begin
+        EMPTY = 1'b1;
+        FULL = 1'b0;
+        SP = 2'b00;
+    end
+
+    always @(posedge Clk) begin
+        if (Rst) begin
+            // Reset the LIFO buffer
+            EMPTY <= 1'b1;
+            FULL <= 1'b0;
+            SP <= 2'b00;
+        end else if (EN) begin
+            if (RW) begin // Pop operation
+                if (!EMPTY) begin
+                    dataOut <= stack_mem[SP];
+                    // Clear the slot (not strictly necessary, but good practice)
+                    stack_mem[SP] <= 4'b0000;
+                    if (SP == 2'b00) begin
+                        EMPTY <= 1'b1;
+                    end else begin
+                        SP <= SP - 1;
+                    end
+                    FULL <= 1'b0;
+                end
+            end else begin // Push operation
+                if (!FULL) begin
+                    stack_mem[SP] <= dataIn;
+                    if (SP == 2'b11) begin
+                        FULL <= 1'b1;
+                    end else begin
+                        SP <= SP + 1;
+                    end
+                    EMPTY <= 1'b0;
+                end
+            end
+        end
+    end
+
+endmodule
+```

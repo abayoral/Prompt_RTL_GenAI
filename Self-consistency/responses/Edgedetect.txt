@@ -4,11 +4,13 @@ module top_module (
     output reg [7:0] pedge
 );
 
-    reg [7:0] in_d;
+    reg [7:0] in_delayed;
 
     always @(posedge clk) begin
-        in_d <= in;
-        pedge <= in & ~in_d;
+        // Check each bit for a 0 to 1 transition
+        pedge <= (in & ~in_delayed);
+        // Update the delayed input to current input
+        in_delayed <= in;
     end
 
 endmodule

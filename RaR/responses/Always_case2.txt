@@ -5,13 +5,16 @@ module top_module (
     output reg [1:0] pos  );
 
     always @(*) begin
-        casez(in)
-            4'b1???: pos = 2'b11; // Highest priority
-            4'b01??: pos = 2'b10;
-            4'b001?: pos = 2'b01;
-            4'b0001: pos = 2'b00; // Lowest priority
-            default: pos = 2'b00; // No bits set
+        casez (in)
+            4'b1???: pos = 2'd3; // Highest priority: bit 3
+            4'b01??: pos = 2'd2; // Next: bit 2
+            4'b001?: pos = 2'd1; // Then: bit 1
+            4'b0001: pos = 2'd0; // Lowest priority: bit 0
+            default: pos = 2'd0; // Default case when no bits are set
         endcase
     end
+
 endmodule
 ```
+
+In this implementation, the `casez` statement is used to handle don't-care conditions in the input. This way, the priority assignment is directly associated with the position of the input bit that is '1', with higher index bits possessing higher priority. If all bits are '0', the default case sets the output position to 0.

@@ -1,0 +1,65 @@
+```verilog
+module radix2_div (
+    input wire clk,
+    input wire rst,
+    input wire sign,
+    input wire [7:0] dividend,
+    input wire [7:0] divisor,
+    input wire opn_valid,
+    output reg res_valid,
+    output reg [15:0] result
+);
+
+    reg [15:0] SR;
+    reg [7:0] NEG_DIVISOR;
+    reg [3:0] cnt;
+    reg start_cnt;
+    reg carry_out;
+
+    wire [7:0] abs_dividend = sign && dividend[7] ? -dividend : dividend;
+    wire [7:0] abs_divisor = sign && divisor[7] ? -divisor : divisor;
+
+    // Shift register subtraction result holder
+    reg [15:0] SR_minus_DIVISOR;
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            SR <= 16'b0;
+            result <= 16'b0;
+            res_valid <= 1'b0;
+            NEG_DIVISOR <= 8'b0;
+            cnt <= 4'b0;
+            start_cnt <= 1'b0;
+        end else if (opn_valid && !res_valid) begin
+            // Load initial values for a new operation
+            SR <= {8'b0, abs_dividend};
+            NEG_DIVISOR <= -abs_divisor;
+            cnt <= 4'b1;
+            start_cnt <= 1'b1;
+            res_valid <= 1'b0;
+        end else if (start_cnt) begin
+            if (cnt == 4'b1000) begin
+                // Division complete
+                result <= {SR[15:8], SR[7:0]}; // remainder in the upper 8 bits, quotient in the lower 8 bits
+                res_valid <= 1'b1;
+                start_cnt <= 1'b0;
+            end else begin
+                // Perform subtraction
+                SR_minus_DIVISOR = {SR[15:8], SR[7:0]} + {NEG_DIVISOR, 8'b0};
+                carry_out = !SR_minus_DIVISOR[15];
+
+                // Update SR
+                if (carry_out)
+                    SR <= {SR_minus_DIVISOR[14:0], 1'b1}; // Shift left and place 1 as LSB if subtraction was successful
+                else
+                    SR <= {SR[14:0], 1'b0}; // Shift left and place 0 as LSB if subtraction failed
+
+                cnt <= cnt + 1;
+            end
+        end
+    end
+
+endmodule
+```
+
+This Verilog module provides an implementation of the radix-2 division algorithm as described. The process revolves around a shift register that iteratively performs division steps in a synchronized manner through the clock cycle. It supports signed and unsigned division operations based on the `sign` signal. The division concludes by delivering the quotient and the remainder via the `result` output in a 16-bit package.

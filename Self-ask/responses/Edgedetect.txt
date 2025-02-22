@@ -1,3 +1,5 @@
+Thank you for the clarification. Here is the complete Verilog module:
+
 ```verilog
 module top_module (
     input clk,
@@ -5,12 +7,14 @@ module top_module (
     output reg [7:0] pedge
 );
 
-    reg [7:0] in_d;
+    reg [7:0] prev_in;
 
     always @(posedge clk) begin
-        in_d <= in; // store the previous state of 'in'
-        pedge <= ~in_d & in; // detect the positive edge (0 to 1 transition)
+        pedge <= (~prev_in) & in; // Detect the rising edge on each bit
+        prev_in <= in;
     end
 
 endmodule
 ```
+
+This module detects rising edges on each bit of the 8-bit input vector `in` and outputs a corresponding bit in the `pedge` vector in the next clock cycle after the 0 to 1 transition.

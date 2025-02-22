@@ -1,0 +1,45 @@
+```verilog
+module accu (
+    input wire clk,
+    input wire rst_n,
+    input wire [7:0] data_in,
+    input wire valid_in,
+    output reg [9:0] data_out,
+    output reg valid_out
+);
+
+    reg [9:0] accumulator; // To store the accumulated sum
+    reg [1:0] count;       // To count the number of valid inputs accumulated
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset state: clear the accumulation and count
+            accumulator <= 10'b0;
+            count <= 2'b0;
+            valid_out <= 1'b0;
+        end else begin
+            if (valid_in) begin
+                // When valid data is input, accumulate the data
+                accumulator <= accumulator + data_in;
+                count <= count + 1'b1;
+
+                if (count == 2'd3) begin
+                    // If the count reaches 3 (4 valid inputs total with current input)
+                    data_out <= accumulator + data_in; // Final accumulation
+                    valid_out <= 1'b1; // Indicate the data_out is valid
+                    // Reset the state for next accumulation
+                    accumulator <= 10'b0;
+                    count <= 2'b0;
+                end else begin
+                    // Ensure valid_out is not asserted on the next clock cycle
+                    valid_out <= 1'b0;
+                end
+            end else begin
+                valid_out <= 1'b0; // valid_out should be de-asserted when no valid input
+            end
+        end
+    end
+
+endmodule
+```
+This module complies with the specified requirements, accumulating serial input data across four valid input cycles, and then setting an output flag (`valid_out`) indicating data readiness, which stays high only for one clock cycle. The process is fully synchronized with the `clk` input, and the module resets correctly on an active-low `rst_n` input.

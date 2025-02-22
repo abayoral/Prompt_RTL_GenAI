@@ -4,74 +4,62 @@ module top_module(
     input [7:0] in,
     input reset,    // Synchronous reset
     output reg [23:0] out_bytes,
-    output reg done);
+    output reg done
+);
 
-    // State Definitions
+    // State encoding
     typedef enum logic [1:0] {
-        IDLE,
-        BYTE1,
-        BYTE2,
-        BYTE3
+        IDLE = 2'b00,
+        BYTE1 = 2'b01,
+        BYTE2 = 2'b10,
+        BYTE3 = 2'b11
     } state_t;
     
     state_t current_state, next_state;
-    
-    // Datapath registers
-    reg [23:0] message;
-    
-    // State Register
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset)
+    reg [23:0] byte_buffer; // Buffer to store the 3 bytes
+
+    // State transitions
+    always @(posedge clk) begin
+        if (reset) begin
             current_state <= IDLE;
-        else
+        end else begin
             current_state <= next_state;
+        end
     end
-    
-    // FSM Logic
-    always_comb begin
+
+    // Next state logic and datapath operations
+    always @(*) begin
+        // Default assignments
         next_state = current_state;
         done = 1'b0;
+        out_bytes = 'bx; // Don't care
         case (current_state)
             IDLE: begin
-                if (in[3])
+                if (in[3] == 1'b1) begin // Check if first byte of message
                     next_state = BYTE1;
+                    byte_buffer[23:16] = in;
+                end
             end
             BYTE1: begin
                 next_state = BYTE2;
+                byte_buffer[15:8] = in;
             end
             BYTE2: begin
                 next_state = BYTE3;
+                byte_buffer[7:0] = in;
             end
             BYTE3: begin
-                next_state = IDLE;
                 done = 1'b1;
+                out_bytes = byte_buffer;
+                if (in[3] == 1'b1) begin // Check for start of new message
+                    next_state = BYTE1;
+                    byte_buffer[23:16] = in;
+                end else begin
+                    next_state = IDLE;
+                end
             end
         endcase
     end
-    
-    // Datapath to capture the incoming bytes
-    always_ff @(posedge clk) begin
-        if (reset) begin
-            message <= 24'h0;
-            out_bytes <= 24'h0;
-        end else begin
-            case (current_state)
-                IDLE: begin
-                    // Do nothing
-                end
-                BYTE1: begin
-                    message[23:16] <= in;
-                end
-                BYTE2: begin
-                    message[15:8] <= in;
-                end
-                BYTE3: begin
-                    message[7:0] <= in;
-                end
-            endcase
-            if (done)
-                out_bytes <= message;
-        end
-    end
+
 endmodule
 ```

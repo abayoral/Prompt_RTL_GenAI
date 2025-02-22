@@ -1,13 +1,17 @@
-Here's the Verilog code for the `top_module` with the simplified Boolean expression derived from your provided K-map:
-
 ```verilog
-module top_module(
+module top_module (
     input a,
     input b,
     input c,
     input d,
     output out
-); 
-    assign out = (~d & b) | (d & ~b);
+);
+
+    // Simplification based on the given Karnaugh map
+    // K-map Simplification yields the following terms:
+    // F = a'b + ab' + bd'c' + b'cd
+
+    assign out = (~a & b) | (a & ~b) | (b & ~d & ~c) | (~b & c & d);
+
 endmodule
 ```

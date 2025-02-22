@@ -1,0 +1,84 @@
+To design the dual-port RAM module with the specified characteristics, we'll create a parameterized Verilog module featuring two always blocks for handling independent read and write operations. The RAM will be initialized to zero using the reset functionality. Below is the step-by-step thought process and the corresponding Verilog code.
+
+### Chain of Thought:
+
+1. **Understand the Requirements:**
+   - The RAM should be dual-port with a depth of 8 and a width of 6-bits.
+   - It should support simultaneous read and write operations.
+   - The memory should be initialized to zero on reset.
+
+2. **Determine the Inputs and Outputs:**
+   - Inputs: `clk`, `rst_n`, `write_en`, `write_addr`, `write_data`, `read_en`, `read_addr`
+   - Output: `read_data`
+
+3. **Parameterize the Design:**
+   - Define parameters for the width (`WIDTH = 6`) and depth (`DEPTH = 8`) of the RAM.
+
+4. **Define Internal Signals:**
+   - A register array to represent the RAM storage.
+   - Temporary signals for storing the read data.
+
+5. **Structuring the Module:**
+   - Include module declaration with parameter definitions.
+   - Implement initialization of RAM to zero using the reset signal.
+   - Create separate always blocks:
+     - One for handling synchronous write operations.
+     - Another for reading operations, outputting the current read value on the `read_data` bus.
+
+6. **Codifying the Design:**
+
+```verilog
+module dual_port_ram #(
+    parameter WIDTH = 6,
+    parameter DEPTH = 8
+)(
+    input wire clk,
+    input wire rst_n,
+    input wire write_en,
+    input wire [2:0] write_addr,
+    input wire [WIDTH-1:0] write_data,
+    input wire read_en,
+    input wire [2:0] read_addr,
+    output reg [WIDTH-1:0] read_data
+);
+
+    // RAM storage array
+    reg [WIDTH-1:0] ram [DEPTH-1:0];
+
+    // Write operation: Synchronize with clock and enable signal
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            integer i;
+            // Initialize RAM to zero when reset is active
+            for (i = 0; i < DEPTH; i = i + 1) begin
+                ram[i] <= {WIDTH{1'b0}};
+            end
+        end else if (write_en) begin
+            // Write data to RAM at specified address
+            ram[write_addr] <= write_data;
+        end
+    end
+
+    // Read operation: Synchronize with clock and enable signal
+    always @(posedge clk) begin
+        if (read_en) begin
+            // Read data from RAM at specified address
+            read_data <= ram[read_addr];
+        end else begin
+            // Maintain read_data output stable if not reading
+            read_data <= {WIDTH{1'bz}}; // Optional: High impedance state
+        end
+    end
+
+endmodule
+```
+
+### Explanation:
+
+- **Memory Initialization:** The always block with the reset signal (`neg_rst`) initializes the RAM array to zero. This ensures that upon reset, all memory locations are cleared.
+- **Write Operation:** Controlled by `write_en`. When enabled, data is stored at the address specified by `write_addr`.
+- **Read Operation:** Controlled by `read_en`. It fetches data from the address specified by `read_addr` into `read_data`.
+- **Clock Synchronization:** Both operations are synchronized to `clk`, ensuring reliable timing control over memory actions.
+- **Parameterization:** Using `WIDTH` and `DEPTH`, this design is adaptable to different configurations by changing these parameters. 
+
+This module meets all specified requirements for a dual-port RAM module while ensuring its initial state is well-defined using the reset functionality.

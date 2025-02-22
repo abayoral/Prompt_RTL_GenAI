@@ -1,27 +1,13 @@
-```verilog
-module add16 (
-    input [15:0] a,
-    input [15:0] b,
-    input cin,
-    output [15:0] sum,
-    output cout
-);
+Thank you for the clarification. Here is the Verilog module implementing the carry-select adder using the add16 modules and a 16-bit 2-to-1 multiplexer:
 
-    // Internal variable for carry bit
-    reg [16:0] result;
-    
-    // Always block to compute sum and carry out
-    always @(*) begin
-        result = a + b + cin;
-    end
-    
-    // Output assignments
-    assign sum = result[15:0];
-    assign cout = result[16];
+```verilog
+module add16 ( input [15:0] a, input [15:0] b, input cin, output [15:0] sum, output cout );
+
+    assign {cout, sum} = a + b + cin;
 
 endmodule
 
-module mux2to1_16bit (
+module mux2to1_16bit(
     input [15:0] in0,
     input [15:0] in1,
     input sel,
@@ -38,46 +24,46 @@ module top_module(
     output [31:0] sum
 );
 
-    wire [15:0] sum0, sum1, sum_lsb;
-    wire cout0, cout1, cout_lsb;
+    wire cout1, cout2, cout3;
+    wire [15:0] sum1, sum2, sum3;
 
-    // First 16-bit adder with carry in 0
-    add16 adder0 (
+    // Lower 16 bits
+    add16 lower_half (
         .a(a[15:0]),
         .b(b[15:0]),
         .cin(1'b0),
-        .sum(sum_lsb),
-        .cout(cout_lsb)
-    );
-
-    // Second 16-bit adder for higher part with carry in 0
-    add16 adder1 (
-        .a(a[31:16]),
-        .b(b[31:16]),
-        .cin(1'b0),
-        .sum(sum0),
-        .cout(cout0)
-    );
-
-    // Third 16-bit adder for higher part with carry in 1
-    add16 adder2 (
-        .a(a[31:16]),
-        .b(b[31:16]),
-        .cin(1'b1),
         .sum(sum1),
         .cout(cout1)
     );
 
-    // 16-bit 2-to-1 multiplexer to select the correct sum and carry
-    mux2to1_16bit mux (
-        .in0(sum0),
-        .in1(sum1),
-        .sel(cout_lsb),
+    // Upper 16 bits, assume cout1 is 0
+    add16 upper_half_cin0 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b0),
+        .sum(sum2),
+        .cout(cout2)
+    );
+
+    // Upper 16 bits, assume cout1 is 1
+    add16 upper_half_cin1 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b1),
+        .sum(sum3),
+        .cout(cout3)
+    );
+
+    // Select the correct sum and cout for the upper half
+    mux2to1_16bit select_upper (
+        .in0(sum2),
+        .in1(sum3),
+        .sel(cout1),
         .out(sum[31:16])
     );
 
-    // Assign lower part of the sum
-    assign sum[15:0] = sum_lsb;
+    // Concatenate lower and upper sums to form the final 32-bit sum
+    assign sum[15:0] = sum1;
 
 endmodule
 ```

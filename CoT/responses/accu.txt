@@ -1,0 +1,59 @@
+To implement the `accu` module as per the given requirements, we will use a binary counter to track the number of valid inputs received and an accumulator to store the running sum of incoming `data_in` values. Once four valid data inputs have been accumulated, the module will output the total sum and set `valid_out` high for one clock cycle. Additionally, the reset logic will clear the accumulator and reset the counter when `rst_n` is active low. Below is the Verilog code for the `accu` module:
+
+```verilog
+module accu (
+    input wire clk,
+    input wire rst_n,
+    input wire [7:0] data_in,
+    input wire valid_in,
+    output reg valid_out,
+    output reg [9:0] data_out
+);
+
+    reg [9:0] sum;
+    reg [1:0] counter; // Counter to track number of valid inputs received
+
+    always @(posedge clk or negedge rst_n) begin
+        if (~rst_n) begin
+            // Reset the state
+            sum <= 10'b0;
+            counter <= 2'b0;
+            valid_out <= 1'b0;
+            data_out <= 10'b0;
+        end else begin
+            if (valid_in) begin
+                // Accumulate the data
+                sum <= sum + data_in;
+                counter <= counter + 1;
+            end
+            
+            if (counter == 3 && valid_in) begin
+                // When the fourth valid input is received, set valid_out high
+                data_out <= sum + data_in; // Update the output with the accumulated sum
+                valid_out <= 1'b1; // Indicate that the output data is valid
+                // Reset the sum and counter for next operation
+                sum <= 10'b0;
+                counter <= 2'b0;
+            end else begin
+                valid_out <= 1'b0; // Default value for valid_out
+            end
+        end
+    end
+endmodule
+```
+
+### Explanation of the Code:
+
+1. **Reset Logic**: When `rst_n` is de-asserted, both the `sum` and `counter` registers are reset to zero. `valid_out` and `data_out` are also reset to ensure there's no residual effect from any previous operations.
+
+2. **Data Accumulation**: The module sums the input data whenever `valid_in` is asserted, and concurrently increments the `counter` by one to track the number of valid inputs received.
+
+3. **Output Condition**: When the counter indicates that the fourth piece of data has been received, the accumulated sum updates `data_out`, and `valid_out` is set high for one clock cycle, indicating this state.
+
+4. **Synchronous Design**: The design ensures that all operations are synchronized with the positive edge of the clock (`clk`), requiring the presence of a valid input (`valid_in`).
+
+### Considerations:
+- The `counter` is a 2-bit register that counts from 0 to 3, after which it resets for the next cycle of accumulation.
+- The bit-width of the `sum` and `data_out` is extended to 10 bits to accommodate the result of summing four 8-bit values. The calculation accounts for potential overflow from the 8-bit data inputs.
+
+This implementation ensures the module efficiently accumulates data and provides output in accordance with the specified conditions, handling edge cases like resets or fewer than four valid inputs gracefully.

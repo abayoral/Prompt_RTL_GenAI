@@ -1,0 +1,91 @@
+```verilog
+module traffic_light (
+    input wire rst_n,       // Active low reset signal
+    input wire clk,         // Clock signal
+    input wire pass_request, // Pedestrian button signal
+    output reg [7:0] clock,  // 8-bit internal timer countdown value
+    output reg red,          // Red light
+    output reg yellow,       // Yellow light
+    output reg green         // Green light
+);
+
+    // State encoding
+    localparam IDLE     = 2'b00;
+    localparam S1_RED   = 2'b01;
+    localparam S2_YELLOW = 2'b10;
+    localparam S3_GREEN = 2'b11;
+
+    // Timing constants
+    localparam RED_TIME = 10;
+    localparam YELLOW_TIME = 5;
+    localparam GREEN_TIME = 60;
+    localparam GREEN_PEDESTRIAN_TIME = 10;
+
+    reg [7:0] cnt;          // Internal counter
+    reg [1:0] state;        // Current state
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= IDLE;
+            cnt <= 8'd0;
+            red <= 1'b0;
+            yellow <= 1'b0;
+            green <= 1'b0;
+            clock <= 8'd0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    red <= 1'b1;
+                    yellow <= 1'b0;
+                    green <= 1'b0;
+                    cnt <= RED_TIME;
+                    state <= S1_RED;
+                end
+
+                S1_RED: begin
+                    red <= 1'b1;
+                    yellow <= 1'b0;
+                    green <= 1'b0;
+                    if (cnt == 0) begin
+                        cnt <= GREEN_TIME;
+                        state <= S3_GREEN;
+                    end else begin
+                        cnt <= cnt - 1;
+                    end
+                end
+
+                S3_GREEN: begin
+                    red <= 1'b0;
+                    yellow <= 1'b0;
+                    green <= 1'b1;
+                    if (pass_request && cnt > GREEN_PEDESTRIAN_TIME) begin
+                        cnt <= GREEN_PEDESTRIAN_TIME;
+                    end else if (cnt == 0) begin
+                        cnt <= YELLOW_TIME;
+                        state <= S2_YELLOW;
+                    end else begin
+                        cnt <= cnt - 1;
+                    end
+                end
+
+                S2_YELLOW: begin
+                    red <= 1'b0;
+                    yellow <= 1'b1;
+                    green <= 1'b0;
+                    if (cnt == 0) begin
+                        cnt <= RED_TIME;
+                        state <= S1_RED;
+                    end else begin
+                        cnt <= cnt - 1;
+                    end
+                end
+
+                default: begin
+                    state <= IDLE;
+                end
+            endcase
+            clock <= cnt;
+        end
+    end
+endmodule
+```

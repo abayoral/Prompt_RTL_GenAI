@@ -1,0 +1,71 @@
+```verilog
+module multi_16bit (
+    input wire clk,
+    input wire rst_n,
+    input wire start,
+    input wire [15:0] ain,
+    input wire [15:0] bin,
+    output reg [31:0] yout,
+    output reg done
+);
+
+    // Internal Registers
+    reg [15:0] areg, breg;
+    reg [31:0] yout_r;
+    reg [4:0] shift_count;
+    reg done_r;
+
+    // Shift and Accumulate Algorithm Process
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            areg <= 16'b0;
+            breg <= 16'b0;
+            yout_r <= 32'b0;
+            shift_count <= 5'b0;
+            done_r <= 1'b0;
+        end else begin
+            if (start) begin
+                if (shift_count == 5'b0) begin
+                    areg <= ain;
+                    breg <= bin;
+                    yout_r <= 32'b0;
+                    done_r <= 1'b0;
+                end
+                
+                if (shift_count < 5'b10000) begin
+                    if (areg[shift_count]) begin
+                        yout_r <= yout_r + (breg << shift_count);
+                    end
+                    shift_count <= shift_count + 1;
+                end
+
+
+                if (shift_count == 5'b10000) begin
+                    done_r <= 1'b1;
+                    shift_count <= 5'b10001;  // Wait state after completion
+                end
+
+            end else begin
+                shift_count <= 5'b0;
+                done_r <= 1'b0;
+            end
+        end
+    end
+
+    // Output Assignments
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            yout <= 32'b0;
+            done <= 1'b0;
+        end else begin
+            if (done_r) begin
+                yout <= yout_r;
+                done <= 1'b1;
+            end else begin
+                done <= 1'b0;
+            end
+        end
+    end
+
+endmodule
+```

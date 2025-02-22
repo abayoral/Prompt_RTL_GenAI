@@ -1,13 +1,10 @@
 ```verilog
-module mod_a ( input in1, input in2, output out );
-// Module functionality not specified
-endmodule
-
 module top_module ( input a, input b, output out );
+    // Instantiation of module mod_a
     mod_a instance_name (
-        .in1(a),
-        .in2(b),
-        .out(out)
+        .in1(a),  // Connect top module's input 'a' to mod_a's input 'in1'
+        .in2(b),  // Connect top module's input 'b' to mod_a's input 'in2'
+        .out(out) // Connect mod_a's output 'out' to top module's output 'out'
     );
 endmodule
 ```

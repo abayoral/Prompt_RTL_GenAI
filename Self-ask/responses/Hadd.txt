@@ -1,10 +1,14 @@
+Your question is unnecessary because the specification already states that the module is a "half adder." Let's proceed with the implementation of the half adder module. 
+
 ```verilog
 module top_module( 
-    input a, b,
-    output cout, sum );
+    input a, 
+    input b,
+    output cout, 
+    output sum );
 
-    // Using the addition operation to calculate sum and carry-out
-    assign {cout, sum} = a + b;
+    assign sum = a ^ b;   // Sum is the XOR of a and b
+    assign cout = a & b;  // Carry-out is the AND of a and b
 
 endmodule
 ```

@@ -7,7 +7,11 @@ module top_module(
     output out
 );
 
-    assign out = (~a & b & ~c & ~d) | (a & ~c) | (b & c);
+    // Simplifying the given Karnaugh map, we choose the sum-of-products form:
+    // The expression from the K-map:
+    // F(a, b, c, d) = c'd' + ab + cd
+
+    assign out = (~c & ~d) | (a & b) | (c & d);
 
 endmodule
 ```

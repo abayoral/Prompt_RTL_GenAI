@@ -5,11 +5,11 @@ module top_module (
     output reg [7:0] pedge
 );
 
-    reg [7:0] in_prev;
+    reg [7:0] in_delayed;
 
     always @(posedge clk) begin
-        in_prev <= in;
-        pedge <= in & ~in_prev;
+        pedge <= ~in_delayed & in;
+        in_delayed <= in;
     end
 
 endmodule

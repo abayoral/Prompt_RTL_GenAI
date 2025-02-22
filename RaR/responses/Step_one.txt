@@ -1,9 +1,7 @@
 ```verilog
-module top_module(
-    output one
-);
+module top_module( output one );
 
-// Assign a constant logic high value to the output signal
+    // To ensure 'one' is always logically high, assign it to 1'b1.
     assign one = 1'b1;
 
 endmodule

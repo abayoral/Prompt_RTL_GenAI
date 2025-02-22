@@ -1,25 +1,15 @@
-// Conway's Game of Life is a two-dimensional cellular automaton.
+Conway's Game of Life is a fascinating and well-known example of a two-dimensional cellular automaton, where the evolution of a grid of cells is determined by specific rules based on the states of neighboring cells. The grid is conceptualized as infinite, but for practical and computational purposes, it is constrained to a specific size, in this case, a 16x16 grid. Additionally, this grid behaves like a toroid, meaning the edges of the grid conceptually wrap around, creating cyclic boundaries rather than having hard edges.
 
-// The "game" is played on a two-dimensional grid of cells, where each cell is either 1 (alive) or 0 (dead). At each time step, each cell changes state depending on how many neighbours it has:
+The rules for cell state transition in this version of the Game of Life are as follows:
+1. If a cell has 0 or 1 neighbor that is alive (state of 1), the cell will transition to a dead state (state of 0).
+2. If a cell has exactly 2 neighbors that are alive, the cell's state remains unchanged.
+3. If a cell has exactly 3 neighbors that are alive, the cell will become or remain alive (state of 1).
+4. If a cell has 4 or more neighbors that are alive, it will transition to a dead state (state of 0).
 
-// 0-1 neighbour: Cell becomes 0.
-// 2 neighbours: Cell state does not change.
-// 3 neighbours: Cell becomes 1.
-// 4+ neighbours: Cell becomes 0.
-// The game is formulated for an infinite grid. In this circuit, we will use a 16x16 grid. To make things more interesting, we will use a 16x16 toroid, where the sides wrap around to the other side of the grid. For example, the corner cell (0,0) has 8 neighbours: (15,1), (15,0), (15,15), (0,1), (0,15), (1,1), (1,0), and (1,15). The 16x16 grid is represented by a length 256 vector, where each row of 16 cells is represented by a sub-vector: q[15:0] is row 0, q[31:16] is row 1, etc. (This tool accepts SystemVerilog, so you may use 2D vectors if you wish.)
+For this particular scenario, the 16x16 grid is represented as a single-dimensional vector of length 256, with each row of the grid represented by a sub-vector of 16 elements. The first 16 elements (indices 0 to 15) of the vector correspond to the first row of the grid, the next 16 elements (indices 16 to 31) correspond to the second row, and so on.
 
-// load: Loads data into q at the next clock edge, for loading initial state.
-// q: The 16x16 current state of the game, updated every clock cycle.
-// The game state should advance by one timestep every clock cycle.
+In the provided SystemVerilog module template, the goal is to implement the logic that updates the grid based on the Game of Life rules at each clock cycle. The inputs include a clock signal ('clk') to drive the updates, a 'load' signal to load initial data into the grid, and a 'data' input representing the initial state of the grid. The output is a vector 'q' representing the current state of the grid after each update.
 
-// Hint: A test case that's easily understandable and tests some boundary conditions is the blinker 256'h7. It is 3 cells in row 0 columns 0-2. It oscillates between a row of 3 cells and a column of 3 cells (in column 1, rows 15, 0, and 1).
+A notable test case is the "blinker" pattern, which alternates between a horizontal line and a vertical line of three consecutive alive cells. This test case, represented by the hexadecimal number 256'h7, involves placing three consecutive alive cells in the first row (columns 0 to 2). When the simulation runs, the pattern will oscillate each clock cycle due to the wrapping properties of the toroidal grid.
 
-module top_module(
-    input clk,
-    input load,
-    input [255:0] data,
-    output [255:0] q ); 
-
-    // Insert your code here
-
-endmodule
+The task is to complete the SystemVerilog module to correctly implement this evolving pattern according to the Game of Life rules, ensuring the grid updates accurately each clock cycle, and properly handles the incoming data load when required.

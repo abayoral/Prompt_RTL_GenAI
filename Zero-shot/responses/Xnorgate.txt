@@ -4,6 +4,7 @@ module top_module(
     input b, 
     output out );
 
+    // XNOR operation: equivalent to ~(a ^ b)
     assign out = ~(a ^ b);
 
 endmodule

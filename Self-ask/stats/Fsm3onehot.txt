@@ -1,6 +1,0 @@
-Self-ask/modules/Fsm3onehot.v:16: error: Index next_state[4] is out of range.
-Self-ask/modules/Fsm3onehot.v:17: error: Index next_state[8] is out of range.
-2 error(s) during elaboration.
-Module file path: Self-ask/modules/Fsm3onehot.v
-Testbench file path: hdlbits_testbenches/Fsm3onehot_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Self-ask/simulations/Fsm3onehot_sim', 'Self-ask/modules/Fsm3onehot.v', 'hdlbits_testbenches/Fsm3onehot_0_tb.v']' returned non-zero exit status 2.

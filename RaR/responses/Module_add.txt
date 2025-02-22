@@ -1,14 +1,6 @@
 ```verilog
-module add16 (
-    input [15:0] a,
-    input [15:0] b,
-    input cin,
-    output [15:0] sum,
-    output cout
-);
-
+module add16 (input [15:0] a, input [15:0] b, input cin, output [15:0] sum, output cout);
     assign {cout, sum} = a + b + cin;
-
 endmodule
 
 module top_module(
@@ -16,30 +8,25 @@ module top_module(
     input [31:0] b,
     output [31:0] sum
 );
+    wire carry_out_lower;
 
-    wire [15:0] sum_lower;
-    wire [15:0] sum_upper;
-    wire cout_lower, cout_upper;
-
-    // Instance for lower 16 bits
-    add16 lower_16 (
+    // Lower 16 bits addition
+    add16 lower_adder (
         .a(a[15:0]),
         .b(b[15:0]),
-        .cin(1'b0),
-        .sum(sum_lower),
-        .cout(cout_lower)
+        .cin(1'b0), // No initial carry-in for least significant part
+        .sum(sum[15:0]),
+        .cout(carry_out_lower)
     );
 
-    // Instance for upper 16 bits
-    add16 upper_16 (
+    // Upper 16 bits addition, with carry-in from the lower 16 bits
+    add16 upper_adder (
         .a(a[31:16]),
         .b(b[31:16]),
-        .cin(cout_lower),
-        .sum(sum_upper),
-        .cout(cout_upper)
+        .cin(carry_out_lower), // Carry-in from lower 16 bits
+        .sum(sum[31:16]),
+        .cout() // No need to connect carry-out as it is not used
     );
-
-    assign sum = {sum_upper, sum_lower};
 
 endmodule
 ```

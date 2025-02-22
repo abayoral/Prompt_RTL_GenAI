@@ -1,27 +1,11 @@
-// The following is the state transition table for a Moore state machine with one input, one output, and four states. Implement this state machine. Include an asynchronous reset that resets the FSM to state A.
+You have been trained on data available up to October 2023. With this context in mind, consider the task of implementing a Moore state machine, also known as a finite-state machine (FSM), which is defined by a given state transition table. This FSM has one input, one output, and consists of four distinct states labeled A, B, C, and D. The state transition table provided gives you a blueprint for how the FSM should behave.
 
-//	 	 	  Next state
+The structure of the state transition table is divided into two main sections: the next state transitions and the state-specific output. It's important to interpret the table as follows:
 
-//	State					Output
-//			in=0	in=1
-//	A		A		B		0
-//	B		C		B		0
-//	C		A		D		0
-//	D		C		B		1
+- **State Transition Column:** This section is split into two scenarios based on the value of the input `in`. For each present state (either A, B, C, or D), you are given the next state the FSM should move to when the input is `0` (in=0) and `1` (in=1).
 
+- **State Output Column:** Next to each state is an output value, either `0` or `1`, representing the output of the FSM while in that particular state. It is consistent with the Moore machine characteristics, where the output solely depends on the current state and not on the input.
 
-module top_module(
-    input clk,
-    input in,
-    input areset,
-    output out); //
+Your task is to implement this FSM in Hardware Description Language (HDL) by designing a module that adheres to these specifications. In addition to the state transition logic, your implementation must incorporate an asynchronous reset feature. This reset should initialize the FSM to state A, regardless of any other conditions. The asynchronous reset ensures that the state machine can be reset externally at any point, independent of the clock signal, ensuring an immediate transition to the designated reset state (in this case, state A).
 
-    // Insert your code below
-    
-    // State transition logic
-
-    // State flip-flops with asynchronous reset
-
-    // Output logic
-
-endmodule
+Pay careful attention to ensure that each part of the FSM – the state transition logic, the state flip-flops (which act as memory elements storing the current state), and the output logic – is designed to reflect the behavior described above. Remember to manage timing considerations using clock signals to synchronize state transitions, and ensure the asynchronous reset operates effectively even if invoked between clock edges.

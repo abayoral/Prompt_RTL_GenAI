@@ -1,11 +1,7 @@
-// Implement the following D flip-flop with synchronous reset
+In the context of designing a digital circuit, specifically a sequential logic circuit, you are tasked with implementing a D flip-flop that includes a mechanism for a synchronous reset using Verilog, a hardware description language. The goal is to use a template of a Verilog module named `top_module` to structure your implementation.
 
-module top_module (
-    input clk,
-    input d, 
-    input r,   // synchronous reset
-    output q);
+To clarify, a D flip-flop is a type of memory element that captures and holds a data input (denoted by `d`) on the rising edge of a clock signal (represented by `clk`). The flip-flop provides an output signal (`q`) that reflects the data input, unless a reset condition is applied.
 
-// Insert your code here
+The unique requirement here involves incorporating a 'synchronous reset' functionality into the D flip-flop. The reset input is specified by the signal `r`. Unlike asynchronous reset, which can trigger reset at any time without reference to the clock, a synchronous reset will only affect the flip-flop's operation on the active edge of the clock cycle, meaning the output `q` will be set to a defined state (typically low) only when the clock signal transitions and the reset signal is asserted. Your task includes ensuring that this synchronous reset behavior is correctly reflected in the module you design.
 
-endmodule
+Thus, as you proceed with filling in the code inside the `top_module`, you need to consider how to properly manage the interactions between the clock, data input, and reset to achieve the desired synchronous reset functionality.

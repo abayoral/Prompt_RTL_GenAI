@@ -1,9 +1,10 @@
 ```verilog
 module top_module (
-    input [7:0] in,
-    output parity); 
-    
-    assign parity = ^in; // XOR all bits of in to calculate parity bit
+    input [7:0] in,   // Represents the 8-bit input data from which parity is to be computed
+    output parity     // The calculated parity bit that ensures even parity for the entire 9-bit sequence
+); 
+    // Compute the even parity bit as the XOR of all the input bits
+    assign parity = ^in;  // The reduction XOR operator in Verilog computes even parity
 
 endmodule
 ```

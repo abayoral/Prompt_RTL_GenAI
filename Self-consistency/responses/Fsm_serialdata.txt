@@ -7,88 +7,69 @@ module top_module(
 ); 
 
     // State encoding
-    typedef enum reg [1:0] {
-        IDLE,
-        START,
-        DATA,
-        STOP
+    typedef enum logic [1:0] {
+        IDLE = 2'b00,   // Waiting for start bit
+        RECEIVE = 2'b01, // Receiving data bits
+        STOP = 2'b10    // Waiting for stop bit
     } state_t;
 
     state_t state, next_state;
-    
-    reg [7:0] data_shift_reg;
-    reg [2:0] bit_count;
+
+    reg [2:0] bit_position; // Keep track of bit position in byte (3 bits: 0 to 7)
+    reg [7:0] shift_reg;    // Shift register to store byte data
 
     // State transition
-    always @(posedge clk or posedge reset) begin
-        if (reset)
+    always @(posedge clk) begin
+        if (reset) begin
             state <= IDLE;
-        else
+        end else begin
             state <= next_state;
+        end
     end
 
-    // Next state logic
+    // Next state logic and output logic
     always @(*) begin
+        // Default values
+        next_state = state;
+        done = 1'b0;
+        
         case (state)
             IDLE: begin
-                done = 0;
-                if (in == 0) // Detect start bit
-                    next_state = START;
-                else
-                    next_state = IDLE;
-            end
-            START: begin
-                done = 0;
-                next_state = DATA;
-            end
-            DATA: begin
-                done = 0;
-                if (bit_count == 3'd7)
-                    next_state = STOP;
-                else
-                    next_state = DATA;
-            end
-            STOP: begin
-                if (in == 1) begin // Detect stop bit
-                    done = 1;
-                    next_state = IDLE;
-                end else begin
-                    done = 0;
-                    next_state = STOP;
+                // Look for start bit (assuming it is a '0')
+                if (in == 1'b0) begin
+                    next_state = RECEIVE;
+                    bit_position = 3'b000; // reset bit position counter
                 end
             end
-            default: begin
-                done = 0;
-                next_state = IDLE;
+
+            RECEIVE: begin
+                // Shift in data bits
+                shift_reg[bit_position] = in;
+
+                if (bit_position == 3'b111) begin
+                    next_state = STOP;
+                end else begin
+                    bit_position = bit_position + 1;
+                end
+            end
+
+            STOP: begin
+                if (in == 1'b1) begin // Verify stop bit (assuming it is a '1')
+                    done = 1'b1;
+                    out_byte = shift_reg; // Output the byte
+                    next_state = IDLE; // Go back to waiting for next start bit
+                end
             end
         endcase
     end
 
-    // Data path
+    // Sequential logic to shift the input bits
     always @(posedge clk) begin
         if (reset) begin
-            data_shift_reg <= 8'b0;
-            bit_count <= 3'b0;
-            out_byte <= 8'b0;
-        end else if (state == DATA) begin
-            data_shift_reg <= {in, data_shift_reg[7:1]}; // Shift in the incoming serial bit
-            bit_count <= bit_count + 1;
-        end else if (state == STOP && in == 1) begin
-            out_byte <= data_shift_reg; // Load the received byte to output
-            bit_count <= 3'b0;
-        end else begin
-            bit_count <= bit_count; // Maintain bit count
-        end
-    end
-    
-    // Set done signal
-    always @(posedge clk) begin
-        if (reset) begin
-            done <= 0;
-        end else if (next_state == IDLE && state == STOP) begin
-            done <= 1;
-        end else begin
-            done <= 0;
+            shift_reg <= 8'b0;
+            bit_position <= 3'b000;
+        end else if (state == RECEIVE) begin
+            shift_reg[bit_position] <= in; // Capture the incoming data bit
         end
     end
 

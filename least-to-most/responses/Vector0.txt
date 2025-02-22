@@ -4,15 +4,16 @@ module top_module (
     output wire [2:0] outv,
     output wire o2,
     output wire o1,
-    output wire o0  );
+    output wire o0
+);
 
-    // Connecting the output vector to the input vector
-    assign outv = vec;
+// Output the same vector
+assign outv = vec;
 
-    // Splitting the input vector into separate outputs
-    assign o0 = vec[0];
-    assign o1 = vec[1];
-    assign o2 = vec[2];
+// Split the vector into individual bits
+assign o0 = vec[0];
+assign o1 = vec[1];
+assign o2 = vec[2];
 
 endmodule
 ```

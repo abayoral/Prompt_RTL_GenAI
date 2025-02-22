@@ -1,0 +1,46 @@
+```verilog
+module multi_booth_8bit(
+    input wire clk,
+    input wire reset,
+    input wire [7:0] a,
+    input wire [7:0] b,
+    output reg [15:0] p,
+    output reg rdy
+);
+
+    reg [15:0] A, Q;
+    reg [7:0] M;
+    reg Q_minus1;
+    reg [4:0] ctr;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            // Sign-extend inputs a and b
+            M <= {a[7], a[7], a[7], a[7], a};
+            Q <= {b[7], b[7], b[7], b[7], b};
+            A <= 16'b0;
+            Q_minus1 <= 1'b0;
+            ctr <= 5'd0;
+            p <= 16'b0;
+            rdy <= 1'b0;
+        end else begin
+            if (ctr < 5'd16) begin
+                case ({Q[0], Q_minus1})
+                    2'b01: A <= A + M; // Add
+                    2'b10: A <= A - M; // Subtract
+                    default: A <= A;   // Do nothing
+                endcase
+
+                {A, Q, Q_minus1} <= {A[15], A, Q}; // Arithmetic right shift
+                ctr <= ctr + 1'b1;
+            end else begin
+                p <= {A, Q};
+                rdy <= 1'b1;
+            end
+        end
+    end
+
+endmodule
+```
+
+This Verilog code implements the 8-bit Radix-4 Booth Multiplier as specified, with appropriate handling of reset and clock signals, sign extension of input numbers, and management of the Booth algorithm's computation process. The `p` output delivers the 16-bit product once the multiplication is complete, and the `rdy` signal indicates the readiness of the final product.

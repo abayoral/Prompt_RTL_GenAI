@@ -1,0 +1,56 @@
+The provided Verilog code implements an 8-bit Booth's multiplier. There are several issues present in the code that need correction:
+
+1. **Order of Reset Logic**: The assignment to `multiplier` and `multiplicand` in the reset block incorrectly concatenates 17 bits for `multiplier` and not 16 bits. Also, it includes `1'b0`, which is not necessary.
+2. **Counter function**: The counter should properly compare with 8 (not 16) as we are operating on 8-bit inputs and bits have been extended to 16 due to multiplicand multiplication.
+3. **Arithmetic Shift Right (ASR) Logic**: The `multiplier` should incorporate correct logic for arithmetic shift right.
+4. **Multipliers edge cases**: The multiplier should cater for cases where 2's complement representation reaches extremes.
+5. **Booth's Algorithm Completion**: Once complete, the circuit should hold `p` steady.
+
+Here is the corrected version with annotations:
+
+```verilog
+module multi_booth_8bit (
+    input wire clk,
+    input wire reset,
+    input wire [7:0] a,
+    input wire [7:0] b,
+    output reg [15:0] p,
+    output reg rdy
+);
+
+    reg [15:0] multiplier;
+    reg [15:0] multiplicand;
+    reg [3:0] ctr; // Updated to 4 bits - max count is 8.
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            // Extend the inputs to 16 bits for signed operations
+            multiplier <= {{8{a[7]}}, a}; // Corrected concatenation
+            multiplicand <= {{8{b[7]}}, b}; 
+            ctr <= 4'b0; // Updated to 4 bits
+            p <= 16'b0;
+            rdy <= 1'b0;
+        end else if (ctr < 8) begin // Operation on 8 steps
+            case ({multiplier[1:0]})
+                2'b01: p <= p + multiplicand;
+                2'b10: p <= p - multiplicand;
+                default: ; // No operation for other cases
+            endcase
+            
+            // Arithmetic shift right on the multiplier
+            multiplier <= {multiplier[15], multiplier[15:1]};
+            
+            ctr <= ctr + 1;
+        end else begin
+            rdy <= 1'b1; // Signal that multiplication is complete
+        end
+    end
+
+endmodule
+```
+
+**Corrections made:**
+- Fixed bit extension for `multiplier`.
+- Adjusted counter for 8-bit operation.
+- Corrected arithmetic right shift and updating process for `multiplier`.
+- Ensured the computation completes correctly with a ready signal and maintains the result stable.

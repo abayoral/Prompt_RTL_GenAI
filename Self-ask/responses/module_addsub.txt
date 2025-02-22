@@ -1,11 +1,15 @@
+Understood. Here is the complete Verilog module that handles 32-bit addition and subtraction by splitting it into two 16-bit operations:
+
 ```verilog
-module add16 ( 
-    input [15:0] a, 
-    input [15:0] b, 
-    input cin, 
-    output [15:0] sum, 
-    output cout 
+module add16 (
+    input [15:0] a,
+    input [15:0] b,
+    input cin,
+    output [15:0] sum,
+    output cout
 );
+    assign {cout, sum} = a + b + cin;
+endmodule
 
 module top_module(
     input [31:0] a,
@@ -13,33 +17,28 @@ module top_module(
     input sub,
     output [31:0] sum
 );
-    
-    wire [15:0] lower_a, upper_a, lower_b, upper_b;
-    wire [15:0] sum_lower, sum_upper;
+    wire [15:0] b_xor_lower, b_xor_upper;
     wire cout_lower;
     
-    assign lower_a = a[15:0];
-    assign upper_a = a[31:16];
-    assign lower_b = b[15:0] ^ {16{sub}};
-    assign upper_b = b[31:16] ^ {16{sub}};
+    // XOR each half of b with the sub signal
+    assign b_xor_lower = b[15:0] ^ {16{sub}};
+    assign b_xor_upper = b[31:16] ^ {16{sub}};
     
-    add16 adder_lower (
-        .a(lower_a), 
-        .b(lower_b), 
-        .cin(sub), 
-        .sum(sum_lower), 
+    // Instantiate two 16-bit adders
+    add16 lower_adder (
+        .a(a[15:0]),
+        .b(b_xor_lower),
+        .cin(sub),
+        .sum(sum[15:0]),
         .cout(cout_lower)
     );
-
-    add16 adder_upper (
-        .a(upper_a), 
-        .b(upper_b), 
-        .cin(cout_lower), 
-        .sum(sum_upper), 
+    
+    add16 upper_adder (
+        .a(a[31:16]),
+        .b(b_xor_upper),
+        .cin(cout_lower),
+        .sum(sum[31:16]),
         .cout()
     );
-    
-    assign sum = {sum_upper, sum_lower};
-
 endmodule
 ```

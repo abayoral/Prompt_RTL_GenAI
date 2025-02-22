@@ -1,16 +1,19 @@
 ```verilog
 module top_module (
     input [7:0] a, b, c, d,
-    output [7:0] min);
+    output [7:0] min
+);
+    wire [7:0] min_ab;
+    wire [7:0] min_cd;
 
-    wire [7:0] min1, min2;
+    // Find the minimum between a and b
+    assign min_ab = (a < b) ? a : b;
 
-    // Compare a and b
-    assign min1 = (a < b) ? a : b;
-    // Compare c and d
-    assign min2 = (c < d) ? c : d;
-    // Compare the results of the first two comparisons to get the final min
-    assign min = (min1 < min2) ? min1 : min2;
+    // Find the minimum between c and d
+    assign min_cd = (c < d) ? c : d;
+
+    // Find the minimum between min_ab and min_cd
+    assign min = (min_ab < min_cd) ? min_ab : min_cd;
 
 endmodule
 ```

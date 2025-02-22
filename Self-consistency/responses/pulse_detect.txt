@@ -1,0 +1,55 @@
+module pulse_detect (
+    input wire clk,
+    input wire rst_n,
+    input wire data_in,
+    output reg data_out
+);
+
+    // State encoding
+    typedef enum reg [1:0] {
+        IDLE = 2'b00,        // Initial state, waiting for 0 -> 1
+        HIGH = 2'b01,        // Detected 0 -> 1, waiting for 1 -> 0
+        DETECTED = 2'b10     // Pulse detected, set output high temporarily
+    } state_t;
+    
+    state_t state;  // Current state
+
+    // Sequential logic to handle state transitions and output logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset logic
+            state <= IDLE;
+            data_out <= 1'b0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    // Waiting for the first transition 0 -> 1
+                    if (data_in == 1'b1) begin
+                        state <= HIGH;
+                    end
+                    data_out <= 1'b0;
+                end
+
+                HIGH: begin
+                    // Waiting for the second transition 1 -> 0
+                    if (data_in == 1'b0) begin
+                        state <= DETECTED;
+                        data_out <= 1'b1; // Set output high to indicate pulse detected
+                    end
+                end
+
+                DETECTED: begin
+                    // Pulse detected, hold the output for one cycle
+                    data_out <= 1'b0;
+                    state <= IDLE; // Return to the initial state
+                end
+
+                default: begin
+                    // Catch-all state, should never be reached
+                    state <= IDLE;
+                    data_out <= 1'b0;
+                end
+            endcase
+        end
+    end
+endmodule

@@ -1,0 +1,44 @@
+```verilog
+module multi_booth_8bit (
+    input clk,
+    input reset,
+    input [7:0] a,  // Multiplicand
+    input [7:0] b,  // Multiplier
+    output reg [15:0] p,  // Product
+    output reg rdy  // Ready signal
+);
+    reg [15:0] multiplicand;  // Sign-extended multiplicand
+    reg [15:0] product;       // Accumulator for the product
+    reg [8:0] multiplier;     // Sign-extended multiplier with extra bit for Booth encoding
+    reg [4:0] ctr;            // 5-bit counter for the operation cycles
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            // Reset state
+            multiplicand <= {8'b0, a};  // Zero-extend 'a'
+            product <= 16'b0;           // Clear the product register
+            multiplier <= {b, 1'b0};    // Zero-extend 'b' and add a trailing 0 for Booth
+            ctr <= 5'b0;                // Clear the counter
+            rdy <= 1'b0;                // Set ready signal low 
+        end else if (ctr < 5'd8) begin  // Iterate for 8 cycles (since they handle 2 bits each)
+            // Booth's recoding
+            case (multiplier[1:0])
+                2'b01: product <= product + multiplicand;  // Add
+                2'b10: product <= product - multiplicand;  // Subtract
+                // 2'b00 and 2'b11 do nothing
+                default: product <= product;
+            endcase
+
+            // Arithmetic right shift of the combined multiplier and product registers
+            {product, multiplier} <= {product[15], product, multiplier} >>> 1;
+
+            ctr <= ctr + 1;  // Increment the cycle counter
+
+        end else begin
+            // Multiplication is complete
+            p <= product;  // Output the final product
+            rdy <= 1'b1;   // Indicate that multiplication is complete
+        end
+    end
+endmodule
+```

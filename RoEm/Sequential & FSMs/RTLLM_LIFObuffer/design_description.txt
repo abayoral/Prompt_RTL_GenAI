@@ -1,29 +1,34 @@
-Please act as a professional Verilog designer.
+Kindly provide comprehensive Verilog code for a module named `LIFObuffer` that implements a Last-In-First-Out buffer designed for temporary data storage. This buffer should be 4 bits wide and capable of holding up to four entries. It must facilitate push and pop operations managed by read/write control signals. Below, I will outline the specific requirements and functionality that the Verilog code should encapsulate:
 
-A Last-In-First-Out (LIFO) buffer for temporary data storage. This 4-bit wide buffer can hold up to 4 entries, allowing for push and pop operations controlled by read/write (RW) signals.
+**Module Overview:**
+- **Module Name:** `LIFObuffer`
+- This module is to serve as a LIFO buffer, storing temporary data in a stack-like fashion.
 
-Module name:
-    LIFObuffer
+**Input Ports:**
+- **`dataIn [3:0]`:** This is a 4-bit input data bus used to input data that needs to be pushed onto the buffer when required.
+- **`RW`:** A single-bit Read/Write control signal. A value of '1' signifies a read operation (pop), while '0' indicates a write operation (push).
+- **`EN`:** Enable signal that activates buffer operations when set to high.
+- **`Rst`:** An active-high reset signal for initializing or clearing the buffer.
+- **`Clk`:** Clock signal ensuring synchronous operation of buffer processes.
 
-Input ports:
-    dataIn [3:0]: 4-bit input data to be pushed onto the buffer.
-    RW: Read/Write control signal (1 for read, 0 for write).
-    EN: Enable signal to activate buffer operations.
-    Rst: Active high reset signal to initialize the buffer.
-    Clk: Clock signal for synchronous operations.
+**Output Ports:**
+- **`EMPTY`:** A flag that indicates whether the buffer is currently empty.
+- **`FULL`:** A flag to convey when the buffer is at full capacity.
+- **`dataOut [3:0]`:** A 4-bit output data bus which provides data retrieved from the buffer during a read operation.
 
-Output ports:
-    EMPTY: Flag indicating whether the buffer is empty.
-    FULL: Flag indicating whether the buffer is full.
-    dataOut [3:0]: 4-bit output data retrieved from the buffer.
+**Implementation Details:**
+- **Data Storage:** Utilize an internal memory array (`stack_mem`) for stack storage, making it capable of holding the 4-bit entries.
+- **Stack Pointer (`SP`):** This pointer keeps track of the current position within the stack. It adjusts based on push and pop operations to indicate the next available position.
 
-Implementation:
-    The buffer uses a stack memory array (stack_mem) to store the data. A stack pointer (SP) tracks the current position in the stack.
-    On the rising edge of the clock (Clk), if the enable (EN) signal is high:
-    If the reset (Rst) signal is high, the stack is cleared, the stack pointer is set to 4 (indicating an empty buffer), and all memory locations are initialized to 0.
-    If the reset signal is low, the buffer checks if it is full or empty and processes data accordingly:
-    If RW is low (write operation) and the buffer is not full, data from dataIn is pushed onto the stack, and the stack pointer is decremented.
-    If RW is high (read operation) and the buffer is not empty, data is popped from the stack into dataOut, the corresponding stack memory is cleared, and the stack pointer is incremented.
-    Flags for EMPTY and FULL are updated based on the stack pointer status.
+**Operational Logic:**
+1. **Reset Condition:** Upon the rising edge of the clock, if the `EN` signal is high:
+   - When the `Rst` signal is also high, the stack is to be fully cleared, the `SP` is set to a value of 4 (denoting an empty buffer state), and each memory location is initialized to zero.
+   
+2. **Operation when Reset is Low:**
+   - The buffer must first evaluate whether it is full or empty, influencing whether push or pop operations can occur.
+   - **Write Operation (RW low):** If the buffer isn't full, data from `dataIn` should be pushed onto the stack, and the `SP` should decrement accordingly.
+   - **Read Operation (RW high):** If not empty, data should be popped from the stack into `dataOut`, the stack memory for that position cleared, and `SP` is incremented.
+   
+3. **Updating Status Flags:** Both `EMPTY` and `FULL` flags should be dynamically updated in response to the `SP` to reflect the current state of the buffer.
 
-Give me the complete code.
+Please translate the above description into Verilog code fully implementing the functionalities and interfaces specified.

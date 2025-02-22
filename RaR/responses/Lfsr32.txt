@@ -1,22 +1,27 @@
 ```verilog
-module top_module(
-    input clk,
-    input reset,     // Active-high synchronous reset to 32'h1
-    output reg [31:0] q
-); 
-    
-    wire feedback;
+module lfsr_32bit(
+    input wire clk,
+    input wire reset,
+    output reg [31:0] lfsr
+);
 
-    // Feedback tap positions: 32, 22, 2, and 1 (0-indexed positions: 31, 21, 1, and 0)
-    assign feedback = q[31] ^ q[21] ^ q[1] ^ q[0];
+    // Specify the feedback taps: 32, 22, 2, 1
+    // Note: Verilog indexing is zero-based, so the taps are actually:
+    // tap positions: 31, 21, 1, 0
 
-    always @(posedge clk) begin
+    always @(posedge clk or posedge reset) begin
         if (reset) begin
-            q <= 32'h1;           // Set LFSR to initial value 32'h1 on reset
+            // Initialize LFSR state to 1 on reset
+            lfsr <= 32'h1;
         end else begin
-            q <= {q[30:0], feedback};  // Shift left and insert feedback bit at position 0
+            // Shift right and feedback polynomial for taps:
+            //   lfsr[31] => next lfsr[0]
+            //   lfsr[0]  used in xor calculation
+            lfsr <= {lfsr[30:0], (lfsr[31] ^ lfsr[21] ^ lfsr[1] ^ lfsr[0])};
         end
     end
 
 endmodule
 ```
+
+This Verilog module defines a 32-bit Linear Feedback Shift Register (LFSR) with specific taps at positions 32, 22, 2, and 1. It is intended for use in applications requiring pseudorandom number generation or data scrambling. The LFSR's feedback polynomial is implemented using a single equation incorporating XOR operations corresponding to the specified taps. Additionally, an active-high synchronous reset is provided to initialize the LFSR to a seed value of `32'h1`, ensuring predictable startup.

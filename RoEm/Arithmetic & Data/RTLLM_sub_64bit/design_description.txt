@@ -1,22 +1,23 @@
-Please act as a professional Verilog designer.
+As a professional Verilog designer, your task is to develop a comprehensive Verilog module designed to accurately perform subtraction on two 64-bit signed integers while simultaneously ensuring proper overflow detection. This module is intended for high-precision arithmetic operations. The objective is to encapsulate the procedure in a cohesive Verilog module. Here are the specific requirements and details you need to address in the implementation:
 
-Implement a module of a 64-bit subtractor with overflow checking for high-precision arithmetic operations. 
+**Module Name:**  
+- The module should be named `sub_64bit`.
 
-Module name:  
-    sub_64bit               
-Input ports:
-    A [63:0]: First 64-bit input operand (representing a large signed integer).
-    B [63:0]: Second 64-bit input operand (representing a large signed integer to be subtracted from A).
-Output ports:
-    result [63:0]: 64-bit output representing the difference of the two operands (A - B).
-    overflow: 1-bit output indicating whether an overflow occurred during the subtraction operation.
+**Input Ports:**  
+- `A [63:0]`: This input should accept a 64-bit wide operand representing the first signed integer to be involved in the subtraction operation. The operation involves interpreting this as a large positive or negative number in binary format.
+- `B [63:0]`: Similarly, this input also should accommodate another 64-bit wide operand, representing the second signed integer. This operand will be subtracted from `A`, and it should be processed to preserve its signed nature.
 
-Implementation:
-Subtraction: The module performs binary subtraction of A and B to obtain the result.
-Overflow Detection: The module checks for overflow conditions by examining the sign bits of A, B, and the result. 
-- Positive overflow occurs when a positive number (A) is subtracted by a negative number (B) and the result is negative.
-- Negative overflow occurs when a negative number (A) is subtracted by a positive number (B) and the result is positive.
+**Output Ports:**  
+- `result [63:0]`: This 64-bit output port must deliver the resultant value of the subtraction operation (i.e., A - B). The output must accurately reflect the computed difference between the two input operants, preserving the sign and magnitude.
+- `overflow`: This will be a single bit output. It has the responsibility to indicate whether the subtraction operation resulted in an overflow—a state where the arithmetic operation exceeds the representational capacity of the 64-bit signed integer format.
 
-The overflow flag is set to 1 if an overflow condition is detected; otherwise, it is set to 0.
+**Implementation Details:**  
+- **Subtraction Process:** The module should conduct a straightforward arithmetic subtraction of the given inputs, `A` and `B`, calculating the result as A - B utilizing binary subtraction.
+  
+- **Overflow Detection:** The module must incorporate logic to detect two main overflow scenarios:
+  - **Positive Overflow:** This condition arises if subtracting a negative number (`B`) from a positive number (`A`) produces a negative result. In this scenario, the operation exceeds the maximum positive limit representable, requiring overflow to be flagged.
+  - **Negative Overflow:** This occurs if subtracting a positive number (`B`) from a negative number (`A`) results in a positive outcome, indicating the operation goes below the lowest negative boundary, necessitating the signaling of an overflow.
+  
+- The `overflow` signal should be truthy (set to 1) if any overflow condition is triggered during the subtraction. Otherwise, it should remain falsy (set to 0) if the calculation stays within permissible bounds.
 
-Give me the complete code.
+For complete guidance on the implementation, ensure the Verilog code follows the specified inputs and outputs, accurately performs bitwise operations, and adequately reflects overflow conditions.

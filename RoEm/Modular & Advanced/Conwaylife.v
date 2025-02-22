@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineering at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // Conway's Game of Life is a two-dimensional cellular automaton.
 
 // The "game" is played on a two-dimensional grid of cells, where each cell is either 1 (alive) or 0 (dead). At each time step, each cell changes state depending on how many neighbours it has:

@@ -1,26 +1,28 @@
-Please act as a professional Verilog designer.
+As a skilled Verilog designer, you are assigned the task of constructing a digital logic module that emulates the functionality of a 4-bit comparator using combinational logic principles. To clarify and expand upon the requirements of this design project, let's explore each aspect in greater detail:
 
-Implement a module of a 4-bit comparator with multiple bit-level comparators in combinational logic.
+**Design Task Outline:**
+- **Module Name:** The module you are constructing should be identified as `comparator_4bit`, which succinctly describes its purpose within a broader digital system.
+  
+- **Input Ports Identified:**
+  - `A [3:0]`: This port represents a 4-bit vector input, where each bit signifies a binary component of the first operand in the comparison operation.
+  - `B [3:0]`: Similarly, this input is a 4-bit vector that constitutes the second operand for comparison against `A`. Both inputs are to be assessed with respect to their binary values.
 
-Module name:  
-    comparator_4bit               
-Input ports:
-    A [3:0]: First 4-bit input operand (binary number to compare).
-    B [3:0]: Second 4-bit input operand (binary number to compare).
-Output ports:
-    A_greater: 1-bit output indicating if A is greater than B.
-    A_equal: 1-bit output indicating if A is equal to B.
-    A_less: 1-bit output indicating if A is less than B.
+- **Output Ports Explained:**
+  - `A_greater`: This is a single-bit output port designed to output a logic high (`1`) when the binary value represented by `A` exceeds that of `B`.
+  - `A_equal`: Another single-bit output, which is intended to assert a logic high (`1`) when both `A` and `B` share identical binary values. This scenario would indicate complete parity between the two inputs.
+  - `A_less`: This output is also a single-bit port, and it becomes high (`1`) when the value of `A` is determined to be less than `B`. This indicates an inferior (smaller) binary value of `A`.
 
-Implementation:
-Comparison Logic: The module compares the two 4-bit binary numbers A and B using combinational logic.
-- A subtraction operation is performed: A - B. The result of this subtraction helps determine whether A is greater than, equal to, or less than B.
-- Carry Generation: If a borrow occurs during the subtraction, A is less than B (A_less).
-- If no borrow occurs and the result of subtraction is non-zero, A is greater than B (A_greater).
-- If A and B are equal, the result of subtraction is zero (A_equal).
+**Design Considerations:**
+- **Combinational Logic Focus:** Given that this is a combinational module, the output of the comparator should be computed exclusively based on the current input data, without reliance on any form of storage or past input states. This necessitates careful design to ensure output states reflect only the immediate data.
 
-Output Encoding: The outputs (A_greater, A_equal, A_less) are mutually exclusive, ensuring only one of the three outputs is high (1) at any given time.
+- **Logic Implementation Strategy:**
+  - The comparison itself is proposed to be implemented via a subtraction operation whereby `A` is subtracted from `B`. This mathematical operation is pivotal to deducing the relationship between the two inputs.
+  - **Analysis of the Results:**
+    - If during the subtraction, a borrow occurs, it signifies that `A` possesses a smaller binary weight than `B`, thus activating the `A_less` output.
+    - Should the subtraction conclude with no borrow and a non-zero result, it confirms that `A` exceeds `B` in value, activating the `A_greater` output.
+    - A result of zero implies `A` and `B` are equivalent, hence setting `A_equal` to a high state.
 
-Give me the complete code.
+**Output Logic Specification:**
+- It is imperative that the outputs `A_greater`, `A_equal`, and `A_less` are mutually exclusive. This means that at any given time, one and only one of these outputs should be in a high (`1`) state to clearly indicate the outcome of the comparison.
 
- 
+Based on the aforementioned specifications, you are encouraged to translate these requirements into well-structured and accurate Verilog code, ensuring the comparator embodies the desired operations and output characteristics as described.

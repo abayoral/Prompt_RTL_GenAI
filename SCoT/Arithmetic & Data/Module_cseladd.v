@@ -1,19 +1,3 @@
-// you are provided with the same module add16 as the previous exercise, 
-// which adds two 16-bit numbers with carry-in and produces a carry-out and 16-bit sum. 
-// You must instantiate three of these to build the carry-select adder, 
-// using your own 16-bit 2-to-1 multiplexer.
+You are tasked with implementing a 32-bit carry-select adder using the `add16` module which you encountered in a prior exercise. The `add16` module is designed to handle the addition of two 16-bit numbers, `a` and `b`, and includes an input for a carry-in (`cin`). Its outputs include a 16-bit sum (`sum`) and a carry-out (`cout`). Your current challenge involves the instantiation of three separate `add16` modules, which you will then interconnect to construct a 32-bit carry-select adder. Additionally, you are required to create or utilize an existing 16-bit 2-to-1 multiplexer to facilitate the decision-making process within the carry-select adder architecture.
 
-// Connect the modules together as shown in the diagram below. 
-// The provided module add16 has the following declaration:
-
-module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );
-
-module top_module(
-    input [31:0] a,
-    input [31:0] b,
-    output [31:0] sum
-);
-
-// Insert your code here
-
-endmodule
+Your task includes understanding and implementing the connections between the different modules according to the provided diagram, ensuring that the outputs from one module correctly serve as inputs to another to achieve the desired carry-select operation. The ultimate goal of this exercise is to produce a top-level module called `top_module`. This module will intake two 32-bit input vectors (`a` and `b`) and output a 32-bit sum (`sum`) which represents the result of adding `a` and `b`. Ensure that the modules interact correctly, taking into consideration the handling of carry bits between the additions performed by the different `add16` instances.

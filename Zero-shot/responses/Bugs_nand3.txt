@@ -1,11 +1,16 @@
 ```verilog
-module andgate ( output out, input a, input b, input c, input d, input e );
+module andgate (output out, input a, input b, input c, input d, input e);
     assign out = a & b & c & d & e;
 endmodule
 
 module top_module (input a, input b, input c, output out);
-    wire and_out;
-    andgate inst1 ( .out(and_out), .a(a), .b(b), .c(c), .d(1'b1), .e(1'b1) );
-    assign out = ~and_out;
+    wire and_output;
+    
+    // Use the 5-input AND gate to combine the inputs
+    // Two of the inputs are tied to '1' so they do not affect the AND operation
+    andgate inst1 (and_output, a, b, c, 1'b1, 1'b1);
+
+    // Use a NOT gate to implement the NAND operation
+    assign out = ~and_output;
 endmodule
 ```

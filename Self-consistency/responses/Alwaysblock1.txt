@@ -5,10 +5,10 @@ module top_module(
     output reg out_alwaysblock
 );
 
-    // using assign statement
+    // AND gate using assign statement
     assign out_assign = a & b;
-
-    // using combinational always block
+    
+    // AND gate using combinational always block
     always @(*) begin
         out_alwaysblock = a & b;
     end

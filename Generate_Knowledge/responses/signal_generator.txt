@@ -1,0 +1,40 @@
+```verilog
+module signal_generator (
+    input wire clk,
+    input wire rst_n,
+    output reg [4:0] wave
+);
+
+    // State register: 0 for incrementing, 1 for decrementing
+    reg state;
+
+    // Always block to generate the triangle wave signal
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Active-low reset: initialize wave and state
+            wave <= 5'd0;
+            state <= 1'b0; // Start with increment mode
+        end else begin
+            case (state)
+                1'b0: begin // Incrementing mode
+                    if (wave == 5'd31) begin
+                        state <= 1'b1; // Switch to decrementing mode
+                        wave <= wave - 1'b1;
+                    end else begin
+                        wave <= wave + 1'b1;
+                    end
+                end
+                1'b1: begin // Decrementing mode
+                    if (wave == 5'd0) begin
+                        state <= 1'b0; // Switch to incrementing mode
+                        wave <= wave + 1'b1;
+                    end else begin
+                        wave <= wave - 1'b1;
+                    end
+                end
+            endcase
+        end
+    end
+
+endmodule
+```

@@ -1,11 +1,1 @@
-// Build a finite-state machine that searches for the sequence 1101 in an input bit stream. When the sequence is found, it should set start_shifting to 1, forever, until reset. Getting stuck in the final state is intended to model going to other states in a bigger FSM that is not yet implemented. We will be extending this FSM in the next few exercises.
-
-module top_module (
-    input clk,
-    input reset,      // Synchronous reset
-    input data,
-    output start_shifting);
-
-    // Insert your code here
-
-endmodule
+Design and implement a finite-state machine (FSM) that is capable of detecting the bit sequence "1101" within a continuous stream of input data bits. The FSM should operate on a single clock and should include a synchronous reset functionality. Upon successful detection of the sequence "1101," the FSM is required to assert an output signal named `start_shifting`. This output, once set to high (1), should remain high indefinitely until the reset condition is triggered. The FSM should be designed to reach a particular "final state" upon detecting the sequence, which essentially indicates the end of the sequence detection process. This "final state" serves as a placeholder for potential future expansions of the FSM, which will involve integrating this FSM into a larger system with additional states and functionalities. Ensure that your design and implementation within the module named `top_module` adhere to these requirements.

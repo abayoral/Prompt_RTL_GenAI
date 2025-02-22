@@ -6,15 +6,15 @@ module top_module (
     output reg [31:0] out
 );
 
-    reg [31:0] in_prev;
+    reg [31:0] in_reg;
 
     always @(posedge clk) begin
         if (reset) begin
             out <= 32'b0;
         end else begin
-            out <= out | (in_prev & ~in);
+            out <= out | (in_reg & ~in);
         end
-        in_prev <= in;
+        in_reg <= in;
     end
 
 endmodule

@@ -1,20 +1,7 @@
-// The 7458 is a chip with four AND gates and two OR gates. 
+Imagine you are an experienced Digital Design Engineer working for a top-tier hardware design company. You have been given a crucial assignment to develop a Verilog module that matches the functionality of the 7458 chip. This task is vital since the performance and reliability of this module are critical to preserving your company's esteemed reputation within the competitive computer hardware industry.
 
-// Create a module with the same functionality as the 7458 chip. 
-// It has 10 inputs and 2 outputs. You may choose to use an assign statement 
-// to drive each of the output wires, or you may choose to declare (four) wires 
-// for use as intermediate signals, where each internal wire is driven by the 
-// output of one of the AND gates. For extra practice, try it both ways.
+The 7458 chip you're emulating features four logic AND gates and two OR gates. To mirror this in your design, you will need to construct a module that accepts 10 input signals and produces 2 output signals. The inputs are labeled as p1a, p1b, p1c, p1d, p1e, p1f, which feed into various logical operations, alongside the additional inputs p2a, p2b, p2c, and p2d.
 
+As part of your design strategy, you have the flexibility to employ an assign statement to directly drive each of the output wires, p1y and p2y, responsible for producing the final results of your logical operations. Alternatively, you could opt to introduce intermediate wires - let’s say four - that will serve to capture and relay the results from the individual AND gate operations to the OR gates, building the necessary logic before reaching the final outputs.
 
-// Hint: You need to drive two signals (p1y and p2y) with a value.
-
-module top_module ( 
-    input p1a, p1b, p1c, p1d, p1e, p1f,
-    output p1y,
-    input p2a, p2b, p2c, p2d,
-    output p2y );
-
-// Insert your code here
-
-endmodule
+In this design challenge, you are encouraged to explore both approaches - first by directly assigning your results to the outputs, and then by using intermediate wires. This practice will enhance your proficiency in Verilog and deepen your understanding of digital circuit design, affirming your role as a key contributor to your team's success. Now, consider how you might structure your Verilog code to meet these specifications, while adhering to best practices for digital design. Insert the necessary Verilog code that will allow the top_module to function as described.

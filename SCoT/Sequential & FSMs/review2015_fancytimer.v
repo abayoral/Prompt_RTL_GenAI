@@ -1,28 +1,13 @@
-// We want to create a timer with one input that:
+The task at hand is to design a digital circuit, specifically a timer, which operates under a defined sequence of events controlled by an input. The system must be sensitive to a serialized data stream arriving at a designated input pin and be capable of recognizing a specific initial bit pattern "1101" as a trigger. The key steps involved in this design are as follows:
 
-// first, is started when a particular input pattern (1101) is detected,
-// second, shifts in 4 more bits to determine the duration to delay,
-// third, waits for the counters to finish counting, and
-// fourth, notifies the user and waits for the user to acknowledge the timer.
-// fifth, The serial data is available on the data input pin. When the pattern 1101 is received, the circuit must then shift in the next 4 bits, // most-significant-bit first. These 4 bits determine the duration of the timer delay. I'll refer to this as the delay[3:0].
+1. **Pattern Detection**: The circuit should continuously monitor the incoming data bits and identify when the specified pattern "1101" appears. This detection acts as the trigger to initiate the second stage of the operation.
 
-// After that, the state machine asserts its counting output to indicate it is counting. The state machine must count for exactly (delay[3:0] + 1) * 1000 clock cycles. e.g., delay=0 means count 1000 cycles, and delay=5 means count 6000 cycles. Also output the current remaining time. This should be equal to delay for 1000 cycles, then delay-1 for 1000 cycles, and so on until it is 0 for 1000 cycles. When the circuit isn't counting, the count[3:0] output is don't-care (whatever value is convenient for you to implement).
+2. **Input for Timer Duration**: Upon successful detection of the "1101" pattern, the system is required to shift in the subsequent four bits from the data stream. These bits, provided in a most-significant-to-least-significant order, are crucial as they define the delay duration for the timer. This four-bit sequence is stored and referred to as `delay[3:0]`.
 
-// At that point, the circuit must assert done to notify the user the timer has timed out, and waits until input ack is 1 before being reset to look for the next occurrence of the start sequence (1101).
+3. **Timer Activation and Counting Phase**: Once the `delay[3:0]` bits are determined, the timer must be activated. During this phase, the circuit should count down for a calculated number of cycles. Specifically, the timer will run for `(delay[3:0] + 1) * 1000` clock cycles, meaning each increment of the delay value increases the counting duration by 1000 cycles. During this counting phase, it is vital for the system to update and output the remaining time, decrementing from the initial delay value down to zero, with each step corresponding to a 1000-cycle duration.
 
-// The circuit should reset into a state where it begins searching for the input sequence 1101.
+4. **Timing Completion and User Notification**: After completing the requisite counting period, the system should signal the end of the countdown by asserting a `done` signal. This alerts the user that the designated time interval has lapsed.
 
-// Hint: It's ok to have all the code in a single module if the components are in their own always blocks, as long as it's clear which blob of code corresponds to which hardware block. Don't merge multiple always blocks together, as that's hard to read and error-prone.
+5. **Acknowledgment and Reset**: Following the countdown completion and user notification, the system awaits the user's acknowledgment, indicated by an input signal `ack`. Once this acknowledgment is received, the timer resets itself, ready to detect the next instance of the "1101" sequence to restart the process.
 
-module top_module (
-    input clk,
-    input reset,      // Synchronous reset
-    input data,
-    output [3:0] count,
-    output counting,
-    output done,
-    input ack );
-
-    // Insert your code here
-
-endmodule
+Throughout this design, state management is crucial as the circuit transitions between detecting the initial pattern, processing subsequent inputs, counting, and awaiting user interaction. It should be built as a state machine with delineated states according to these stages. The reset functionality should ensure that the system reverts to its initial state and becomes ready to detect a new pattern without further initialization from an external source. It is also suggested that while a single module may contain all logic, distinct parts should be organized within separate always blocks for clarity and maintainability. Avoid merging multiple logical operations in one block as this could increase complexity and introduce potential errors.

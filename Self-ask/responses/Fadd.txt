@@ -1,10 +1,12 @@
+Thank you for the clarification. Here's the complete Verilog module implementing a full adder:
+
 ```verilog
 module top_module( 
     input a, b, cin,
     output cout, sum );
 
-    assign sum = a ^ b ^ cin; // Sum is XOR of a, b and cin
-    assign cout = (a & b) | (b & cin) | (cin & a); // Carry out is when any two of the inputs are 1
+    assign sum = a ^ b ^ cin;    // Sum is the XOR of the three inputs
+    assign cout = (a & b) | (b & cin) | (cin & a); // Carry-out is true if at least two inputs are true
 
 endmodule
 ```

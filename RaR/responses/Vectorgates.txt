@@ -11,11 +11,11 @@ module top_module(
     assign out_or_bitwise = a | b;
     
     // Logical OR operation
-    assign out_or_logical = |(a | b); // Reduce or to compute the logical OR
+    assign out_or_logical = |(a | b);
     
-    // Bitwise NOT operation
-    assign out_not[5:3] = ~b; // Upper half containing bitwise NOT of b
-    assign out_not[2:0] = ~a; // Lower half containing bitwise NOT of a
+    // NOT operation with part selection
+    assign out_not[5:3] = ~b;
+    assign out_not[2:0] = ~a;
 
 endmodule
 ```

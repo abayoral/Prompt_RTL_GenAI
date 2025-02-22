@@ -1,0 +1,57 @@
+```verilog
+module freq_divbyfrac (
+    input wire clk,
+    input wire rst_n,
+    output reg clk_div
+);
+
+    // Parameters for division
+    localparam integer COUNT1_MAX = 4; // 4 cycles for the first half
+    localparam integer COUNT2_MAX = 3; // 3 cycles for the second half
+    localparam integer TOTAL_CYCLES = 7;
+
+    // Registers to track the state
+    reg [2:0] count;      // 3-bit cycle counter, max value requires 3 bits
+    reg clk_toggle;       // Toggles the clock for final output
+    reg half_cycle_phase; // Indicates the current phase
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            count <= 3'b0;
+            clk_toggle <= 1'b0;
+            half_cycle_phase <= 1'b0;
+        end else begin
+            if (count == TOTAL_CYCLES-1) begin
+                count <= 3'b0;
+                clk_toggle <= ~clk_toggle; // Toggle every 3.5 cycles
+                half_cycle_phase <= ~half_cycle_phase;
+            end else begin
+                count <= count + 1;
+            end
+        end
+    end
+
+    // Generate the divided clock with phase shift
+    always @(negedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            clk_div <= 1'b0;
+        end else begin
+            // Create a phase adjustment by toggling clk_div
+            if (count == COUNT1_MAX) begin
+                if (!half_cycle_phase) begin
+                    clk_div <= 1'b1; // Phase lead
+                end
+            end else if (count == COUNT2_MAX) begin
+                if (half_cycle_phase) begin
+                    clk_div <= ~clk_div; // Phase lag
+                end
+            end else begin
+                clk_div <= ~clk_toggle; // Maintain toggle for cycle completion
+            end
+        end
+    end
+
+endmodule
+```
+
+This module achieves a 3.5x division of the input clock signal using a counter for cycling through clock periods and phase adjustments. The alternating counting between three and four clock cycles, coupled with a half-cycle phase shift, helps form a reasonably consistent output signal.

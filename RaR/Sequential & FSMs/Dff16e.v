@@ -1,17 +1,9 @@
-// Create 16 D flip-flops. It's sometimes useful to only modify parts of a group of flip-flops. The byte-enable inputs control whether each byte of the 16 registers should be written to on that cycle. byteena[1] controls the upper byte d[15:8], while byteena[0] controls the lower byte d[7:0].
+As a Senior Digital Design Engineer at a prominent hardware design company, you have been entrusted with a crucial task that involves developing a Verilog module that plays a critical role in the next-generation product lineup. The design and functionality of this module are imperative for upholding the esteemed reputation of your company within the competitive computer hardware industry. 
 
-// resetn is a synchronous, active-low reset.
+Your specific task is to design a system that includes 16 D flip-flops. This particular configuration is essential because it provides a foundation for modifying certain parts of a group of flip-flops, which can be extremely useful under certain conditions. The system must incorporate byte-enable inputs for control purposes. These byte-enable inputs are responsible for managing whether each byte within the 16 registers is written during a given cycle. Specifically, byteena[1] is tasked with controlling the upper byte, which corresponds to d[15:8], and byteena[0] manages the lower byte, equating to d[7:0]. This allows for selective data manipulation based on specific operational needs.
 
-// All DFFs should be triggered by the positive edge of clk.
+Furthermore, it is crucial to incorporate a reset mechanism. The resetn input should be a synchronous, active-low reset, ensuring that all operations are neatly reset and ready to commence upon system startup or during certain system states, providing a robust design.
 
-module top_module (
-    input clk,
-    input resetn,
-    input [1:0] byteena,
-    input [15:0] d,
-    output [15:0] q
-);
+Lastly, ensure that all the D flip-flops included in your design are synchronized using the positive edge of the clk signal. This edge-triggered design ensures that data is sampled accurately and only at the intended moments, providing a reliable and consistent operation for all included D flip-flops.
 
-	//Insert your code here
-
-endmodule
+In summary, incorporate and synthesize these requirements into a cohesive Verilog module that defines the interaction and manipulation of data flows using D flip-flops, while also managing byte-level data writing through the enable inputs, and ensuring seamless operations through an active-low reset and edge-triggered clock management. This approach is crucial for delivering exceptional performance and upholding the high standards expected from your company’s next-generation product line.

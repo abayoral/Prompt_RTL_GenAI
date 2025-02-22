@@ -1,0 +1,47 @@
+module instr_reg (
+    input wire clk,
+    input wire rst,
+    input wire [1:0] fetch,
+    input wire [7:0] data,
+    output reg [2:0] ins,
+    output reg [4:0] ad1,
+    output reg [7:0] ad2
+);
+
+    reg [7:0] ins_p1;
+    reg [7:0] ins_p2;
+
+    always @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            ins_p1 <= 8'b0;
+            ins_p2 <= 8'b0;
+        end else begin
+            case (fetch)
+                2'b01: ins_p1 <= data;
+                2'b10: ins_p2 <= data;
+                default: begin
+                    // Retain current value if fetch is neither 01 nor 10
+                end
+            endcase
+        end
+    end
+
+    always @(*) begin
+        // Extract fields from the registers based on fetch control
+        if (fetch == 2'b01) begin
+            ins = ins_p1[7:5]; // High 3 bits as opcode
+            ad1 = ins_p1[4:0]; // Low 5 bits as register address
+            ad2 = 8'b0;        // No data output in this case
+        end else if (fetch == 2'b10) begin
+            ins = 3'b0;        // No opcode output in this case
+            ad1 = 5'b0;        // No address output in this case
+            ad2 = ins_p2;      // Full 8-bit data output
+        end else begin
+            // Default case when fetch is neither 01 nor 10, retain values
+            ins = 3'b0;
+            ad1 = 5'b0;
+            ad2 = 8'b0;
+        end
+    end
+
+endmodule

@@ -1,22 +1,9 @@
-// You are given a module add16 that performs a 16-bit addition. 
-//Instantiate two of them to create a 32-bit adder. 
-//One add16 module computes the lower 16 bits of the addition result, 
-//while the second add16 module computes the upper 16 bits of the result, 
-//after receiving the carry-out from the first adder. Your 32-bit adder does 
-//not need to handle carry-in (assume 0) or carry-out (ignored), 
-//but the internal modules need to in order to function correctly. 
-//(In other words, the add16 module performs 16-bit a + b + cin, while your module performs 32-bit a + b).
+// You are tasked with implementing a 32-bit adder using two instances of a provided `add16` module. The `add16` module is designed to perform an addition operation on two 16-bit inputs, `a` and `b`, along with an additional input `cin` which stands for carry-in, producing a 16-bit sum output and a carry-out output `cout`. Your goal is to instantiate this module twice to achieve a full 32-bit addition operation on two 32-bit input numbers. 
 
-// Connect the modules together as shown in the diagram below. 
-//The provided module add16 has the following declaration:
+// To accomplish this, the lower 16 bits of the 32-bit numbers `a` and `b` will be processed by the first instance of the `add16` module. This instance will add the lower segments of these numbers and produce a 16-bit sum along with a carry-out bit, which indicates whether a carry is needed to the subsequent higher-order bit section.
 
-module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );
+// Subsequently, the second instance of the `add16` module will take over, using this carry-out as its carry-in (`cin`) to perform the addition of the upper 16 bits of `a` and `b`. It will also generate its 16-bit sum for the upper segment of the 32-bit result. In this implementation, you are required to connect the internal signals appropriately to ensure that the `add16` modules function cohesively as described.
 
-module top_module(
-    input [31:0] a,
-    input [31:0] b,
-    output [31:0] sum
-);
+// Please remember that while the `add16` modules are structured to compute `a + b + cin`, your 32-bit adder should primarily operate on the principle of summing `a + b` over the full width of 32 bits. You are not required to manage a carry-in for the entire 32-bit adder, as it is assumed to be zero. Also, you can disregard the overall carry-out after processing both halves, as it is not needed for the overall module output.
 
-	// Insert the code here
-endmodule
+// Utilize your knowledge of Verilog and digital design principles to instantiate and connect these two 16-bit adders within the `top_module`, ensuring the correct functionality of a comprehensive 32-bit addition. Take careful consideration to accurately align the input and output ports with the instanced `add16` modules and guarantee a seamless integration and execution of the overall addition process.

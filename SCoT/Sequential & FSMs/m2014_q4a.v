@@ -1,11 +1,5 @@
-// Implement a D flip flop. Note that this is a latch, so a Quartus warning about having inferred a latch is expected.
+The task involves designing a digital circuit module, specifically a D flip flop (also called a D latch in this context), using a Hardware Description Language (HDL). You are required to implement this module within the provided framework for a Verilog design, which is intended to operate in a digital logic simulation or actual hardware on programmable logic devices like FPGAs. Given that this is a latch implementation, be prepared to receive a typical Quartus software warning indicating that a latch has been inferred, as latches often are inferred from specific coding patterns that involve level-sensitive logic. 
 
-module top_module (
-    input d, 
-    input ena,
-    output q);
-    
-// Insert your code here
+To start, focus on completing the module named "top_module" by defining the internal logic that captures the data input, 'd', and controls the output, 'q', based on the enable signal, 'ena'. Remember that in a D flip flop or latch design, 'q' should only assume the value of 'd' if the enable ('ena') signal permits it, holding the previous state when 'ena' is not asserted. This behavior mimics real-world applications where the latch stores the input when enabled, a key aspect across numerous digital systems. 
 
-endmodule
-
+Consider using always or assign statements, or a combination of both to capture the design’s behavior. Your implementation should emphasize the specific way a D latch interacts with the enable signal to either pass through the input or hold the currently latched value, reflecting typical use in synchronous digital circuits.

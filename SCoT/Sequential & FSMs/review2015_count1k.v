@@ -1,10 +1,1 @@
-// Build a counter that counts from 0 to 999, inclusive, with a period of 1000 cycles. The reset input is synchronous, and should reset the counter to 0.
-
-module top_module (
-    input clk,
-    input reset,
-    output [9:0] q);
-
-    // Insert your code here
-
-endmodule
+The task at hand is to design and implement a digital counter using a hardware description language (Verilog), specifically within the framework of a module named `top_module`. This counter is required to increment every clock cycle, starting from 0 and counting up to 999, making it a 10-bit binary counter since the highest value 999 requires 10 bits in binary representation. Once the counter reaches 999, it should automatically wrap around on the next count, returning to 0 and continuing in this manner, thus completing its counting cycle over a total of 1000 counts. Additionally, the counter includes a reset functionality, which is synchronous. This means that when a reset input signal is provided, the counter should immediately set its output (`q`) back to 0, but this should happen in sync with the clock, meaning the reset operation is only performed at the rising edge of the clock signal. This requirement ensures that the reset doesn't affect the counter in an asynchronous manner. Considerations should be made for the definition of inputs and outputs where `clk` indicates the clock signal, `reset` is the input control signal for resetting the counter, and `q` is the 10-bit output representing the current count value. Your task is to write the necessary code within the provided structural framework to achieve this counting behavior while adhering to these specifications.

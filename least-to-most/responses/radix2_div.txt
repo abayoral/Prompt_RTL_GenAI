@@ -1,0 +1,77 @@
+```verilog
+module radix2_div (
+    input clk,
+    input rst,
+    input sign,
+    input [7:0] dividend,
+    input [7:0] divisor,
+    input opn_valid,
+    output reg res_valid,
+    output reg [15:0] result
+);
+
+    reg [15:0] SR; // Shift register
+    reg [7:0] NEG_DIVISOR;
+    reg [3:0] cnt; // Counter for number of shifts
+    reg start_cnt;
+    reg [7:0] abs_dividend, abs_divisor;
+
+    wire [7:0] divisor_complement;
+    wire [15:0] subtraction_result;
+    wire [15:0] mux_result;
+    wire [8:0] subtraction_check;
+    wire carry_out;
+
+    assign divisor_complement = ~abs_divisor + 1; // Two's complement for subtraction
+    assign subtraction_result = SR[15:8] + {1'b0, divisor_complement}; // Add the negative divisor
+    assign carry_out = ~subtraction_result[8]; // Check if the subtraction resulted in a borrow
+    assign mux_result = carry_out ? {subtraction_result[7:0], SR[7:0], 1'b1} : {SR[15:0], 1'b0};
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            res_valid <= 0;
+            result <= 0;
+            SR <= 0;
+            cnt <= 0;
+            start_cnt <= 0;
+        end else begin
+            if (opn_valid && !start_cnt) begin
+                if (sign) begin
+                    abs_dividend <= dividend[7] ? ~dividend + 1 : dividend;
+                    abs_divisor <= divisor[7] ? ~divisor + 1 : divisor;
+                end else begin
+                    abs_dividend <= dividend;
+                    abs_divisor <= divisor;
+                end
+
+                NEG_DIVISOR <= ~abs_divisor + 1;
+                SR <= {abs_dividend, 8'b0};
+                cnt <= 0;
+                start_cnt <= 1;
+                res_valid <= 0;
+            end else if (start_cnt) begin
+                SR <= mux_result[15:0];
+                cnt <= cnt + 1;
+                
+                if (cnt == 8) begin
+                    start_cnt <= 0;
+                    res_valid <= 1;
+                    
+                    if (sign && (dividend[7] ^ divisor[7])) begin
+                        result[7:0] <= ~SR[7:0] + 1; // Two's complement for signed quotient
+                    end else begin
+                        result[7:0] <= SR[7:0];
+                    end
+
+                    if (sign && dividend[7]) begin
+                        result[15:8] <= ~SR[15:8] + 1; // Two's complement for signed remainder
+                    end else begin
+                        result[15:8] <= SR[15:8];
+                    end
+                end
+            end
+        end
+    end
+
+endmodule
+```

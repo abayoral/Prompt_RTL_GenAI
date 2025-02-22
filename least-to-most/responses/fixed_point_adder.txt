@@ -1,0 +1,47 @@
+```verilog
+module fixed_point_adder #(parameter Q = 8, parameter N = 16)(
+    input wire [N-1:0] a,
+    input wire [N-1:0] b,
+    output reg [N-1:0] c
+);
+
+    reg [N-1:0] res;
+    reg signed [N:0] a_ext, b_ext, sum;
+
+    always @* begin
+        // Extend the input operands to one more bit to accommodate overflow
+        a_ext = {a[N-1], a};
+        b_ext = {b[N-1], b};
+
+        if (a[N-1] == b[N-1]) begin
+            // Same sign, perform addition
+            sum = a_ext + b_ext;
+
+            // Adjust the result sign
+            if (sum[N]) begin
+                // Check for overflow
+                res = {1'b1, sum[N-1:1]};
+            end else begin
+                res = sum[N-1:0];
+            end
+        end else begin
+            // Different signs, perform subtraction
+            if (a_ext[N-1:0] >= b_ext[N-1:0]) begin
+                // |a| >= |b|, result is a - b
+                sum = a_ext - b_ext;
+                res = sum[N-1:0];
+            end else begin
+                // |a| < |b|, result is b - a
+                sum = b_ext - a_ext;
+                res = ~sum[N-1:0] + 1; // Take two's complement
+            end
+        end
+
+        // Assign the result to output with consideration of potential overflow
+        c = res[N-1:0];
+    end
+
+endmodule
+```
+
+This module takes into account fixed-point arithmetic with correct handling of sign addition and subtraction, overflow control, and maintains precision dictated by fraction width. It uses an extra bit to check for overflow conditions, applying the two's complement where necessary to manage the sign of the result.

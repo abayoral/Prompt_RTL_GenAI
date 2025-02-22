@@ -6,16 +6,15 @@ module top_module (
     output reg [31:0] out
 );
 
-    reg [31:0] prev_in;
+    reg [31:0] in_d;
 
     always @(posedge clk) begin
         if (reset) begin
-            out <= 32'b0;
+            out <= 32'b0; // Reset all output bits to 0
         end else begin
-            // Capture the transition from 1 to 0
-            out <= out | (prev_in & ~in);
+            out <= out | (in_d & ~in); // Set output bits where there is a 1->0 transition
         end
-        prev_in <= in;
+        in_d <= in; // Store the previous state of the input
     end
 
 endmodule

@@ -1,24 +1,7 @@
-// You are provided with a BCD one-digit adder named bcd_fadd that adds 
-// two BCD digits and carry-in, and produces a sum and carry-out.
+In this exercise, you are asked to design a module that makes use of a provided BCD (Binary-Coded Decimal) one-digit adder, identified as `bcd_fadd`. This `bcd_fadd` adder module is capable of adding two BCD digit inputs, each represented as a 4-bit value (`input [3:0] a`, `input [3:0] b`), along with a carry-in (`input cin`). It outputs a 4-bit BCD sum (`output [3:0] sum`) and a carry-out (`output cout`). Although adding two single BCD digits might seem relatively straightforward, your task is to scale this operation to handle much larger BCD numbers.
 
-module bcd_fadd (
-    input [3:0] a,
-    input [3:0] b,
-    input     cin,
-    output   cout,
-    output [3:0] sum );
-    
-// Instantiate 100 copies of bcd_fadd to create a 100-digit BCD ripple-carry adder. 
-//Your adder should add two 100-digit BCD numbers (packed into 400-bit vectors) 
-//and a carry-in to produce a 100-digit sum and carry out.
+Specifically, you need to leverage the `bcd_fadd` module to construct a top-level module called `top_module`. This module should be capable of performing addition on two 100-digit BCD numbers, each encapsulated in a 400-bit vector (`input [399:0] a`, `input [399:0] b`). You will also have a single-bit carry-in input (`input cin`), reflecting any additional carry into the least significant digit of the addition process. The goal is for your solution to output a 400-bit BCD sum (`output [399:0] sum`) that represents the result of adding two 100-digit numbers, as well as an overall carry-out bit (`output cout`) that indicates whether there is an overflow from the most significant digit.
 
+The challenge in this task is effectively managing the ripple-carry across 100 instances of the `bcd_fadd` and ensuring that the carry-out from each less significant digit correctly influences the carry-in of the subsequent more significant digit. Given the nature of the problem and the scale of numbers being added, you might consider using an instance array or a generate statement in your design. This would facilitate replicating the `bcd_fadd` module 100 times while systematically wiring the carry-in and carry-out signals between consecutive digit additions.
 
-// Hint: An instance array or generate statement would be useful here.
-
-module top_module( 
-    input [399:0] a, b,
-    input cin,
-    output cout,
-    output [399:0] sum );
-    // Insert your cod here
-endmodule
+Once you structure your top-level module, it should function as a 100-digit BCD adder by cascading the individual BCD adders together, preserving the correct order of arithmetic operations from the least to the most significant digit. Remember, this assembly of the `bcd_fadd` in a chained manner produces a ripple-carry effect, which must be accurately managed throughout the sequence of digits for proper arithmetic operation. Writing the necessary code to implement this functionality represents the core of the task.

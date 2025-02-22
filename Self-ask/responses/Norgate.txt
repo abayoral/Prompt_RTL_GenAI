@@ -4,6 +4,7 @@ module top_module(
     input b, 
     output out );
 
+    // Perform a NOR operation
     assign out = ~(a | b);
 
 endmodule

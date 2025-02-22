@@ -1,8 +1,0 @@
-Self-ask/modules/Module_name.v:11: error: Unknown module type: mod_a
-2 error(s) during elaboration.
-*** These modules were missing:
-        mod_a referenced 1 times.
-***
-Module file path: Self-ask/modules/Module_name.v
-Testbench file path: hdlbits_testbenches/Module_name_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Self-ask/simulations/Module_name_sim', 'Self-ask/modules/Module_name.v', 'hdlbits_testbenches/Module_name_0_tb.v']' returned non-zero exit status 2.

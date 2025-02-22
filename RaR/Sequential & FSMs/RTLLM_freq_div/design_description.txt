@@ -1,31 +1,25 @@
-Please act as a professional verilog designer.
+As an experienced Verilog designer, you are tasked with engineering a frequency divider module that efficiently generates distinct output clock signals from a single input clock. The primary goal of this project is to take an input clock signal, which operates at a frequency of 100MHz, and divide it to produce three distinct output clock signals with frequencies of 50MHz, 10MHz, and 1MHz, respectively. Below is a detailed elaboration of the requirements and specifications for the module you will design:
 
-Implement a frequency divider that the input clock frequency of 100MHz signal, and the outputs are 3 clock frequencies: 50MHz, 10MHz, 1MHz.
+Module Specifications:
+- You are to develop a module named `freq_div`.
 
-Module name:  
-    freq_div      
+Inputs Required:
+1. `CLK_in`: This is the input clock signal with a frequency of 100MHz, serving as the source for generating the output clocks.
+2. `RST`: This signal is used to reset the module. When asserted, it initializes and resets the output clocks and any internal counters.
 
-Input ports:
-    CLK_in: Input clock signal
-    RST: Reset signal
+Outputs Required:
+1. `CLK_50`: This output should provide a clock signal at half of the input frequency, specifically 50MHz.
+2. `CLK_10`: This output is required to produce a clock signal at one-tenth of the input frequency, namely 10MHz.
+3. `CLK_1`: This output should generate a signal at one-hundredth of the input frequency, which is 1MHz.
 
-Output ports:
-    CLK_50: Output clock signal with a frequency of CLK_in divided by 2.
-    CLK_10: Output clock signal with a frequency of CLK_in divided by 10.
-    CLK_1: Output clock signal with a frequency of CLK_in divided by 100.
+Implementation Guide:
+- Solution for generating `CLK_50`:
+  * You need to create a mechanism that toggles the state of the `CLK_50` signal on every second positive edge of the `CLK_in`. This effectively divides the clocks in half. Ensure that, upon assertion of the `RST` signal, `CLK_50` is immediately reset to 0.
 
-Implementation:
-The module uses three counters to divide the input clock frequency. 
-CLK_50 generation:
-On every positive edge of CLK_in or RST, if RST is active, CLK_50 is set to 0.
-Otherwise, CLK_50 is toggled by inverting its current value.
-CLK_10 generation:
-On every positive edge of CLK_in or RST, if RST is active, CLK_10 is set to 0, and the counter cnt_10 is reset to 0.
-If the counter cnt_10 reaches a value of 4, CLK_10 is toggled by inverting its current value, and the counter cnt_10 is reset to 0.
-Otherwise, the counter cnt_10 is incremented by 1.
-CLK_1 generation:
-On every positive edge of CLK_in or RST, if RST is active, CLK_1 is set to 0, and the counter cnt_100 is reset to 0.
-If the counter cnt_100 reaches a value of 49, CLK_1 is toggled by inverting its current value, and the counter cnt_100 is reset to 0.
-Otherwise, the counter cnt_100 is incremented by 1.
+- Steps for generating `CLK_10`:
+  * A counter, referred to as `cnt_10`, is to be used to count cycles of the `CLK_in`. When the counter reaches a specific value (i.e., 4), the `CLK_10` signal should toggle, and the counter should be reset to zero. Make sure both `CLK_10` and `cnt_10` are reset to zero when `RST` is asserted.
 
-Give me the complete code.
+- Method for generating `CLK_1`:
+  * Another counter named `cnt_100` should be utilized to increment with each rising edge of `CLK_in`. When this counter reaches 49, toggle the `CLK_1` signal, and reset the counter to zero. With the `RST` signal's assertion, both `CLK_1` and `cnt_100` should return to zero.
+
+Your goal is to request the complete Verilog code to realize this specified functionality while conforming to industry-standard digital design practices and leveraging efficient techniques for creating counters and managing flip-flops within a Verilog hardware description language context. This ensures an optimal balance of clarity, efficiency, and hardware resource usage.

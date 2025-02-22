@@ -1,0 +1,44 @@
+```verilog
+module multi_booth_8bit (
+    input wire clk,
+    input wire reset,
+    input wire [7:0] a,
+    input wire [7:0] b,
+    output reg [15:0] p,
+    output reg rdy
+);
+    reg [15:0] multiplicand;
+    reg [16:0] multiplier;
+    reg [4:0] ctr;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            multiplicand <= {{8{b[7]}}, b};
+            multiplier <= {1'b0, {{8{a[7]}}, a}}; // initialize as 17-bit to include an extra bit for Booth's algorithm
+            p <= 16'b0;
+            ctr <= 5'b0;
+            rdy <= 1'b0;
+        end else begin
+            if (ctr < 5'd16) begin
+                // Booth's Encoding: Check last two bits of multiplier
+                if (multiplier[1:0] == 2'b01) begin
+                    // Add multiplicand to product
+                    p = p + multiplicand;
+                end else if (multiplier[1:0] == 2'b10) begin
+                    // Subtract multiplicand from product
+                    p = p - multiplicand;
+                end
+                // Arithmetic shift right multiplier and p
+                multiplier = {p[0], multiplier[16:1]}; 
+                p = {p[15], p[15:1]};
+                
+                // Increment cycle counter
+                ctr = ctr + 1;
+            end else begin
+                // Multiplication complete
+                rdy <= 1'b1;
+            end
+        end
+    end
+endmodule
+```

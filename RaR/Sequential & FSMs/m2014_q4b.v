@@ -1,13 +1,7 @@
-// Implement the following D flip-flop with asynchronous reset
+Imagine you are working as a senior Digital Design Engineer at a top-tier hardware design firm, a role that places you at the forefront of developing innovative and cutting-edge technology. You have been entrusted with a significant task: to develop a crucial Verilog module that will be a part of a next-generation product line. This module is of utmost importance because its proper implementation and functionality are critical for maintaining and enhancing your company's reputation in the highly competitive computer hardware industry. 
 
-module top_module (
-    input clk,
-    input d, 
-    input ar,   // asynchronous reset
-    output q);
+Your specific task is to implement a D flip-flop, which is a fundamental building block in digital design and circuits. This flip-flop must feature an asynchronous reset. The asynchronous reset allows the flip-flop to be reset independently of the clock signal, which is a vital functionality in certain applications where immediate resetting of the state is required, without waiting for a clock edge.
 
-    // Insert your code here
+The module you need to design should have a few key input signals: a clock (`clk`), a data input (`d`), and an asynchronous reset (`ar`). The output of this module is (`q`), which will represent the stored value of the input `d` after the clock edge, unless reset by the asynchronous reset. 
 
-endmodule
-
-
+Your challenge is to correctly implement the logic for this D flip-flop, ensuring that it handles the clock input and asynchronous reset condition effectively. It must reset the `q` output to its default state whenever the `ar` is activated, irrespective of the clock signal. This requires an understanding of how asynchronous logic interacts with clocked logic within Verilog. How would you go about defining this behavior within the Verilog module to meet these requirements?

@@ -8,7 +8,8 @@ module rom_tb;
         .dout(dout_tb)
     );
 
-    integer error;
+    integer error = 0;
+    integer total_tests = 0; // Counter for total test cases
 
     initial begin
         // Initialize simulation
@@ -16,6 +17,7 @@ module rom_tb;
         error = 0;
 
         // Test reading data from different memory locations
+        total_tests = total_tests + 1;
         addr_tb = 8'h00;  // Read from address 0
         #10;
         if (dout_tb !== 16'hA0A0) begin
@@ -23,6 +25,7 @@ module rom_tb;
             error = error + 1;
         end
 
+        total_tests = total_tests + 1;
         addr_tb = 8'h01;  // Read from address 1
         #10;
         if (dout_tb !== 16'hB1B1) begin
@@ -30,6 +33,7 @@ module rom_tb;
             error = error + 1;
         end
 
+        total_tests = total_tests + 1;
         addr_tb = 8'h02;  // Read from address 2
         #10;
         if (dout_tb !== 16'hC2C2) begin
@@ -37,6 +41,7 @@ module rom_tb;
             error = error + 1;
         end
 
+        total_tests = total_tests + 1;
         addr_tb = 8'h03;  // Read from address 3
         #10;
         if (dout_tb !== 16'hD3D3) begin
@@ -46,11 +51,15 @@ module rom_tb;
 
         // Add more test cases here if needed
 
-        // Check for errors
+        // Final test result summary
+        $display("=========== Test Summary ===========");
+        $display("Total Tests Run: %d", total_tests);
+        $display("Total Failures: %d", error);
+
         if (error == 0) begin
             $display("=========== Your Design Passed ===========");
         end else begin
-            $display("Test completed with %d errors.", error);
+            $display("=========== Test completed with %d / %d failures ===========", error, total_tests);
         end
 
         $finish;

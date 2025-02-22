@@ -1,0 +1,79 @@
+The Verilog code you have provided is designed to perform 16-bit multiplication using a shift-and-add algorithm. After reviewing the code, I've identified a few issues and improvements that can be made for better functionality and code safety.
+
+### Observed Issues
+1. **Shift Counting Logic**: The logic for `done_r` and reset for `i` is not correct. The multiplier is supposed to execute a shift-and-add 16 times, so `i` should be checked against specific values accurately.
+   
+2. **Multiplication Logic**: The logic that checks `areg[i-1]` should actually check `breg[i-1]` since it is the multiplier that determines when to add the shifted multiplicand.
+
+3. **Reset Logic**: The initialization of `areg` and `breg` before the multiplication starts is not properly resetting on `rst_n`, potentially causing incorrect operations if not properly checked.
+   
+4. **Output Update**: The `done` signal should only be activated once the entire operation is complete.
+
+5. **Edge Case Handling**: There is no explicit handling when `start` is de-asserted midway through an operation, leading to incomplete operations.
+
+### Corrected Version
+```verilog
+module multi_16bit (
+    input wire clk,
+    input wire rst_n,
+    input wire start,
+    input wire [15:0] ain,
+    input wire [15:0] bin,
+    output reg [31:0] yout,
+    output reg done
+);
+
+    reg [4:0] i; // Counter to track the shift count
+    reg [15:0] areg; // Register to store the multiplicand
+    reg [15:0] breg; // Register to store the multiplier
+    reg [31:0] yout_r; // Register to store the intermediate product
+    reg done_r; // Register to store the done flag
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            i <= 5'b0;
+            done_r <= 1'b0;
+            areg <= 16'b0;
+            breg <= 16'b0;
+            yout_r <= 32'b0;
+        end else if (start) begin
+            if (i == 0) begin
+                // Initialize the values
+                areg <= ain;
+                breg <= bin;
+                yout_r <= 32'b0;
+                done_r <= 1'b0;
+            end 
+            
+            if (i >= 0 && i < 16) begin
+                if (breg[i]) begin
+                    yout_r <= yout_r + (areg << i);
+                end
+                i <= i + 1; // Increment counter
+            end
+            
+            if (i == 16) begin
+                done_r <= 1'b1; // Set done when finished
+                i <= i + 1; // Increment once more to stop operations
+            end
+
+            if (i == 17 && start == 1'b0) begin
+                // Reset the state when done and start is de-asserted
+                i <= 5'b0;
+                done_r <= 1'b0;
+            end
+        end
+
+        // Update outputs
+        yout <= yout_r;
+        done <= done_r;
+    end
+
+endmodule
+```
+
+### Explanation:
+1. **Reset Initialization**: All registers are cleared when `rst_n` is low.
+2. **Accurate Shift Based on Multiplier**: Uses the `breg[i]` signal to decide when to add the shifted `areg`.
+3. **Complete Cycle Handling**: Resets when operation is finished and `start` is de-asserted.
+4. **Simplified Logic**: Each segment clearly represents initialization, operation, and completion stages.

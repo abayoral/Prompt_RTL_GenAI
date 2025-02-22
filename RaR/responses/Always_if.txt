@@ -1,24 +1,24 @@
 ```verilog
-// synthesis verilog_input_version verilog_2001
-module top_module(
-    input a,
-    input b,
-    input sel_b1,
-    input sel_b2,
-    output wire out_assign,
-    output reg out_always
-); 
+module top_module (
+    input wire a,          // Input a
+    input wire b,          // Input b
+    input wire sel_b1,     // Selection input 1
+    input wire sel_b2,     // Selection input 2
+    output wire out_assign, // Output for assign method
+    output reg out_always  // Output for always block method
+);
 
-    // Concurrent assignment implementation
-    assign out_assign = (sel_b1 && sel_b2) ? b : a;
+// Continuous assignment with assign statement
+assign out_assign = (sel_b1 && sel_b2) ? b : a;
 
-    // Procedural if-statement implementation
-    always @(*) begin
-        if (sel_b1 && sel_b2)
-            out_always = b;
-        else
-            out_always = a;
+// Procedural assignment with always block
+always @(*) begin
+    if (sel_b1 && sel_b2) begin
+        out_always = b;
+    end else begin
+        out_always = a;
     end
+end
 
 endmodule
 ```

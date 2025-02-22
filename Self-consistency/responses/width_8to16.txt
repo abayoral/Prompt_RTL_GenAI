@@ -1,0 +1,41 @@
+module width_8to16 (
+    input wire clk,
+    input wire rst_n,
+    input wire valid_in,
+    input wire [7:0] data_in,
+    output reg valid_out,
+    output reg [15:0] data_out
+);
+
+// Internal register to hold the first 8-bit input
+reg [7:0] data_temp;
+reg data_temp_valid;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        // Reset condition: clear all registers
+        data_out <= 16'd0;
+        valid_out <= 1'b0;
+        data_temp <= 8'd0;
+        data_temp_valid <= 1'b0;
+    end else begin
+        if (valid_in) begin
+            if (!data_temp_valid) begin
+                // Store the first 8-bit data into the temporary register
+                data_temp <= data_in;
+                data_temp_valid <= 1'b1;
+                valid_out <= 1'b0;
+            end else begin
+                // Concatenate the data from the temporary register and the current input
+                data_out <= {data_temp, data_in};
+                valid_out <= 1'b1;
+                data_temp_valid <= 1'b0;
+            end
+        end else begin
+            // Deactivate the valid_out when inputs are not valid
+            valid_out <= 1'b0;
+        end
+    end
+end
+
+endmodule

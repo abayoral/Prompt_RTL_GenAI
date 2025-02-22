@@ -1,15 +1,18 @@
 ```verilog
 module top_module (
-    input clk,      // Clock signal
-    input [7:0] in, // 8-bit input vector
-    output reg [7:0] anyedge // 8-bit output vector indicating 0 to 1 transitions
-); 
+    input clk,
+    input [7:0] in,
+    output reg [7:0] anyedge
+);
 
     reg [7:0] prev_in;
 
     always @(posedge clk) begin
-        anyedge <= (in & ~prev_in);
-        prev_in <= in;
+        prev_in <= in; // Store the previous state of the input
+    end
+
+    always @(posedge clk) begin
+        anyedge <= (~prev_in) & in; // Detect 0 to 1 transitions
     end
 
 endmodule

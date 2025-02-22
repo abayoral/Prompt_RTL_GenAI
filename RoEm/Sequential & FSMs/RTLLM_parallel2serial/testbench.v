@@ -21,6 +21,8 @@ module parallel2serial_tb;
   integer error = 0;
   integer failcase = 0;
   integer i = 0;
+  integer timeout;
+
   initial begin
     for (i=0; i<100; i=i+1) begin
         error = 0;
@@ -33,22 +35,27 @@ module parallel2serial_tb;
         rst_n = 1;
         #10;
         d = $random;
-        while (valid_out == 0) begin
-            @(posedge clk); // Wait for one clock cycle
+        
+        // Timeout mechanism for valid_out assertion
+        timeout = 1000;
+        while (valid_out == 0 && timeout > 0) begin
+            @(posedge clk);
+            timeout = timeout - 1;
         end
-        // $display("dout = %b, valid_out = %b", dout, valid_out);
+        
+        if (timeout == 0) begin
+            $display("ERROR: Timeout waiting for valid_out signal");
+            $finish;
+        end
+        
         error = (dout == d[3] && valid_out==1) ? error : error+1;
         #10;
-        // $display("dout = %b, valid_out = %b", dout, valid_out);
         error = (dout == d[2] && valid_out==0) ? error : error+1;
         #10;
-        // $display("dout = %b, valid_out = %b", dout, valid_out);
         error = (dout == d[1] && valid_out==0) ? error : error+1;
         #10;
-        // $display("dout = %b, valid_out = %b", dout, valid_out);
         error = (dout == d[0] && valid_out==0) ? error : error+1;
         #10;
-        // $display("dout = %b, valid_out = %b", dout, valid_out);
         error = (valid_out==1) ? error : error+1;
         #10;
         failcase = (error==0)? failcase :failcase+1;
@@ -64,4 +71,3 @@ module parallel2serial_tb;
   end
 
 endmodule
-

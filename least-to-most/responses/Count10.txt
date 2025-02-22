@@ -2,19 +2,17 @@
 module top_module (
     input clk,
     input reset,        // Synchronous active-high reset
-    output reg [3:0] q);
+    output reg [3:0] q  // Declare q as a register since it will be updated in always block
+);
 
+    // Always block triggered by the rising edge of the clock
     always @(posedge clk) begin
         if (reset) begin
-            q <= 4'b0000;
-        end
-        else begin
-            if (q == 4'b1001) begin
-                q <= 4'b0000;
-            end
-            else begin
-                q <= q + 1;
-            end
+            q <= 4'b0000;  // Reset the counter to 0
+        end else if (q == 4'b1001) begin
+            q <= 4'b0000;  // Reset to 0 after counting to 9
+        end else begin
+            q <= q + 1'b1;  // Increment the counter
         end
     end
 

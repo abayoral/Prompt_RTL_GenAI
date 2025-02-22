@@ -4,11 +4,12 @@ module top_module(
     input b,
     input c,
     input d,
-    output out  
+    output out
 );
 
-    // Simplified logic expression from the Karnaugh map
-    assign out = (a & ~c) | (b & ~d) | (~b & c & d) | (~a & ~c & ~d);
+    // Sum-of-Products (SOP) form based on the K-map
+    // Simplified expression: out = (a' & b & d') | (a & b' & d) | (a & b & d')
+    assign out = (~a & b & ~d) | (a & ~b & d) | (a & b & ~d);
 
 endmodule
 ```

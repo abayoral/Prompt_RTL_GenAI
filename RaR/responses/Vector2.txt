@@ -3,10 +3,11 @@ module top_module(
     input [31:0] in,
     output [31:0] out );
 
-    assign out[31:24] = in[7:0];
-    assign out[23:16] = in[15:8];
-    assign out[15:8] = in[23:16];
-    assign out[7:0] = in[31:24];
+    // Perform byte reversal using part-select operations
+    assign out[31:24] = in[7:0];   // First byte of input becomes the last byte of output
+    assign out[23:16] = in[15:8];  // Second byte of input becomes the third byte of output
+    assign out[15:8]  = in[23:16]; // Third byte of input becomes the second byte of output
+    assign out[7:0]   = in[31:24]; // Last byte of input becomes the first byte of output
 
 endmodule
 ```

@@ -3,52 +3,60 @@ import os
 import glob
 import sys
 
-
 def check_test_results(file_path, is_rtllm):
     with open(file_path, 'r') as file:
         content = file.readlines()
 
     if is_rtllm:
-        # For RTLLM directories
+        if len(content) == 0:
+            return False, 0, 100
+        
+        if any("error" in line.lower() for line in content):
+            return False, 0, 100
+        
         simulation_successful = any("Your Design Passed" in line for line in content)
-        errors = sum(int(line.split()[4]) for line in content if "Test completed with" in line)
-        total_tests = 100  # As per the RTLLM benchmark description
-        passed_tests = total_tests - errors
 
-        if simulation_successful:
-            return True, passed_tests, total_tests
+        test_summary_line = next((line for line in content if "Test Summary" in line), None)
+        if test_summary_line:
+            try:
+                total_tests = int([line for line in content if "Total Tests Run:" in line][0].split()[-1])
+                errors = int([line for line in content if "Total Failures:" in line][0].split()[-1])
+            except (IndexError, ValueError):
+                total_tests = 100
+                errors = sum(int(line.split()[4]) for line in content if "Test completed with" in line and line.split()[4].isdigit())
         else:
-            return False, passed_tests, total_tests
+            total_tests = 100
+            errors = sum(int(line.split()[4]) for line in content if "Test completed with" in line and line.split()[4].isdigit())
+
+        if errors == 0 and total_tests == 100:
+            errors = 0  
+
+        passed_tests = total_tests - errors
+        return simulation_successful, passed_tests, total_tests
+
     else:
-        # For normal directories
+        if len(content) == 0:
+            return False, 0, 100  
+
+        if any("error" in line.lower() for line in content):
+            return False, 0, 100
+        
         simulation_successful = any("Simulation completed successfully." in line for line in content)
-        
-        # Count the number of tests passed
         passed_tests = sum(1 for line in content if "passed!" in line)
-        
-        # Count the total number of tests
         total_tests = sum(1 for line in content if line.startswith("Test"))
 
-        if not simulation_successful:
-            return False, 0, total_tests
+        return simulation_successful, passed_tests, total_tests if simulation_successful else (False, 0, total_tests)
 
-        if passed_tests == total_tests:
-            return True, passed_tests, total_tests
-        else:
-            return False, passed_tests, total_tests
 
-# Ensure the script is called with exactly one argument
 if len(sys.argv) != 2:
     print("Usage: python script_name.py <framework_name>")
     sys.exit(1)
 
-# Get the framework name from the command line arguments
 framework_name = sys.argv[1]
-
 succ_counter = {}
+pass_k_counter = {}  # Track pass@k success
 os.environ['framework_name'] = framework_name
 
-# Define the directory paths based on framework_name
 if framework_name == "RaR":
     framework_directory = os.path.join(os.getcwd(), "RaR")
     script_path = os.path.join(framework_directory, "rar.py")
@@ -59,88 +67,107 @@ else:
     framework_directory = os.path.join(os.getcwd(), framework_name)
     script_path = None
 
-# Directories to iterate through
-prompt_directories = [
-    "Arithmetic & Data",
-    "Modular & Advanced",
-    "Sequential & FSMs",
-    "Basic-Combinational"
-]
+prompt_directories = ["Sequential & FSMs", "Basic-Combinational", "Arithmetic & Data", "Modular & Advanced"]
+#prompt_directories = ["Sequential & FSMs", "Basic-Combinational"]; 
 
-# Perform iterations for each directory
 for prompt_dir in prompt_directories:
     prompts_dir = os.path.join(framework_directory, prompt_dir)
-    stats_dir = os.path.join(prompts_dir, 'stats')  # stats is in the prompt dir
-    os.makedirs(stats_dir, exist_ok=True)  # Ensure the stats directory exists
+    stats_dir = os.path.join(prompts_dir, 'stats')
+    os.makedirs(stats_dir, exist_ok=True)
+
+    succ_counter = {}  
+    pass_k_counter = {}  
 
     for i in range(5):
         if script_path:
             print(f"Executing {script_path} for framework {framework_name}, prompts in '{prompt_dir}' (iteration {i + 1})...")
             try:
-                subprocess.run(['python', script_path], check=True)
+                subprocess.run(['python', script_path, prompts_dir], check=True)
                 print(f"Execution of {script_path} completed successfully.")
             except subprocess.CalledProcessError as e:
                 print(f"Error executing {script_path}: {e}")
                 continue
 
         subprocess.run(['python', 'main.py', framework_name, prompt_dir], check=True)
-
-        # Get all log files in the stats directory
         stats_files = glob.glob(os.path.join(stats_dir, '*.txt'))
 
-        # Iterate through each log file and check the test results
         for stats_file in stats_files:
             stats_file_name = os.path.splitext(os.path.basename(stats_file))[0]
 
-            # Determine if it's an RTLLM directory
+            if stats_file_name.startswith("RTLLM_"):
+                clean_stats_file_name = stats_file_name[6:]
+            else:
+                clean_stats_file_name = stats_file_name
+            
+
             is_rtllm = "RTLLM_" in stats_file_name
 
-            # Initialize the dictionary entry to 0 if it doesn't exist
             if stats_file_name not in succ_counter:
-                succ_counter[stats_file_name] = [0, 0, 0]
+                succ_counter[stats_file_name] = [0, 0, 0, []]  # Success count, total passed, total tests, success ratios
+                pass_k_counter[stats_file_name] = [False] * 5  # Track success per iteration
 
             results = check_test_results(stats_file, is_rtllm)
 
-            if results[0]:
-                succ_counter[stats_file_name][0] += 1
+            if results[0]:  # If the test passed in this iteration
+                pass_k_counter[stats_file_name][i] = True  # Mark this iteration as successful
+                succ_counter[stats_file_name][0] += 1  
+
+            succ_counter[stats_file_name][1] += results[1]  
+            succ_counter[stats_file_name][2] += results[2]  
+            succ_counter[stats_file_name][3].append(results[1] / results[2] if results[2] != 0 else 0)
+
+            with open(stats_file, "w") as s_file:
+                s_file.truncate(0)  # Clear the log file after execution
+
+            responses_file = os.path.join(framework_directory, "responses", f"{clean_stats_file_name}.v")
+            modules_file = os.path.join(framework_directory, "modules", f"{clean_stats_file_name}.v")
+
+             # Clear the corresponding .v files if they exist
+            for file_path in [responses_file, modules_file]:
+                if os.path.exists(file_path):
+                    with open(file_path, "w") as f:
+                        f.truncate(0)
             
-            succ_counter[stats_file_name][1] += results[1]
-            succ_counter[stats_file_name][2] += results[2]
-            succ_counter[stats_file_name].append(results[1] / results[2] if results[2] != 0 else 0)
 
-    # Ensure the metrics directory exists
+            
+
     metrics_dir = os.path.join(framework_directory, 'metrics')
-    if not os.path.exists(metrics_dir):
-        os.makedirs(metrics_dir)
-
-    # Write the results to a separate metrics file for each directory
+    os.makedirs(metrics_dir, exist_ok=True)
     metrics_file_path = os.path.join(metrics_dir, f'metrics_{prompt_dir.replace(" ", "_")}.txt')
 
     with open(metrics_file_path, 'w') as metrics_file:
-        # Define the column widths
         name_width = 17
         success_width = 13
         ratio_width = 24
         total_success_width = 10
         overall_success_width = 7
+        pass_k_width = 12
 
-        # Writing header
-        metrics_file.write(f"{'Name'.ljust(name_width)} | {'Overall Success'.ljust(success_width)} | "
-                           f"{'Success Ratio Iteration 1'.ljust(ratio_width)} | "
-                           f"{'Success Ratio Iteration 2'.ljust(ratio_width)} | "
-                           f"{'Success Ratio Iteration 3'.ljust(ratio_width)} | "
-                           f"{'Success Ratio Iteration 4'.ljust(ratio_width)} | "
-                           f"{'Success Ratio Iteration 5'.ljust(ratio_width)} | "
-                           f"{'Total Success'.ljust(total_success_width)} | "
-                           f"{'Sum of Ratios'.ljust(overall_success_width)}\n")
-        
+        header = (f"{'Name'.ljust(name_width)} | {'Overall Success'.ljust(success_width)} | "
+                  f"{'Success Ratio Iteration 1'.ljust(ratio_width)} | "
+                  f"{'Success Ratio Iteration 2'.ljust(ratio_width)} | "
+                  f"{'Success Ratio Iteration 3'.ljust(ratio_width)} | "
+                  f"{'Success Ratio Iteration 4'.ljust(ratio_width)} | "
+                  f"{'Success Ratio Iteration 5'.ljust(ratio_width)} | "
+                  f"{'Total Success'.ljust(total_success_width)} | "
+                  f"{'Sum of Ratios'.ljust(overall_success_width)} | "
+                  f"{'Pass@1'.ljust(pass_k_width)} | {'Pass@2'.ljust(pass_k_width)} | "
+                  f"{'Pass@3'.ljust(pass_k_width)} | {'Pass@4'.ljust(pass_k_width)} | "
+                  f"{'Pass@5'.ljust(pass_k_width)}\n")
+
+        metrics_file.write(header)
+
         for key, value in succ_counter.items():
-            # Formatting the output for Total Success with "/5"
             total_success = f"{value[0]}/5".ljust(success_width)
-            success_ratios = ' | '.join(f"{ratio:24.2f}" for ratio in value[3:])
-            overall_success_ratio = value[1] / value[2] if value[2] != 0 else 0.0  # Prevent division by zero
-            sum_of_ratios = sum(value[3:])  # Calculate the sum of success ratios from value[3:]
+            success_ratios = ' | '.join(f"{ratio:24.2f}" for ratio in value[3])
+            overall_success_ratio = value[1] / value[2] if value[2] != 0 else 0.0
+            sum_of_ratios = sum(value[3])
+
+            # Compute pass@k values correctly
+            pass_k_results = [1 if any(pass_k_counter[key][:k + 1]) else 0 for k in range(5)]
+            pass_k_values = ' | '.join(f"{pass_k_results[k]:12d}" for k in range(5))
+
             metrics_file.write(f"{key.ljust(name_width)} | {total_success} | {success_ratios} | "
-                               f"{overall_success_ratio:24.2f} | {sum_of_ratios:7.2f}\n")
+                               f"{overall_success_ratio:24.2f} | {sum_of_ratios:7.2f} | {pass_k_values}\n")
 
     print(f"Metrics saved to {metrics_file_path}")

@@ -1,0 +1,58 @@
+The provided Verilog code defines a simple digital clock module. However, there are a few issues and improvements that need to be addressed for correctness and efficiency:
+
+1. **Simultaneous Events Handling**: The three always blocks are all driven by the same clock and reset events, but each block updates related counters based on other counters reaching their maximum values. This approach can cause issues in simulation due to not properly handling simultaneous transitions, especially at their boundary conditions.
+
+2. **Secure Reset Handling**: To improve stability, all registers should be reset appropriately in one block, ensuring a clear state upon reset.
+
+3. **Counter Increment Independence**: Incrementing `Mins` should only occur after `Secs` reaches 59, and `Hours` should increment only after both `Secs` is 59 and `Mins` is 59. This means that Mins and Hours should have dependencies on Secs and Mins values.
+
+4. **Best Practice in Edge Sensitive Design**: Instead of each block being triggered by `posedge CLK or posedge RST`, there's an advantage in combining some logic so updates happen together logically when a new second or minute occurs.
+
+Here’s the corrected version with some improvements:
+
+```verilog
+module calendar(
+    input wire CLK,
+    input wire RST,
+    output reg [5:0] Secs,
+    output reg [5:0] Mins,
+    output reg [4:0] Hours // 5 bits are sufficient for a range 0 to 23
+);
+
+    always @(posedge CLK or posedge RST) begin
+        if (RST) begin
+            // Reset conditions
+            Secs <= 6'd0;
+            Mins <= 6'd0;
+            Hours <= 5'd0;
+        end else begin
+            // Seconds handling
+            if (Secs == 6'd59) begin
+                Secs <= 6'd0;
+                // Minutes handling
+                if (Mins == 6'd59) begin
+                    Mins <= 6'd0;
+                    // Hours handling
+                    if (Hours == 5'd23) begin
+                        Hours <= 5'd0;
+                    end else begin
+                        Hours <= Hours + 1'b1;
+                    end
+                end else begin
+                    Mins <= Mins + 1'b1;
+                end
+            end else begin
+                Secs <= Secs + 1'b1;
+            end
+        end
+    end
+
+endmodule
+```
+
+**Key Improvements:**
+- Combined all logic into a single always block to manage dependencies directly.
+- Changed the `Hours` register to use 5 bits since 24 states (0 to 23) only require 5 bits.
+- Improved reset logic by initializing all counters together when reset is triggered. 
+
+This creates a more efficient and reliable implementation of the calendar module.

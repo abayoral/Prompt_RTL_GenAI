@@ -1,3 +1,5 @@
+Thank you for the clarification. Let's proceed with the Verilog module implementation. 
+
 ```verilog
 module top_module (
     input ring,
@@ -6,11 +8,11 @@ module top_module (
     output motor         // Vibrate
 );
 
-    // If vibrate_mode is on and ring is active, motor should be on.
-    assign motor = ring & vibrate_mode;
+    // The motor is on when vibrate_mode is 1 and ring is 1
+    assign motor = (vibrate_mode && ring);
 
-    // If vibrate_mode is off and ring is active, ringer should be on.
-    assign ringer = ring & ~vibrate_mode;
+    // The ringer is on when vibrate_mode is 0 and ring is 1
+    assign ringer = (!vibrate_mode && ring);
 
 endmodule
 ```

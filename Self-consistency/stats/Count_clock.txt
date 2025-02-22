@@ -1,8 +1,0 @@
-Self-consistency/modules/Count_clock.v:48: error: Concatenation operand "(mm_tens)+('sd1)" has indefinite width.
-Self-consistency/modules/Count_clock.v:51: error: Concatenation operand "(mm_ones)+('sd1)" has indefinite width.
-Self-consistency/modules/Count_clock.v:54: error: Concatenation operand "(ss_tens)+('sd1)" has indefinite width.
-Self-consistency/modules/Count_clock.v:57: error: Concatenation operand "(ss_ones)+('sd1)" has indefinite width.
-4 error(s) during elaboration.
-Module file path: Self-consistency/modules/Count_clock.v
-Testbench file path: hdlbits_testbenches/Count_clock_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'Self-consistency/simulations/Count_clock_sim', 'Self-consistency/modules/Count_clock.v', 'hdlbits_testbenches/Count_clock_0_tb.v']' returned non-zero exit status 4.

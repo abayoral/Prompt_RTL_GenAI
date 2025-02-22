@@ -11,9 +11,9 @@ module test_alu();
     wire negative;
     wire overflow;
     wire flag;
-    reg[4:0]cnt;
+    reg [4:0] cnt;
     
-    alu uut(a,b,aluc,r,zero,carry,negative,overflow,flag);
+    alu uut(a, b, aluc, r, zero, carry, negative, overflow, flag);
 
     parameter ADD = 6'b100000;
     parameter ADDU = 6'b100001;
@@ -34,55 +34,62 @@ module test_alu();
     parameter JR = 6'b001000;
     parameter LUI = 6'b001111;
 
-    reg[5:0]opcodes[0:31];
-    reg[31:0]reference[0:31];
-    reg error=0;
+    reg [5:0] opcodes[0:31];
+    reg [31:0] reference[0:31];
+    integer error = 0;  // Updated to integer for better tracking
+    integer total_tests = 0; // Counter for total test cases
     integer file_open;
+
     initial begin
+        $readmemh("reference.dat", reference);
 
-    $readmemh("reference.dat",reference);
+        opcodes[0] = ADD;
+        opcodes[1] = ADDU;
+        opcodes[2] = SUB;
+        opcodes[3] = SUBU;
+        opcodes[4] = AND;
+        opcodes[5] = OR;
+        opcodes[6] = XOR;
+        opcodes[7] = NOR;
+        opcodes[8] = SLT;
+        opcodes[9] = SLTU;
+        opcodes[10] = SLL;
+        opcodes[11] = SRL;
+        opcodes[12] = SRA;
+        opcodes[13] = SLLV;
+        opcodes[14] = SRLV;
+        opcodes[15] = SRAV;
+        //opcodes[16] = JR; // JR was commented out in the original
+        opcodes[16] = LUI;
 
-    opcodes[0]=ADD;
-    opcodes[1]=ADDU;
-    opcodes[2]=SUB;
-    opcodes[3]=SUBU;
-    opcodes[4]=AND;
-    opcodes[5]=OR;
-    opcodes[6]=XOR;
-    opcodes[7]=NOR;
-    opcodes[8]=SLT;
-    opcodes[9]=SLTU;
-    opcodes[10]=SLL;
-    opcodes[11]=SRL;
-    opcodes[12]=SRA;
-    opcodes[13]=SLLV;
-    opcodes[14]=SRLV;
-    opcodes[15]=SRAV;
-    //opcodes[16]=JR;
-    opcodes[16]=LUI;
-    a=32'h0000001c;
-    b=32'h00000021;
-    #5;
-
-    cnt = 0;
-
-    
-    for(cnt=0;cnt<17;cnt=cnt+1)
-        begin
+        a = 32'h0000001c;
+        b = 32'h00000021;
         #5;
-        aluc=opcodes[cnt];
-        #5;
-        error=error|(reference[cnt]!=r);
-    end
 
-	if(error==0)
-	begin
-		$display("===========Your Design Passed===========");
+        cnt = 0;
+
+        for (cnt = 0; cnt < 17; cnt = cnt + 1) begin
+            total_tests = total_tests + 1; // Increment total test count
+            #5;
+            aluc = opcodes[cnt];
+            #5;
+            if (reference[cnt] != r) begin
+                error = error + 1;
+                $display("Test failed: Opcode = %b, Expected = %h, Got = %h", aluc, reference[cnt], r);
+            end
         end
-	else
-	begin
-		$display("===========Error===========");
-	end
-    $finish;
+
+        // Final test result summary
+        $display("=========== Test Summary ===========");
+        $display("Total Tests Run: %d", total_tests);
+        $display("Total Failures: %d", error);
+
+        if (error == 0) begin
+            $display("=========== Your Design Passed ===========");
+        end else begin
+            $display("=========== Test completed with %d / %d failures ===========", error, total_tests);
+        end
+
+        $finish;
     end
 endmodule

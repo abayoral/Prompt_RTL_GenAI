@@ -1,5 +1,0 @@
-CoT/modules/Fsm3.v:8: syntax error
-CoT/modules/Fsm3.v:8: error: Invalid module instantiation
-Module file path: CoT/modules/Fsm3.v
-Testbench file path: hdlbits_testbenches/Fsm3_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/Fsm3_sim', 'CoT/modules/Fsm3.v', 'hdlbits_testbenches/Fsm3_0_tb.v']' returned non-zero exit status 2.

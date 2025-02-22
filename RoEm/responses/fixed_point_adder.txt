@@ -1,0 +1,46 @@
+```verilog
+module fixed_point_adder #(parameter Q = 8, parameter N = 16) (
+    input wire [N-1:0] a,
+    input wire [N-1:0] b,
+    output reg [N-1:0] c
+);
+    reg [N-1:0] temp_a, temp_b, res;
+    reg sign_a, sign_b;
+
+    always @(*) begin
+        // Get the sign bits
+        sign_a = a[N-1];
+        sign_b = b[N-1];
+
+        // Take absolute value
+        temp_a = sign_a ? (~a + 1) : a;
+        temp_b = sign_b ? (~b + 1) : b;
+
+        if (sign_a == sign_b) begin
+            // Same signs: perform addition
+            res = temp_a + temp_b;
+            // Assign the sign of the inputs to the result
+            c = sign_a ? (~res + 1) : res;
+        end else begin
+            // Different signs: perform subtraction
+            if (temp_a >= temp_b) begin
+                res = temp_a - temp_b;
+                c = sign_a ? (~res + 1) : res;
+            end else begin
+                res = temp_b - temp_a;
+                c = sign_b ? (~res + 1) : res;
+            end
+        end
+
+        // Check for overflow and saturation
+        if ((sign_a == sign_b && res[N-1] != sign_a) || (res[N-1] && !sign_a && !sign_b) || (!res[N-1] && sign_a && sign_b)) begin
+            if (sign_a)
+                c = {1'b1, {(N-1){1'b0}}}; // Negative overflow, saturate at min value
+            else
+                c = {1'b0, {(N-1){1'b1}}}; // Positive overflow, saturate at max value
+        end
+    end
+endmodule
+```
+
+This code defines a parameterized Verilog module `fixed_point_adder` with parameters `Q` for fractional bits and `N` for total bits. It includes inputs `a` and `b`, and an output `c`, all N-bit wide, for fixed-point addition. Internal logic is used to handle the addition based on the signs of the inputs, ensuring correct sign handling and overflow prevention. Overflow handling is done by saturating the output to min or max values when overflow is detected.

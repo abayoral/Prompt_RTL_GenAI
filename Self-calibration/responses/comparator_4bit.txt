@@ -1,0 +1,39 @@
+The provided Verilog module is a 4-bit comparator that attempts to determine if one 4-bit input (`A`) is greater than, equal to, or less than another 4-bit input (`B`). Let's review and correct any issues in the code. 
+
+### Issues Identified:
+1. **Subtraction for Comparison**: The logic for determining if `A` is greater, equal, or less than `B` seems mostly correct but could be simplified or clarified.
+2. **Borrow Bit Interpretation**: The borrow bit determines whether `A` is less than `B` in unsigned subtraction. However, the current usage needs verification in this context.
+3. **Redundant Conditions**: The condition for `A_equal` can be simplified since it should logically align with `A - B` resulting in zero without needing a separate `==` check.
+
+### Corrections & Best Practices:
+1. **Logical Expressions**: Simplify the logic used for determining when `A` is greater or equal.
+2. **Clean Code**: Ensure logic directly reflects functionality.
+
+Here's the revised code:
+
+```verilog
+module comparator_4bit (
+    input [3:0] A,
+    input [3:0] B,
+    output A_greater,
+    output A_equal,
+    output A_less
+);
+    // Use subtraction to derive comparison. Equivalent to direct comparison.
+    wire [4:0] diff = {1'b0, A} - {1'b0, B}; // Extending to 5 bits to observe borrow
+
+    // Assign outputs based on diff
+    assign A_greater = diff[4] == 0 && diff[3:0] != 0; // No borrow and non-zero difference
+    assign A_equal = diff[3:0] == 0;                   // Result is zero indicating equality
+    assign A_less = diff[4] == 1;                      // Borrow indicates A < B
+
+endmodule
+```
+
+### Explanation:
+- **Sign Extension**: The subtraction `diff` includes a higher-order bit (5th bit `diff[4]`) to correctly capture a borrow condition when `A` is less than `B`.
+- **Comparisons**: 
+  - `A_greater`: Checks for no borrow and non-zero `diff`.
+  - `A_equal`: Simply checks if `diff` in lower 4-bits is zero.
+  - `A_less`: Checks if the borrow bit `diff[4]` is set.
+- This logic ensures the correct determination of comparison outputs based on standard unsigned binary arithmetic.

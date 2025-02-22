@@ -1,0 +1,55 @@
+The provided Verilog code for the `signal_generator` module generally looks correct. However, I'll review it for potential improvements in readability and practices. Here's the revised version with explanations:
+
+```verilog
+module signal_generator (
+    input wire clk,      // Explicitly specify wire for input ports for clarity
+    input wire rst_n,
+    output reg [4:0] wave
+);
+
+    reg state; // 0 for incrementing, 1 for decrementing
+
+    // Improved sensitivity list: The original list is correct since it uses posedge and negedge as intended. No changes needed in this part.
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset conditions
+            wave <= 5'd0;   // Initialize wave to 0 on reset
+            state <= 1'b0;  // Initialize state to increment mode
+        end else begin
+            case (state)
+                1'b0: begin
+                    // Increment mode
+                    if (wave == 5'd31) begin
+                        // Switch to decrement mode
+                        state <= 1'b1;
+                    end else begin
+                        // Increment wave
+                        wave <= wave + 5'd1;  // Use 5'd1 for clarity and consistency
+                    end
+                end
+                1'b1: begin
+                    // Decrement mode
+                    if (wave == 5'd0) begin
+                        // Switch to increment mode
+                        state <= 1'b0;
+                    end else begin
+                        // Decrement wave
+                        wave <= wave - 5'd1;  // Use 5'd1 for clarity and consistency
+                    end
+                end
+                default: state <= 1'b0; // Additional case for completeness and safety
+            endcase
+        end
+    end
+
+endmodule
+```
+
+### Key Points and Improvements:
+1. **Port Declarations Explicitly as `wire`:** The input ports are inherently wires, but specifying them can improve readability and consistency.
+
+2. **Arithmetic Operations:** In the arithmetic operations (`wave <= wave + 1;` and `wave <= wave - 1;`), although it's syntactically correct without specifying bit width, I've added `5'd1` to make it more explicit that we're dealing with 5-bit arithmetic, which can improve readability.
+
+3. **Default Case in State Machine:** Added a `default` case to the `case` statement to handle unexpected states. This change ensures that the logic is safer and helps in debugging by covering all potential cases even if unexpected behavior occurs or in case another value mistakenly gets assigned to `state`.
+
+These changes ensure the code is clear, robust, and adheres to best practices. The design intent is maintained: smoothly transitioning between incrementing and decrementing the `wave` signal while resetting on `rst_n`.

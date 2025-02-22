@@ -1,0 +1,43 @@
+To design the 4-bit comparator as specified, we will use combinational logic. The module will compare the two 4-bit numbers `A` and `B` and produce the outputs `A_greater`, `A_equal`, and `A_less`. We'll achieve this by directly comparing the two vectors, taking advantage of Verilog's built-in comparison operators which streamline the process compared to manually analyzing bit-by-bit borrow conditions.
+
+Here's the Verilog code implementing the required functionality:
+
+```verilog
+module comparator_4bit (
+    input wire [3:0] A,
+    input wire [3:0] B,
+    output wire A_greater,
+    output wire A_equal,
+    output wire A_less
+);
+    // Comparator logic:
+    // A_greater is high if A is greater than B
+    // A_equal is high if A and B are equal
+    // A_less is high if A is less than B
+    assign A_greater = (A > B);
+    assign A_equal = (A == B);
+    assign A_less = (A < B);
+
+endmodule
+```
+
+**Chain of Thought Explanation:**
+
+1. **Understand the Requirements:** 
+   - We need to compare two 4-bit numbers, `A` and `B`, and determine which is greater, if they're equal, or if one is less than the other.
+
+2. **Determine Inputs and Outputs:**
+   - Inputs: `A [3:0]`, `B [3:0]`
+   - Outputs: `A_greater`, `A_equal`, `A_less`
+
+3. **Combinational Logic Implementation:**
+   - Establish logical conditions for each output.
+   - Use the comparison operators in Verilog to determine the relationships:
+     - `(A > B)` returns true (1) if `A` is greater than `B`.
+     - `(A == B)` returns true (1) if `A` equals `B`.
+     - `(A < B)` returns true (1) if `A` is less than `B`.
+
+4. **Mutual Exclusivity of Outputs:**
+   - The assignment of outputs through logical comparison ensures only one output is high at a time, because the conditions `(A > B)`, `(A == B)`, and `(A < B)` are mutually exclusive for any given bitwise input values `A` and `B`.
+
+This implementation efficiently meets the project requirements by utilizing simple comparison operators to derive the necessary output conditions, ensuring logic simplicity and clarity.

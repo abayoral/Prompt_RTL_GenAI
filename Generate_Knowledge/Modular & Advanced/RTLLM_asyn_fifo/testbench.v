@@ -51,61 +51,55 @@ module asyn_fifo_tb;
     #10;
     $finish;
   end
+
   integer outfile1;
   integer outfile2;
   integer outfile3;
-  reg[31:0]data1[0:50];
-  reg[31:0]data2[0:50];
-  reg[31:0]data3[0:50];
+  reg [31:0] data1[0:50];
+  reg [31:0] data2[0:50];
+  reg [31:0] data3[0:50];
   integer i = 0;
-  integer error =0;
+  integer error = 0;
+  integer total_tests = 0; // Counter for total test cases
 
   initial begin
     #550;
-    $readmemh("wfull.txt",data1);
-    $readmemh("rempty.txt",data2);
-    $readmemh("tdata.txt",data3);
-    // outfile1 = $fopen("wfull.txt", "w");
-    // outfile2 = $fopen("rempty.txt", "w");
-    // outfile3 = $fopen("tdata.txt", "w");
+    $readmemh("wfull.txt", data1);
+    $readmemh("rempty.txt", data2);
+    $readmemh("tdata.txt", data3);
+
     repeat(48) begin
+      total_tests = total_tests + 1; // Increment total test count
       #10;
-      // $fwrite(outfile1, "%h\n", wfull);
-      // $fwrite(outfile2, "%h\n", rempty);
-      // $fwrite(outfile3, "%h\n", rdata);
-      error = (wfull==data1[i] && rempty == data2[i] && rdata ==data3[i]) ? error:error+1;
+      error = (wfull == data1[i] && rempty == data2[i] && rdata == data3[i]) ? error : error + 1;
       i = i + 1;
     end
-    if(error==0)
-      begin
-        $display("===========Your Design Passed===========");
-            end
-      else
-      begin
-        $display("===========Error===========");
-      end
 
-    // $fclose(outfile1);
-    // $fclose(outfile2);
-    // $fclose(outfile3);
-  end
-  // Display FIFO status
-  // always @(posedge wclk) begin
-  //   $display("wfull=%d, rempty=%d, rdata=%h", wfull, rempty, rdata);
-  // end
+    // Final test result summary
+    $display("=========== Test Summary ===========");
+    $display("Total Tests Run: %d", total_tests);
+    $display("Total Failures: %d", error);
 
-  initial begin
-  repeat (17) begin
-    #20;
-    if (wfull) begin
-      // $display("FIFO is full (wfull=1) at depth %d", $time);
-      break;
+    if (error == 0) begin
+      $display("=========== Your Design Passed ===========");
+    end else begin
+      $display("=========== Test completed with %d / %d failures ===========", error, total_tests);
     end
-    winc = 1; // Enable write
-    wdata = wdata + 1; // Write data
-    #10;
-    winc = 0; // Disable write
   end
+
+  // FIFO write operation until full
+  initial begin
+    repeat (17) begin
+      #20;
+      if (wfull) begin
+        break;
+      end
+      total_tests = total_tests + 1; // Increment total test count
+      winc = 1; // Enable write
+      wdata = wdata + 1; // Write data
+      #10;
+      winc = 0; // Disable write
+    end
   end
   
 endmodule

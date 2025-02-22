@@ -1,0 +1,8 @@
+hdlbits_testbenches/Fsm3_0_tb.v:17: error: Unknown module type: top_module
+2 error(s) during elaboration.
+*** These modules were missing:
+        top_module referenced 1 times.
+***
+Module file path: RaR/modules/Fsm3.v
+Testbench file path: hdlbits_testbenches/Fsm3_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Fsm3_sim', 'RaR/modules/Fsm3.v', 'hdlbits_testbenches/Fsm3_0_tb.v']' returned non-zero exit status 2.

@@ -1,26 +1,14 @@
-Please act as a professional verilog designer.
+Imagine you are a highly skilled Verilog designer tasked with developing a component known as a Multiplying Accumulator, also referred to as a MAC (Multiply-Accumulate unit), specifically tailored for handling 32-bit integers. The focus here is on the detailed specification and intended operation of this component. Within this system, we refer to the module as "pe" (processing element). The design requires the integration of a mechanism to effectively store intermediate results during the accumulation process, making use of a dedicated register. This register plays a crucial role as it holds onto the partial sum, essentially the intermediate accumulation result from previous cycles. In each operational cycle of the system, the component performs the task of taking two input integers, 'a' and 'b', multiplying them to produce a result. This result is then added to whatever existing value is stored within the register in order to maintain a running total, represented by the output port 'c'.
 
-Implement a Multiplying Accumulator for 32bit integer. In the MAC_PE, there is a register that stores the partial sum (the intermediate accumulation result), and in each cycle, the result of “a multiplied by b” will be accumulated in this register, and the “c” shows the value of the register.
+The module should be defined with specific input and output ports to facilitate its function. As inputs, the module must accept: 
+1. `clk` - a clock signal that governs the timing of synchronous operations within the logic.
+2. `rst` - a reset signal that is active when set to '1', signaling the module to initiate a reset and inactive when set to '0'.
+3. `a` - a 32-bit bus carrying the first operand for multiplication.
+4. `b` - a 32-bit bus carrying the second operand for multiplication.
 
-Module name:  
-    pe   
+For its output, the module should provide:
+- `c` - a 32-bit bus that outputs the current accumulated total or sum.
 
-Input ports:
-    clk: Clock signal used for synchronous operations.
-    rst: Reset signal. Defined as 1 for reset and 0 for reset signal inactive.
-    a: 32-bit input operand A.
-    b: 32-bit input operand B.
+The implementation of this design involves a parallel multiplication and accumulation process within the Verilog code. This encompasses the use of registers alongside an "always" block to carry out the multiplication and summation tasks. The updating of the accumulator register `c` occurs on either the rising edge of the clock signal (`clk`) or the reset signal (`rst`). Upon detecting an active reset signal, the module should initialize the `c` register to a value of 0, effectively clearing the accumulated result. Conversely, if the reset signal is inactive, the module proceeds to update the `c` register by integrating the product of input operands `a` and `b` with the register's current value, thereby performing the accumulation.
 
-Output ports:
-    c: 32-bit output representing the accumulated result.
-
-Implementation:
-The module implements a parallel multiplier and accumulator using registers and an always block. It multiplies the input operands and accumulates the result into an output register.
-Accumulator Register:
-The module includes a register, c, to store the accumulated result.
-On the positive edge of the clock signal (clk) or the positive edge of the reset signal (rst), the module updates the register.
-If the reset signal (rst) is high, indicating a reset condition, the register (c) is set to 0. If the reset signal (rst) is low, the register (c) is updated by adding the product of the input operands (a and b) to its current value.
-Multiplication and Accumulation:
-Inside the always block, the module performs the multiplication and accumulation operation. If the reset signal (rst) is high, the register (c) is set to 0. If the reset signal (rst) is low, the module adds the product of the input operands (a and b) to the register (c).
-
-Give me the complete code.
+To encapsulate this behavior within Verilog, provide a comprehensive piece of code delineating these processes. The code should accurately model the described multiplication and accumulation operations while ensuring synchronization with both clock and reset signals, highlighting the inherent reset capability and circulation of output through the `c` register.

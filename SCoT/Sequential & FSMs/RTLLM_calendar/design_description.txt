@@ -1,23 +1,7 @@
-Please act as a professional verilog designer.
+Could you please develop a Verilog module that functions as a perpetual calendar, starting with initial time values all set to zero for seconds (Secs), minutes (Mins), and hours (Hours)? This module should incorporate the capability for Secs and Mins to loop continuously from 0 to 59. Specifically, when Secs reaches 59, the module should automatically increase Mins by 1 at the subsequent clock cycle. Similarly, when both Secs and Mins reach their maximum value of 59, Hours should consequently be incremented at the next cycle, continuing to count in a cycle from 0 to 23. The module should utilize 6-bit registers for Hours, Mins, and Secs to store their respective current values.
 
-Implement a module of perpetual calendar. The starting value of Secs, Mins, and Hours are all 0. Both Secs and Mins loop continuously from 0 to 59. When Secs=59, Min increases by 1 at the next cycle, and when Min=59 && Secs=59, Hours increases by 1 at the next cycle. Hours is counted from the 0-23 cycle.
+For the implementation, name the module as `calendar`, and include two primary input ports: a clock input (`CLK`) for timing control and an active-high reset signal (`RST`) that initializes the counters. The output ports should consist of three 6-bit values — `Hours`, `Mins`, and `Secs` — which correspond to the current hours, minutes, and seconds.
 
-Module name:  
-    calendar  
-                 
-Input ports:
-    CLK: Clock input
-    RST: Active high reset signal
+In terms of the procedural logic, the module is expected to employ three distinct always blocks, each responsible for updating one of the time value registers (Secs, Mins, Hours). These always blocks should be sensitive to the positive edge of the `CLK` for synchronous operations and the positive edge of `RST` for immediate reset functionality. The process should be clearly designed to handle edge cases, such as resetting the time values to zero when RST is asserted, or wrapping the time values accurately when they reach their respective limits.
 
-Output ports:
-    Hours: 6-bit output representing the current hours
-    Mins: 6-bit output representing the current minutes
-    Secs: 6-bit output representing the current seconds
-
-Implementation:
-The calendar module uses three always blocks to update the values of seconds, minutes, and hours based on the clock signal and reset signal.
-The first always block triggers on the positive edge of the clock signal (posedge CLK) or the positive edge of the reset signal (posedge RST). It checks if the reset signal is active (RST) and sets the seconds value (Secs) to 0. If the seconds value is 59, it wraps around and sets the seconds value to 0. Otherwise, it increments the seconds value by 1.
-The second always block also triggers on the positive edge of the clock signal or the positive edge of the reset signal. It handles the minutes value (Mins). If the reset signal is active, it sets the minutes value to 0. If both the minutes and seconds values are 59, it wraps around and sets the minutes value to 0. If the seconds value is 59, it increments the minutes value by 1. Otherwise, it keeps the minutes value unchanged.
-The third always block triggers on the positive edge of the clock signal or the positive edge of the reset signal. It handles the hours value (Hours). If the reset signal is active, it sets the hours value to 0. If the hours, minutes, and seconds values are all at their maximum (23, 59, and 59 respectively), it wraps around and sets the hours value to 0. If the minutes and seconds values are both 59, it increments the hours value by 1. Otherwise, it keeps the hours value unchanged.
-
-Give me the complete code.
+This implementation should properly encapsulate the described behavior in a well-structured Verilog HDL code that comprehensively simulates a perpetual clock system. Please provide a complete and detailed Verilog code illustrating this logic.

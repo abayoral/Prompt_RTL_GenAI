@@ -1,0 +1,28 @@
+module multi_8bit(
+    input [7:0] A,
+    input [7:0] B,
+    output [15:0] product
+    );
+    
+    reg [15:0] product_reg;
+    reg [7:0] temp_A;
+    reg [7:0] temp_B;
+    integer i;
+    
+    always @(*) begin
+        product_reg = 16'h0000;  // Initialize the product register to zero
+        temp_A = A;              // Copy the input A to a temporary register
+        temp_B = B;              // Copy the input B to a temporary register
+
+        for (i = 0; i < 8; i = i + 1) begin
+            if (temp_B[0] == 1'b1) begin
+                product_reg = product_reg + {8'b00000000, temp_A};  // Add temp_A to product_reg
+            end
+            temp_A = temp_A << 1;   // Shift left temp_A
+            temp_B = temp_B >> 1;   // Shift right temp_B
+        end
+    end
+    
+    assign product = product_reg;  // Assign the calculated product to the output port
+    
+endmodule

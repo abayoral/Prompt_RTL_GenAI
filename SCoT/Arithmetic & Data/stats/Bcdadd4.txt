@@ -1,0 +1,11 @@
+RaR/modules/Bcdadd4.v:13: error: Unknown module type: bcd_fadd
+RaR/modules/Bcdadd4.v:21: error: Unknown module type: bcd_fadd
+RaR/modules/Bcdadd4.v:29: error: Unknown module type: bcd_fadd
+RaR/modules/Bcdadd4.v:37: error: Unknown module type: bcd_fadd
+5 error(s) during elaboration.
+*** These modules were missing:
+        bcd_fadd referenced 4 times.
+***
+Module file path: RaR/modules/Bcdadd4.v
+Testbench file path: hdlbits_testbenches/Bcdadd4_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Bcdadd4_sim', 'RaR/modules/Bcdadd4.v', 'hdlbits_testbenches/Bcdadd4_0_tb.v']' returned non-zero exit status 5.

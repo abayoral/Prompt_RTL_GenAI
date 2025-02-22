@@ -1,6 +1,0 @@
-RoEm/modules/Fsm3onehot.v:12: error: Index next_state[4] is out of range.
-RoEm/modules/Fsm3onehot.v:13: error: Index next_state[8] is out of range.
-2 error(s) during elaboration.
-Module file path: RoEm/modules/Fsm3onehot.v
-Testbench file path: hdlbits_testbenches/Fsm3onehot_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'RoEm/simulations/Fsm3onehot_sim', 'RoEm/modules/Fsm3onehot.v', 'hdlbits_testbenches/Fsm3onehot_0_tb.v']' returned non-zero exit status 2.

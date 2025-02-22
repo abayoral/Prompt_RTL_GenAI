@@ -5,10 +5,9 @@ module top_module (
     output reg shut_off_computer,
     input      arrived,
     input      gas_tank_empty,
-    output reg keep_driving  ); //
+    output reg keep_driving  );
 
-    // Fix the bug in the following code
-    
+    // Correctly set shut_off_computer without creating a latch
     always @(*) begin
         if (cpu_overheated)
             shut_off_computer = 1;
@@ -16,6 +15,7 @@ module top_module (
             shut_off_computer = 0;
     end
 
+    // Correctly set keep_driving without creating a latch
     always @(*) begin
         if (arrived || gas_tank_empty)
             keep_driving = 0;

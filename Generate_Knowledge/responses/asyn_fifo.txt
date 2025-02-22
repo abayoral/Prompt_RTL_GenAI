@@ -1,0 +1,126 @@
+```verilog
+module dual_port_ram #(parameter WIDTH = 8, DEPTH = 16) (
+    input wire                  wclk,
+    input wire                  wen,
+    input wire [$clog2(DEPTH)-1:0] waddr,
+    input wire [WIDTH-1:0]      wdata,
+    input wire                  rclk,
+    input wire                  ren,
+    input wire [$clog2(DEPTH)-1:0] raddr,
+    output reg [WIDTH-1:0]      rdata
+);
+
+    reg [WIDTH-1:0] mem [0:DEPTH-1];
+    
+    // Write Port
+    always @(posedge wclk) begin
+        if (wen)
+            mem[waddr] <= wdata;
+    end
+    
+    // Read Port
+    always @(posedge rclk) begin
+        if (ren)
+            rdata <= mem[raddr];
+    end
+    
+endmodule
+
+module asyn_fifo #(parameter WIDTH = 8, DEPTH = 16) (
+    input wire                   wclk,
+    input wire                   rclk,
+    input wire                   wrstn,
+    input wire                   rrstn,
+    input wire                   winc,
+    input wire                   rinc,
+    input wire [WIDTH-1:0]       wdata,
+    output wire                  wfull,
+    output wire                  rempty,
+    output reg [WIDTH-1:0]       rdata 
+);
+    
+    localparam ADDR_WIDTH = $clog2(DEPTH);
+
+    // Write Pointer
+    reg [ADDR_WIDTH:0] write_ptr_gray, write_ptr_bin, write_ptr_bin_next;
+    wire [ADDR_WIDTH:0] write_ptr_gray_next;
+
+    // Read Pointer
+    reg [ADDR_WIDTH:0] read_ptr_gray, read_ptr_bin, read_ptr_bin_next;
+    wire [ADDR_WIDTH:0] read_ptr_gray_next;
+    
+    // Synced pointers
+    reg [ADDR_WIDTH:0] read_ptr_gray_sync_rclk, write_ptr_gray_sync_wclk;
+    
+    // Dual-port RAM instantiation
+    wire [$clog2(DEPTH)-1:0] write_addr, read_addr;
+    wire ren, wen;
+
+    dual_port_ram #(.WIDTH(WIDTH), .DEPTH(DEPTH)) dp_ram (
+        .wclk(wclk),
+        .wen(wen),
+        .waddr(write_addr),
+        .wdata(wdata),
+        .rclk(rclk),
+        .ren(ren),
+        .raddr(read_addr),
+        .rdata(rdata)
+    );
+
+    // Write Logic
+    assign write_addr = write_ptr_bin[ADDR_WIDTH-1:0];
+    
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            write_ptr_bin <= 0;
+            write_ptr_gray <= 0;
+        end else if (wen) begin
+            write_ptr_bin <= write_ptr_bin_next;
+            write_ptr_gray <= write_ptr_gray_next;
+        end
+    end
+    
+    assign write_ptr_bin_next = write_ptr_bin + (winc & ~wfull);
+    assign write_ptr_gray_next = (write_ptr_bin_next >> 1) ^ write_ptr_bin_next;
+
+    // Read Logic
+    assign read_addr = read_ptr_bin[ADDR_WIDTH-1:0];
+
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            read_ptr_bin <= 0;
+            read_ptr_gray <= 0;
+        end else if (ren) begin
+            read_ptr_bin <= read_ptr_bin_next;
+            read_ptr_gray <= read_ptr_gray_next;
+        end
+    end
+
+    assign read_ptr_bin_next = read_ptr_bin + (rinc & ~rempty);
+    assign read_ptr_gray_next = (read_ptr_bin_next >> 1) ^ read_ptr_bin_next;
+    
+    // Pointer Synchronization
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            read_ptr_gray_sync_rclk <= 0;
+        end else begin
+            read_ptr_gray_sync_rclk <= read_ptr_gray;
+        end
+    end
+    
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            write_ptr_gray_sync_wclk <= 0;
+        end else begin
+            write_ptr_gray_sync_wclk <= write_ptr_gray;
+        end
+    end
+
+    // Full and Empty Flag Logic
+    assign wfull = (write_ptr_gray_next == {~write_ptr_gray_sync_wclk[ADDR_WIDTH], write_ptr_gray_sync_wclk[ADDR_WIDTH-1:0]});
+    assign ren = (rinc & ~rempty);
+    assign wen = (winc & ~wfull);
+    assign rempty = (read_ptr_gray_next == write_ptr_gray_sync_wclk);
+
+endmodule
+```

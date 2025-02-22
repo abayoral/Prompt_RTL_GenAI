@@ -3,14 +3,17 @@ module top_module (
     input [3:0] in,
     output reg [1:0] pos
 );
+
     always @(*) begin
         casez (in)
-            4'b1000: pos = 2'd3;
-            4'b?100: pos = 2'd2;
-            4'b??10: pos = 2'd1;
-            4'b???1: pos = 2'd0;
-            default: pos = 2'd0;
+            4'b0000: pos = 2'd0; // When no bits are high, output zero
+            4'b???1: pos = 2'd0; // Highest priority: Bit 0 is high
+            4'b??10: pos = 2'd1; // Next priority: Bit 1 is high
+            4'b?100: pos = 2'd2; // Next priority: Bit 2 is high
+            4'b1000: pos = 2'd3; // Lowest priority: Bit 3 is high
+            default: pos = 2'd0; // This handles all other default cases
         endcase
     end
+
 endmodule
 ```

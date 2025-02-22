@@ -3,11 +3,14 @@ module top_module(
     input a,
     input b,
     input c,
-    output out
+    output out  
 );
 
-    // Simplified equation from the Karnaugh map
-    assign out = 1;
+    // Simplified expression after analyzing the K-map:
+    // The K-map shows all 1s in its cells, indicating this function is always true.
+    // Therefore, the output is simply a constant value '1'.
+    
+    assign out = 1'b1;
 
 endmodule
 ```

@@ -1,0 +1,53 @@
+```verilog
+module freq_divbyfrac(
+    input wire clk,
+    input wire rst_n,
+    output reg clk_div
+);
+
+  // Internal counters
+  reg [2:0] count;
+
+  // Internal signals
+  reg clk_div_int1;
+  reg clk_div_int2;
+
+  // Parameters for cycle periods
+  localparam PHASE1_PERIOD = 4;
+  localparam PHASE2_PERIOD = 3;
+  localparam CYCLE_COUNT = 7;
+
+  // Reset or initialize counters
+  always @(posedge clk or negedge rst_n) begin
+    if (~rst_n) begin
+      count <= 3'b0;
+      clk_div_int1 <= 1'b0;
+      clk_div_int2 <= 1'b0;
+    end else begin
+      // Counter logic for phase division
+      if (count < CYCLE_COUNT - 1) begin
+        count <= count + 1;
+      end else begin
+        count <= 3'b0;
+      end
+
+      // Generate the two phase clock signals
+      if (count < PHASE1_PERIOD) begin
+        clk_div_int1 <= ~clk_div_int1;
+      end
+      
+      if (count >= PHASE2_PERIOD) begin
+        clk_div_int2 <= ~clk_div_int2;
+      end
+    end
+  end
+
+  // OR the two phased signals to create the final divided clock
+  always @(*) begin
+    clk_div = clk_div_int1 | clk_div_int2;
+  end
+
+endmodule
+```
+
+This Verilog code implements a frequency divider with fractional division using double-edge clocking. It generates two 3.5 clock-cycle phased signals and combines them to ensure the output clock (`clk_div`) has a balanced duty cycle, maintaining predictable behavior.

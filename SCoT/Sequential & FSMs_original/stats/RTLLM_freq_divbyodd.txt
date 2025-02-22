@@ -1,0 +1,13 @@
+./simv -l run.log
+Failed at          1: clk=1, clk_div=0 (expected           1)
+Failed at          2: clk=0, clk_div=0 (expected           1)
+Failed at          3: clk=1, clk_div=0 (expected           1)
+Failed at          4: clk=0, clk_div=0 (expected           1)
+Failed at          6: clk=0, clk_div=1 (expected           0)
+Failed at          7: clk=1, clk_div=1 (expected           0)
+Failed at          8: clk=0, clk_div=1 (expected           0)
+Failed at         11: clk=1, clk_div=0 (expected           1)
+Failed at         12: clk=0, clk_div=0 (expected           1)
+Failed at         16: clk=0, clk_div=1 (expected           0)
+=========== Test completed with          10/20 failures ===========
+testbench.v:27: $finish called at 130000 (1ps)

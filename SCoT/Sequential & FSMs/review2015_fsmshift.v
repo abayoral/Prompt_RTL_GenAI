@@ -1,12 +1,1 @@
-// As part of the FSM for controlling the shift register, we want the ability to enable the shift register for exactly 4 clock cycles whenever the proper bit pattern is detected. Design an FSM handles enabling the shift register for 4 cycles.
-
-// Whenever the FSM is reset, assert shift_ena for 4 cycles, then 0 forever (until reset).
-
-module top_module (
-    input clk,
-    input reset,      // Synchronous reset
-    output shift_ena);
-
-    // Insert your code here
-    
-endmodule
+In the context of designing a Finite State Machine (FSM) tasked with controlling a shift register, you are required to develop a sequential logic circuit that enables the shift register for precisely four clock cycles upon detecting a specific bit pattern. This task involves conceptualizing and implementing an FSM that consistently manages this enabling functionality. Further, the design should incorporate behavior for when the FSM undergoes a reset operation, wherein the signal 'shift_ena' must assert or activate for four consecutive clock cycles immediately following the reset. After these four cycles, the signal should remain deactivated indefinitely, until another reset condition is encountered, at which point the cycle repeats. The FSM must therefore include states and logic to both recognize the bit pattern and manage the timed activation of the shift register. Using the synchronous reset input, which coordinates with the clock signal, you will address the timing and state transitions. Given this framework, describe how an FSM, implemented within a Verilog module named 'top_module', could be structured to fulfill these specifications.

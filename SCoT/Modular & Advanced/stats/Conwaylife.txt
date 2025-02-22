@@ -1,0 +1,35 @@
+RaR/modules/Conwaylife.v:2: error: Net data type requires SystemVerilog.
+RaR/modules/Conwaylife.v:3: error: Net data type requires SystemVerilog.
+RaR/modules/Conwaylife.v:4: error: Net data type requires SystemVerilog.
+RaR/modules/Conwaylife.v:11: syntax error
+RaR/modules/Conwaylife.v:1: error: Error in task/function port item after port name int.
+RaR/modules/Conwaylife.v:11: syntax error
+RaR/modules/Conwaylife.v:11: error: Syntax error defining function.
+RaR/modules/Conwaylife.v:28: syntax error
+RaR/modules/Conwaylife.v:28: error: Invalid module instantiation
+RaR/modules/Conwaylife.v:32: error: Invalid module item.
+RaR/modules/Conwaylife.v:32: syntax error
+RaR/modules/Conwaylife.v:32: error: Invalid module instantiation
+RaR/modules/Conwaylife.v:32: error: Invalid module instantiation
+RaR/modules/Conwaylife.v:35: syntax error
+RaR/modules/Conwaylife.v:35: error: Invalid module instantiation
+RaR/modules/Conwaylife.v:36: syntax error
+RaR/modules/Conwaylife.v:36: error: Invalid module instantiation
+RaR/modules/Conwaylife.v:37: syntax error
+RaR/modules/Conwaylife.v:37: error: Invalid module instantiation
+RaR/modules/Conwaylife.v:40: error: Invalid module item.
+RaR/modules/Conwaylife.v:41: syntax error
+RaR/modules/Conwaylife.v:42: error: Invalid module item.
+RaR/modules/Conwaylife.v:43: syntax error
+hdlbits_testbenches/Conwaylife_0_tb.v:3: error: Invalid module item.
+hdlbits_testbenches/Conwaylife_0_tb.v:8: error: 'clk' has already been declared in this scope.
+RaR/modules/Conwaylife.v:2:      : It was declared here as a net.
+hdlbits_testbenches/Conwaylife_0_tb.v:9: error: 'load' has already been declared in this scope.
+RaR/modules/Conwaylife.v:3:      : It was declared here as a net.
+hdlbits_testbenches/Conwaylife_0_tb.v:10: error: 'data' has already been declared in this scope.
+RaR/modules/Conwaylife.v:4:      : It was declared here as a net.
+hdlbits_testbenches/Conwaylife_0_tb.v:12: error: 'q' has already been declared in this scope.
+RaR/modules/Conwaylife.v:5:      : It was declared here as a variable.
+Module file path: RaR/modules/Conwaylife.v
+Testbench file path: hdlbits_testbenches/Conwaylife_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'RaR/simulations/Conwaylife_sim', 'RaR/modules/Conwaylife.v', 'hdlbits_testbenches/Conwaylife_0_tb.v']' returned non-zero exit status 28.

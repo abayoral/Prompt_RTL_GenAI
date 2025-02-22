@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // You are given a module my_dff8 with two inputs and one output (that implements a set of 8 D flip-flops). 
 // Instantiate three of them, then chain them together to make a 8-bit wide shift register of length 3. 
 // In addition, create a 4-to-1 multiplexer (not provided) that chooses what to output depending on sel[1:0]: 

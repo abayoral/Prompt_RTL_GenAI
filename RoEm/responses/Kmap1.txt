@@ -6,9 +6,7 @@ module top_module(
     output out
 ); 
 
-    // The Karnaugh map provided simplifies to the function:
-    // out = 1
-    // Since all minterms are covered and produce '1', the output is always '1'.
+    // The K-map simplifies to out = 1 for all combinations of a, b, and c.
     assign out = 1;
 
 endmodule

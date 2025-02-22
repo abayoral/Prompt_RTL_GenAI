@@ -1,0 +1,19 @@
+RaR/modules/Module_cseladd.v:30: warning: Port 3 (cin) of add16 expects 1 bits, got 32.
+RaR/modules/Module_cseladd.v:30:        : Pruning (signed) 31 high bits of the expression.
+RaR/modules/Module_cseladd.v:39: warning: Port 3 (cin) of add16 expects 1 bits, got 32.
+RaR/modules/Module_cseladd.v:39:        : Pruning (signed) 31 high bits of the expression.
+RaR/modules/Module_cseladd.v:48: warning: Port 3 (cin) of add16 expects 1 bits, got 32.
+RaR/modules/Module_cseladd.v:48:        : Pruning (signed) 31 high bits of the expression.
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Test 3 passed!
+Test 4 passed!
+Test 5 passed!
+Test 6 passed!
+All tests passed!
+hdlbits_testbenches/Module_cseladd_0_tb.v:109: $finish called at 14000 (10ps)
+Module file path: RaR/modules/Module_cseladd.v
+Testbench file path: hdlbits_testbenches/Module_cseladd_0_tb.v
+Compilation successful. Executable created at RaR/simulations/Module_cseladd_sim
+Simulation completed successfully.

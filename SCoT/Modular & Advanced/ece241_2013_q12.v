@@ -1,14 +1,7 @@
-// In this question, you will design a circuit for an 8x1 memory, where writing to the memory is accomplished by shifting-in bits, and reading is "random access", as in a typical RAM. You will then use the circuit to realize a 3-input logic function.
+In this task, you are required to develop a circuit design for a memory module specifically structured as an 8x1 configuration. The writing process to this memory is unique in that it relies on shifting-in bits rather than directly addressing memory locations. In essence, this behavior means that new data is sequentially shifted into the memory, with the most significant bit (MSB) being updated first based on the data input line. The memory is capable of "random access" reading, a feature typical of standard Random Access Memory (RAM) systems, allowing any bit to be accessed independently. 
 
-// First, create an 8-bit shift register with 8 D-type flip-flops. Label the flip-flop outputs from Q[0]...Q[7]. The shift register input should be called S, which feeds the input of Q[0] (MSB is shifted in first). The enable input controls whether to shift. Then, extend the circuit to have 3 additional inputs A,B,C and an output Z. The circuit's behaviour should be as follows: when ABC is 000, Z=Q[0], when ABC is 001, Z=Q[1], and so on. Your circuit should contain ONLY the 8-bit shift register, and multiplexers. (Aside: this circuit is called a 3-input look-up-table (LUT)).
+Your first objective is to design an 8-bit shift register, which consists of a series of 8 D-type flip-flops. These flip-flops should be labeled sequentially with outputs Q[0] through Q[7]. Here, Q[0] will serve as the output for the least significant bit (LSB), moving up to Q[7] for the MSB. The shift register should receive its input through a line labeled ‘S,’ directly feeding into the D input of Q[0]. A control line termed ‘enable’ is necessary to determine when the bits should be actively shifted through the register.
 
-module top_module (
-    input clk,
-    input enable,
-    input S,
-    input A, B, C,
-    output Z ); 
+Once the shift register is established, the next phase involves expanding the circuit to integrate three additional input signals, denoted as A, B, and C. Together, these inputs serve as a 3-bit selector that influences the eventual output, labeled as Z. The output behavior should adhere to the following logic: when the combination ABC equals 000, the output Z should be the same as Q[0], when ABC is 001, Z should mirror Q[1], and this pattern continues up through ABC equalling 111 to produce an output Z equivalent to Q[7]. This part of the circuit requires multiplexers to accommodate this selection functionality. Note that this design effectively realizes a 3-input look-up-table (LUT), which is a common logic function implementation in digital systems design.
 
-    // Insert your code here
-
-endmodule
+To encapsulate the complete design, you are expected to code this logic into a module, conventionally referred to as ‘top_module’. This module will take as inputs a clock signal (clk), an enable signal, the serial input S (for the shift register), and the select inputs A, B, and C, ultimately producing the output Z. It's crucial to adhere strictly to the constraint of utilizing only the components specified: the shift register and multiplexers.

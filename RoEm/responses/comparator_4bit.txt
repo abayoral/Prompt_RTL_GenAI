@@ -1,0 +1,26 @@
+```verilog
+module comparator_4bit (
+    input [3:0] A,
+    input [3:0] B,
+    output A_greater,
+    output A_equal,
+    output A_less
+);
+
+    // Intermediate wire to hold the result of subtraction A - B
+    wire [4:0] result;
+    
+    // Perform subtraction A - B using 5 bits to detect borrow
+    assign result = {1'b0, A} - {1'b0, B};
+    
+    // Determine A_greater if result is positive and no borrow occurred
+    assign A_greater = result[4] == 1'b0 && result[3:0] != 4'b0000;
+    
+    // Determine A_equal if result is all zeros (no borrow and zero result)
+    assign A_equal = result[4:0] == 5'b00000;
+    
+    // Determine A_less if result has a borrow bit set
+    assign A_less = result[4] == 1'b1;
+    
+endmodule
+```

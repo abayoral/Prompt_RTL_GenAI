@@ -1,0 +1,38 @@
+```verilog
+module ROM (
+    input  [7:0]  addr, // 8-bit address input
+    output [15:0] dout  // 16-bit data output
+);
+
+    // Memory array: 256 locations of 16-bit width
+    reg [15:0] mem [0:255];
+
+    // Output data register
+    reg [15:0] data_out;
+
+    // Assign the output register to the module output
+    assign dout = data_out;
+
+    // Initialization block for ROM content
+    initial begin
+        // Initialize specific memory locations with predetermined values
+        mem[0] = 16'hA0A0;
+        mem[1] = 16'hB1B1;
+        mem[2] = 16'hC2C2;
+        mem[3] = 16'hD3D3;
+        // Initialize other memory locations as needed
+        // For simplicity, we initialize all other memory locations to zero
+        integer i;
+        for (i = 4; i < 256; i = i + 1) begin
+            mem[i] = 16'h0000;
+        end
+    end
+
+    // Always block to handle read operations
+    always @(*) begin
+        // Read data from memory based on the provided address
+        data_out = mem[addr];
+    end
+
+endmodule
+```

@@ -1,10 +1,1 @@
-// Implement the following circuit:
-
-// in --- out
-
-module top_module (
-    input in,
-    output out);
-    
-    // Insert your code here
-endmodule
+As a senior Digital Design Engineer at a prominent hardware design company, you have been assigned a crucial task that involves developing a Verilog module integral to the success of a next-generation product. This product is significant for your organization's standing and reputation in the highly competitive computer hardware industry. The primary focus of this task is to ensure the effective implementation of a specified circuit, which involves taking an input signal 'in' and producing the corresponding output signal 'out'. Your expertise is required to draft the Verilog code that will fulfill these requirements. The module of interest is named 'top_module', with the given skeletal structure already laid out. Your task is to design and implement the functional logic inside this module to achieve the desired input-output relationship correctly and efficiently. Consider the potential complexity of digital logic that might be required, given that this module is labeled as 'critical' for your company.

@@ -1,0 +1,122 @@
+Let's develop a Verilog module for the traffic light controller based on the specified requirements. We're going to manage a system with different states for traffic lights and handle pedestrian input to adjust the timing dynamically.
+
+### Chain of Thought
+
+1. **State Declaration:**
+   - We have four main states: `idle`, `s1_red` (red), `s2_yellow` (yellow), and `s3_green` (green).
+
+2. **State Transition Logic:**
+   - The FSM will begin in the `idle` state.
+   - After the `idle` state, the controller moves to `s1_red`, followed by `s3_green`, where the green-light duration can be shortened if the pedestrian button is pressed.
+   - After green, it transitions to `s2_yellow`, and then back to `s1_red`.
+
+3. **Pedestrian Button Press Handling:**
+   - During the green state, if the pedestrian button (`pass_request`) is pressed and more than 10 cycles are remaining, the green duration will be cut to 10 total cycles.
+
+4. **Signal Output Logic:**
+   - The pedestrian light (implicitly mentioned) will be green during `s1_red` and red otherwise.
+   - Vehicle lights will change based on the current state.
+
+5. **Counter Management:**
+   - A counter will manage timing for each state, adjusting transitions based on either the current state or any external input via the pedestrian button.
+
+6. **Clock and Reset:**
+   - Utilize `rst_n` as an active-low reset to reset the controller.
+   - Clock (`clk`) manages state transitions and counter increments.
+
+Now let's code the Verilog module according to this plan:
+
+```verilog
+module traffic_light (
+    input wire rst_n,          // Active-low reset
+    input wire clk,            // Clock input
+    input wire pass_request,   // Pedestrian button input
+    output reg [7:0] clock,    // 8-bit current state duration counter
+    output reg red,            // Red light signal, assuming pedestrian light logic
+    output reg yellow,         // Yellow light signal
+    output reg green           // Green light signal
+);
+
+    // State encoding
+    typedef enum reg [1:0] {
+        idle     = 2'b00,
+        s1_red   = 2'b01,
+        s2_yellow = 2'b10,
+        s3_green = 2'b11
+    } state_t;
+    
+    state_t state, next_state;
+    reg [7:0] cnt;
+
+    // State transition and output logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= idle;
+            cnt <= 8'd0;
+            clock <= 8'd0;
+            {red, yellow, green} <= 3'b100;
+        end else begin
+            state <= next_state;
+            cnt <= cnt - 1;
+
+            // Output signals based on state
+            case (state)
+                s1_red:    {red, yellow, green} <= 3'b100;
+                s2_yellow: {red, yellow, green} <= 3'b010;
+                s3_green:  {red, yellow, green} <= 3'b001;
+                default:   {red, yellow, green} <= 3'b100; // idle defaults to red
+            endcase
+        end
+    end
+
+    // Next state logic
+    always @(*) begin
+        next_state = state;
+        case (state)
+            idle: begin
+                next_state = s1_red;
+                cnt = 8'd10; // Short red as a placeholder start state
+            end
+
+            s1_red: begin
+                if (cnt == 0) begin
+                    next_state = s3_green;
+                    cnt = 8'd60; // Default green time
+                end else begin
+                    next_state = s1_red;
+                end
+            end
+
+            s3_green: begin
+                if (pass_request && cnt > 10) begin
+                    cnt = 8'd10; // If button pressed & more than 10 left
+                end
+                if (cnt == 0) begin
+                    next_state = s2_yellow;
+                    cnt = 8'd5; // Yellow time
+                end else begin
+                    next_state = s3_green;
+                end
+            end
+
+            s2_yellow: begin
+                if (cnt == 0) begin
+                    next_state = s1_red;
+                    cnt = 8'd10; // Red time again
+                end else begin
+                    next_state = s2_yellow;
+                end
+            end
+        endcase
+        clock = cnt; // Update clock output to see counter
+    end
+endmodule
+```
+
+### Explanation
+
+- The FSM has four states, transitioning as per the given specification.
+- The counter `cnt` manages the duration each state persists based on the state transitions.
+- Pedestrian input `pass_request` modifies the duration of the green light under specific conditions.
+- Reset logic initializes the traffic light to red.
+- Outputs are set according to the state: red for `s1_red`, green for `s3_green`, yellow for `s2_yellow`, and red on `idle`/reset.

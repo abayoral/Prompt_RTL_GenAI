@@ -1,7 +1,0 @@
-CoT/modules/Fsm_ps2data.v:9: syntax error
-CoT/modules/Fsm_ps2data.v:9: error: Invalid module instantiation
-CoT/modules/Fsm_ps2data.v:16: syntax error
-CoT/modules/Fsm_ps2data.v:16: error: Invalid module instantiation
-Module file path: CoT/modules/Fsm_ps2data.v
-Testbench file path: hdlbits_testbenches/Fsm_ps2data_0_tb.v
-Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/Fsm_ps2data_sim', 'CoT/modules/Fsm_ps2data.v', 'hdlbits_testbenches/Fsm_ps2data_0_tb.v']' returned non-zero exit status 4.

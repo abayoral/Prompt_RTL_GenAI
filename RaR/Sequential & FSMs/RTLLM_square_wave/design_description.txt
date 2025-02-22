@@ -1,27 +1,26 @@
-Please act as a professional verilog designer.
+As an experienced Verilog designer, your current assignment involves the development and implementation of a Verilog module intended specifically for generating square wave signals. These square waves are characterized by their frequency, which should be adjustable based on given input parameters. Below, the primary focus of your task is outlined along with the specific technical aspects you must consider during the design and coding process.
 
-The module is a simple yet effective generator designed to produce square wave signals with variable frequency. It takes an input clock signal and a frequency value, and outputs a square wave signal toggling at the specified frequency.
+**Objective and Naming:**
+- You are to name the module `square_wave`, which directly reflects its primary functionality — generating square wave outputs.
+  
+**Key Inputs to Consider:**
+- **Clock Signal (`clk`):** This essential input acts as the driving force behind the sequential logic of your module. The `clk` signal will dictate the timing and rhythm of your circuit operations.
+- **Frequency Control (`freq`, 8-bit vector `[7:0]`):** This input signal is critical because it controls the frequency of the output square wave. Adjustments in this 8-bit value will directly influence how fast or slow the square wave toggles between its high and low states.
 
-Module name:  
-    square_wave 
-                 
-Input ports:
-    clk: Clock signal that drives the module.
-    [7:0]freq: Frequency control, specifying how often the square wave toggles.
+**Critical Output:**
+- **Square Wave Output (`wave_out`):** This output represents the generated square wave signal. The frequency at which this signal toggles between high and low states is determined by the `freq` input and your designed logic within the module.
 
-Output ports:
-    wave_out: Square wave output signal.
+**Internal Mechanisms and Components:**
+- **Internal Counter (`count`, 8-bit register `[7:0]`):** The internal `count` register serves as a timing mechanism. Its primary role is to keep track of the number of clock cycles that have passed. By doing so, it helps determine the precise moments when `wave_out` should toggle.
 
-Internal Registers:
-    count (reg [7:0]): Counter register used to track cycles between wave toggles.
-    
-Implementation:
-Counter Operation:
-    The count register increments on each rising edge of the clk.
-    When count reaches (freq - 1), the count is reset to 0 and wave_out is toggled (i.e., flipped from 0 to 1 or from 1 to 0).
-    If count has not reached freq, it simply increments by one on the next clock cycle.
-Square Wave Generation:
-    The module produces a square wave by flipping the wave_out signal at the rate determined by freq.
-    The higher the freq value, the slower the square wave toggles (i.e., the lower the output frequency), and vice versa.
-    
-Give me the complete code.
+**Design and Operational Outline:**
+- **Counting Logic:**
+  - Implement a mechanism such that the `count` register increments with each active edge (rising edge) of `clk`. This incrementation occurs in a continuous cycle throughout the operation.
+  - The pivotal logic is that when `count` reaches a value equal to `freq - 1`, it triggers the toggle of the `wave_out` signal, and then resets the `count` to zero to begin the next cycle.
+  - If `count` has not yet reached the specified value (i.e., `freq`), it simply continues to increment with each clock cycle.
+
+- **Square Wave Signal Toggling:**
+  - The essence of this module lies in its ability to output an oscillating square wave of correct frequency. The frequency is modulated based on the value of `freq`, hence a larger `freq` will slow down the toggling rate, while a smaller `freq` will increase it.
+  - Ensure that your logic accounts for edge cases and correctly handles the variable `freq` input to provide consistent and accurate frequency modulation.
+
+Your task is to translate these functional descriptions into a coherent and efficient Verilog code. The code should encapsulate the detailed behavior of square wave generation, from handling the input signals properly and implementing the internal counter logic, to ensuring the accurate production of the desired square wave output. This design needs to support a range of applications where square wave frequency modulation is necessary, providing functionality that adapts to changes in the input parameters seamlessly.

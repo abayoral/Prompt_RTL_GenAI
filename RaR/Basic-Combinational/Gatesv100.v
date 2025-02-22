@@ -1,19 +1,9 @@
-// You are given a 100-bit input vector in[99:0]. 
-//We want to know some relationships between each bit and its neighbour:
+As a senior Digital Design Engineer at a preeminent hardware development company, you have been entrusted with the significant responsibility of crafting a crucial Verilog module intended for an innovative, next-generation hardware product. The performance and precision of this module are essential to uphold the high standards and reputation that your computer hardware company has established within the industry. Your primary challenge involves analyzing a 100-bit input vector labeled 'in[99:0]' and generating three distinct output vectors based on specific bit relationships:
 
-//out_both: Each bit of this output vector should indicate whether both the corresponding input bit and its neighbour to the left are '1'. For example, out_both[98] should indicate if in[98] and in[99] are both 1. Since in[99] has no neighbour to the left, the answer is obvious so we don't need to know out_both[99].
-//out_any: Each bit of this output vector should indicate whether any of the corresponding input bit and its neighbour to the right are '1'. For example, out_any[2] should indicate if either in[2] or in[1] are 1. Since in[0] has no neighbour to the right, the answer is obvious so we don't need to know out_any[0].
-//out_different: Each bit of this output vector should indicate whether the corresponding input bit is different from its neighbour to the left. For example, out_different[98] should indicate if in[98] is different from in[99]. For this part, treat the vector as wrapping around, so in[99]'s neighbour to the left is in[0].
+1. **Output Vector 'out_both'**: This vector (out_both[98:0]) is designed to evaluate a relationship where each bit signifies whether both the current bit and the adjacent bit to the left in the input vector are set to '1'. For instance, 'out_both[98]' should reflect the condition where both 'in[98]' and its left neighbor 'in[99]' are '1'. Note that for 'in[99]', which lacks a left neighbor, the vector doesn't need any output, thus excluding 'out_both[99]'.
 
+2. **Output Vector 'out_any'**: This vector (out_any[99:1]) should determine whether any of the bits in the input vector or their neighboring bits to the right are '1'. For example, 'out_any[2]' should indicate if either 'in[2]' or its right neighbor 'in[1]' is '1'. Since 'in[0]' lacks a right neighbor, the response is inherently predetermined, so 'out_any[0]' is not required.
 
-// Hint: Using vectors, this can still be done in 3 assign statements.
+3. **Output Vector 'out_different'**: This vector (out_different[99:0]) examines the divergence between each bit in the input vector and its left neighbor. In this context, treat the vector as cyclic, meaning each end-wraps-around. Thus, for the wrap-around scenario, 'in[99]' is considered to have 'in[0]' as its left neighbor. For example, 'out_different[98]' should indicate whether 'in[98]' and 'in[99]' differ from one another, while 'out_different[99]' checks if 'in[99]' is distinct from 'in[0]'.
 
-module top_module( 
-    input [99:0] in,
-    output [98:0] out_both,
-    output [99:1] out_any,
-    output [99:0] out_different );
-
-    // Insert your code here
-
-endmodule
+Your task is to implement this Verilog module within a succinct and efficient design framework, employing no more than three 'assign' statements as suggested in the hint provided, to achieve the outlined functionalities. This requirement underscores the need for a meticulous approach to vector manipulation and logic construction, reinforcing the critical nature of this task in the context of advanced digital design practices.

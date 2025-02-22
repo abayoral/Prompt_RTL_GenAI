@@ -1,59 +1,72 @@
 ```verilog
-module top_module(
+module conway_game_of_life (
     input clk,
+    input rst,
     input load,
-    input [255:0] data,
+    input [255:0] initial_data,
     output reg [255:0] q
 );
 
-reg [255:0] next_q;
+    // Internal signal to hold the next state of the grid
+    reg [255:0] next_q;
 
-integer i;  // Row index
-integer j;  // Column index
-integer ni; // Neighbor row index
-integer nj; // Neighbor column index
-integer neighbor_count;
-reg [3:0] neighbors; // For storing the number of neighbors
+    // Helper function to calculate neighbor indices in a toroidal fashion
+    function [3:0] wrap_index(input [3:0] idx);
+        begin
+            if (idx == 16)
+                wrap_index = 0;
+            else if (idx == 15 && idx < 0)
+                wrap_index = 15;
+            else
+                wrap_index = idx;
+        end
+    endfunction
 
-always @(posedge clk) begin
-    if (load) begin
-        q <= data;
-    end else begin
-        for (i = 0; i < 16; i = i + 1) begin
-            for (j = 0; j < 16; j = j + 1) begin
-                // Calculate the number of neighbors
-                neighbor_count = 0;
-                for (ni = i-1; ni <= i+1; ni = ni + 1) begin
-                    for (nj = j-1; nj <= j+1; nj = nj + 1) begin
-                        if (!(ni == i && nj == j)) begin
-                            // Use modulo operation for wrapping
-                            neighbor_count = neighbor_count + q[(16*((ni+16)%16) + (nj+16)%16)];
-                        end
-                    end
-                end
-
-                // Apply the Game of Life rules
-                if (q[16*i + j] == 1) begin
-                    // Currently alive
-                    if (neighbor_count < 2 || neighbor_count > 3) begin
-                        next_q[16*i + j] = 0; // Dies
-                    end else begin
-                        next_q[16*i + j] = 1; // Stays alive
-                    end
-                end else begin
-                    // Currently dead
-                    if (neighbor_count == 3) begin
-                        next_q[16*i + j] = 1; // Becomes alive
-                    end else begin
-                        next_q[16*i + j] = 0; // Stays dead
+    // Return number of alive neighbors for a given cell
+    function [3:0] count_alive_neighbors(input [255:0] grid, input integer row, col);
+        integer idx, nrow, ncol;
+        reg [3:0] i, j;
+        begin
+            count_alive_neighbors = 0;
+            for (i = 15; i <= 16; i++) begin
+                for (j = 15; j <= 16; j++) begin
+                    if (!(i == 0 && j == 0)) begin
+                        nrow = wrap_index(row + i - 1);
+                        ncol = wrap_index(col + j - 1);
+                        idx = nrow * 16 + ncol;
+                        count_alive_neighbors = count_alive_neighbors + grid[idx];
                     end
                 end
             end
         end
-        // Update the state
-        q <= next_q;
+    endfunction
+
+    // Calculate the next state of the grid
+    always @* begin
+        integer row, col, cell_index;
+        reg [3:0] alive_neighbors;
+        for (row = 0; row < 16; row = row + 1) begin
+            for (col = 0; col < 16; col = col + 1) begin
+                cell_index = row * 16 + col;
+                alive_neighbors = count_alive_neighbors(q, row, col);
+                if (alive_neighbors == 3 || (alive_neighbors == 2 && q[cell_index]))
+                    next_q[cell_index] = 1;
+                else
+                    next_q[cell_index] = 0;
+            end
+        end
     end
-end
+
+    // Sequential logic to load initial state or update grid state
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            q <= 256'b0;
+        end else if (load) begin
+            q <= initial_data;
+        end else begin
+            q <= next_q;
+        end
+    end
 
 endmodule
 ```

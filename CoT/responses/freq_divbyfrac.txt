@@ -1,0 +1,76 @@
+To implement a 3.5x frequency divider using double-edge clocking in Verilog, we will leverage a combination of counters and phase shifting. The logic involves counting clock periods, sequencing through distinct cycles, and combining phase-shifted clock versions.
+
+### Chain of Thought
+
+1. **Understand the Requirements:**
+   - We need to divide the frequency of an input clock by 3.5x.
+   - Use a double-edge technique to handle fractional division.
+   - Use counters to manage clock cycles and create a balanced output.
+   - Phase-shift the clock to balance duty cycles and correct phase gaps.
+
+2. **Determine Inputs and Outputs:**
+   - Inputs: 
+     - `clk`: Main clock signal input.
+     - `rst_n`: Active low reset signal.
+   - Output:
+     - `clk_div`: Fractionally divided output clock.
+
+3. **Intermediate Logic:**
+   - Manage a cycle counter `cnt` that ranges from 0 to 6.
+   - Implement two phases, `phase1` and `phase2`, with phase shifts.
+   - Use an OR operation to combine phase-shifted clocks.
+
+4. **Structuring the Module:**
+   - Use an always block sensitive to both edges of `clk`.
+   - Reset logic to initialize counters and intermediary signals.
+   - Control logic to update counters and clock toggling logic.
+   - Combine phase-shifted signals for the output clock.
+
+5. **Writing the Verilog Code:**
+
+Here’s the full Verilog code:
+
+```verilog
+module freq_divbyfrac (
+    input wire clk,
+    input wire rst_n,
+    output wire clk_div
+);
+
+    reg [2:0] cnt;        // 3-bit counter
+    reg phase1, phase2;   // Intermediate phase signals
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt <= 3'b000;
+            phase1 <= 1'b0;
+        end else begin
+            if (cnt == 3 || cnt == 6) phase1 <= ~phase1;
+            if (cnt == 6) cnt <= 3'b000;
+            else cnt <= cnt + 3'b001;
+        end
+    end
+
+    always @(negedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            phase2 <= 1'b0;
+        end else begin
+            if (cnt == 4) phase2 <= ~phase2;
+        end
+    end
+
+    // Combine phase-shifted clocks
+    assign clk_div = phase1 | phase2;
+
+endmodule
+```
+
+### Explanation
+- **Counters and Phases:**
+  - The module uses a counter (`cnt`) to keep track of clock cycles. It resets after counting up to 6, implementing the 3.5x division through 7 clock cycles.
+  - Two intermediate signals, `phase1` and `phase2`, toggle at key counts: `phase1` toggles at 3 and 6, and `phase2` toggles at 4.
+  
+- **Phase Combination:**
+  - By combining `phase1` and `phase2` with an OR gate, we generate the output `clk_div` that approximates a smooth, 3.5x divided clock by leveraging both clock edges.
+
+This solution should meet the specified requirements, ensuring a balanced duty cycle and correct phase alignment for fractional division.

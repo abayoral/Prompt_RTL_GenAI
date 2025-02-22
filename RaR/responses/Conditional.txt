@@ -1,16 +1,20 @@
+```verilog
 module top_module (
     input [7:0] a, b, c, d,
-    output [7:0] min
-);
+    output [7:0] min);
 
-    // Define variables to hold intermediate results
-    wire [7:0] min_ab, min_cd;
-
-    // Create two-way comparison circuits using the conditional operator
+    // Use ternary operator to find the minimum of the pairs
+    wire [7:0] min_ab;
+    wire [7:0] min_cd;
+    
+    // Find minimum of a and b
     assign min_ab = (a < b) ? a : b;
+    
+    // Find minimum of c and d
     assign min_cd = (c < d) ? c : d;
-
-    // Combine the intermediate comparisons to create a 4-way min circuit
+    
+    // Find minimum of the two intermediate results
     assign min = (min_ab < min_cd) ? min_ab : min_cd;
 
 endmodule
+```

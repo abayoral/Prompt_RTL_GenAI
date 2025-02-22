@@ -1,0 +1,50 @@
+The provided Verilog code for `sub_64bit` has the correct logic for signed subtraction and overflow detection. However, there are certain improvements and clarifications needed to adhere to best practices:
+
+1. **Port Declaration**: Instead of using `output reg`, it's better to declare outputs as `output` and use a separate register within an always block if needed. This is a style preference but can help in adhering to certain coding guidelines or tool requirements.
+
+2. **Logic Consistency**: It's convenient to use `wire` type by default for `output` declarations when the output values are combinational.
+
+Here's the updated version of the code with these considerations:
+
+```verilog
+module sub_64bit(
+    input signed [63:0] A,
+    input signed [63:0] B,
+    output signed [63:0] result,
+    output overflow
+);
+
+    // Internal regs to store outputs
+    reg overflow_reg;
+    reg signed [63:0] result_reg;
+
+    always @(*) begin
+        // Perform the 64-bit subtraction
+        result_reg = A - B;
+        
+        // Check for overflow conditions
+        // Overflow occurs if:
+        // 1. A is positive, B is negative, and result is negative (positive overflow)
+        // 2. A is negative, B is positive, and result is positive (negative overflow)
+        
+        if ((A[63] == 0 && B[63] == 1 && result_reg[63] == 1) || 
+            (A[63] == 1 && B[63] == 0 && result_reg[63] == 0)) begin
+            overflow_reg = 1;
+        end else begin
+            overflow_reg = 0;
+        end
+    end
+
+    // Assign the register values to outputs
+    assign result = result_reg;
+    assign overflow = overflow_reg;
+
+endmodule
+```
+
+### Key Points:
+- **Result and Overflow Register**: The result of the subtraction and overflow are stored in internal registers (`result_reg` and `overflow_reg`). These register values are then assigned to the module's outputs using `assign` statements.
+- **Combinational Logic**: All logic inside the always block remains combinational by using the `@(*)` sensitivity list. This ensures any change in inputs A or B instantly reflects in the output.
+- **Overflow Logic**: Implementing overflow logic ensures that it captures any overflow conditions during subtraction, which is crucial for signed arithmetic operations.
+
+These changes do not alter the functionality but align the module more closely with typical style and organization practices, including clean separation of combinational logic from output assignments.

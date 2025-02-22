@@ -1,39 +1,34 @@
+To tackle this problem, we need to develop a finite state machine (FSM) that manages the reception of bytes from a serial bitstream. The FSM must detect the start bit, collect 8 data bits in the correct order, verify the stop bit, and then output the correctly received byte when complete. The serial protocol we're working with transmits the least significant bit (LSB) first. The Verilog code below reveals the thought process and implementation for such a system.
+
 Chain of Thought:
 
 1. **Understand the Requirements:**
-    - We need an FSM to identify the correct reception of a byte in a serial bitstream.
-    - The data protocol consists of a start bit, 8 data bits, and a stop bit.
-    - Once a byte is correctly received (validated by the stop bit), the byte should be outputted as `out_byte`, and a `done` signal should be asserted.
-    - The serial protocol sends the least significant bit (LSB) first.
+   - We need an FSM that identifies start, stop, and data bits in a serial bitstream.
+   - Serial data comes in LSB first.
+   - Output the full byte when received correctly, along with a valid “done” signal.
 
-2. **FSM Implementation:**
-    - We will create an FSM with the following states:
-        - `IDLE`: Waiting for the start bit.
-        - `START`: Validating the start bit.
-        - `RECEIVE`: Receiving the 8 data bits.
-        - `STOP`: Validating the stop bit and marking the reception as done.
+2. **Determine the Inputs and Outputs:**
+   - Inputs: `clk`, `in`, `reset`.
+   - Outputs: `out_byte` (8-bit data), `done` (indicating valid data output).
 
-3. **Datapath Implementation:**
-    - A register needs to shift in one bit at a time to form the received byte.
-    - When the stop bit is validated, this register will be presented as `out_byte`.
+3. **FSM Design:**
+   - States: Idle (wait for start bit), Data (shift in 8 data bits), Check (verify stop bit).
+   - Transition: From Idle to Data on receiving a start bit (usually '0'). From Data to Check after receiving 8 bits. From Check back to Idle if stop bit is correct, otherwise keep checking.
 
-4. **Inputs and Outputs:**
-    - **Inputs:** `clk`, `in`, `reset`
-    - **Outputs:** `out_byte`, `done`
+4. **Datapath Design:**
+   - Shift register will store the 8 received data bits.
+   - Output control: `out_byte` should be valid when the `done` signal is high.
 
-5. **Define Intermediate Signals:**
-    - `state`: Current state of FSM.
-    - `next_state`: Next state of FSM.
-    - `bit_count`: Counter to keep track of received bits.
-    - `data_reg`: Register to store the received byte.
+5. **Intermediate Signals:**
+   - `shift_reg` to hold the 8 bits temporarily.
+   - Counter to track the number of bits shifted.
 
 6. **Structuring the Module:**
-    - Declare the module, inputs, and outputs.
-    - Declare the state machine states.
-    - Implement the FSM with an always block.
-    - Implement the datapath to shift in bits and capture the byte.
+   - Use an always block for the FSM.
+   - Use combinational logic to determine state transitions based on inputs.
+   - Capture data bits using a shift register within the FSM’s data state.
 
-7. **Writing the Verilog Code:**
+7. **Verilog Code:**
 
 ```verilog
 module top_module(
@@ -44,70 +39,77 @@ module top_module(
     output reg done
 );
 
-    // State declarations
-    typedef enum logic [1:0] {
-        IDLE = 2'b00,
-        START = 2'b01,
-        RECEIVE = 2'b10,
-        STOP = 2'b11
+    // State encoding
+    typedef enum reg [1:0] {
+        IDLE   = 2'b00,
+        DATA   = 2'b01,
+        CHECK  = 2'b10
     } state_t;
-    
+
     state_t state, next_state;
-    
-    reg [7:0] data_reg;
-    reg [2:0] bit_count;  // To count the received bits
-    
-    // FSM and control logic
+    reg [7:0] shift_reg;
+    reg [2:0] count; // Counts the 8 data bits
+
+    // State transitions
     always @(posedge clk) begin
         if (reset) begin
             state <= IDLE;
-            out_byte <= 8'd0;
+            count <= 3'b000;
+            shift_reg <= 8'b0;
             done <= 0;
-            data_reg <= 8'd0;
-            bit_count <= 3'd0;
-        end else begin
-            state <= next_state;
-
-            // Output and intermediate signal updates
-            case (state)
-                IDLE: begin
-                    done <= 0;
-                    if (in == 0)  // Detected start bit
-                        next_state <= START;
-                    else
-                        next_state <= IDLE;
-                end
-
-                START: begin
-                    bit_count <= 3'd0;
-                    data_reg <= 8'd0;
-                    next_state <= RECEIVE;
-                end
-
-                RECEIVE: begin
-                    data_reg[bit_count] <= in;
-                    bit_count <= bit_count + 1;
-
-                    if (bit_count == 3'd7)  // All 8 bits received
-                        next_state <= STOP;
-                    else
-                        next_state <= RECEIVE;
-                end
-
-                STOP: begin
-                    if (in == 1) begin  // Stop bit is correct
-                        out_byte <= data_reg;
-                        done <= 1;
-                        next_state <= IDLE;
-                    end else begin  // Stop bit is incorrect, wait for next stop bit
-                        next_state <= STOP;
-                    end
-                end
-            endcase
         end
+        else begin
+            state <= next_state;
+            if (state == DATA) begin
+                shift_reg <= {in, shift_reg[7:1]};
+                if (count < 3'd7)
+                    count <= count + 1'b1;
+                else
+                    count <= 3'b000;
+            end
+            else begin
+                count <= 3'b000;
+                shift_reg <= shift_reg;
+            end
+        end
+    end
+
+    // Next state logic
+    always @(*) begin
+        case (state)
+            IDLE: begin
+                done = 0;
+                if (in == 1'b0) // Start bit detected
+                    next_state = DATA;
+                else
+                    next_state = IDLE;
+            end
+            DATA: begin
+                done = 0;
+                if (count == 3'd7)
+                    next_state = CHECK;
+                else
+                    next_state = DATA;
+            end
+            CHECK: begin
+                if (in == 1'b1) begin // Stop bit should be 1
+                    done = 1;
+                    out_byte = shift_reg;
+                    next_state = IDLE;
+                end
+                else begin
+                    done = 0;
+                    next_state = CHECK; // Stay until the correct stop bit is detected
+                end
+            end
+            default: begin
+                next_state = IDLE;
+                done = 0;
+            end
+        endcase
     end
 
 endmodule
 ```
 
-The above Verilog module implements an FSM to track the reception of a byte in a serial bitstream, verifying the start bit, data bits, and stop bit. It also includes a datapath that shifts in the serial data and outputs the byte once fully received and validated.
+In this implementation, the FSM starts in the `IDLE` state and waits for a start bit. Once the start bit is detected, it transitions to the `DATA` state, shifting in bits into a register. After receiving 8 bits, the FSM checks for the correct stop bit in the `CHECK` state. If correct, the data is output, and the FSM returns to the `IDLE` state. If not, it remains in the `CHECK` state until the stop bit is validated. The received byte is available at `out_byte` when `done` is asserted.

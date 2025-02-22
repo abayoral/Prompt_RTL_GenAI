@@ -1,14 +1,15 @@
 ```verilog
-module top_module(
+module top_module( 
     input [99:0] in,
     output out_and,
     output out_or,
-    output out_xor
+    output out_xor 
 );
 
-    assign out_and = &in;  // AND reduction operator
-    assign out_or = |in;   // OR reduction operator
-    assign out_xor = ^in;  // XOR reduction operator
+    // Using reduction operators to generate the outputs
+    assign out_and = &in;  // Reduction AND
+    assign out_or = |in;   // Reduction OR
+    assign out_xor = ^in;  // Reduction XOR
 
 endmodule
 ```

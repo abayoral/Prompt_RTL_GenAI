@@ -1,7 +1,10 @@
+Thank you for the clarification. I will proceed to provide the Verilog code for the module that behaves as a wire.
+
 ```verilog
-module top_module( input in, output out );
-
+module top_module( 
+    input in, 
+    output out 
+);
     assign out = in;
-
 endmodule
 ```

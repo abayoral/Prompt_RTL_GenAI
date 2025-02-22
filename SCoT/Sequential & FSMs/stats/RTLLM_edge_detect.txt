@@ -1,0 +1,3 @@
+./simv -l run.log
+===========Your Design Passed===========
+testbench.v:67: $finish called at 85 (1ns)

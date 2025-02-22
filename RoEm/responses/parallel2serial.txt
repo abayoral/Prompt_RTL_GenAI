@@ -1,0 +1,38 @@
+```verilog
+module parallel2serial (
+    input wire clk,        // Clock Signal
+    input wire rst_n,      // Active-low Reset Signal
+    input wire [3:0] d,    // 4-bit Parallel Data Input
+    output reg valid_out,  // Valid Output Signal
+    output reg dout        // Serial Output
+);
+
+    reg [3:0] data_reg;  // Register to hold the input data
+    reg [1:0] cnt;       // 2-bit Counter
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset State
+            data_reg <= 4'b0000;
+            cnt <= 2'b00;
+            valid_out <= 1'b0;
+            dout <= 1'b0;
+        end else begin
+            if (cnt == 2'b11) begin
+                // Full cycle of serial transmission completed
+                cnt <= 2'b00;
+                data_reg <= d; // Load next parallel data
+                valid_out <= 1'b1;
+                dout <= data_reg[3]; // Output MSB of the new data
+            end else begin
+                // During transmission
+                cnt <= cnt + 1;
+                valid_out <= 1'b0;
+                dout <= data_reg[3]; // Output current MSB
+                data_reg <= {data_reg[2:0], 1'b0}; // Shift the data left
+            end
+        end
+    end
+
+endmodule
+```

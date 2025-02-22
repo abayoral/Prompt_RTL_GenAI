@@ -3,45 +3,44 @@ module top_module(
     input clk,
     input in,
     input areset,
-    output reg out
-);
+    output reg out);
 
-    typedef enum reg [1:0] {
-        A = 2'b00,
-        B = 2'b01,
-        C = 2'b10,
-        D = 2'b11
+    // State encoding
+    typedef enum logic [1:0] {
+        S_A = 2'b00,
+        S_B = 2'b01,
+        S_C = 2'b10,
+        S_D = 2'b11
     } state_t;
 
-    state_t state, next_state;
+    state_t current_state, next_state;
 
     // State transition logic
     always @(*) begin
-        case (state)
-            A: next_state = in ? B : A;
-            B: next_state = in ? B : C;
-            C: next_state = in ? D : A;
-            D: next_state = in ? B : C;
-            default: next_state = A;
+        case (current_state)
+            S_A: next_state = (in) ? S_B : S_A;
+            S_B: next_state = (in) ? S_B : S_C;
+            S_C: next_state = (in) ? S_D : S_A;
+            S_D: next_state = (in) ? S_B : S_C;
+            default: next_state = S_A; // Default to state A for safety
         endcase
     end
 
     // State flip-flops with asynchronous reset
     always @(posedge clk or posedge areset) begin
-        if (areset)
-            state <= A;
-        else
-            state <= next_state;
+        if (areset) begin
+            current_state <= S_A;
+        end
+        else begin
+            current_state <= next_state;
+        end
     end
 
     // Output logic
     always @(*) begin
-        case (state)
-            A: out = 0;
-            B: out = 0;
-            C: out = 0;
-            D: out = 1;
-            default: out = 0;
+        case (current_state)
+            S_D: out = 1'b1;
+            default: out = 1'b0;
         endcase
     end
 

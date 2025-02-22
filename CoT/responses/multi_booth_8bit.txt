@@ -1,0 +1,85 @@
+Certainly! Let's walk through the steps to create an 8-bit Radix-4 Booth Multiplier using Verilog:
+
+### Chain of Thought:
+
+1. **Understand the Requirements:**
+   - Implement an 8-bit Booth Multiplier to handle signed multiplication.
+   - Inputs: two 8-bit numbers (`a`, `b`), a clock signal (`clk`), and a reset signal (`reset`).
+   - Outputs: a 16-bit product (`p`) and a ready signal (`rdy`).
+
+2. **Setup Synchronous Operations:**
+   - On the positive edge of `clk`, perform Booth's multiplication steps.
+   - If `reset` is high, initialize all internal states to start conditions.
+
+3. **Bit Extension for Signed Operations:**
+   - Extend both `a` and `b` to 16 bits to ensure signed multiplication support.
+   - Perform initialization and setup based on Booth's algorithm properties.
+
+4. **Algorithm Implementation:**
+   - Use a 5-bit counter `ctr` to track up to 16 cycles of operation.
+   - Follow Booth's algorithm by adjusting and processing bits, with particular attention to signed aspects.
+
+5. **Initialize and Control Signals:**
+   - Clear product and set counter values upon reset.
+   - Set `rdy` to indicate the completion.
+
+6. **Code Structure:**
+   - Start by declaring the module with specified inputs/outputs.
+   - Use always blocks to encapsulate synchronous logic.
+
+### Verilog Code Implementation:
+
+```verilog
+module multi_booth_8bit (
+    input wire [7:0] a,
+    input wire [7:0] b,
+    input wire clk,
+    input wire reset,
+    output reg [15:0] p,
+    output reg rdy
+);
+    // Internal registers
+    reg [15:0] multiplicand, product;
+    reg [16:0] multiplier;  // Extended to accommodate Booth's processing
+    reg [4:0] ctr;          // 5-bit counter for up to 16 cycles
+
+    // Booth's multiplier algorithm on positive edge of clock or reset
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            // Initialize values on reset
+            multiplicand <= {{8{b[7]}}, b};   // Sign-extended multiplicand
+            multiplier <= {{8{a[7]}}, a, 1'b0}; // Sign-extended multiplier with extra bit for Booth
+            product <= 16'b0;
+            ctr <= 5'b00000;
+            rdy <= 1'b0;
+        end else if (!rdy) begin
+            // Perform Booth's operations
+            case (multiplier[1:0])
+                2'b01: product <= product + multiplicand; // Add multiplicand
+                2'b10: product <= product - multiplicand; // Subtract multiplicand
+                default: ; // No operation needed for 2'b00 and 2'b11
+            endcase
+            
+            // Arithmetic shift right multiplier, preserving the sign
+            multiplier <= {multiplier[16], multiplier[16:1]};
+            // Increment counter
+            ctr <= ctr + 1'b1;
+
+            // If 16 operations are complete, finalize
+            if (ctr == 5'b10000) begin
+                p <= product;  // Assign product to output
+                rdy <= 1'b1;   // Set ready signal
+            end
+        end
+    end
+endmodule
+```
+
+### Explanation:
+
+- **Reset Operation:** On reset, the multiplicand and multiplier are sign-extended, and internal states (product, counter, and ready) are initialized.
+- **Booth Operand Processing:** Handles 2-bit Booth encoding (00, 01, 10, 11) to determine arithmetic shifts and computations.
+- **Shift and Counter Management:** The multiplier shifts right every cycle, and the counter ensures the loop runs the correct number of times (16 cycles).
+- **Output Finalization:** Upon completing 16 cycles, the counter checks, setting the product to output (`p`) and indicating readiness (`rdy`).
+
+This Verilog module follows the Booth multiplication principles, managing its operations over a synchronous reset/process flow, suitable for signed 8-bit multiplications.

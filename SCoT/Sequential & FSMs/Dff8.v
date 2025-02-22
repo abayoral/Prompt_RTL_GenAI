@@ -1,10 +1,5 @@
-// Create 8 D flip-flops. All DFFs should be triggered by the positive edge of clk.
+In this task, you are required to design a digital circuit using Verilog, a hardware description language. Specifically, you are to implement eight D-type flip-flops, often referred to as DFFs, within a module called `top_module`. Each flip-flop must be set up such that it is triggered by the rising edge, also known as the positive edge, of a clock signal labeled `clk`. 
 
-module top_module (
-    input clk,
-    input [7:0] d,
-    output [7:0] q
-);
-	// Insert your code here
+You'll be provided with an 8-bit wide input signal `d`, representing a set of data bits, from which each bit will be fed into a separate D flip-flop. The output `q` should also be 8 bits wide, where each bit corresponds to the stored value from each D flip-flop after being triggered by a clock event. The task is to write the appropriate Verilog code within the provided module structure that achieves this setup. 
 
-endmodule
+Ensure that the D flip-flops are correctly configured to sample the input signal `d` and update the output signal `q` with the stable data value on the rising edge of the clock. Consider how you would declare and instantiate each flip-flop, and how you would ensure they are all synchronized using the same clock signal.

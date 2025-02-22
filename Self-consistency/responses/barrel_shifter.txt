@@ -1,0 +1,42 @@
+module mux2X1(
+    input wire [7:0] a,  // First input
+    input wire [7:0] b,  // Second input
+    input wire sel,      // Control signal to select between `a` and `b`
+    output wire [7:0] y  // Output
+);
+    assign y = sel ? b : a;
+endmodule
+
+module barrel_shifter(
+    input wire [7:0] in,    // 8-bit input
+    input wire [2:0] ctrl,  // 3-bit control for shifting
+    output wire [7:0] out   // 8-bit output
+);
+    wire [7:0] stage1, stage2, stage3;
+
+    // Stage 1: Shift by 4 bits
+    mux2X1 mux_stage1(
+        .a(in),
+        .b({in[3:0], in[7:4]}),  // 4-bit left rotate
+        .sel(ctrl[2]),
+        .y(stage1)
+    );
+
+    // Stage 2: Shift by 2 bits
+    mux2X1 mux_stage2(
+        .a(stage1),
+        .b({stage1[1:0], stage1[7:2]}),  // 2-bit left rotate
+        .sel(ctrl[1]),
+        .y(stage2)
+    );
+
+    // Stage 3: Shift by 1 bit
+    mux2X1 mux_stage3(
+        .a(stage2),
+        .b({stage2[0], stage2[7:1]}),  // 1-bit left rotate
+        .sel(ctrl[0]),
+        .y(stage3)
+    );
+
+    assign out = stage3;  // Final output
+endmodule

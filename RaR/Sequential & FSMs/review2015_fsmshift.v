@@ -1,12 +1,7 @@
-// As part of the FSM for controlling the shift register, we want the ability to enable the shift register for exactly 4 clock cycles whenever the proper bit pattern is detected. Design an FSM handles enabling the shift register for 4 cycles.
+You are assigned the role of a senior Digital Design Engineer at a premier hardware design organization, where you are entrusted with the responsibility of developing a crucial Verilog module for an upcoming, high-stakes product. The performance and reliability of this module are imperative to uphold the esteemed reputation of your computer hardware company within the competitive industry landscape.
 
-// Whenever the FSM is reset, assert shift_ena for 4 cycles, then 0 forever (until reset).
+Your task specifically involves the design of a Finite State Machine (FSM) that will effectively manage the control of a shift register. The shift register must be enabled for a precise duration of exactly four clock cycles whenever a designated bit pattern is detected. This functionality is crucial as it plays a significant role in the overall operation and success of the product.
 
-module top_module (
-    input clk,
-    input reset,      // Synchronous reset
-    output shift_ena);
+Furthermore, it is a requirement that, upon a reset of the FSM—which is synchronous with the clock signal—the output signal 'shift_ena' should be asserted for exactly four consecutive clock cycles. Following this initial assertion caused by the reset, 'shift_ena' should then remain low indefinitely unless another reset occurs, at which point the cycle would repeat.
 
-    // Insert your code here
-    
-endmodule
+Given these specifications, you are to design the Verilog module 'top_module', with the provided inputs and outputs: a clock signal 'clk', a synchronous reset signal 'reset', and an output signal 'shift_ena'. How would you approach coding this FSM to ensure it meets all specified requirements, keeping in mind the precise behavior required for both the bit pattern detection and the reset condition?

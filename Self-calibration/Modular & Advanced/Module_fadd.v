@@ -1,3 +1,5 @@
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
 // you are given a module add16 that performs a 16-bit addition. You must instantiate two of them to create a 32-bit adder. 
 // One add16 module computes the lower 16 bits of the addition result, 
 // while the second add16 module computes the upper 16 bits of the result. 

@@ -1,23 +1,9 @@
-// Assume you have a finite state machine that will identify when bytes have been correctly received when given a stream of bits. It needs to identify the start bit, wait for all 8 data bits, then verify that the stop bit was correct. If the stop bit does not appear when expected, the FSM must wait until it finds a stop bit before attempting to receive the next byte.
-// Now that you have a finite state machine that can identify when bytes are correctly received in a serial bitstream, add a datapath that will output the correctly-received data byte. out_byte needs to be valid when done is 1, and is don't-care otherwise.
+You are working with a finite state machine (FSM) designed to recognize correctly received bytes from a given stream of bits within a serial communication protocol. The primary function of this FSM is to detect the structure of a byte by identifying the start bit, sequentially collecting the subsequent 8 data bits, and then verifying the presence and correctness of the stop bit. Should the stop bit fail to appear when it is expected, the FSM is required to disregard the data and continue monitoring the stream until a valid stop bit is observed, enabling it to begin the process anew for the next byte.
 
-// Note that the serial protocol sends the least significant bit first.
+Given this context, your task is to extend the existing FSM by incorporating a data path that effectively outputs the bytes that have been correctly received. The output, referred to as `out_byte`, must be valid (i.e., it should accurately represent the received 8 data bits) when a signal, `done`, is high (set to 1). When `done` is not active (when its value is not 1), the `out_byte` value is considered irrelevant or a "don't-care" state, meaning that its value does not impact the correctness of the system.
 
-// Hint: The serial bitstream needs to be shifted in one bit at a time, then read out in parallel.
+Furthermore, it's important to note a specific characteristic of the protocol: the serial communication protocol in use transmits data starting with the least significant bit (LSB) first. This detail is crucial for correctly handling the incoming sequence of bits, as the received bits need to be shifted in one at a time before they are inspected or used.
 
+In light of the above requirements and context, the implementation should be structured such that it accounts for synchronous operations, driven by a clock (`clk`) as well as a synchronous reset (`reset`). The FSM logic will handle the state transitions based on the incoming serial bitstream (`in`), while the data path will ensure the proper collection and output of the received byte when the FSM has confirmed the byte's validity.
 
-module top_module(
-    input clk,
-    input in,
-    input reset,    // Synchronous reset
-    output [7:0] out_byte,
-    output done
-); //
-
-	// Insert your code below
-	
-    // Use FSM from Fsm_serial
-
-    // New: Datapath to latch input bits.
-
-endmodule
+It's also suggested to build upon or integrate aspects of a predefined module named `Fsm_serial`, which likely encapsulates the FSM logic for detecting the start, data, and stop bits. The new component to be added must effectively manage the shifting and parallel reading of data bits to satisfy the output requirements.

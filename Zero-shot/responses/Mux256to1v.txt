@@ -4,6 +4,7 @@ module top_module(
     input [7:0] sel,
     output [3:0] out );
 
+    // Use indexed vector part-select to extract 4-bit wide slices
     assign out = in[sel*4 +: 4];
 
 endmodule

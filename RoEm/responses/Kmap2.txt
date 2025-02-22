@@ -4,13 +4,13 @@ module top_module(
     input b,
     input c,
     input d,
-    output out
-    );
+    output out  
+);
 
-    // Simplified Sum-of-Products (SOP) form from the K-map:
-    // out = a'b'c' + a'b'c + a'b d' + a c d' + a b c + ab' d
+    // Simplified expression from the Karnaugh map:
+    // out = (a'c'd') + (a'bd') + (ab'c') + (bcd)
 
-    assign out = (~a & ~b & ~c) | (~a & ~b & c) | (~a & b & ~d) | (a & ~b & ~d) | (a & b & c);
+    assign out = (~a & ~c & ~d) | (~a & b & ~d) | (a & ~b & ~c) | (b & c & d);
 
 endmodule
 ```

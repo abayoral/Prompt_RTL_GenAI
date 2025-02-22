@@ -1,0 +1,81 @@
+module traffic_light(
+    input rst_n,
+    input clk,
+    input pass_request,
+    output reg [7:0] clock,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+    // State encoding
+    typedef enum reg [1:0] {
+        S_IDLE = 2'b00,
+        S_RED = 2'b01,
+        S_YELLOW = 2'b10,
+        S_GREEN = 2'b11
+    } state_t;
+    
+    state_t state, next_state;
+    
+    // Parameters for the duration of each light
+    localparam integer RED_DURATION = 8'd10;
+    localparam integer YELLOW_DURATION = 8'd5;
+    localparam integer GREEN_DURATION = 8'd60;
+    localparam integer GREEN_MIN_DURATION = 8'd10;
+    
+    reg [7:0] cnt;
+    reg ped_request;  // Internal signal to latch pedestrian request
+
+    // State transition logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= S_RED;
+            cnt <= RED_DURATION;
+            ped_request <= 1'b0;
+        end else begin
+            state <= next_state;
+            if (state == S_GREEN && pass_request && cnt > GREEN_MIN_DURATION) begin
+                ped_request <= 1'b1;  // Latch pedestrian request
+            end
+            if (cnt == 8'd0) begin
+                cnt <= (next_state == S_RED) ? RED_DURATION :
+                       (next_state == S_YELLOW) ? YELLOW_DURATION : GREEN_DURATION;
+            end else begin
+                cnt <= cnt - 1;
+            end
+        end
+    end
+
+    // Next state logic
+    always @(*) begin
+        case (state)
+            S_RED: begin
+                if (cnt == 8'd0) next_state = S_GREEN;
+                else next_state = S_RED;
+            end
+            S_GREEN: begin
+                if (ped_request || cnt == GREEN_MIN_DURATION) begin
+                    next_state = S_YELLOW;
+                    ped_request = 1'b0;  // Reset pedestrian request after processed
+                end else next_state = S_GREEN;
+            end
+            S_YELLOW: begin
+                if (cnt == 8'd0) next_state = S_RED;
+                else next_state = S_YELLOW;
+            end
+            default: begin
+                next_state = S_RED; // Default state
+            end
+        endcase
+    end
+
+    // Output logic
+    always @(*) begin
+        red = (state == S_RED);
+        yellow = (state == S_YELLOW);
+        green = (state == S_GREEN && !ped_request);
+        clock = cnt;  // Output the current count
+    end
+
+endmodule

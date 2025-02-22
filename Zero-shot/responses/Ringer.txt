@@ -6,11 +6,11 @@ module top_module (
     output motor         // Vibrate
 );
 
-    // The motor is on when vibrate_mode is 1 and there is an incoming call (ring).
-    assign motor = ring & vibrate_mode;
-
-    // The ringer is on when vibrate_mode is 0 and there is an incoming call (ring).
-    assign ringer = ring & ~vibrate_mode;
+    // The motor is on when vibrate_mode is enabled and there is a ring signal.
+    assign motor = vibrate_mode & ring;
+    
+    // The ringer is on when vibrate_mode is not enabled and there is a ring signal.
+    assign ringer = ~vibrate_mode & ring;
 
 endmodule
 ```

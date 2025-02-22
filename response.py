@@ -11,19 +11,9 @@ import regex as reg  # Assumes this contains the extract_verilog_code function
 def generate_response(system_prompt, design_prompt, model_type, prompt_strategy=None):
     """
     Generates a response from the language model based on the design prompt.
-    
-    Parameters:
-    system_prompt (str): Custom system prompt to use.
-    design_prompt (str): The prompt to input into the LLM.
-    model_type (str): The type of LLM to use.
-    prompt_strategy (str): The strategy for the system prompt.
-    
-    Returns:
-    str: The generated response from the LLM.
     """
     conv = cv.Conversation()
 
-    # Set system prompt based on the strategy
     if system_prompt:
         conv.add_message("system", system_prompt)
     else:
@@ -31,10 +21,26 @@ def generate_response(system_prompt, design_prompt, model_type, prompt_strategy=
     
     conv.add_message("user", design_prompt)
 
-    # Generate the response
     response = generate_verilog(conv, model_type)
 
     return response
+
+def find_mistakes_and_correct(response, model_type):
+    """
+    Passes the generated response through an additional verification step
+    to find and correct mistakes.
+    """
+    conv = cv.Conversation()
+    conv.add_message("system", (
+        "You are a Verilog verification assistant. Your task is to analyze the given Verilog module, "
+        "identify any logical, syntax, or functional errors, and provide a corrected version. "
+        "Ensure that the corrected module adheres to best practices and security constraints."
+    ))
+    conv.add_message("user", f"Here is the generated Verilog code:\n\n{response}\n\nPlease find and correct any errors.")
+
+    corrected_response = generate_verilog(conv, model_type)
+
+    return corrected_response
 
 def get_sys_prompt(prompt_strategy=None):
     framework_name = os.environ.get('framework_name', 'default_framework')
@@ -107,38 +113,45 @@ def get_response(design_prompt, module, model_type, outdir="", log=None, prompt_
         outdir += "/"
 
     conv = cv.Conversation()
-
     conv.add_message("system", get_sys_prompt(prompt_strategy))
     conv.add_message("user", design_prompt)
 
     # Generate the directory path
     dir_path = os.path.join(outdir, prompt_strategy, dirname)
-
-    # Create the directory if it doesn't exist
     os.makedirs(dir_path, exist_ok=True)
 
     # Generate the filename within the new directory
     filename = os.path.join(dir_path, f"{module}.txt")
 
-    if prompt_strategy == 'Self-consistency':
-        responses = []
-        for i in range(5): 
-            response = generate_verilog(conv, model_type)
-            responses.append(reg.extract_verilog_code(response))
-        # Select the most consistent response
-        final_response = get_most_consistent_response(responses)
-    elif prompt_strategy == 'Self-ask':
-        final_response = handle_self_ask(conv, model_type, module)
-    elif prompt_strategy == 'Least-to-most':
-        final_response = handle_least_to_most(conv, design_prompt, model_type)
+    framework_name = os.environ.get('framework_name', 'default_framework')
+
+    if framework_name == "Self-calibration":
+        # Step 1: Generate initial response
+        initial_response = generate_verilog(conv, model_type)
+        
+        # Step 2: Pass through verification to correct mistakes
+        final_response = find_mistakes_and_correct(initial_response, model_type)
+
     else:
-        final_response = generate_verilog(conv, model_type)
+        if prompt_strategy == 'Self-consistency':
+            responses = []
+            for i in range(5): 
+                response = generate_verilog(conv, model_type)
+                responses.append(reg.extract_verilog_code(response))
+            final_response = get_most_consistent_response(responses)
+        elif prompt_strategy == 'Self-ask':
+            final_response = handle_self_ask(conv, model_type, module)
+        elif prompt_strategy == 'Least-to-most':
+            final_response = handle_least_to_most(conv, design_prompt, model_type)
+        else:
+            final_response = generate_verilog(conv, model_type)
 
     with open(filename, 'w') as file:
         file.write(final_response)
 
     print(f"Response written to {filename}")
     return final_response
+
 
 def handle_self_ask(conv, model_type, module):
     """
@@ -147,45 +160,59 @@ def handle_self_ask(conv, model_type, module):
     Parameters:
     conv (cv.Conversation): The conversation object.
     model_type (str): The type of LLM to use.
+    module (str): The name of the Verilog module.
 
     Returns:
     str: The final response after self-asking.
     """
 
     clarifying_question_prompt = (
-    "Identify the one clarifying question that is absolutely necessary to understand the specification of this Verilog module. "
-    "This question should be crucial to understanding the problem, without which a solution cannot be developed. "
-    "If no such question is needed, it is acceptable to proceed without asking any. "
-    "Please avoid asking any question that hints towards a solution.")
+        "Identify the one clarifying question that is absolutely necessary to understand the specification of this Verilog module. "
+        "This question should be crucial to understanding the problem, without which a solution cannot be developed. "
+        "If no such question is needed, it is acceptable to proceed without asking any. "
+        "Please avoid asking any question that hints towards a solution."
+    )
     
     # Ask for clarifying questions
     conv.add_message("user", clarifying_question_prompt)
     question_response = generate_verilog(conv, model_type)
-    # clarifying_questions = extract_questions_from_response(questions_response)
+
+    # Determine the solution directory and file name
+    if module.startswith("RTLLM_"):
+        solution_dir = "RTLLM_solutions"
+        verified_module_name = module.replace("RTLLM_", "verified_", 1)  # Replace only the first occurrence
+        solution_file_name = f"{verified_module_name}.v"
+    else:
+        solution_dir = "hdlbits_solutions"
+        solution_file_name = f"{module}.v"
 
     # Construct the path to the solution file
-    solution_dir = "hdlbits_solutions"
-    solution_file_path = os.path.join(solution_dir, f"{module}.v")
+    solution_file_path = os.path.join(solution_dir, solution_file_name)
 
     # Read the solution file
     if os.path.isfile(solution_file_path):
         with open(solution_file_path, 'r') as file:
             solution_code = file.read()
-            # Ask for a short answer based on the question and the solution
-        answer_prompt = question_response + ": " + solution_code                                                                                 
+        
+        # Ask for a short answer based on the question and the solution
+        answer_prompt = question_response + ": " + solution_code
         conv2 = cv.Conversation()
-        conv2.add_message("system","You are an advanced Verilog design assistant. Based on the following Verilog module and the provided solution, generate a short, one-sentence answer to the question. Ensure the response is concise and directly addresses the question.")
-        conv2.add_message("user",answer_prompt)
+        conv2.add_message("system", (
+            "You are an advanced Verilog design assistant. Based on the following Verilog module and the provided solution, generate a short, "
+            "one-sentence answer to the question. Ensure the response is concise and directly addresses the question."
+        ))
+        conv2.add_message("user", answer_prompt)
         user_answer = generate_verilog(conv2, model_type)
     else:
         user_answer = "Question cannot be answered, proceed to generate the Verilog code"
-    
+
     conv.add_message("user", user_answer)
-    
+
     # Finalize the Verilog module based on the clarifications
     final_response = generate_verilog(conv, model_type)
-    
+
     return final_response
+
 
 def handle_least_to_most(conv, design_prompt, model_type):
     """

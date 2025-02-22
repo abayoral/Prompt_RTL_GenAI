@@ -1,20 +1,69 @@
 ```verilog
-module top_module(
-    input in,
-    input [3:0] state,
-    output [3:0] next_state,
-    output out); //
+module moore_state_machine (
+    input wire clk,
+    input wire reset,
+    input wire in,
+    output reg out
+);
+    // State encoding using one-hot
+    parameter STATE_A = 4'b0001;
+    parameter STATE_B = 4'b0010;
+    parameter STATE_C = 4'b0100;
+    parameter STATE_D = 4'b1000;
+    
+    reg [3:0] state, next_state;
 
-    parameter A = 0, B = 1, C = 2, D = 3;
+    // State transition logic
+    always @(*) begin
+        case (state)
+            STATE_A: begin
+                if (in == 0)
+                    next_state = STATE_A;
+                else
+                    next_state = STATE_B;
+            end
+            STATE_B: begin
+                if (in == 0)
+                    next_state = STATE_C;
+                else
+                    next_state = STATE_B;
+            end
+            STATE_C: begin
+                if (in == 0)
+                    next_state = STATE_A;
+                else
+                    next_state = STATE_D;
+            end
+            STATE_D: begin
+                if (in == 0)
+                    next_state = STATE_C;
+                else
+                    next_state = STATE_B;
+            end
+            default: begin
+                next_state = STATE_A; // Default state
+            end
+        endcase
+    end
 
-    // State transition logic: Derive an equation for each state flip-flop.
-    assign next_state[A] = state[A] & ~in | state[C] & ~in;
-    assign next_state[B] = state[A] & in | state[B] & in | state[D] & in;
-    assign next_state[C] = state[B] & ~in | state[D] & ~in;
-    assign next_state[D] = state[C] & in;
+    // Output logic
+    always @(*) begin
+        case (state)
+            STATE_A: out = 0;
+            STATE_B: out = 0;
+            STATE_C: out = 0;
+            STATE_D: out = 1;
+            default: out = 0;
+        endcase
+    end
 
-    // Output logic:
-    assign out = state[D];
-
+    // State register
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            state <= STATE_A; // Reset to STATE_A
+        end else begin
+            state <= next_state;
+        end
+    end
 endmodule
 ```

@@ -1,54 +1,103 @@
-Chain of Thought:
+To design a 4-digit BCD counter, we first need to break the problem into manageable parts. Each of the 4 digits requires its own BCD counter. Additionally, we must generate enable signals for upper digits to ensure they increment at the right time. Let's summarize this process in a chain of thought and then implement the Verilog code:
 
-Understand the Requirements:
-A 4-digit BCD counter counts from 0000 to 9999 (in decimal) where each BCD digit is encoded using 4 bits. The BCD counter increments its value on each rising edge of the clock (clk).
-The counter resets to 0000 when the reset (reset) signal is high.
-The enable signals ena[3] to ena[1] are asserted high when the respective BCD digit should be incremented.
-Inputs: clk, reset
-Outputs: ena[3:1], q[15:0]
+### Chain of Thought:
 
-Determine the Inputs and Outputs:
-Inputs: clk, reset
-Output: ena[3:1], q[15:0]
+1. **Understand the Requirements:**
+   - We need a 4-digit BCD counter. Each digit is represented by 4 bits.
+   - The enable signals for the tens, hundreds, and thousands digits need to be appropriately generated to ensure the correct chaining of the counters.
 
-Define Intermediate Signals:
-Intermediate signals count[3:0] are used to hold the value of each BCD digit.
+2. **Determine the Inputs and Outputs:**
+   - Inputs: `clk`, `reset`
+   - Outputs: `q[15:0]` for the BCD values, `ena[3:1]` for the enable signals of the upper digits.
 
-Structuring the Module:
+3. **Define Intermediate Signals and Logic:**
+   - Each digit counter will have its BCD logic.
+   - Enable the next digit counter when the current digit counter rolls over from 9 to 0.
 
-Start with the module declaration, specifying the inputs and outputs.
-Define four instances of a single BCD counter for each digit.
-Use an always block triggered on the rising edge of the clock or the rising edge of the reset signal.
-Inside the always block, if the reset signal is high, assign zero to all BCD digits.
-If the reset signal is low, increment the value of each BCD digit when its corresponding enable signal is asserted.
-Assign the value of each BCD digit to the corresponding part of the output q[15:0].
+4. **Structuring the Module:**
+   - Use a top module to instantiate four single-digit BCD counters.
+   - Generate the enable signals.
+   - Pass the enable signals to control the chaining of digit counters.
 
-Writing the Verilog Code:
+5. **Write the Core Logic:**
+   - Each digit is a BCD counter that resets to 0 after 9 and enables the next significant digit.
+   - Implement logic to determine when a digit rolls over.
 
-verilog
+### Verilog Code:
+
+```verilog
+module bcd_digit (
+    input wire clk,
+    input wire reset,
+    input wire ena,
+    output reg [3:0] q
+);
+    always @(posedge clk) begin
+        if (reset) begin
+            q <= 4'b0000;
+        end else if (ena) begin
+            if (q == 4'b1001) // if 9 increment to 0
+                q <= 4'b0000;
+            else
+                q <= q + 1;
+        end
+    end
+endmodule
 
 module top_module (
     input wire clk,
-    input wire reset,
+    input wire reset,   // Synchronous active-high reset
     output wire [3:1] ena,
-    output reg [15:0] q
+    output wire [15:0] q
 );
-    reg [3:0] count [0:3];
-    
-    always @(posedge clk or posedge reset) begin
-        if (reset)
-            q <= 16'b0000000000000000;
-        else begin
-            if (ena[1]) count[1] <= count[1] + 1;
-            if (ena[2]) count[2] <= count[2] + 1;
-            if (ena[3]) count[3] <= count[3] + 1;
-        end
-    end
-    
-    assign q[3:0] = count[0];
-    assign q[7:4] = count[1];
-    assign q[11:8] = count[2];
-    assign q[15:12] = count[3];
-endmodule
+    // Internal enable signals for chaining the counters
+    wire ena1, ena2, ena3;
 
-Please note that you need to be careful with 4-bit BCD digit, because it must not exceed 9. The increment logic should be built properly, if the count value is 9, next increment should make it 0 and carry to the next digit.
+    // Least significant digit, always enabled
+    bcd_digit digit0 (
+        .clk(clk),
+        .reset(reset),
+        .ena(1'b1),
+        .q(q[3:0])
+    );
+
+    // Generate enable signals based on digit roll over
+    assign ena1 = (q[3:0] == 4'b1001);
+    assign ena2 = ena1 && (q[7:4] == 4'b1001);
+    assign ena3 = ena2 && (q[11:8] == 4'b1001);
+
+    // Latching enable signals for output
+    assign ena[1] = ena1;
+    assign ena[2] = ena2;
+    assign ena[3] = ena3;
+
+    // Second digit, enabled by first
+    bcd_digit digit1 (
+        .clk(clk),
+        .reset(reset),
+        .ena(ena1),
+        .q(q[7:4])
+    );
+
+    // Third digit, enabled by second
+    bcd_digit digit2 (
+        .clk(clk),
+        .reset(reset),
+        .ena(ena2),
+        .q(q[11:8])
+    );
+
+    // Most significant digit, enabled by third
+    bcd_digit digit3 (
+        .clk(clk),
+        .reset(reset),
+        .ena(ena3),
+        .q(q[15:12])
+    );
+endmodule
+```
+
+### Explanation:
+- Each digit has a module `bcd_digit` that independently handles counting from 0 to 9.
+- Enable signals (`ena1`, `ena2`, `ena3`) ensure that the next digit only increments when the current digit rolls over from 9 to 0.
+- The largest digit (thousands) only changes when all lower digits have rolled over.

@@ -3,10 +3,10 @@ module top_module(
     input a, b,
     output cout, sum );
 
-    // Sum is the XOR of the two input bits
+    // Sum is the XOR of a and b
     assign sum = a ^ b;
     
-    // Carry-out is the AND of the two input bits
+    // Carry out is the AND of a and b
     assign cout = a & b;
 
 endmodule

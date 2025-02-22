@@ -1,0 +1,23 @@
+```verilog
+module square_wave (
+    input wire clk,                   // Clock signal input
+    input wire [7:0] freq,            // Frequency control input
+    output reg wave_out               // Square wave output
+);
+
+    // Internal 8-bit counter
+    reg [7:0] count;
+
+    // Sequential block triggered on the positive edge of the clock
+    always @(posedge clk) begin
+        // Check if the counter has reached the frequency threshold
+        if (count == (freq - 1)) begin
+            count <= 8'b0;            // Reset counter
+            wave_out <= ~wave_out;    // Toggle the square wave output
+        end else begin
+            count <= count + 1;       // Increment counter
+        end
+    end
+    
+endmodule
+```
