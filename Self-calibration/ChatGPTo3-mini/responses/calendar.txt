@@ -1,0 +1,65 @@
+Below is one acceptable corrected version of the code. Functionally nothing was “wrong” with your implementation, but there were a few style and best‐practice issues that can be improved:
+
+• It is better to use consistent naming conventions (e.g. lower case for clock and reset).
+• There’s no need to “hold” a register by assigning it to itself in a clocked always block.
+• The hours register only needs 5 bits (0–23) so using 6 bits is more than necessary (though not an error).
+• Using intermediate “flag” signals (optional) can improve readability.
+
+Below is the revised code with these improvements:
+
+------------------------------------------------
+module calendar(
+   input wire clk,
+   input wire rst,
+   output reg [5:0] secs,  // 0 to 59: 6 bits is correct
+   output reg [5:0] mins,  // 0 to 59: 6 bits is correct
+   output reg [4:0] hours  // 0 to 23: 5 bits is sufficient
+);
+
+  // Seconds counter: counts 0 → 59 then wraps to 0.
+  always @(posedge clk or posedge rst) begin
+    if (rst)
+      secs <= 6'd0;
+    else if (secs == 6'd59)
+      secs <= 6'd0;
+    else
+      secs <= secs + 6'd1;
+  end
+
+  // Minutes counter: increments when seconds complete a cycle (i.e. reached 59).
+  always @(posedge clk or posedge rst) begin
+    if (rst)
+      mins <= 6'd0;
+    else if (secs == 6'd59) begin
+      if (mins == 6'd59)
+        mins <= 6'd0;
+      else
+        mins <= mins + 6'd1;
+    end
+    // No else branch needed; mins retains its value.
+  end
+
+  // Hours counter: increments when seconds and minutes both finished their cycles.
+  always @(posedge clk or posedge rst) begin
+    if (rst)
+      hours <= 5'd0;
+    else if ((secs == 6'd59) && (mins == 6'd59)) begin
+      if (hours == 5'd23)
+        hours <= 5'd0;
+      else
+        hours <= hours + 5'd1;
+    end
+    // No else branch needed; hours retains its value.
+  end
+
+endmodule
+------------------------------------------------
+
+Key points in this corrected version:
+
+1. We use consistent signal naming (clk, rst).
+2. We removed redundant “hold” assignments (the registers automatically hold their value when not updated).
+3. We sized the hours register to 5 bits since it only needs to count up to 23.
+4. All registers have an asynchronous reset; if you prefer a synchronous reset, that style can be adopted instead.
+
+This version adheres to good Verilog design practices while implementing the same functionality as your original code.

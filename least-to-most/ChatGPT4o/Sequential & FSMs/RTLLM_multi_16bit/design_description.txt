@@ -1,0 +1,27 @@
+As a professional Verilog designer, your task is to implement a digital system design for an unsigned 16-bit multiplier that utilizes the method of shift and accumulate operations for generating its product output, referred to as `yout`. The specific module you're asked to create is named `multi_16bit` and is composed of inputs including clock (`clk`), active-low reset (`rst_n`), a start signal (`start`), and two 16-bit wide inputs representing the multiplicand (`ain`) and the multiplier (`bin`). The system's outputs consist of a 32-bit product (`yout`) and a flag (`done`) signaling the completion of the multiplication task. 
+
+In your implementation, you'll need to consider the following procedural logic:
+
+1. **Data Bit Control:** 
+    - Ensure updates to a shift count register (`i`) occur at every rising edge of the clock signal (`clk`) or falling edge of the reset signal (`rst_n`).
+    - When the reset signal (`rst_n`) is active (low), the shift count should be initialized to zero.
+    - If the start signal (`start`) is active, update the shift count register (`i`) by incrementing it by one, but only if its current value is less than 17.
+    - If the start signal is inactive (i.e., low), reset the shift count register (`i`) back to zero.
+
+2. **Multiplication Completion Flag Generation:** 
+    - You'll update a completion flag register (`done_r`) at every clock positive edge or upon a falling reset edge.
+    - Under reset conditions (`rst_n` low), ensure the completion flag is set to zero.
+    - Make sure the flag is set to indicate completion (`done_r` = 1) when the shift count register (`i`) equals 16.
+    - When the shift count reaches 17, reset the multiplication completion flag to zero.
+
+3. **Shift and Accumulate Operation:** 
+    - Perform necessary operations at positive edges of clock cycles or falling reset edges.
+    - On reset, initialize the multiplicand (`areg`), multiplier (`breg`), and product registers (`yout_r`) to zero.
+    - With the start signal being active, begin the multiplication sequence.
+    - During the initial shift count (`i` = 0), load the multiplicand and multiplier values into their corresponding registers (`areg` and `breg`).
+    - For shift counts in the range of 1 to 16, if the bit at position `i-1` in the multiplicand register is high, update the product register by accumulating a shifted version of the multiplier register, specifically by shifting it left by `i-1` bits and padding with zeros at the least significant bits.
+
+4. **Output Assignment:** 
+    - At the end of the operation, assign the processed value of the product register (`yout_r`) to your module's product output (`yout`). 
+
+Please ensure your Verilog coding practices abide by these detailed operational phases and consider appropriate usage of standard Verilog syntax to develop the complete and functional module design for the `multi_16bit` system.

@@ -1,0 +1,35 @@
+```
+module edge_detect (
+    input wire clk,
+    input wire rst_n,
+    input wire a,
+    output reg rise,
+    output reg down
+);
+    reg a_prev;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            rise <= 0;
+            down <= 0;
+            a_prev <= 0;
+        end else begin
+            rise <= 0; // Default to low
+            down <= 0; // Default to low
+            
+            // Detect rising edge
+            if (a == 1 && a_prev == 0) begin
+                rise <= 1;
+            end
+            
+            // Detect falling edge
+            if (a == 0 && a_prev == 1) begin
+                down <= 1;
+            end
+
+            // Store the current value for the next clock cycle
+            a_prev <= a;
+        end
+    end
+endmodule
+```

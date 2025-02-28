@@ -1,0 +1,107 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg [7:0] out_byte,
+    output reg done
+);
+
+    // FSM state definitions
+    localparam IDLE   = 2'd0,
+               DATA   = 2'd1,
+               PARITY = 2'd2,
+               STOP   = 2'd3;
+               
+    reg [1:0] state, next_state;
+    reg [2:0] bit_count;  // counts from 0 to 7 for the 8 data bits
+
+    // Signals for parity module instance
+    reg par_in;
+    reg par_reset_sig;
+    wire par_odd;  // '1' if the number of ones (in 9 bits) is odd
+    
+    // Instance of parity-checking module (TFF)
+    parity parity_inst (
+        .clk(clk),
+        .reset(par_reset_sig),
+        .in(par_in),
+        .odd(par_odd)
+    );
+
+    // Sequential FSM and datapath logic (synchronous reset)
+    always @(posedge clk) begin
+        if (reset) begin
+            state       <= IDLE;
+            bit_count   <= 3'd0;
+            out_byte    <= 8'd0;
+            done        <= 1'b0;
+            par_reset_sig <= 1'b1;  // ensure parity counter is reset
+            par_in      <= 1'b0;
+        end else begin
+            // Default assignments
+            done <= 1'b0;
+            case (state)
+                IDLE: begin
+                    // In idle state, keep parity module in reset.
+                    par_reset_sig <= 1'b1;
+                    par_in <= 1'b0;
+                    if (in == 1'b0) begin  // detect start bit (should be 0)
+                        state <= DATA;
+                        bit_count <= 3'd0;
+                        // Assert parity reset for one cycle to prepare for new frame.
+                        par_reset_sig <= 1'b1;
+                    end
+                end
+                DATA: begin
+                    // Release parity reset
+                    par_reset_sig <= 1'b0;
+                    // Feed current bit to parity checker and store it in the data byte.
+                    par_in <= in;
+                    out_byte[bit_count] <= in;
+                    
+                    if (bit_count == 3'd7) begin
+                        state <= PARITY;
+                    end else begin
+                        bit_count <= bit_count + 3'd1;
+                    end
+                end
+                PARITY: begin
+                    // Sample the parity bit and feed it to the parity module.
+                    par_in <= in;
+                    state <= STOP;
+                end
+                STOP: begin
+                    // In STOP state, we expect a '1' as the stop bit.
+                    par_in <= 1'b0;  // no need to update parity now
+                    if (in == 1'b1) begin
+                        // When stop bit is found, check the parity module's output.
+                        if (par_odd == 1'b1) begin
+                            // Odd parity satisfied: assert done for one clock cycle.
+                            done <= 1'b1;
+                        end
+                        // Regardless of parity result, return to idle.
+                        state <= IDLE;
+                    end 
+                    // If not a valid stop bit, remain in STOP until one is detected.
+                end
+                default: state <= IDLE;
+            endcase
+        end
+    end
+
+endmodule
+
+// Provided parity calculation module
+module parity (
+    input clk,
+    input reset,
+    input in,
+    output reg odd
+);
+
+    always @(posedge clk)
+        if (reset)
+            odd <= 1'b0;
+        else if (in)
+            odd <= ~odd;
+endmodule

@@ -1,0 +1,113 @@
+```
+module traffic_light (
+    input wire rst_n,
+    input wire clk,
+    input wire pass_request,
+    output reg [7:0] clock,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+    // State Encoding
+    typedef enum reg [1:0] {
+        idle = 2'b00,
+        s1_red = 2'b01,
+        s2_yellow = 2'b10,
+        s3_green = 2'b11
+    } state_t;
+
+    state_t state, next_state;
+    
+    // Counter parameters
+    reg [7:0] cnt;
+    reg [7:0] green_duration = 60;
+    reg [7:0] yellow_duration = 5;
+    reg [7:0] red_duration = 10;
+    
+    // States signals
+    reg p_red, p_yellow, p_green;
+
+    // State Transition Logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= idle;
+            cnt <= 0;
+        end else begin
+            state <= next_state;
+            if (state == s1_red || state == s2_yellow || state == s3_green) begin
+                if (cnt > 0) 
+                    cnt <= cnt - 1;
+            end
+        end
+    end
+
+    // Next State and Counter Logic
+    always @(*) begin
+        next_state = state;
+        case (state)
+            idle: next_state = s1_red;
+            s1_red: begin
+                if (cnt == 0) begin
+                    next_state = s3_green;
+                    cnt = green_duration;
+                end else begin
+                    next_state = s1_red;
+                end
+            end
+            s2_yellow: begin
+                if (cnt == 0) begin
+                    next_state = s1_red;
+                    cnt = red_duration;
+                end else begin
+                    next_state = s2_yellow;
+                end
+            end
+            s3_green: begin
+                if (cnt < 10 && pass_request) begin
+                    cnt = 10; // Set to switch sooner if more than 10 remaining
+                } else if (cnt == 0) begin
+                    next_state = s2_yellow;
+                    cnt = yellow_duration;
+                end else begin
+                    next_state = s3_green;
+                end
+            end
+        endcase
+    end
+
+    // Light Output and Counting Logic
+    always @(*) begin
+        // Initial output states
+        red = 1'b0;
+        yellow = 1'b0;
+        green = 1'b0;
+        // Default clock value
+        clock = cnt;
+
+        case (state)
+            s1_red: begin
+                red = 1'b1;
+                yellow = 1'b0;
+                green = 1'b0;
+            end
+            s2_yellow: begin
+                red = 1'b0;
+                yellow = 1'b1;
+                green = 1'b0;
+            end
+            s3_green: begin
+                red = 1'b0;
+                yellow = 1'b0;
+                green = 1'b1;
+            end
+            idle: begin
+                red = 1'b0;
+                yellow = 1'b0;
+                green = 1'b0;
+            end
+        endcase
+    end
+
+endmodule
+```

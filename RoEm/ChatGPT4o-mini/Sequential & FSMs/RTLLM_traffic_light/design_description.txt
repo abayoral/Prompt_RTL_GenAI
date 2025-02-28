@@ -1,0 +1,50 @@
+Could you please take on the role of an expert in Verilog design and draft a comprehensive implementation plan for a traffic light system tailored to the following specific requirements? The traffic light should include three small indicator signals for red, yellow, and green lights, as well as a pedestrian button. Generally, under normal conditions, the traffic light for the vehicle lane should cycle through 60 clock cycles of green, followed by 5 clock cycles of yellow, and then 10 clock cycles of red. If the pedestrian button is activated and the green light's remaining time exceeds 10 clock cycles, the green duration should be reduced to 10 clock cycles. If the remaining green time is already under 10 clock cycles at the button press, the green time should remain as is. Note that the pairing of lane lights and sidewalk lights must be considered, such that when the lane light is green or yellow, the sidewalk light is red, and when the lane light is red, the sidewalk light is green, focusing primarily on lane lights for simplicity.
+
+In your implementation strategy, please incorporate the following module specifications:
+
+Module Name: 
+- traffic_light
+
+Inputs:
+- rst_n: A reset signal that is active low.
+- clk: A clock signal.
+- pass_request: A signal that requests permission for vehicles to pass.
+
+Outputs:
+- clock[7:0]: An 8-bit output to reflect the current count value maintained by an internal counter.
+- red, yellow, green: Signals to denote the current state of the traffic lights.
+
+Parameters:
+- idle, s1_red, s2_yellow, s3_green: Enum values indicating the distinct states within the traffic light controller.
+
+Internals:
+- cnt: An 8-bit internal register serving as a timer or counter.
+- state: A 2-bit register to indicate the present state of the traffic light system.
+- p_red, p_yellow, p_green: 1-bit registers that capture the impending values for red, yellow, and green signals, respectively.
+
+Implementation Guidance: 
+The specification includes a recommended design track. The first suggested always block should handle state transitions with a case statement to differentiate states. Below is a summary:
+
+- idle: The initial phase where all signal outputs default to 0, transitioning promptly to the s1_red state.
+
+- s1_red: Activates the red signal and maintains this state for 3 count cycles prior to shifting to s3_green.
+
+- s2_yellow: Engages the yellow signal, waiting for a count of 3 before proceeding to s1_red. 
+
+- s3_green: Lights up the green signal, persisting for 3 count cycles before advancing to s2_yellow.
+
+The second suggested always block focuses on the internal counter (cnt) logic, decreasing it with every positive clock edge or at the reset's negative edge. This logic should account for specific conditions:
+
+- If (!rst_n), initialize the counter to 10.
+
+- If the pass_request is asserted and the green is active, reset the counter to 10.
+
+- Transitions impacting signal states adjust the counter: setting it to 60 post green, 5 post yellow, and 10 post red.
+
+- Otherwise, decrement the counter as usual.
+
+The assign statement should bind the internal counter's value to the 'clock' output.
+
+Lastly, another always block should manage output signal updates, ensuring the transmission of signal values (p_red, p_yellow, p_green) to the respective outputs (red, yellow, green) upon a positive clock edge or negative transition on the reset signal.
+
+With these outlines, please provide a detailed and complete code solution for the traffic light module that adheres to the description and requirements given.

@@ -1,0 +1,41 @@
+module multi_booth_8bit (
+    input wire clk,
+    input wire reset,
+    input wire [7:0] a,
+    input wire [7:0] b,
+    output reg [15:0] p,
+    output reg rdy
+);
+
+    reg [15:0] multiplier;
+    reg [15:0] multiplicand;
+    reg [4:0] ctr;
+    reg [1:0] current_bit;
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            multiplier <= {{8{a[7]}}, a}; // Extend 'a' to 16 bits
+            multiplicand <= {{8{b[7]}}, b}; // Extend 'b' to 16 bits
+            p <= 16'b0; // Initialize product to 0
+            rdy <= 1'b0; // Reset ready signal
+            ctr <= 5'b0; // Initialize counter
+            current_bit <= 2'b0; // Initialize last two bits
+        end else if (ctr < 16) begin
+            current_bit <= {multiplier[0], current_bit[1]}; // Capture bit pairs for Booth's algorithm
+            multiplier <= {multiplier[15:1], 1'b0}; // Shift multiplier right (with 0 padding)
+            
+            // Apply Booth's encoding logic (add on certain conditions)
+            case (current_bit)
+                2'b01: p <= p + multiplicand; // Add multiplicand if current_bit is 01
+                2'b10: p <= p - multiplicand; // Subtract multiplicand if current_bit is 10
+                default: ; // No action for 00 and 11
+            endcase
+            
+            ctr <= ctr + 1; // Increment cycle counter
+            
+            if (ctr == 15) begin
+                rdy <= 1'b1; // Set ready to high on final cycle
+            end
+        end
+    end
+endmodule

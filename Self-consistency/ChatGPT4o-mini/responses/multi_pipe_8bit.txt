@@ -1,0 +1,47 @@
+module multi_pipe_8bit(
+    input wire clk,
+    input wire rst_n,
+    input wire mul_en_in,
+    input wire [7:0] mul_a,
+    input wire [7:0] mul_b,
+    output reg mul_en_out,
+    output reg [15:0] mul_out
+);
+    
+    reg [7:0] mul_a_reg, mul_b_reg;
+    reg [15:0] temp [0:7]; // Array for partial products
+    reg [15:0] sum;
+    reg [3:0] count; // Counter for the bits processed
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            mul_a_reg <= 8'd0;
+            mul_b_reg <= 8'd0;
+            mul_en_out <= 1'b0;
+            mul_out <= 16'd0;
+            sum <= 16'd0;
+            count <= 4'd0;
+        end else begin
+            if (mul_en_in) begin
+                mul_a_reg <= mul_a;
+                mul_b_reg <= mul_b;
+                mul_en_out <= 1'b1;
+                sum <= 16'd0; // Reset sum for new multiplication
+                count <= 4'd0; // Start counting bits
+            end else begin
+                mul_en_out <= 1'b0; // Multiplication not enabled
+            end
+
+            if (count < 8 && mul_en_out) begin
+                temp[count] <= mul_a_reg & {8{mul_b_reg[count]}}; // Generate partial product
+                count <= count + 1; // Increment counter
+            end
+
+            if (count == 8) begin
+                // Calculate the sum of partial products
+                sum <= temp[0] + temp[1] + temp[2] + temp[3] + temp[4] + temp[5] + temp[6] + temp[7];
+                mul_out <= sum; // Update the output with final product
+            end
+        end
+    end
+endmodule

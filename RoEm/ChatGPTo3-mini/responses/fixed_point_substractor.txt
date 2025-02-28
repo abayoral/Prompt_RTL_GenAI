@@ -1,0 +1,72 @@
+module fixed_point_subtractor #(parameter Q = 8, parameter N = 16) (
+    input  [N-1:0] a,
+    input  [N-1:0] b,
+    output [N-1:0] c
+);
+
+  // In this implementation the numbers are considered to be in sign‐magnitude
+  // fixed–point format. The most–significant bit is the sign bit and the remaining
+  // N-1 bits represent the magnitude (with Q fractional bits).
+  //
+  // The subtraction is defined as follows:
+  // 1. If both inputs carry the same sign, the result is obtained by subtracting 
+  //    their magnitudes. If the magnitude of a is not less than that of b, the result
+  //    inherits the common sign; otherwise the magnitude is computed as (b_mag – a_mag)
+  //    and the result sign is the inverse of the inputs’ sign.
+  //
+  // 2. If the signs differ then the arithmetic operation a – b is equivalent to adding 
+  //    the magnitudes (since subtracting a negative is like adding) but the chosen sign 
+  //    follows the expected polarity:
+  //      • if a is positive and b negative then a – b = a + |b|, result is positive.
+  //      • if a is negative and b positive then a – b = –(|a| + b), result is negative.
+  //
+  // 3. Finally, if the computed magnitude is zero the sign is forced to 0.
+  
+  reg [N-1:0] res;
+
+  // Extract the sign and magnitude parts
+  wire         a_sign = a[N-1];
+  wire         b_sign = b[N-1];
+  wire [N-2:0] a_mag  = a[N-2:0];
+  wire [N-2:0] b_mag  = b[N-2:0];
+
+  reg          result_sign;
+  reg [N-2:0]  result_mag;
+  
+  always @(*) begin
+    // Case 1: Both operands have the same sign. Subtract the magnitudes.
+    if (a_sign == b_sign) begin
+      if (a_mag >= b_mag) begin
+        result_mag  = a_mag - b_mag;
+        result_sign = a_sign;  // the common sign is output
+      end
+      else begin
+        result_mag  = b_mag - a_mag;
+        // When the second magnitude is larger, the result’s sign
+        // is the inverse of the common input sign.
+        result_sign = ~a_sign;
+      end
+    end 
+    // Case 2: Operands have different signs.
+    else begin
+      // In sign–magnitude arithmetic subtraction becomes an addition of magnitudes.
+      result_mag = a_mag + b_mag;
+      // The result carries the sign of the operand that is conceptually being subtracted.
+      // For a positive a and negative b, a - b = a + |b| is positive.
+      // For a negative a and positive b, a - b = -(|a| + b) is negative.
+      if (a_sign == 0 && b_sign == 1)
+        result_sign = 0;
+      else if (a_sign == 1 && b_sign == 0)
+        result_sign = 1;
+    end
+
+    // Special handling: if the computed magnitude is zero, force sign to 0.
+    if (result_mag == 0)
+      result_sign = 0;
+      
+    res = {result_sign, result_mag};
+  end
+
+  assign c = res;
+
+endmodule

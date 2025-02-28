@@ -1,0 +1,16 @@
+```verilog
+module top_module( 
+    input [1023:0] in,
+    input [7:0] sel,
+    output reg [3:0] out );
+
+    always @(*) begin
+        if (sel > 255) begin
+            out = 4'bxxxx; // Undefined output when sel is more than 255
+        end else begin
+            out = in[sel*4 +: 4]; // Select 4 bits based on sel
+        end
+    end
+
+endmodule
+```

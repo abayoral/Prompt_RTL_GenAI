@@ -1,0 +1,59 @@
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output reg done
+);
+
+    // Define the four FSM states.
+    localparam WAIT  = 2'b00, // Waiting for a byte with in[3]==1.
+               BYTE1 = 2'b01, // First byte received (in[3]==1 confirmed).
+               BYTE2 = 2'b10, // Second byte received.
+               DONE  = 2'b11; // Third byte received; assert done.
+
+    reg [1:0] state, next_state;
+
+    // Combinational state transition logic.
+    always @(*) begin
+        case(state)
+            WAIT: begin
+                // Discard bytes until a byte with in[3]==1 is found.
+                if(in[3])
+                    next_state = BYTE1;
+                else
+                    next_state = WAIT;
+            end
+            BYTE1: begin
+                // We assume the next byte is the second byte of the message.
+                next_state = BYTE2;
+            end
+            BYTE2: begin
+                // The next byte is the third byte, and we'll assert done.
+                next_state = DONE;
+            end
+            DONE: begin
+                // Immediately after asserting done, check if the incoming byte qualifies
+                // as the first byte of a new message.
+                if(in[3])
+                    next_state = BYTE1;
+                else
+                    next_state = WAIT;
+            end
+            default: next_state = WAIT;
+        endcase
+    end
+
+    // Sequential logic: state flip-flops with synchronous reset.
+    always @(posedge clk) begin
+        if(reset)
+            state <= WAIT;
+        else
+            state <= next_state;
+    end
+
+    // Output logic: done is asserted when in the DONE state.
+    always @(*) begin
+        done = (state == DONE);
+    end
+
+endmodule

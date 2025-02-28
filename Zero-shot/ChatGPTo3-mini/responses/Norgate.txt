@@ -1,0 +1,10 @@
+module top_module( 
+    input a, 
+    input b, 
+    output out 
+); 
+
+    // Implementing a NOR gate using OR and NOT operators.
+    assign out = ~(a | b); 
+
+endmodule

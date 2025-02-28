@@ -1,0 +1,16 @@
+module top_module(
+    input a, 
+    input b,
+    output wire out_assign,     // Output via assign statement
+    output reg out_alwaysblock  // Output via combinational always block
+);
+
+    // Implementation using assign statement
+    assign out_assign = a & b;
+    
+    // Implementation using combinational always block
+    always @(*) begin
+        out_alwaysblock = a & b;
+    end
+
+endmodule

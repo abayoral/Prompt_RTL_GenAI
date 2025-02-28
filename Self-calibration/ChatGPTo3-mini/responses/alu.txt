@@ -1,0 +1,273 @@
+Below is one acceptable corrected and slightly “clean‐coded” version of the ALU. In this version we make the following improvements:
+
+1. Define parameters for the various ALU operation codes so that the code is self–documenting and easier to maintain.
+2. Replace the “magic numbers” in the op–codes with meaningful symbolic names.
+3. Adjust the LUI operation so that only the lower 16 bits of the immediate become the upper 16 bits of the output.
+4. Retain the careful default assignments in the combinational always block so that no latches result.
+5. Keep the “carry” extraction for shifts as originally intended (with a cautionary note that the definition of a “carry‐bit” during shifts is not uniquely defined).
+
+Below is the revised module:
+
+------------------------------------------------------------
+module alu (
+    input  [31:0] a,
+    input  [31:0] b,
+    input  [5:0]  aluc,
+    output reg [31:0] r,
+    output reg        zero,
+    output reg        carry,
+    output reg        negative,
+    output reg        overflow,
+    output reg        flag
+);
+
+    // Local parameters for ALU control codes (MIPS style)
+    localparam ADD   = 6'b100000;
+    localparam ADDU  = 6'b100001;
+    localparam SUB   = 6'b100010;
+    localparam SUBU  = 6'b100011;
+    localparam AND   = 6'b100100;
+    localparam OR    = 6'b100101;
+    localparam XOR   = 6'b100110;
+    localparam NOR   = 6'b100111;
+    localparam SLT   = 6'b101010;
+    localparam SLTU  = 6'b101011;
+    localparam SLL   = 6'b000000;
+    localparam SRL   = 6'b000010;
+    localparam SRA   = 6'b000011;
+    localparam SLLV  = 6'b000100;
+    localparam SRLV  = 6'b000110;
+    localparam SRAV  = 6'b000111;
+    localparam LUI   = 6'b001111;
+
+    // Temporary wire to capture an extra carry/borrow bit for addition and subtraction.
+    reg [32:0] tmp;
+    reg [4:0] shamt;  // shift amount extracted from operand a’s lower 5 bits
+
+    always @(*) begin
+        // Default assignments to avoid latches
+        r         = 32'b0;
+        carry     = 1'b0;
+        negative  = 1'b0;
+        overflow  = 1'b0;
+        flag      = 1'b0;
+        zero      = 1'b0;
+      
+        case (aluc)
+            ADD: begin  // ADD (signed addition)
+                tmp = {1'b0, a} + {1'b0, b};
+                r = tmp[31:0];
+                carry = tmp[32];
+                // Signed overflow: if operands have the same sign but the result has a different sign.
+                overflow = ((a[31] == b[31]) && (r[31] != a[31])) ? 1'b1 : 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            ADDU: begin  // ADDU (unsigned addition)
+                tmp = {1'b0, a} + {1'b0, b};
+                r = tmp[31:0];
+                carry = tmp[32];
+                overflow = 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            SUB: begin  // SUB (signed subtraction)
+                tmp = {1'b0, a} - {1'b0, b};
+                r = tmp[31:0];
+                // For subtraction: define carry as the complement of a borrow.
+                carry = (a >= b) ? 1'b1 : 1'b0;
+                // Signed overflow for subtraction.
+                overflow = ((a[31] != b[31]) && (r[31] != a[31])) ? 1'b1 : 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            SUBU: begin  // SUBU (unsigned subtraction)
+                tmp = {1'b0, a} - {1'b0, b};
+                r = tmp[31:0];
+                carry = (a >= b) ? 1'b1 : 1'b0;
+                overflow = 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            AND: begin  // AND
+                r = a & b;
+                carry = 1'b0;
+                overflow = 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            OR: begin  // OR
+                r = a | b;
+                carry = 1'b0;
+                overflow = 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            XOR: begin  // XOR
+                r = a ^ b;
+                carry = 1'b0;
+                overflow = 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            NOR: begin  // NOR
+                r = ~(a | b);
+                carry = 1'b0;
+                overflow = 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            SLT: begin  // SLT (Set on less than, signed)
+                if ($signed(a) < $signed(b)) begin
+                    flag = 1'b1;
+                    r = 32'd1;
+                end else begin
+                    flag = 1'b0;
+                    r = 32'd0;
+                end
+                carry = 1'b0;
+                overflow = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            SLTU: begin  // SLTU (Set on less than, unsigned)
+                if (a < b) begin
+                    flag = 1'b1;
+                    r = 32'd1;
+                end else begin
+                    flag = 1'b0;
+                    r = 32'd0;
+                end
+                carry = 1'b0;
+                overflow = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            SLL: begin  // SLL (Shift Left Logical, immediate)
+                shamt = a[4:0];
+                r = b << shamt;
+                if (shamt == 0)
+                    carry = 1'b0;
+                else
+                    carry = b[32 - shamt];  // Extract the bit shifted out from the MSB side.
+                overflow = 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            SRL: begin  // SRL (Shift Right Logical, immediate)
+                shamt = a[4:0];
+                r = b >> shamt;
+                if (shamt == 0)
+                    carry = 1'b0;
+                else
+                    carry = b[shamt - 1];  // Extract the last bit shifted out from the right.
+                overflow = 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            SRA: begin  // SRA (Shift Right Arithmetic, immediate)
+                shamt = a[4:0];
+                r = $signed(b) >>> shamt;
+                if (shamt == 0)
+                    carry = 1'b0;
+                else
+                    carry = b[shamt - 1];  
+                overflow = 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            SLLV: begin  // SLLV (Shift Left Logical Variable)
+                shamt = a[4:0];  // shift amount from lower 5 bits of a
+                r = b << shamt;
+                if (shamt == 0)
+                    carry = 1'b0;
+                else
+                    carry = b[32 - shamt];
+                overflow = 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            SRLV: begin  // SRLV (Shift Right Logical Variable)
+                shamt = a[4:0];
+                r = b >> shamt;
+                if (shamt == 0)
+                    carry = 1'b0;
+                else
+                    carry = b[shamt - 1];
+                overflow = 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            SRAV: begin  // SRAV (Shift Right Arithmetic Variable)
+                shamt = a[4:0];
+                r = $signed(b) >>> shamt;
+                if (shamt == 0)
+                    carry = 1'b0;
+                else
+                    carry = b[shamt - 1];
+                overflow = 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            LUI: begin  // LUI (Load Upper Immediate)
+                // In many ISAs only the lower 16 bits constitute the immediate.
+                // Place them in the upper 16 bits.
+                r = {a[15:0], 16'b0};
+                carry = 1'b0;
+                overflow = 1'b0;
+                flag = 1'b0;
+                negative = r[31];
+                zero = (r == 32'b0);
+            end
+
+            default: begin
+                // For any undefined opcodes, drive outputs to high impedance.
+                r         = 32'hz;
+                zero      = 1'bz;
+                carry     = 1'bz;
+                negative  = 1'bz;
+                overflow  = 1'bz;
+                flag      = 1'bz;
+            end
+        endcase
+    end
+
+endmodule
+------------------------------------------------------------
+
+Notes:
+
+• The “carry” for shift operations is defined by extracting one bit from the input operand b. (The definition of a “carry‐bit” during shifts is not standard; some designs may choose to ignore carry for shifts.)
+• The LUI operation now explicitly uses the lower 16 bits of input a to form the upper 16 bits of the result.
+• Parameters for op–codes improve readability and ease future modifications.
+
+This version adheres to best practices for combinational logic in Verilog, avoids latches by giving every output a default assignment, and uses proper coding style for verification and synthesis.

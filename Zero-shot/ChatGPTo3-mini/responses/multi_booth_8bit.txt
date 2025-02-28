@@ -1,0 +1,57 @@
+module multi_booth_8bit(
+    input            clk,
+    input            reset,
+    input      [7:0] a,
+    input      [7:0] b,
+    output reg [15:0] p,
+    output reg        rdy
+);
+
+  // Internal registers
+  // “multiplier” holds the extended version of input a,
+  // and “multiplicand” holds the extended version of input b.
+  // Although the algorithm is named “Radix‐4 Booth”, the following
+  // implementation follows the iterative signed‐multiplier style
+  // that uses Booth’s idea of conditionally accumulating a shifted
+  // version of the multiplicand. (A full radix–4 Booth algorithm would use
+  // grouping of bits and fewer cycles. Here we stick closely to the provided
+  // instructions using a 16‐cycle process with a 5‐bit counter.)
+  reg [15:0] multiplicand;
+  reg [15:0] multiplier;
+  reg [4:0]  ctr;
+  
+  always @(posedge clk or posedge reset) begin
+    if (reset) begin
+      // When reset is high, sign–extend both inputs to 16 bits. 
+      // This ensures that signed arithmetic is performed correctly.
+      multiplier   <= {{8{a[7]}}, a};
+      multiplicand <= {{8{b[7]}}, b};
+      p            <= 16'd0;
+      ctr          <= 5'd0;
+      rdy          <= 1'b0;
+    end
+    else if (!rdy) begin
+      // In each cycle, check the current (LSB) bit of the multiplier.
+      // This decision “encodes” the Booth condition in a very simplified form.
+      // If the current bit is 1, add the current (shifted) multiplicand to the product.
+      if (multiplier[0])
+        p <= p + multiplicand;
+        
+      // Shift the multiplicand left by one position.
+      // This simulates the increasing weight (alignment) required as the algorithm progresses.
+      multiplicand <= multiplicand << 1;
+      
+      // Also shift the multiplier to bring the next bit into LSB position.
+      // (This is necessary so that in subsequent cycles a new bit is examined.)
+      multiplier <= multiplier >> 1;
+      
+      // Increment the cycle counter.
+      ctr <= ctr + 1;
+      
+      // Once the counter reaches 16 cycles, declare the multiplication complete.
+      if (ctr == 5'd15)
+        rdy <= 1'b1;
+    end
+  end
+
+endmodule

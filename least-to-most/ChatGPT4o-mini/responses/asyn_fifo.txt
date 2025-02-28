@@ -1,0 +1,108 @@
+```verilog
+module asyn_fifo #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16
+) (
+    input wire wclk,
+    input wire rclk,
+    input wire wrstn,
+    input wire rrstn,
+    input wire winc,
+    input wire rinc,
+    input wire [WIDTH-1:0] wdata,
+    output reg [WIDTH-1:0] rdata,
+    output wire wfull,
+    output wire rempty
+);
+
+    localparam ADDR_WIDTH = $clog2(DEPTH);
+    localparam GRAY_WIDTH = ADDR_WIDTH;
+
+    // Dual-Port RAM instance
+    reg [WIDTH-1:0] ram [0:DEPTH-1];
+    wire [ADDR_WIDTH-1:0] waddr;
+    wire [ADDR_WIDTH-1:0] raddr;
+
+    reg [GRAY_WIDTH-1:0] wptr_gray, rptr_gray;
+    reg [GRAY_WIDTH-1:0] wptr_gray_sync, rptr_gray_sync;
+    reg [ADDR_WIDTH-1:0] wptr_bin, rptr_bin;
+    reg [ADDR_WIDTH-1:0] bin_to_gray;
+    
+    // Gray code conversion
+    function [ADDR_WIDTH-1:0] bin_to_gray_code(input [ADDR_WIDTH-1:0] bin);
+        bin_to_gray_code = bin ^ (bin >> 1);
+    endfunction
+
+    function [ADDR_WIDTH-1:0] gray_to_bin_code(input [GRAY_WIDTH-1:0] gray);
+        integer i;
+        begin
+            gray_to_bin_code = gray[GRAY_WIDTH-1];
+            for (i = GRAY_WIDTH-2; i >= 0; i = i - 1)
+                gray_to_bin_code[i] = gray_to_bin_code[i+1] ^ gray[i];
+        end
+    endfunction
+
+    // Write Pointer Logic
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            wptr_gray <= 0;
+        end else if (winc) begin
+            wptr_gray <= bin_to_gray_code(wptr_bin + 1);
+        end
+    end
+
+    // Read Pointer Logic
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            rptr_gray <= 0;
+        end else if (rinc) begin
+            rptr_gray <= bin_to_gray_code(rptr_bin + 1);
+        end
+    end
+
+    // Synchronize write pointer to read clock domain
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            wptr_gray_sync <= 0;
+        end else begin
+            wptr_gray_sync <= wptr_gray;
+        end
+    end
+
+    // Synchronize read pointer to write clock domain
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            rptr_gray_sync <= 0;
+        end else begin
+            rptr_gray_sync <= rptr_gray;
+        end
+    end
+
+    // Convert Gray code back to binary
+    always @* begin
+        wptr_bin = gray_to_bin_code(wptr_gray_sync);
+        rptr_bin = gray_to_bin_code(rptr_gray);
+    end
+
+    // RAM Write Logic
+    always @(posedge wclk) begin
+        if (winc) begin
+            ram[wptr_bin] <= wdata;
+        end
+    end
+
+    // RAM Read Logic
+    always @(posedge rclk) begin
+        if (rinc) begin
+            rdata <= ram[rptr_bin];
+        end
+    end
+
+    // FIFO Full Condition
+    assign wfull = (wptr_gray[GRAY_WIDTH-1] != rptr_gray[GRAY_WIDTH-1]) && (wptr_gray[GRAY_WIDTH-2:0] == rptr_gray[GRAY_WIDTH-2:0]);
+
+    // FIFO Empty Condition
+    assign rempty = (wptr_gray == rptr_gray);
+
+endmodule
+```

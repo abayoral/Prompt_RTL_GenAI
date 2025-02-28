@@ -1,0 +1,24 @@
+You are tasked with developing a Verilog module specifically designed to perform a combinational logic-based division operation on two binary numbers. This functional requirement involves a 16-bit dividend and an 8-bit divisor, which diverges from traditional arithmetic operations that often favor similar bit widths for both the dividend and the divisor. As a professional Verilog designer, your responsibilities include structuring a module that accurately computes both the quotient and the remainder for this particular division process. The task is outlined as follows:
+
+1. **Module Definition**: Name the module `div_16bit`. This nomenclature reflects the operation and the primary data width being processed.
+
+2. **Input Ports**: The module must accept two input parameters:
+   - `A`: A 16-bit wide signal representing the dividend.
+   - `B`: An 8-bit wide signal representing the divisor.
+
+3. **Output Ports**: The module should produce two outputs:
+   - `result`: A 16-bit signal representing the computed quotient of the division.
+   - `odd`: A 16-bit signal representing the remainder after completing the division process.
+
+4. **Division Approach**: The division process runs through a specific method where:
+   - You should extract the highest set of eight bits from the dividend, aligning with the bit width of the divisor.
+   - This segment of the dividend must be compared with the divisor. Based on the comparison's outcome, set the corresponding bit position in the `result` (quotient) to 1 if the dividend segment is larger, otherwise to 0.
+   - Calculate the difference between the dividend segment and the divisor if the quotient bit is set.
+   - Concatenate this difference, or remainder, with the next bit of the dividend yet to be processed.
+   - Iteratively repeat this comparison and subtraction process for each bit in the dividend until all bits have been incorporated into the computation. This effectively creates a bit-serial division.
+
+5. **Implementation Details**: The division operation should be realized using two always blocks, configured for combinational logic:
+   - The first always block triggers on any input changes. It handles the assignment of the input signals `A` and `B` to intermediate storage registers, named `a_reg` and `b_reg`, respectively.
+   - The second always block, also sensitive to changes in `A` and `B`, drives the core logic processing of the division. Here, the extracted dividend bits undergo comparison, quotient bit determination, and reminder calculation until completion.
+
+By orchestrating these components, you will create a Verilog module capable of dividing a 16-bit dividend by an 8-bit divisor with precision, reflecting the quotient and remainder in the specified output ports. The focus is on correct functionality, taking into account the combinational nature of your logic design and ensuring continual operation until the entire dividend has been processed.

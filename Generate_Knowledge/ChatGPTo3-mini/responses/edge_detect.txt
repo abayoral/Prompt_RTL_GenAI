@@ -1,0 +1,41 @@
+module edge_detect (
+    input clk,
+    input rst_n,
+    input a,
+    output reg rise,
+    output reg down
+);
+
+  // Register to hold previous state of input 'a'
+  reg a_reg;
+
+  // Synchronous process for edge detection and register updates
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      // Active low reset: clear registers and outputs
+      a_reg <= 1'b0;
+      rise  <= 1'b0;
+      down  <= 1'b0;
+    end else begin
+      // Detect rising edge: previous was 0 and current is 1
+      if (a && ~a_reg) begin
+        rise <= 1'b1;
+        down <= 1'b0;
+      end
+      // Detect falling edge: previous was 1 and current is 0
+      else if (~a && a_reg) begin
+        rise <= 1'b0;
+        down <= 1'b1;
+      end
+      else begin
+        // No edge detected: outputs remain low
+        rise <= 1'b0;
+        down <= 1'b0;
+      end
+
+      // Update previous state register with current value of 'a'
+      a_reg <= a;
+    end
+  end
+
+endmodule

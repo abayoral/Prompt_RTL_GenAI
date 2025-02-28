@@ -1,0 +1,18 @@
+Acting in the capacity of a professional Verilog designer, please consider the task of crafting a digital module in Verilog that functions as a frequency divider, specifically for an odd-number clock division. Your objective is to design a module named `freq_divbyodd`, which accepts an input clock signal and generates an output clock signal that has been divided by an odd integer factor. The module should accommodate different odd divisor values as specified by a parameter, though it will default to a divisor of 5.
+
+You are tasked with defining the following input and output ports for the module:
+
+**Input Ports:**
+- `clk`: This is the input clock signal, which serves as the primary timing reference that will be subsequently divided by the module.
+- `rst_n`: An active low reset signal is supplied to initialize the divider, thereby ensuring the system starts in a known state upon reset.
+
+**Output Ports:**
+- `clk_div`: This output port provides the resulting clock signal, which has been frequency-divided by the specified odd divisor.
+
+**Module Description:**
+- The module is expected to perform division of the input clock frequency by an odd-valued number, which is determined by a parameter called `NUM_DIV`, with a default setting of 5. This parameter-driven approach allows for flexibility in changing the division factor to any odd number.
+- To manage the division process, you will implement two separate counters named `cnt1` and `cnt2`. These counters are employed to monitor and count the rising and falling edges of the input clock signal. Both counters will count up to a value of `NUM_DIV - 1`.
+- The division of the clock frequency involves generating two auxiliary clock signals, `clk_div1` and `clk_div2`. One of these handles the positive edges, and the other manages the negative edges of the input clock. The toggling of these signals occurs when the respective counter reaches half of the `NUM_DIV` value.
+- Finally, the output, `clk_div`, will be the logical OR operation of `clk_div1` and `clk_div2`. This combination ensures that both the positive and negative clock edges contribute to the output signal.
+
+This prompt is specifically designed to explore the intricate details and nuances in implementation of such a module, considering all potential operational parameters, behaviors, and expected functionalities.

@@ -1,0 +1,61 @@
+Below is an analysis of the supplied module and one way to “correct” it following common best practices.
+
+───────────────────────────── Analysis ─────────────────────────────
+
+1. Edge-Detection Logic:  
+  • The expression (~prev_in) & in correctly detects a rising (0-to-1) edge on each bit.  
+  • The “prev_in” register saves the current value of “in” for edge‐comparison in the next clock cycle.
+
+2. Register Initialization:  
+  • The original code has no explicit reset or initialization for “prev_in” (or “pedge_reg”). In many designs, especially in FPGA and ASIC design, it’s best practice to reset the state registers to a known value (usually 0) to avoid simulation mismatches and ensure proper hardware behavior.
+
+3. Output Delay:  
+  • The edge detection result is stored in the “pedge_reg” register and then assigned to the output, which means the result is delayed by one clock cycle relative to the input edge. This is as noted in the comment.
+
+───────────────────────────── Recommendations ─────────────────────────────
+
+• It is advisable to include a reset (synchronous or asynchronous) or initial block (if allowed by the target) so that “prev_in” and “pedge_reg” start in a known state.  
+• While the original code is functionally correct for edge detection, adding a reset makes it more robust and synthesis-friendly.
+
+───────────────────────────── Corrected Version ─────────────────────────────
+
+Below is one corrected version using an asynchronous reset (commonly used in many designs). Note that if you prefer a different reset style (or if a reset isn’t required for your application), you can modify accordingly.
+
+-----------------------------------------------------------
+module top_module (
+    input clk,
+    input reset,        // Asynchronous reset signal (active high)
+    input [7:0] in,
+    output [7:0] pedge
+);
+
+    reg [7:0] prev_in;
+    reg [7:0] pedge_reg;
+
+    // On each clock cycle, or when reset is asserted, update our registers.
+    // When reset is high, initialize both registers to 0.
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            prev_in   <= 8'b0;
+            pedge_reg <= 8'b0;
+        end else begin
+            pedge_reg <= (~prev_in) & in; // Compute edge detection (rising edge)
+            prev_in   <= in;              // Save current input for next comparison
+        end
+    end
+
+    // Assign the registered positive edge detection result to the output
+    assign pedge = pedge_reg;
+
+endmodule
+-----------------------------------------------------------
+
+───────────────────────────── Explanation ─────────────────────────────
+
+• The module now includes an additional input (reset) that asynchronously resets the “prev_in” and “pedge_reg” registers to 0.  
+• The always block is sensitive to both the clock and the reset, ensuring proper initialization.  
+• This version adheres to best practices for synchronous design and is less likely to cause unexpected behavior in simulation or synthesis.
+
+If you do not require a reset (or if your design scenario guarantees proper initialization by other means), the original code would work. However, adding explicit reset logic is generally recommended for robust designs.
+
+This corrected version should meet your requirements for a clean, synthesis-friendly positive edge detection module.

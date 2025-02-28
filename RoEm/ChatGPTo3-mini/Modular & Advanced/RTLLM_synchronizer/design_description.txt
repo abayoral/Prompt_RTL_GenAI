@@ -1,0 +1,30 @@
+As a professional Verilog designer, you are tasked with implementing a multi-bit MUX-based synchronizer within a digital system, ensuring proper data handling across different clock domains. This synchronizer should facilitate the stable and consistent transfer of data by connecting two separate clock domains, clk_a and clk_b, via appropriate handling of enable signals and data registers.
+
+Here's a detailed breakdown of the requirements and structure for this synchronizer module:
+
+1. **Module Identification**: The module should be named `synchronizer`.
+
+2. **Clock Domains**:
+   - `clk_a`: This clock signal governs the domain associated with input data signals (`data_in`) and the enable signal (`data_en`).
+   - `clk_b`: This clock signal governs the domain for the output data (`dataout`) and manages delayed enable signal transitions.
+
+3. **Reset Signals**:
+   - `arstn`: An active-low reset signal associated with clock domain `a`, which resets relevant registers within this domain.
+   - `brstn`: An active-low reset signal associated with clock domain `b`, which resets registers and controls within this domain.
+
+4. **Data Management**:
+   - `data_in`: A 4-bit input data signal that is stable long enough to allow synchronization based on changes occurring at a low frequency, with a minimum change interval of 10 `clk_b` cycles.
+   - `dataout`: A 4-bit synchronized output data signal transitioning from the input domain (clk_a) to the output domain (clk_b).
+
+5. **Enable Signal**:
+   - `data_en`: This signal serves as an input to enable synchronization of `data_in`. When high, it indicates that data can be transferred to the output domain. This signal remains high for at least 3 cycles of `clk_b`.
+  
+6. **Synchronization Strategy**:
+   - Utilize a multi-bit MUX-based approach to handle data signals and enable signal synchronization across clock domains.
+   - Implement data and enable registers to store `data_in` and `data_en`, respectively. Ensure these are updated synchronously with `clk_a` and reset with `arstn`.
+   - Implement two D flip-flops in the `clk_b` domain to delay the enable signal by two cycles, providing stable handoff for data synchronization.
+   - The output `dataout` should synchronize `data_in` to the `clk_b` domain when the delayed enable control signal is active, keeping data stable across any reset conditions initiated by `brstn`.
+
+Carefully structure your Verilog code to adhere to these specifications, ensuring robust and error-free synchronization between disparate clock domains. Ensure the functionality is thoroughly tested across various scenarios to validate the design's resilience to timing discrepancies and reset activities. 
+
+Please provide the complete and detailed Verilog code to achieve this data synchronization effectively.

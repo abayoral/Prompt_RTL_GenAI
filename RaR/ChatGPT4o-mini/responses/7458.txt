@@ -1,0 +1,37 @@
+```verilog
+module chip_7458 (
+    input wire p1a,
+    input wire p1b,
+    input wire p1c,
+    input wire p1d,
+    input wire p1e,
+    input wire p1f,
+    input wire p2a,
+    input wire p2b,
+    input wire p2c,
+    input wire p2d,
+    output wire p1y,
+    output wire p2y
+);
+    // Intermediate wires for the AND gates
+    wire p1_and1, p1_and2, p1_and3, p1_and4;
+    wire p2_or1, p2_or2;
+
+    // AND gate implementations for p1y
+    assign p1_and1 = p1a & p1b; // AND of p1a and p1b
+    assign p1_and2 = p1c & p1d; // AND of p1c and p1d
+    assign p1_and3 = p1e & p1f; // AND of p1e and p1f
+    assign p1_and4 = p1_and1 & p1_and2; // AND of the results
+
+    // Final output for p1y
+    assign p1y = p1_and4 | p1_and3; // OR gate to combine results
+
+    // OR gate implementations for p2y
+    assign p2_or1 = p2a | p2b; // OR of p2a and p2b
+    assign p2_or2 = p2c | p2d; // OR of p2c and p2d
+
+    // Final output for p2y
+    assign p2y = p2_or1 & p2_or2; // AND gate to combine results
+
+endmodule
+```

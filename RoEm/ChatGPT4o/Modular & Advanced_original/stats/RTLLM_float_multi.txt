@@ -1,0 +1,6 @@
+./simv -l run.log
+=========== Test Summary ===========
+Total Tests Run:           3
+Total Failures:           0
+=========== Your Design Passed ===========
+testbench.v:45: $finish called at 243 (1s)

@@ -1,0 +1,7 @@
+As a senior Digital Design Engineer at a prominent hardware design firm, your expertise is required to create a crucial Verilog module that is essential for a next-generation product. This module holds significant importance as its performance will directly influence the company's standing in the competitive landscape of the computer hardware industry. 
+
+Your task is to develop a three distinct implementations of an XOR gate. Each implementation should utilize a different Verilog approach: one using an assign statement, another employing a combinational always block, and the third utilizing a clocked always block. 
+
+To provide further context, please construct the module in accordance with the guidelines for the synthesis tool specified, ensuring that it adheres to the Verilog 2001 standard. Additionally, the module should be designed to accommodate specific input and output requirements, where `clk` serves as the clock input, `a` and `b` are the inputs to the XOR gate, and you must define three separate outputs: `out_assign` for the assign statement implementation, `out_always_comb` for the combinational always block, and `out_always_ff` for the clocked always block.
+
+In your response, while refrain from providing the actual code, please focus on clarifying the requirements and expectations associated with each implementation method for the XOR gate within the framework of the Verilog module specified.

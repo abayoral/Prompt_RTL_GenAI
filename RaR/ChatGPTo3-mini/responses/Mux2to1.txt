@@ -1,0 +1,9 @@
+module top_module( 
+    input a, b, sel,
+    output out 
+); 
+
+    // Using the ternary operator to implement the multiplexer
+    assign out = sel ? b : a;
+
+endmodule

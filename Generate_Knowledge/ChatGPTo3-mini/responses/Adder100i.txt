@@ -1,0 +1,42 @@
+module full_adder(
+    input a,
+    input b,
+    input cin,
+    output sum,
+    output cout
+);
+    // behavioral full adder: sum = a ^ b ^ cin; cout = (a&b) | (a&cin) | (b&cin);
+    assign sum = a ^ b ^ cin;
+    assign cout = (a & b) | (a & cin) | (b & cin);
+endmodule
+
+module top_module( 
+    input  [99:0] a, 
+    input  [99:0] b,
+    input        cin,
+    output [99:0] cout,
+    output [99:0] sum
+);
+    // Internal wire to connect carry between full adders.
+    // There will be 101 carry signals: one extra for the final full adder's carry-out.
+    wire [100:0] carry;
+    
+    // Initial carry is the external carry in
+    assign carry[0] = cin;
+    
+    genvar i;
+    generate 
+        for (i = 0; i < 100; i = i + 1) begin : ripple
+            full_adder FA (
+                .a(a[i]),
+                .b(b[i]),
+                .cin(carry[i]),
+                .sum(sum[i]),
+                .cout(carry[i+1])
+            );
+            // Output the carry-out from each full adder.
+            // cout[99] will be the carry-out of the final full adder.
+            assign cout[i] = carry[i+1];
+        end 
+    endgenerate
+endmodule

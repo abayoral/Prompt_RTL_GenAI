@@ -1,0 +1,50 @@
+module freq_divbyfrac (
+    input wire clk,
+    input wire rst_n,
+    output reg clk_div
+);
+
+    // Parameters for fractional division
+    localparam integer MUL2_DIV_CLK = 7; // Total cycles to implement 3.5x division
+    localparam integer CYCLES_1 = 4;      // Number of clock cycles for the first phase
+    localparam integer CYCLES_2 = 3;      // Number of clock cycles for the second phase
+
+    reg [2:0] counter;                    // 3-bit counter for division
+    reg clk_int_1;                        // Intermediate clock for first phase
+    reg clk_int_2;                        // Intermediate clock for second phase
+
+    // Clock division process
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            counter <= 0;
+            clk_div <= 0;
+            clk_int_1 <= 0;
+            clk_int_2 <= 0;
+        end else begin
+            // Counter to track clock cycles
+            if (counter < MUL2_DIV_CLK - 1) begin
+                counter <= counter + 1;
+            end else begin
+                counter <= 0; // Reset counter
+            end
+
+            // Generating the intermediate clocks
+            if (counter < CYCLES_1) begin
+                clk_int_1 <= 1; // Active for first 4 cycles
+            end else begin
+                clk_int_1 <= 0; // Inactive for next 3 cycles
+            end
+            
+            if (counter >= CYCLES_1 && counter < MUL2_DIV_CLK) begin
+                clk_int_2 <= 1; // Active for next 3 cycles
+            end else begin
+                clk_int_2 <= 0; // Inactive for the first 4 cycles
+            end
+            
+            // Combining both intermediate clock signals to produce the output clock
+            clk_div <= clk_int_1 | clk_int_2; 
+
+        end
+    end
+
+endmodule

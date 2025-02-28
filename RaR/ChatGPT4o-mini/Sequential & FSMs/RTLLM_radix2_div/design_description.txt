@@ -1,0 +1,30 @@
+As a skilled Verilog designer, you are tasked with developing a Verilog module named `radix2_div`, which is intended to embody a simplified approach to radix-2 division tailored specifically for 8-bit integers. This module is designed to accommodate both signed and unsigned integer operations, providing a versatile tool for handling division tasks in digital systems. 
+
+The module will require the following essential features and functionalities:
+
+**Module Title:**
+- `radix2_div`
+
+**Input Parameters:**
+- **`clk`**: A clock signal that is critical for the synchronous functioning of the module. It ensures that state changes and data processing occur in precise timing intervals, thereby maintaining the integrity of the division algorithm.
+- **`rst`**: A reset signal that enables the module to be initialized or reset to a specific state. This is essential for preparing the module to perform a fresh operation or for clearing any residual data from previous computations.
+- **`sign`**: A 1-bit flag that dictates whether the division operation will treat the input numbers as signed or unsigned. A value of '1' indicates a signed operation, while a '0' signifies that the operation should treat the integers as unsigned.
+- **`dividend`**: An 8-bit input that contains the dividend, which is the number to be divided.
+- **`divisor`**: Another 8-bit input that holds the divisor, the number by which the dividend will be divided.
+- **`opn_valid`**: A 1-bit control signal that indicates when a valid division operation is requested. When asserted high, this signal prompts the module to initiate the division process based on the provided inputs.
+
+**Output Parameters:**
+- **`res_valid`**: A 1-bit output signal that informs external systems when the division operation has been completed and the results are available for use.
+- **`result`**: A 16-bit output that encompasses the results of the division operation. The upper 8 bits of this output correspond to the remainder derived from the division, while the lower 8 bits represent the quotient.
+
+**Operational Framework:**
+
+- **Initiation of Division Operation**: The beginning of the division process is triggered when the `opn_valid` signal is high, suggesting that valid dividend and divisor values have been entered. At this point, if `res_valid` is not set, the module should capture the current values of the dividend and divisor. As part of the initialization phase, the module will initialize a shift register (termed `SR`) with the absolute value of the dividend, which is to be shifted left by one bit. Additionally, the negative absolute value of the divisor must be computed for later steps. The counters `cnt` and `start_cnt` should be initialized to the value '1' to signal the start of the division process.
+
+- **Execution of Division**: The core of the process occurs as the module enters a division phase upon asserting `start_cnt`. The steps during this phase include:
+  - A check on the counter `cnt` to determine if it has reached '8', indicating that a full cycle of shifts or iterations has been completed. If so, both `cnt` and `start_cnt` should be reset, and the contents of the shift register `SR` need to be updated to reflect the final computed remainder and quotient.
+  - If `cnt` has not yet reached '8', the module must increment the `cnt` value while concurrently updating the shift register `SR` based on the results of the subtraction involving the `NEG_DIVISOR`. A multiplexer will be utilized at this point to appropriately select the result based on the carry-out flag, and the shift register `SR` will undergo a bitwise left shift aided by the carry-out value.
+
+- **Management of Result Validity**: The logic governing the `res_valid` signal must account for several factors, including the reset signal, the current status of the counter, and whether the result has been acknowledged or consumed by external systems.
+
+The extensive specifications provided for this Verilog module outline the necessity for a complete implementation that adheres to these outlined requirements. This encompasses the ability to manage both signed and unsigned division operations effectively, perform necessary arithmetic shifts, and ensure that state transitions occur accurately in line with the clock cycles. The challenge presented here is to execute these tasks cohesively in a synchronous logical framework, emphasizing precise control over bit manipulation and ensuring timely generation of output results.

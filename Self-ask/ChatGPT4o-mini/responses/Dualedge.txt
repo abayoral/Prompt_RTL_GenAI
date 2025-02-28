@@ -1,0 +1,24 @@
+```
+module top_module (
+    input clk,
+    input d,
+    output reg q
+);
+
+    reg d_ff_pos;
+    reg d_ff_neg;
+
+    always @(posedge clk) begin
+        d_ff_pos <= d;
+    end
+
+    always @(negedge clk) begin
+        d_ff_neg <= d;
+    end
+
+    always @(posedge clk or negedge clk) begin
+        q <= d_ff_pos | d_ff_neg;
+    end
+
+endmodule
+```

@@ -1,0 +1,26 @@
+As a professional Verilog designer, you are tasked with implementing a module named `calendar` that functions as a perpetual time-keeping system. This system starts with initial values of zero for seconds (Secs), minutes (Mins), and hours (Hours). Understanding the full functionality is crucial for accurate implementation.
+
+The `Secs` counter operates on a cycle from 0 to 59, incrementing with each clock pulse until it reaches 59, after which it resets back to 0. When `Secs` hits 59 and completes its cycle, it triggers an increment in the `Mins` counter.
+
+Similarly, the `Mins` counter runs on a loop from 0 to 59. Whenever `Secs` reach 59, indicating a complete minute, `Mins` should increment by 1. If `Mins` is at 59, then a complete hour is signified, leading to an increment in the `Hours` counter.
+
+The `Hours` counter circulates from 0 to 23. A complete hour cycle comprises 59 minutes and 59 seconds. Thus, when both `Mins` and `Secs` are at 59, `Hours` should increment by 1. Once `Hours` surpasses 23, it resets to 0.
+
+Your module will have several inputs and outputs:
+- **Input Ports:**
+  - `CLK`: It is a clock signal that drives the operation of the module, determining when values should be updated.
+  - `RST`: This is an active-high reset signal, used to immediately set `Secs`, `Mins`, and `Hours` back to 0 regardless of current values.
+
+- **Output Ports:**
+  - `Secs`: A 6-bit output that provides the current seconds count.
+  - `Mins`: A 6-bit output for the current minutes count.
+  - `Hours`: A 6-bit output reflecting the current hours count.
+
+The module functionality is managed using three `always` blocks:
+1. **Seconds Handling**: The first `always` block focuses on updating `Secs`. It is executed at the positive edge of `CLK` or `RST`. When `RST` is high, `Secs` is instantly set to 0. If `Secs` reaches 59, it resets to 0 in the next cycle; else, it simply increments.
+
+2. **Minutes Handling**: The second block similarly triggers on `CLK` or `RST` and updates `Mins`. Resetting is prioritized if `RST` is true. When `Secs` hits 59, it checks if `Mins` should increment. If both reach 59, it resets `Mins` to 0 in the following cycle.
+
+3. **Hours Handling**: The third block governs the `Hours` value. A reset here also aims to zero `Hours` promptly with an active `RST`. There’s an increment of `Hours` whenever the complete minute (60 seconds) completes at the top of the hour. After reaching 23, it cycles back to 0 with those conducive conditions.
+
+Consider structuring your Verilog code to reflect this logical architecture, ensuring that each counter properly responds to the timekeeping logic while also appropriately resetting with the `RST` signal.

@@ -1,0 +1,23 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // Observing the Karnaugh map, the output is '1' when an odd number of inputs are 1.
+    // That is, the function is the XOR of a, b, c, and d.
+    // For example, using the minterm list from the K-map:
+    //   a' b  c' d'  --> one '1'
+    //   a  b' c' d'  --> one '1'
+    //   a' b' c' d   --> one '1'
+    //   a  b  c' d   --> three '1's
+    //   a' b  c  d   --> three '1's
+    //   a  b' c  d   --> three '1's
+    //   a' b' c  d'  --> one '1'
+    //   a  b  c  d'  --> three '1's
+    // This matches the truth table of a ⊕ b ⊕ c ⊕ d.
+    assign out = a ^ b ^ c ^ d;
+    
+endmodule

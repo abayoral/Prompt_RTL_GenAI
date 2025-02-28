@@ -1,0 +1,9 @@
+Imagine you are a distinguished Digital Design Engineer working at a prominent hardware design firm, and your current challenge involves the creation of a vital Verilog module for an innovative product that is in development. The successful execution of this module is crucial not only for the functionality of the product itself but also for preserving your company's esteemed reputation in the competitive landscape of the hardware industry.
+
+Your objective is to design a priority encoder that specifically handles an 8-bit input vector. This encoder should effectively identify and report the position of the first (or least significant) bit within the vector that is set to '1'. In scenarios where none of the bits in the input vector are high, the output should default to zero. 
+
+To provide a clearer context, let's consider an example: when the input is 8'b10010000, the output should indicate 3'd4, since the bit at position 4 of the input vector is the first bit that is high (counting positions from right to left and starting from zero).
+
+In this respect, you are to implement the design using synthesizable Verilog, adhering to the Verilog 2001 standards. The provided code framework outlines a module named `top_module`, which includes an 8-bit input (`in`) and a 3-bit output (`pos`) that is designated to convey the position of the identified bit. 
+
+Your task is to strategically insert the necessary code within this module to fulfill the design specifications. How would you approach this challenge while also considering the implications it bears on your team and the broader context of your company's technological advancement?

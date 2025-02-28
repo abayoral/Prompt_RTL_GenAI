@@ -1,0 +1,22 @@
+I would like you to take on the role of a skilled Verilog designer tasked with creating a frequency divider. The main objective of this task is to design and implement a Verilog module that takes an input clock signal with a frequency of 100MHz and produces three distinct output clock signals, each with specific reduced frequencies: one at 50MHz, another at 10MHz, and the last one at 1MHz. These frequencies are derived by dividing the input clock frequency by fixed factors.
+
+The module to be designed should be named `freq_div`. It will feature both input and output ports. Regarding the input ports, you will have:
+
+1. `CLK_in`: This is your primary clock input port receiving the 100MHz signal which needs to be frequency divided.
+2. `RST`: A reset signal that initializes the state of the module, affecting all outputs and any internal counters upon activation.
+
+As for the output ports, three distinct signals are required:
+
+1. `CLK_50`: This output should provide a clock signal with a frequency of 50MHz, effectively halving the frequency of the input clock.
+2. `CLK_10`: This output should provide a clock signal with a frequency of 10MHz, resulting from dividing the input clock frequency by 10.
+3. `CLK_1`: This output should provide a clock signal with a frequency of 1MHz, which is one hundredth of the input frequency.
+
+To implement this frequency division, the design should incorporate counters — a total of three — each corresponding to maintain the division logic for one of the output clocks. You should consider these implementation guidelines for each clock frequency generation:
+
+- **CLK_50 Generation**: Utilize a simple mechanism that toggles the output clock `CLK_50` on every positive edge of `CLK_in`, unless `RST` is active. When `RST` is activated, `CLK_50` should be reset to a defined default state (typically 0), indicating that with each toggle, the frequency will inherently be halved.
+
+- **CLK_10 Generation**: This involves a counter mechanism. On each positive edge of `CLK_in`, if `RST` is activated, you must reset `CLK_10` to a default level and restart the associated counter, let's name it `cnt_10`, to zero. The counter increments with each positive edge and toggles `CLK_10` when it reaches four, corresponding to one-tenth frequency division of `CLK_in`, and then resets to zero to repeat the cycle.
+
+- **CLK_1 Generation**: Analogous but larger counting involved here, using another counter, say `cnt_100`. With each `CLK_in` edge, if `RST` is active, reset `CLK_1` and `cnt_100` to zero. `cnt_100` increases with each cycle, and upon reaching 49, `CLK_1` toggles, achieving a one-hundredth division of input frequency. After toggling `CLK_1`, `cnt_100` resets to zero.
+
+Now that you understand the intricacies and specifications required for the frequency division, your task is to intricately program this functionality into Verilog code, ensuring adherence to these conditions and module naming conventions. Remember that thorough logic synthesis and simulation are essential to verify the accuracy of your design against the expected frequency outputs.

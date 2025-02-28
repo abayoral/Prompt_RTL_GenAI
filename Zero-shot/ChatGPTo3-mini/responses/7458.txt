@@ -1,0 +1,33 @@
+module top_module ( 
+    input  p1a, p1b, p1c, p1d, p1e, p1f,
+    output p1y,
+    input  p2a, p2b, p2c, p2d,
+    output p2y );
+
+// Implementation Option 1: Using continuous assign statements directly
+// This implementation assumes that the 7458’s functionality is to form two outputs: 
+// • p1y is the OR of two 2‐input ANDs on the p1 group [p1a,p1b] and [p1c,p1d].
+// • p2y is the OR of two ANDs – one a 3–input AND using [p1e, p1f, p2a] and the other a 3–input AND using [p2b, p2c, p2d].
+// This uses a total of four AND operations (two are 2–input and two are 3–input) and two OR operations.
+assign p1y = (p1a & p1b) | (p1c & p1d);
+assign p2y = (p1e & p1f & p2a) | (p2b & p2c & p2d);
+
+
+/* 
+// Implementation Option 2: Using intermediate wires for clarity
+
+// Declare intermediate signals for the outputs of the four AND gates.
+wire and1, and2, and3, and4;
+
+// p1 branch: Two 2-input AND gates whose outputs are ORed to form p1y.
+assign and1 = p1a & p1b;
+assign and2 = p1c & p1d;
+assign p1y = and1 | and2;
+
+// p2 branch: Two AND gates (one 3–input and one 3–input) whose outputs are ORed to form p2y.
+assign and3 = p1e & p1f & p2a;
+assign and4 = p2b & p2c & p2d;
+assign p2y = and3 | and4;
+*/
+
+endmodule

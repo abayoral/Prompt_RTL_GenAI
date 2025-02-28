@@ -1,0 +1,71 @@
+```
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg done
+); 
+
+    typedef enum reg [2:0] {
+        IDLE,       // Waiting for a start bit
+        START_BIT,  // Detected start bit
+        DATA_0,     // Receiving data bit 0
+        DATA_1,     // Receiving data bit 1
+        DATA_2,     // Receiving data bit 2
+        DATA_3,     // Receiving data bit 3
+        DATA_4,     // Receiving data bit 4
+        DATA_5,     // Receiving data bit 5
+        DATA_6,     // Receiving data bit 6
+        DATA_7,     // Receiving data bit 7
+        STOP_BIT    // Waiting for stop bit
+    } state_t;
+
+    state_t current_state, next_state;
+    reg [3:0] bit_count; // Counts received data bits
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+            done <= 0;
+            bit_count <= 0;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+
+    always @(*) begin
+        next_state = current_state;
+        case (current_state)
+            IDLE: begin
+                if (in == 0) // Start bit detected
+                    next_state = START_BIT;
+            end
+            START_BIT: begin
+                next_state = DATA_0; // Move to first data bit
+            end
+            DATA_0: next_state = (bit_count == 7) ? STOP_BIT : DATA_1;
+            DATA_1: next_state = (bit_count == 7) ? STOP_BIT : DATA_2;
+            DATA_2: next_state = (bit_count == 7) ? STOP_BIT : DATA_3;
+            DATA_3: next_state = (bit_count == 7) ? STOP_BIT : DATA_4;
+            DATA_4: next_state = (bit_count == 7) ? STOP_BIT : DATA_5;
+            DATA_5: next_state = (bit_count == 7) ? STOP_BIT : DATA_6;
+            DATA_6: next_state = (bit_count == 7) ? STOP_BIT : DATA_7;
+            DATA_7: next_state = STOP_BIT;
+            STOP_BIT: begin
+                done = (in == 1); // Check if stop bit is valid
+                next_state = (in == 1) ? IDLE : STOP_BIT; // Stay until valid stop bit
+            end
+        endcase
+    end
+
+    // Count data bits
+    always @(posedge clk) begin
+        if (reset || current_state == IDLE) begin
+            bit_count <= 0;
+        end else if (current_state >= DATA_0 && current_state <= DATA_7) begin
+            bit_count <= bit_count + 1;
+        end
+    end
+
+endmodule
+```

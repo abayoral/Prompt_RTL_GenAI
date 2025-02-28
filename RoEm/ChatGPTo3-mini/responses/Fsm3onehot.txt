@@ -1,0 +1,32 @@
+module top_module(
+    input in,
+    input [3:0] state,
+    output [3:0] next_state,
+    output out
+);
+
+    // One-hot state encoding: A = state[0], B = state[1], C = state[2], D = state[3]
+
+    // Derivation by inspection from the state table:
+    //
+    // State A: in=0: stay A, in=1: go to B
+    //   -> A gets driven by (state[A] or state[C]) when in==0 (because state C with in=0 goes to A)
+    // State B: in=0: (no transition to B), in=1: stay B (and also receive from A and D) 
+    //   -> B gets driven by (state[A] or state[B] or state[D]) when in==1
+    // State C: in=0: from B and D go to C, in=1: (no transition to C)
+    //   -> C gets driven by (state[B] or state[D]) when in==0
+    // State D: in=1: from C goes to D, in=0: (no transition to D)
+    //   -> D gets driven by state[C] when in==1
+    //
+    // Output logic: Output is 1 only when in state D (Moore machine)
+
+    // State transition logic:
+    assign next_state[0] = (~in) & (state[0] | state[2]);  // Next A: from A with in=0 and from C with in=0
+    assign next_state[1] = in & (state[0] | state[1] | state[3]);  // Next B: from A with in=1, B with in=1, D with in=1
+    assign next_state[2] = (~in) & (state[1] | state[3]);  // Next C: from B with in=0, D with in=0
+    assign next_state[3] = in & state[2];  // Next D: from C with in=1
+
+    // Output logic:
+    assign out = state[3];  // Output 1 when in state D
+
+endmodule

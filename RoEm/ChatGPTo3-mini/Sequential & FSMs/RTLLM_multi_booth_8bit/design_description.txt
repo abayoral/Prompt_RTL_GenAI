@@ -1,0 +1,21 @@
+You are tasked with designing a module in Verilog, functioning as an 8-bit Radix-4 Booth multiplier, a specialized form of multiplier that utilizes the Booth algorithm to efficiently compute the product of two 8-bit inputs. The module you will create is named `multi_booth_8bit` and must adhere to specific input and output requirements for its operation.
+
+Input Ports:
+- `clk`: This is the clock signal, essential for synchronous operations within the module. It orchestrates the timing for the entire operation, ensuring each computation step occurs at the correct interval.
+- `reset`: A reset signal that initializes or resets the state of the multiplier. When activated, it sets up necessary conditions within the module, such as clearing registers or initializing counters.
+- `a`: Represents one of the 8-bit inputs acting as the multiplicand. The multiplicand is the number that is repeatedly added in the multiplication process per the Booth algorithm.
+- `b`: The second 8-bit input acting as the multiplier. The multiplier is the number that dictates how many times the multiplicand should be added to itself.
+
+Output Ports:
+- `p`: This is a 16-bit output that provides the product of the multiplication of `a` and `b`. The extended bit-width accounts for the maximum size of the result produced by multiplying two 8-bit numbers.
+- `rdy`: A ready signal that becomes active (set to 1) when the multiplication process is complete. It signals that the output `p` contains a valid and finalized product.
+
+Operational Implementation:
+- The core logic operates on the positive edge of the `clk` or `reset` signals. This dual-edge sensitivity allows for both normal operations and resetting conditions to be managed effectively.
+- Upon activation of the `reset` signal, initializations occur wherein two 16-bit registers are set: `multiplier` and `multiplicand`. The `multiplier` register is formed by sign-extending the 8-bit input `a` and similarly, the `multiplicand` register is sign-extended from `b`.
+- The module cycles through a series of computational steps as dictated by a counter (`ctr`). Starting from zero, it controls the loop for up to 16 iterations, mirroring the number of bits required for Radix-4 Booth processing.
+- During each iteration, the multiplicand undergoes left-shifting by 1 bit—a critical step in the Booth algorithm, facilitating radix-based encoding and partial product additions.
+- The algorithm checks specific bits within the `multiplier` to determine the encoding type (positive, negative, or zero) and accordingly accumulates the multiplicand value into the `p` register if a positive encoding is detected.
+- This iterative process allows the complete multiplication operation to unfold systematically until `ctr` reaches the value of 16. At this point, multiplication is deemed complete, and the `rdy` signal is set high to signal this completion, indicating the output `p` is ready for use.
+
+Your task is to draft the Verilog code for this module, encapsulating all the above functionalities, ensuring the design aligns with the specified behavior and signal interactions.

@@ -1,0 +1,45 @@
+module pairwise_comparator(
+    input  a,
+    input  b,
+    input  c,
+    input  d,
+    input  e,
+    output [24:0] out
+);
+
+    // Comparisons for a row: a with a, b, c, d, e
+    assign out[24] = ~(a ^ a); // a XNOR a, always 1
+    assign out[23] = ~(a ^ b); // a XNOR b
+    assign out[22] = ~(a ^ c); // a XNOR c
+    assign out[21] = ~(a ^ d); // a XNOR d
+    assign out[20] = ~(a ^ e); // a XNOR e
+
+    // Comparisons for b row: b with a, b, c, d, e
+    assign out[19] = ~(b ^ a); // b XNOR a
+    assign out[18] = ~(b ^ b); // b XNOR b, always 1
+    assign out[17] = ~(b ^ c); // b XNOR c
+    assign out[16] = ~(b ^ d); // b XNOR d
+    assign out[15] = ~(b ^ e); // b XNOR e
+
+    // Comparisons for c row: c with a, b, c, d, e
+    assign out[14] = ~(c ^ a); // c XNOR a
+    assign out[13] = ~(c ^ b); // c XNOR b
+    assign out[12] = ~(c ^ c); // c XNOR c, always 1
+    assign out[11] = ~(c ^ d); // c XNOR d
+    assign out[10] = ~(c ^ e); // c XNOR e
+
+    // Comparisons for d row: d with a, b, c, d, e
+    assign out[9]  = ~(d ^ a); // d XNOR a
+    assign out[8]  = ~(d ^ b); // d XNOR b
+    assign out[7]  = ~(d ^ c); // d XNOR c
+    assign out[6]  = ~(d ^ d); // d XNOR d, always 1
+    assign out[5]  = ~(d ^ e); // d XNOR e
+
+    // Comparisons for e row: e with a, b, c, d, e
+    assign out[4]  = ~(e ^ a); // e XNOR a
+    assign out[3]  = ~(e ^ b); // e XNOR b
+    assign out[2]  = ~(e ^ c); // e XNOR c
+    assign out[1]  = ~(e ^ d); // e XNOR d
+    assign out[0]  = ~(e ^ e); // e XNOR e, always 1
+
+endmodule

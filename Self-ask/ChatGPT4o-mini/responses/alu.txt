@@ -1,0 +1,76 @@
+```verilog
+module alu (
+    input  [31:0] a,
+    input  [31:0] b,
+    input  [5:0]  aluc,
+    output reg [31:0] r,
+    output reg zero,
+    output reg carry,
+    output reg negative,
+    output reg overflow,
+    output reg flag
+);
+
+    always @(*) begin
+        // Initialize outputs
+        r = 32'bz;
+        zero = 0;
+        carry = 0;
+        negative = 0;
+        overflow = 0;
+        flag = 0;
+
+        case (aluc)
+            6'b100000: begin // ADD
+                {carry, r} = a + b;
+                overflow = (a[31] == b[31]) && (r[31] != a[31]);
+            end
+            6'b100001: begin // ADDU
+                {carry, r} = a + b;
+            end
+            6'b100010: begin // SUB
+                {carry, r} = a - b;
+                overflow = (a[31] != b[31]) && (r[31] != a[31]);
+            end
+            6'b100011: begin // SUBU
+                {carry, r} = a - b;
+            end
+            6'b100100: begin // AND
+                r = a & b;
+            end
+            6'b100101: begin // OR
+                r = a | b;
+            end
+            6'b100110: begin // XOR
+                r = a ^ b;
+            end
+            6'b100111: begin // NOR
+                r = ~(a | b);
+            end
+            6'b101010: begin // SLT
+                r = (a < b) ? 32'b1 : 32'b0;
+                flag = 1;
+            end
+            6'b101011: begin // SLTU
+                r = ($unsigned(a) < $unsigned(b)) ? 32'b1 : 32'b0;
+                flag = 1;
+            end
+            6'b000000: r = b << a[4:0]; // SLL
+            6'b000010: r = b >> a[4:0]; // SRL
+            6'b000011: r = $signed(b) >>> a[4:0]; // SRA
+            6'b000100: r = b << a; // SLLV
+            6'b000110: r = b >> a; // SRLV
+            6'b000111: r = $signed(b) >>> a; // SRAV
+            6'b001111: begin // LUI
+                r = {a[15:0], 16'b0};
+            end
+            default: r = 32'bz; // Undefined operation
+        endcase
+
+        // Set flags based on result
+        zero = (r == 32'b0);
+        negative = r[31];
+
+    end
+endmodule
+```

@@ -1,0 +1,24 @@
+Imagine you are a seasoned Verilog design engineer with the challenge of creating a digital module that serves as a frequency divider targeting an odd-numbered division factor. The project involves designing a module, to be named freq_divbyodd, that takes in an external clock signal and a reset signal, and then produces a new clock signal whose frequency is reduced by an odd integer factor. Although this divider factor should be adjustable via a parameter, you will configure the module so that it defaults to dividing by 5.
+
+The module should include the following ports:
+
+• Input Ports:
+  – clk: This is the main clock signal that will be used as the reference for timing. It is the signal to be divided.
+  – rst_n: This active-low reset input is used to initialize the frequency divider, ensuring that the module starts in a known state upon reset.
+
+• Output Ports:
+  – clk_div: This is the output clock signal, which will have a reduced frequency as a result of the division operation by the chosen odd factor.
+
+The design must adhere to these additional specifications:
+
+• Parameterization:
+  – The number by which the input clock is divided is specified by the parameter NUM_DIV, which has a default value of 5. While this default is set for an odd divisor of 5, the module should be flexible enough to accept other odd-number values as needed.
+
+• Internal Implementation Details:
+  – Two internal counters, referred to as cnt1 and cnt2, are to be utilized. Their role is to detect the rising and falling edges of the input clock signal.
+  – Both counters should increment until they reach a count of NUM_DIV - 1, adhering to the logic that manages the timing for the clock division.
+  – The module should generate two auxiliary internal clock signals, clk_div1 and clk_div2. One of these signals is responsible for handling operations on the positive edges of the input clock, while the other manages the negative edges.
+  – The toggling behavior for both auxiliary signals should be programmed to occur when the counter’s value reaches half of NUM_DIV, thus ensuring that both halves of the clock cycle are accounted for correctly.
+  – Lastly, the final output clock clk_div should be produced by performing a logical OR operation on clk_div1 and clk_div2. This logical combination is key to ensuring that both edges contribute to the resulting output waveform.
+
+The purpose of this task is to deeply explore the implementation aspects of an odd clock divider in Verilog, requiring you to consider parameter flexibility, counter operations, handling of different clock edges, and the logic necessary to combine the edge contributions into one cohesive output. No solution is provided here; the focus is solely on understanding and elaborating the detailed requirements and expected behavior of the module.

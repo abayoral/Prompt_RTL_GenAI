@@ -1,0 +1,43 @@
+module accu(
+    input         clk,
+    input         rst_n,
+    input  [7:0]  data_in,
+    input         valid_in,
+    output reg    valid_out,
+    output reg [9:0] data_out
+);
+
+    // Internal registers for accumulation and counting valid inputs.
+    reg [9:0] sum_reg;
+    reg [2:0] count;  // We count from 0 to 3; once we have 4 valid inputs, count wraps.
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            sum_reg   <= 10'd0;
+            count     <= 3'd0;
+            valid_out <= 1'b0;
+            data_out  <= 10'd0;
+        end else begin
+            // Default: valid_out is not asserted unless explicitly set below.
+            valid_out <= 1'b0;
+
+            if (valid_in) begin
+                // Check if this valid input is the fourth one.
+                if (count == 3) begin
+                    // For the fourth valid data, perform the addition:
+                    // Note: Using non-blocking assignments, so sum_reg is still its old value.
+                    data_out  <= sum_reg + data_in;
+                    valid_out <= 1'b1;
+                    // Reset the accumulator and counter for next accumulation sequence.
+                    sum_reg   <= 10'd0;
+                    count     <= 3'd0;
+                end else begin
+                    // Accumulate the data and increment the counter.
+                    sum_reg <= sum_reg + data_in;
+                    count   <= count + 3'd1;
+                end
+            end
+        end
+    end
+
+endmodule

@@ -1,0 +1,62 @@
+module LIFObuffer(
+    input wire [3:0] dataIn,
+    input wire RW,      // 0: push, 1: pop
+    input wire EN,
+    input wire Rst,     // active-high reset
+    input wire Clk,
+    output wire EMPTY,
+    output wire FULL,
+    output reg [3:0] dataOut
+);
+
+    // Depth and pointer settings:
+    // The buffer can hold 4 entries.
+    // SP value of 4 means the stack is empty.
+    // SP value of 0 indicates the stack is full.
+    reg [3:0] stack_mem [0:3]; // Memory array to store 4-bit data in 4 locations.
+    reg [2:0] sp;             // Stack pointer: ranges from 0 to 4 (requires 3 bits)
+
+    // Combinational assignments for status flags.
+    assign EMPTY = (sp == 3'd4);
+    assign FULL  = (sp == 3'd0);
+
+    integer i;
+    
+    always @(posedge Clk) begin
+        if (EN) begin
+            if (Rst) begin
+                // Reset the stack pointer and clear memory and dataOut.
+                sp <= 3'd4;  // Indicating empty. (Indexes 0 to 3 used; 4 indicates no valid entries)
+                dataOut <= 4'd0;
+                // Clear the memory array.
+                for (i = 0; i < 4; i=i+1) begin
+                    stack_mem[i] <= 4'd0;
+                end
+            end
+            else begin
+                // If not reset, then perform operation based on RW.
+                if (RW == 1'b0) begin
+                    // Push operation: check if not full.
+                    if (sp != 3'd0) begin
+                        // Decrement stack pointer to point to new top location.
+                        sp <= sp - 3'd1;
+                        // Write input data into the memory at the new stack pointer.
+                        stack_mem[sp - 3'd1] <= dataIn;
+                    end
+                end
+                else begin
+                    // Pop operation: check if not empty.
+                    if (sp != 3'd4) begin
+                        // Read the data from the top of the stack.
+                        dataOut <= stack_mem[sp];
+                        // Clear the memory location for clarity.
+                        stack_mem[sp] <= 4'd0;
+                        // Increment stack pointer to pop the item.
+                        sp <= sp + 3'd1;
+                    end
+                end
+            end
+        end
+    end
+
+endmodule

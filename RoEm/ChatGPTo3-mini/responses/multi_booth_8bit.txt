@@ -1,0 +1,68 @@
+module multi_booth_8bit(
+    input         clk,
+    input         reset,
+    input  [7:0]  a,         // 8-bit multiplicand (per port description)
+    input  [7:0]  b,         // 8-bit multiplier (per port description)
+    output [15:0] p,         // 16-bit product output
+    output        rdy        // Ready signal: high when multiplication is complete
+);
+
+  // Internal registers
+  reg [15:0] multiplier;    // Register holding sign-extended value from 'a'
+  reg [15:0] multiplicand;  // Register holding sign-extended value from 'b'
+  reg [15:0] product;       // Accumulation register for the product
+  reg [4:0]  ctr;           // 5-bit counter for up to 16 iterations
+  reg        ready;         // Internal ready signal
+  
+  // Assign outputs
+  assign p   = product;
+  assign rdy = ready;
+  
+  // Sequential block
+  // The design works on the positive edge of clk or when reset is activated.
+  // On reset, the registers are initialized:
+  //   - 'multiplier' is assigned the sign extended value from input 'a'.
+  //   - 'multiplicand' is assigned the sign extended value from input 'b'.
+  //   - 'product' is cleared.
+  //   - Counter is initialized.
+  // During operation, for each clock cycle (if not finished):
+  //   1. Check the corresponding bit of multiplier (using ctr as the index) to decide 
+  //      if a positive encoding is present.
+  //      If multiplier[ctr]==1, then add the current value of multiplicand into product.
+  //   2. In every iteration, shift the multiplicand left by 1.
+  //   3. Increment the counter until 16 iterations are complete.
+  //   4. When 16 iterations are finished, assert the ready signal.
+  always @(posedge clk, posedge reset) begin
+    if (reset) begin
+      // Initialize registers on reset.
+      // Note: Although the port descriptions say "a" is the multiplicand and "b" is the multiplier,
+      // the specification for register initialization calls for sign-extending a into the multiplier register
+      // and b into the multiplicand register.
+      multiplier   <= { {8{a[7]}}, a };
+      multiplicand <= { {8{b[7]}}, b };
+      product      <= 16'd0;
+      ctr          <= 5'd0;
+      ready        <= 1'b0;
+    end 
+    else if (ctr < 5'd16) begin
+      // For the current iteration, if the current bit of the multiplier indicates a positive encoding,
+      // accumulate the current multiplicand into the product.
+      if (multiplier[ctr] == 1'b1) begin
+        product <= product + multiplicand;
+      end
+      
+      // Each iteration, shift the multiplicand left by 1.
+      multiplicand <= multiplicand << 1;
+      
+      // Increment the counter.
+      ctr <= ctr + 1;
+      
+      // If this is the final iteration, set the ready signal.
+      if (ctr == 5'd15) begin
+        ready <= 1'b1;
+      end
+    end
+    // Remain in multiplication done state until reset.
+  end
+
+endmodule

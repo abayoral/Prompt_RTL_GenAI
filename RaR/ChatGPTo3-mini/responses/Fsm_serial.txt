@@ -1,0 +1,80 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output done
+);
+
+    // Define FSM states
+    localparam IDLE   = 2'b00,  // Waiting for start bit (logic 0)
+               DATA   = 2'b01,  // Capturing eight data bits
+               STOP   = 2'b10,  // Checking for stop bit (logic 1)
+               RECOVER= 2'b11;  // Waiting for stop bit if missing
+
+    reg [1:0] state;
+    reg [3:0] bit_count;  // to count 0 to 7 (8 data bits)
+    reg done_reg;
+
+    // Synchronous FSM
+    always @(posedge clk) begin
+        if (reset) begin
+            state     <= IDLE;
+            bit_count <= 0;
+            done_reg  <= 0;
+        end
+        else begin
+            // Default: clear done signal each cycle
+            done_reg <= 0;
+            case (state)
+                // Waiting for a start bit (logic 0). The line normally idles high.
+                IDLE: begin
+                    if (in == 1'b0) begin
+                        // Detected start bit; begin capturing data bits.
+                        state     <= DATA;
+                        bit_count <= 0;
+                    end
+                    else begin
+                        state <= IDLE;
+                    end
+                end
+
+                // Data bit capture state: capture 8 sequential bits.
+                DATA: begin
+                    if (bit_count == 4'd7) begin
+                        // Last data bit captured; next check for stop bit.
+                        state <= STOP;
+                    end
+                    else begin
+                        bit_count <= bit_count + 1;
+                    end
+                end
+
+                // Expect stop bit: ideally logic 1.
+                STOP: begin
+                    if (in) begin
+                        // Correct stop bit detected: byte reception complete.
+                        done_reg <= 1;
+                        state    <= IDLE;
+                    end
+                    else begin
+                        // Stop bit missing: remain in error recovery until a stop bit appears.
+                        state <= RECOVER;
+                    end
+                end
+
+                // Recovery state: wait until a stop bit (logic 1) is seen.
+                RECOVER: begin
+                    if (in) begin
+                        state <= IDLE;
+                    end
+                    // Otherwise, stay in RECOVER.
+                end
+
+                default: state <= IDLE;
+            endcase
+        end
+    end
+
+    assign done = done_reg;
+
+endmodule

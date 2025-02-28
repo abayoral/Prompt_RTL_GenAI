@@ -1,0 +1,82 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,
+    output reg [7:0] out_byte,
+    output reg done
+);
+
+    // FSM state encoding
+    localparam STATE_IDLE      = 2'b00;
+    localparam STATE_RECV      = 2'b01;
+    localparam STATE_WAIT_STOP = 2'b10;
+
+    reg [1:0] state;
+    reg [2:0] bit_count;   // counts from 0 to 7 for the eight data bits
+    reg [7:0] shift_reg;   // holds the assembled byte
+
+    // This module implements a receiver for serial data that follows the protocol:
+    // 1. A start bit (logic '0') to indicate the beginning of a byte.
+    // 2. Eight data bits received in LSB-first order.
+    // 3. A stop bit (logic '1') to indicate the end of the byte.
+    // If the stop bit is not immediately encountered after receiving eight bits,
+    // the FSM remains in the WAIT_STOP state until a '1' is detected.
+    // When a valid byte is received (start bit, 8 data bits, followed by a stop bit),
+    // the assembled byte is output on out_byte and a one-cycle pulse is produced on done.
+
+    always @(posedge clk) begin
+        if (reset) begin
+            state     <= STATE_IDLE;
+            bit_count <= 3'd0;
+            shift_reg <= 8'd0;
+            out_byte  <= 8'd0;
+            done      <= 1'b0;
+        end else begin
+            // Default: deassert done unless a valid frame is completed
+            done <= 1'b0;
+            case (state)
+                // In IDLE state, wait for the start bit (logic 0).
+                STATE_IDLE: begin
+                    if (in == 1'b0) begin
+                        // Detected start bit. Initialize bit counter and clear shift register.
+                        bit_count <= 3'd0;
+                        shift_reg <= 8'd0;
+                        state <= STATE_RECV;
+                    end
+                end
+
+                // In RECV state, receive eight data bits (LSB first).
+                STATE_RECV: begin
+                    // Store the incoming bit in the current bit position.
+                    // Since data is LSB first, the first bit goes to shift_reg[0],
+                    // the second to shift_reg[1], and so on.
+                    shift_reg[bit_count] <= in;
+                    
+                    // Check if we have received the last (8th) bit.
+                    if (bit_count == 3'd7) begin
+                        state <= STATE_WAIT_STOP;
+                    end else begin
+                        // Increment the bit counter to receive the next bit.
+                        bit_count <= bit_count + 3'd1;
+                    end
+                end
+
+                // In WAIT_STOP state, wait for the stop bit. The FSM stays here until a '1' is detected.
+                STATE_WAIT_STOP: begin
+                    if (in == 1'b1) begin
+                        // Valid stop bit detected.
+                        out_byte <= shift_reg;  // Output the assembled byte.
+                        done <= 1'b1;           // Assert done for one clock cycle.
+                        state <= STATE_IDLE;    // Return to idle, ready to receive the next byte.
+                    end
+                    // Else remain in WAIT_STOP until a '1' is seen.
+                end
+
+                default: begin
+                    state <= STATE_IDLE;
+                end
+            endcase
+        end
+    end
+
+endmodule

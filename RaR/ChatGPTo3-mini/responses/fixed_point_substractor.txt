@@ -1,0 +1,65 @@
+module fixed_point_subtractor 
+  #(parameter Q = 8,        // number of fractional bits
+    parameter N = 16)       // total number of bits (1 sign bit + N-1 magnitude bits)
+   (input  [N-1:0] a,        // first fixed‑point operand
+    input  [N-1:0] b,        // second fixed‑point operand
+    output [N-1:0] c);       // subtraction result
+
+  // In this design the numbers are assumed to be in sign‐magnitude format:
+  // – The most significant bit is the sign bit (0 = positive, 1 = negative).
+  // – The remaining bits represent the magnitude of the fixed‑point number
+  //   with Q fractional bits (the integer portion is in bits [N-2:Q] and
+  //   the fractional portion in bits [Q-1:0], although arithmetic is performed
+  //   on the entire magnitude).
+
+  // Extract sign and magnitude fields of the operands.
+  wire a_sign = a[N-1];
+  wire b_sign = b[N-1];
+  wire [N-2:0] a_mag = a[N-2:0];
+  wire [N-2:0] b_mag = b[N-2:0];
+
+  reg [N-1:0] res; // internal register holding the result
+
+  always @(*) begin
+    reg result_sign;
+    reg [N-2:0] result_mag;
+    // Case 1: Operands have the same sign -> perform subtraction of magnitudes.
+    // In sign‐magnitude arithmetic subtracting two numbers of the same sign requires 
+    // comparing the absolute values to decide the sign of the result.
+    if(a_sign == b_sign) begin
+      if(a_mag >= b_mag) begin
+        result_mag  = a_mag - b_mag;
+        result_sign = a_sign;  // result retains the sign of both operands
+      end 
+      else begin
+        result_mag  = b_mag - a_mag;
+        result_sign = ~a_sign; // sign flips if the second magnitude exceeds the first
+      end
+    end 
+    // Case 2: Operands have opposite signs 
+    // (this is equivalent to adding the absolute values).
+    else begin
+      // When a is positive and b is negative: a - (-|b|) is equivalent to a + |b|
+      // When a is negative and b is positive: (-|a|) - b equals -( |a| + b )
+      // In each case, we add the magnitudes and then assign the sign from the operand
+      // whose sign is “active” in the operation.
+      // To perform addition correctly, we widen each magnitude by one bit to capture
+      // any carry; the carry is discarded to remain in the fixed bit‐width format.
+      reg [N-1:0] add_temp;
+      add_temp = {1'b0, a_mag} + {1'b0, b_mag};
+      if(a_sign == 0 && b_sign == 1)
+        result_sign = 0; // positive
+      else // a_sign == 1 && b_sign == 0
+        result_sign = 1; // negative
+      result_mag = add_temp[N-2:0]; // ignore any overflow bit
+    end
+
+    // Special handling: if the computed magnitude is zero, force the sign bit to 0.
+    if(result_mag == 0)
+      result_sign = 1'b0;
+    res = {result_sign, result_mag};
+  end
+
+  assign c = res;
+
+endmodule

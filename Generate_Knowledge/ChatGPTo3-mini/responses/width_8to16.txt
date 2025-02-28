@@ -1,0 +1,59 @@
+module width_8to16 (
+  input         clk,       // Clock signal
+  input         rst_n,     // Active-low reset signal
+  input         valid_in,  // Indicates that data_in is valid
+  input  [7:0]  data_in,   // 8‐bit data input
+  output reg        valid_out, // Indicates that data_out is valid
+  output reg [15:0] data_out   // 16‐bit data output (concatenation of two 8‐bit words)
+);
+
+  // Internal registers for pipelining the conversion.
+  // first_valid indicates whether the first 8-bit sample has been received.
+  reg         first_valid;
+  reg  [7:0]  stored_byte;
+  // conversion_result holds the combined 16-bit result when the second sample is received.
+  reg  [15:0] conversion_result;
+  // pending_conversion is a flag that, when high, means that a pair has been received and
+  // the valid 16-bit output should be presented in the next cycle.
+  reg         pending_conversion;
+
+  // Main sequential process. The output (data_out and valid_out) are updated every clock cycle,
+  // and the input processing is done concurrently.
+  // The valid 16-bit output is produced in the cycle after a pair of valid inputs is received.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      // Asynchronous reset: clear all registers
+      first_valid         <= 1'b0;
+      stored_byte         <= 8'b0;
+      conversion_result   <= 16'b0;
+      pending_conversion  <= 1'b0;
+      valid_out           <= 1'b0;
+      data_out            <= 16'b0;
+    end else begin
+      // Drive the outputs using the previously computed conversion result.
+      // Because of nonblocking assignment, these use the values from the previous cycle.
+      valid_out  <= pending_conversion;
+      data_out   <= conversion_result;
+
+      // By default, clear the pending_conversion flag for the next cycle.
+      pending_conversion <= 1'b0;
+
+      // If a new valid input is present, process it.
+      if (valid_in) begin
+        // If no first sample has been captured, store the current sample.
+        if (!first_valid) begin
+          stored_byte <= data_in;
+          first_valid <= 1'b1;
+        end
+        // Otherwise, if a first sample was already stored, combine it with the new sample.
+        else begin
+          conversion_result <= {stored_byte, data_in}; // Concatenate: first sample as MSB, new sample as LSB
+          first_valid       <= 1'b0;   // Clear stored sample flag after second sample
+          pending_conversion<= 1'b1;   // Mark that a valid 16-bit result is now ready (to be output next cycle)
+        end
+      end
+      // If valid_in is not asserted, no new data is processed.
+    end
+  end
+
+endmodule

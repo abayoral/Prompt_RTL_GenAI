@@ -1,0 +1,38 @@
+As a professional Verilog designer, please create a comprehensive Verilog module named "alu" for a 32-bit MIPS ISA CPU. The module should accommodate various arithmetic and logical operations specified by a 6-bit opcode, represented by the input signal 'aluc'. The inputs to the ALU are two 32-bit operands, 'a' and 'b.' The module should output the following:
+
+1. 'r': a 32-bit result of the operation.
+2. 'zero': a 1-bit indicator signaling if the result 'r' is zero.
+3. 'carry': a 1-bit flag indicating if there is a carry out from the most significant bit during the operation.
+4. 'negative': a 1-bit signal indicating if the result 'r' is negative.
+5. 'overflow': a 1-bit flag denoting if an arithmetic overflow occurred during the operation.
+6. 'flag': a 1-bit result specifically for the outcome of the "Set on Less Than" (SLT) and "Set on Less Than Unsigned" (SLTU) instructions.
+
+The operations should align with the following parameters, where each parameter corresponds to a specific opcode:
+
+- ADD: 6'b100000
+- ADDU: 6'b100001
+- SUB: 6'b100010
+- SUBU: 6'b100011
+- AND: 6'b100100
+- OR: 6'b100101
+- XOR: 6'b100110
+- NOR: 6'b100111
+- SLT: 6'b101010
+- SLTU: 6'b101011
+- SLL: 6'b000000
+- SRL: 6'b000010
+- SRA: 6'b000011
+- SLLV: 6'b000100
+- SRLV: 6'b000110
+- SRAV: 6'b000111
+- LUI: 6'b001111
+
+You need to implement this logic within a Verilog module. In terms of implementation details:
+
+- The operands should be signed or unsigned based on the operation (e.g., addition vs. unsigned addition).
+- The module should process the 'aluc' signal within a case statement to determine the appropriate operation on the operands.
+- Special attention is needed for shift operations (e.g., logical shift left, logical shift right, arithmetic shift right) to handle the bit-shifting correctly, especially considering the cases where the shift amount is given directly or derived from certain bits of the operand.
+- Implement logic to handle the LUI operation by shifting the upper 16 bits of operand 'a' and filling the lower bits with zeros.
+- The determination of the zero, carry, negative, overflow, and flag outputs should be based on the result of the operation performed.
+
+Please ensure that operations not explicitly defined in the parameters default to a high-impedance state ('z') to account for any unhandled cases. Based on these requirements, write the full real-world Verilog code that accurately models this ALU functionality under the defined constraints and parameters.

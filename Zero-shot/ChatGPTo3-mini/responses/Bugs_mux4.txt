@@ -1,0 +1,45 @@
+module mux2 (
+    input sel,
+    input [7:0] a,
+    input [7:0] b,
+    output [7:0] out
+);
+    assign out = sel ? b : a;
+endmodule
+
+module top_module (
+    input [1:0] sel,
+    input [7:0] a,
+    input [7:0] b,
+    input [7:0] c,
+    input [7:0] d,
+    output [7:0] out
+);
+
+    // First stage: two 2-to-1 muxes use sel[0] to choose between a,b and c,d, respectively.
+    wire [7:0] lower_mux0;
+    wire [7:0] lower_mux1;
+    
+    mux2 u_mux0 (
+        .sel(sel[0]),
+        .a(a),
+        .b(b),
+        .out(lower_mux0)
+    );
+    
+    mux2 u_mux1 (
+        .sel(sel[0]),
+        .a(c),
+        .b(d),
+        .out(lower_mux1)
+    );
+    
+    // Second stage: a 2-to-1 mux uses sel[1] to choose the final output.
+    mux2 u_mux2 (
+        .sel(sel[1]),
+        .a(lower_mux0),
+        .b(lower_mux1),
+        .out(out)
+    );
+    
+endmodule

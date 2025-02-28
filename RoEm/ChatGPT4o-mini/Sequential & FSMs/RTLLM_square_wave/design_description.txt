@@ -1,0 +1,27 @@
+You have identified yourself as a Verilog designer, and you are tasked with developing a module intended to generate square wave signals that exhibit a variable frequency. The core functionality of this module involves taking a clock signal and a frequency parameter as inputs and producing a square wave signal that toggles its state at a frequency specified by the input frequency parameter.
+
+The module you're working on is named `square_wave`, which succinctly describes its function. 
+
+Here is a breakdown of the design requirements and components you need to consider when writing the complete code for this module:
+
+**Inputs:**
+
+1. **clk**: This is the clock signal that triggers the operation of the module. Each rising edge of this clock will contribute to the progression of the internal logic, particularly influencing the count register.
+
+2. **[7:0] freq**: This 8-bit input serves as the frequency control. It determines how often the square wave signal should toggle. The value of `freq` directly influences the behavior of the internal counter logic and, by extension, the timing at which the square wave output changes its state.
+
+**Outputs:**
+
+1. **wave_out**: This is the primary output of the module, the square wave signal. It is expected to alternately switch between high and low states in accordance with the frequency specified by the `freq` input.
+
+**Internal Registers:**
+
+1. **count (reg [7:0])**: An 8-bit internal register used as a counter. The count increments with each rising edge of the clock signal. It keeps track of the number of clock cycles that have passed, determining when the square wave output should toggle its state.
+
+**Implementation Details:**
+
+- **Counter Operation**: The `count` register begins at zero and increments with each rising edge of the clock. Once the counter reaches the value of `freq - 1`, it is reset to zero, and the wave output (`wave_out`) flips its state. This mechanism ensures the frequency at which `wave_out` toggles is regulated by the value provided to `freq`.
+
+- **Square Wave Generation**: The essence of the module is the consistent toggling of the output signal, `wave_out`, at a rate determined by the `freq` input. Notably, a higher `freq` value results in a slower toggling rate of the output square wave, effectively reducing the frequency of the square wave, while a lower `freq` results in a quicker toggle and thus a higher output frequency.
+
+With these requirements and operational details in mind, you should draft the complete Verilog code implementing this logic while ensuring the module operates accurately under various input frequency conditions. The code should handle the described logic for counting and toggling the output to achieve the desired behavior.

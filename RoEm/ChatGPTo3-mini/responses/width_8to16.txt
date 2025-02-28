@@ -1,0 +1,43 @@
+module width_8to16(
+    input        clk,       // Clock signal.
+    input        rst_n,     // Active-low reset signal.
+    input        valid_in,  // Indicates if data_in is valid.
+    input  [7:0] data_in,   // 8-bit input data.
+    output reg        valid_out, // Indicates when data_out is valid.
+    output reg [15:0] data_out   // 16-bit converted output data.
+);
+
+  // Internal register to store the first 8-bit data.
+  reg [7:0] data_buffer;
+  // Toggle state: 0 means waiting for the first data, 1 means waiting for the second.
+  reg       toggle;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      // Reset all registers.
+      data_buffer <= 8'd0;
+      data_out    <= 16'd0;
+      toggle      <= 1'b0;
+      valid_out   <= 1'b0;
+    end else begin
+      // By default, deassert valid_out.
+      valid_out <= 1'b0;
+
+      // Process input only when valid_in is high.
+      if (valid_in) begin
+        // If toggle is low, capture the first data.
+        if (!toggle) begin
+          data_buffer <= data_in;
+          toggle      <= 1'b1;
+        end else begin
+          // If toggle is high, then we have the second 8-bit data.
+          // Concatenate stored first data (higher byte) with current data (lower byte).
+          data_out    <= {data_buffer, data_in};
+          valid_out   <= 1'b1;
+          toggle      <= 1'b0;
+        end
+      end
+    end
+  end
+
+endmodule

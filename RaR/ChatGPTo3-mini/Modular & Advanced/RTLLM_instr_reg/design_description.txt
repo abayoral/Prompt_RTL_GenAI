@@ -1,0 +1,35 @@
+Below is an expanded and rephrased version of the question that outlines all requirements in greater detail without providing any solutions:
+
+We are looking for a complete and detailed implementation in Verilog HDL of an instruction register module, which should be named instr_reg. This module is a critical component in a CPU system that captures and processes instructions by separating them into distinct fields for subsequent operations.
+
+The module should have the following interface and behavior:
+
+1. Module Name:
+   • instr_reg
+
+2. Input Ports:
+   • clk: A clock signal that synchronizes all operations within the module.
+   • rst: An active low reset signal. When this signal is asserted (i.e., goes low), the instruction register should initialize to a predetermined state—in this case, resetting internal registers to zero.
+   • fetch [1:0]: A 2-bit control signal determining the source from which to fetch the instruction. Specifically:
+         ○ A value of 01 (i.e., 2’b01) indicates that the instruction should be fetched from one particular register.
+         ○ A value of 10 (i.e., 2’b10) indicates that the instruction should be fetched from a RAM/ROM source.
+   • data [7:0]: An 8-bit data input carrying the instruction to be fetched into the module.
+
+3. Output Ports:
+   • ins [2:0]: A 3-bit output that should provide the high-order 3 bits of the fetched instruction. This field typically represents the opcode.
+   • ad1 [4:0]: A 5-bit output representing the lower 5 bits of the instruction, usually corresponding to a register address.
+   • ad2 [7:0]: An 8-bit output that provides the full instruction data when the instruction is fetched from the alternative source.
+
+4. Internal Implementation Details:
+   • The module should include two distinct 8-bit registers: ins_p1 and ins_p2. Each register is designated to hold an instruction coming from its respective source.
+   • On every rising edge of the clk signal, the module should first check the rst signal. If rst is active (i.e., it is at a low level), both internal registers (ins_p1 and ins_p2) must be cleared to zero.
+   • The fetch control signal directs which register is to be updated:
+         ○ When fetch equals 2’b01, the module should capture the instruction from the data input and store it in ins_p1.
+         ○ When fetch equals 2’b10, the instruction should be captured and stored in ins_p2.
+         ○ If the fetch signal is not 2’b01 or 2’b10, then no update should occur; both ins_p1 and ins_p2 should retain their current values.
+   • Finally, the outputs (ins, ad1, and ad2) must be derived based on the contents of the internal registers and formatted as specified:
+         ○ The ins output should be connected to the high 3 bits of one of the stored instruction registers.
+         ○ The ad1 output should reflect the low 5 bits of the same or appropriate instruction.
+         ○ The ad2 output should either provide the complete 8-bit instruction corresponding to the fetched data from the second source or be determined based on the module's overall functionality as described.
+
+Please provide the complete Verilog code that implements this design, ensuring that it meets all the input, output, and functional specifications as detailed above. Remember, no solution or code should be provided at this stage—only the enhanced, clarified question is desired.

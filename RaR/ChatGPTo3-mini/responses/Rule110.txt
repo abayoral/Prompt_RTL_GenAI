@@ -1,0 +1,50 @@
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output reg [511:0] q
+);
+
+    // Combinational logic to compute the next state for each cell based on Rule 110.
+    // The rule is:
+    //   111 -> 0
+    //   110 -> 1
+    //   101 -> 1
+    //   100 -> 0
+    //   011 -> 1
+    //   010 -> 1
+    //   001 -> 1
+    //   000 -> 0
+    // One compact way to express this is:
+    //     next = (~left & (center | right)) | (left & (center ^ right))
+    //
+    // For cells on the boundaries, the missing neighbor is assumed 0.
+    
+    wire [511:0] next_state;
+    genvar j;
+    
+    generate
+        // For cell 0, left neighbor is assumed 0.
+        assign next_state[0] = ((~1'b0) & (q[0] | q[1])) | (1'b0 & (q[0] ^ q[1]));  // simplifies to (q[0] | q[1])
+        
+        // For cells 1 to 510, use the actual left and right neighbors.
+        for (j = 1; j < 511; j = j + 1) begin : cell_update
+            assign next_state[j] = ((~q[j-1]) & (q[j] | q[j+1])) | (q[j-1] & (q[j] ^ q[j+1]));
+        end
+        
+        // For cell 511, right neighbor is assumed 0.
+        // Expression: (~q[510] & (q[511] | 1'b0)) | (q[510] & (q[511] ^ 1'b0))
+        // simplifies to: (~q[510] & q[511]) | (q[510] & q[511]) which further simplifies to q[511].
+        assign next_state[511] = q[511];
+    endgenerate
+
+    // Sequential logic: on each rising clock edge, if load is high, capture the
+    // input data into the state. Otherwise, update the state with the computed next_state.
+    always @(posedge clk) begin
+        if (load)
+            q <= data;
+        else
+            q <= next_state;
+    end
+
+endmodule

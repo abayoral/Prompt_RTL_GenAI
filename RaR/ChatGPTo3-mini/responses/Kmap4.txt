@@ -1,0 +1,28 @@
+module top_module(
+    input  a,
+    input  b,
+    input  c,
+    input  d,
+    output out
+);
+
+    // The given Karnaugh map can be interpreted as:
+    //   For rows where c equals d (i.e. c'd' and cd), the output is true 
+    //   when a and b differ (a XOR b).
+    //   For rows where c and d differ (i.e. c'd and cd'), the output is true
+    //   when a and b are the same (a XNOR b).
+    // We can capture this behavior by first computing:
+    //   X = a XOR b 
+    //   Y = c XOR d
+    // Then, the overall output is true when X and Y have the same value.
+    // This is equivalent to X XNOR Y. In Verilog, we can write this as:
+    //   out = ~(X ^ Y)  or  out = X ~^ Y.
+
+    wire x, y;
+    assign x = a ^ b;
+    assign y = c ^ d;
+    
+    // Implementing X XNOR Y to get the desired function.
+    assign out = x ~^ y;
+
+endmodule

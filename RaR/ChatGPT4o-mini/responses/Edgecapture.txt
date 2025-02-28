@@ -1,0 +1,31 @@
+```verilog
+module transition_monitor (
+    input wire clk,               // Clock input
+    input wire reset_n,           // Active-low synchronous reset
+    input wire [31:0] vector_in,  // 32-bit input vector
+    output reg [31:0] vector_out   // 32-bit output vector
+);
+
+reg [31:0] vector_reg;          // Register to hold the previous state of the input vector
+
+always @(posedge clk) begin
+    if (!reset_n) begin
+        // Synchronous reset: reset output to 0
+        vector_out <= 32'b0;
+    end else begin
+        // Capture transitions from 1 to 0
+        for (integer i = 0; i < 32; i = i + 1) begin
+            if (vector_reg[i] == 1'b1 && vector_in[i] == 1'b0) begin
+                vector_out[i] <= 1'b1; // Set output for transition from 1 to 0
+            end
+            // Maintain the output at 1 until reset condition is met
+            // (Reset condition has already been checked at the beginning)
+        end
+    end
+
+    // Update the previous state register
+    vector_reg <= vector_in;
+end
+
+endmodule
+```

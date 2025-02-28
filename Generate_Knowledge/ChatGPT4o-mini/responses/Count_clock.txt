@@ -1,0 +1,47 @@
+```
+module top_module(
+    input clk,
+    input reset,
+    input ena,
+    output reg pm,
+    output reg [7:0] hh,
+    output reg [7:0] mm,
+    output reg [7:0] ss
+); 
+
+    reg [26:0] counter; // counter for 1 second pulse
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            hh <= 8'd1;
+            mm <= 8'd0;
+            ss <= 8'd0;
+            pm <= 0;
+            counter <= 0;
+        end else begin
+            counter <= counter + 1;
+            if (counter == 27'd49999999) begin // Assuming clk is 50MHz
+                counter <= 0;
+                if (ena) begin
+                    ss <= ss + 1;
+                    if (ss == 8'd59) begin
+                        ss <= 8'd0;
+                        mm <= mm + 1;
+                        if (mm == 8'd59) begin
+                            mm <= 8'd0;
+                            hh <= hh + 1;
+                            if (hh == 8'd12) begin
+                                pm <= ~pm; // Toggle PM/AM
+                            end
+                            if (hh == 8'd13) begin
+                                hh <= 8'd1;
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+endmodule
+```

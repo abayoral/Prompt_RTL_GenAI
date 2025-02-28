@@ -1,0 +1,118 @@
+module traffic_light(
+    input rst_n,
+    input clk,
+    input pass_request,
+    output [7:0] clock,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+  // State parameters for the traffic light controller
+  parameter IDLE       = 2'b00,
+            S1_RED     = 2'b01,
+            S3_GREEN   = 2'b10,
+            S2_YELLOW  = 2'b11;
+  
+  // Duration parameters (number of clock cycles)
+  parameter RED_TIME    = 8'd10,
+            GREEN_TIME  = 8'd60,
+            YELLOW_TIME = 8'd5;
+
+  // Internal state registers
+  reg [1:0] curr_state;
+  reg [7:0] cnt;  // countdown timer
+  
+  // Drive the output clock bus from the internal counter
+  assign clock = cnt;
+  
+  // Sequential logic: state transitions and counter management
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      curr_state <= IDLE;
+      cnt <= 8'd0;
+    end 
+    else begin
+      case (curr_state)
+        IDLE: begin
+          // Upon coming out of reset (IDLE), start with the red phase.
+          curr_state <= S1_RED;
+          cnt <= RED_TIME;
+        end
+        
+        S1_RED: begin
+          if (cnt == 8'd0) begin
+            curr_state <= S3_GREEN;
+            cnt <= GREEN_TIME;
+          end 
+          else begin
+            cnt <= cnt - 8'd1;
+          end
+        end
+        
+        S3_GREEN: begin
+          // Check for pedestrian request: if active and more than 10 cycles remain,
+          // truncate the remaining green phase to 10 cycles.
+          if (pass_request && (cnt > 8'd10))
+            cnt <= 8'd10;
+          else if (cnt == 8'd0) begin
+            curr_state <= S2_YELLOW;
+            cnt <= YELLOW_TIME;
+          end 
+          else begin
+            cnt <= cnt - 8'd1;
+          end
+        end
+        
+        S2_YELLOW: begin
+          if (cnt == 8'd0) begin
+            curr_state <= S1_RED;
+            cnt <= RED_TIME;
+          end 
+          else begin
+            cnt <= cnt - 8'd1;
+          end
+        end
+        
+        default: begin
+          curr_state <= IDLE;
+          cnt <= 8'd0;
+        end
+      endcase
+    end
+  end
+  
+  // Combinational logic: assign output signals based on the current state.
+  // Vehicular lights: 
+  //   - Red light ON in S1_RED (which also signals pedestrian walk)
+  //   - Green light ON in S3_GREEN (pedestrians see red)
+  //   - Yellow light ON in S2_YELLOW (pedestrians see red)
+  always @(*) begin
+    case (curr_state)
+      S1_RED: begin
+        red = 1'b1;
+        yellow = 1'b0;
+        green = 1'b0;
+      end
+      
+      S3_GREEN: begin
+        red = 1'b0;
+        yellow = 1'b0;
+        green = 1'b1;
+      end
+      
+      S2_YELLOW: begin
+        red = 1'b0;
+        yellow = 1'b1;
+        green = 1'b0;
+      end
+      
+      default: begin
+        red = 1'b0;
+        yellow = 1'b0;
+        green = 1'b0;
+      end
+    endcase
+  end
+
+endmodule

@@ -1,0 +1,49 @@
+```
+module multi_booth_8bit(
+    input wire [7:0] a,
+    input wire [7:0] b,
+    input wire clk,
+    input wire reset,
+    output reg [15:0] p,
+    output reg rdy
+);
+    reg [15:0] multiplicand;  // 16-bit multiplicand
+    reg [15:0] multiplier;    // 16-bit multiplier
+    reg [4:0] ctr;           // 5-bit counter for cycles
+    reg [1:0] booth_code;    // Booth's algorithm code for the current cycle
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            // Initialize outputs
+            p <= 16'b0;
+            rdy <= 1'b0;
+            ctr <= 5'b0;
+            
+            // Extend inputs to 16-bits for signed multiplication
+            multiplier <= {{8{a[7]}}, a}; // Sign-extend a
+            multiplicand <= {{8{b[7]}}, b}; // Sign-extend b
+        end else begin
+            // Booth's multiplication process
+            booth_code = {multiplier[1], multiplier[0]}; // Get the last two bits from multiplier
+            
+            case (booth_code)
+                2'b01: p <= p + multiplicand;        // Add multiplicand
+                2'b10: p <= p - multiplicand;        // Subtract multiplicand
+                // 2'b00 or 2'b11 do nothing
+            endcase
+            
+            // Shift the multiplier and multiplicand
+            multiplicand <= multiplicand << 1;    // Shift multiplicand left
+            
+            // Arithmetic right shift of multiplier
+            multiplier <= {multiplier[15], multiplier[15:1]}; // Maintain the sign bit
+            
+            // Increment the counter
+            ctr <= ctr + 1;
+            if (ctr == 5'b11111) begin
+                rdy <= 1'b1; // Set ready signal when complete
+            end
+        end
+    end
+endmodule
+```

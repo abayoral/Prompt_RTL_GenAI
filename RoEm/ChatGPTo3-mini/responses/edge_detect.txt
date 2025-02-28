@@ -1,0 +1,29 @@
+module edge_detect(
+    input  clk,
+    input  rst_n,
+    input  a,
+    output reg rise,
+    output reg down
+);
+
+  // Internal register to hold the previous value of 'a'
+  reg a_prev;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      // When reset is active, initialize outputs and previous value to 0
+      rise   <= 1'b0;
+      down   <= 1'b0;
+      a_prev <= 1'b0;
+    end
+    else begin
+      // Detect rising edge: previous value is 0 and current value is 1, rising pulse active for one cycle
+      rise <= (~a_prev) & a;
+      // Detect falling edge: previous value is 1 and current value is 0, falling pulse active for one cycle
+      down <= a_prev & (~a);
+      // Update the stored previous value for the next clock cycle
+      a_prev <= a;
+    end
+  end
+
+endmodule

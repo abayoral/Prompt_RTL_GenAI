@@ -1,0 +1,38 @@
+Imagine you are tasked with designing a Verilog module that performs a simplified radix-2 division specifically for 8-bit integers. This design must be applicable to both signed and unsigned values. Your module, to be named radix2_div, must accept two 8-bit operands—the dividend and the divisor—and then provide a combined 16-bit output where the quotient and remainder are jointly represented. The specifics of the module can be broken down as follows:
+
+Module Identifier:
+• The module must be labeled radix2_div.
+
+Input Characteristics:
+• clk: A clock signal that synchronizes the module’s operations, ensuring that state changes occur in proper time steps.
+• rst: A reset signal that initializes or reinitializes the module’s internal circuitry, clearing any previous data and preparing it for a new operation.
+• sign: A 1-bit control input that indicates the nature of the division. A value of 1 means the operation should handle signed numbers, while a value of 0 implies an unsigned division.
+• dividend: An 8-bit input representing the number to be divided.
+• divisor: An 8-bit input that serves as the divisor.
+• opn_valid: A 1-bit signal that, when high, indicates that the operands are valid and that the module should begin processing the division.
+
+Output Specifications:
+• res_valid: A 1-bit output signal that indicates when the division result is ready for use.
+• result: A 16-bit output where the high-order 8 bits contain the remainder, and the low-order 8 bits contain the quotient after the division process is complete.
+
+Implementation Steps:
+1. Operation Initialization:
+   - When opn_valid is asserted (high) while res_valid is not set (low), the module should capture the dividend and divisor.
+   - The absolute value of the dividend is loaded into a shift register (denoted as SR) after being shifted left by one bit.
+   - Simultaneously, compute the negative absolute value of the divisor (referred to as NEG_DIVISOR).
+   - Counters, such as cnt and start_cnt, should be initialized (e.g., set to 1) to prepare the module for the division process.
+
+2. Division Process:
+   - With start_cnt activated, the module will progress through a series of recursive operations, typically spanning 8 iterations.
+   - During each iteration:
+     • The module checks whether the counter cnt has reached the value 8, which signals that the division steps are complete.
+     • If not, cnt is incremented, and SR is updated based on the subtraction of NEG_DIVISOR from the current bits of SR.
+     • The carry-out flag obtained from this arithmetic operation is used by a multiplexer to decide how to update the shift register.
+     • As the operation evolves, SR is shifted left, and the carry flag is appended appropriately.
+   - Once cnt reaches 8, the division cycle is considered complete, counters are reset, and SR now contains the final quotient and remainder.
+
+3. Result Handling:
+   - The output signal res_valid must be carefully managed. This involves ensuring that the reset signal, the status of the cnt counter, and the readiness of the final result (based on consumption by external systems) are all taken into account.
+   - When the operation concludes, res_valid should be set high to indicate that the result on the 16-bit result port is valid and ready for downstream processing.
+
+Your challenge is to thoroughly implement this module in Verilog according to the above specifications. The design should handle both arithmetic cases—signed and unsigned—accurately, incorporate the required shift operations, and manage control signals to ensure precise behavior in a synchronous logic environment. Be sure to focus on the correct bit-level manipulations and proper timing control based on the system clock, without providing an answer or solution at this stage.

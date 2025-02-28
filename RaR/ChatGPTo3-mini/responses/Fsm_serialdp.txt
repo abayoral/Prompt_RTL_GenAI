@@ -1,0 +1,99 @@
+module serial_receiver(
+    input        clk,
+    input        rst,
+    input        serial_in,
+    output reg   done,
+    output reg [7:0] data_out
+);
+
+  // FSM state encoding
+  localparam S_IDLE      = 3'd0,
+             S_DATA      = 3'd1,
+             S_PARITY    = 3'd2,
+             S_STOP      = 3'd3,
+             S_WAIT_STOP = 3'd4;
+
+  reg [2:0]   state;
+  reg [3:0]   bit_cnt;      // counts data bits (0 to 7)
+  reg [7:0]   data_reg;     // shift register for 8-bit data
+  reg         parity_reg;   // parity accumulator (TFF style)
+
+  // FSM and datapath always block
+  // Assumes one sample per clock cycle.
+  always @(posedge clk or posedge rst) begin
+    if (rst) begin
+      state     <= S_IDLE;
+      bit_cnt   <= 4'd0;
+      data_reg  <= 8'd0;
+      parity_reg<= 1'b0;
+      done      <= 1'b0;
+      data_out  <= 8'd0;
+    end else begin
+      // Default: clear done pulse each cycle.
+      done <= 1'b0;
+      case (state)
+        S_IDLE: begin
+          // Wait for a falling edge (start bit = 0).
+          if (serial_in == 1'b0) begin
+            // Start bit detected. Initialize bit counter, data register, and parity accumulator.
+            state      <= S_DATA;
+            bit_cnt    <= 4'd0;
+            data_reg   <= 8'd0;
+            parity_reg <= 1'b0;
+          end
+        end
+
+        S_DATA: begin
+          // Sample data bits one by one.
+          // Store the current bit (order: LSB first) and update parity accumulator.
+          data_reg[bit_cnt] <= serial_in;
+          if (serial_in)
+            parity_reg <= ~parity_reg;  // Toggle parity if bit is 1.
+          
+          // Increment bit counter and move to parity stage after 8 bits.
+          if (bit_cnt == 4'd7) begin
+            state <= S_PARITY;
+          end else begin
+            bit_cnt <= bit_cnt + 1;
+          end
+        end
+
+        S_PARITY: begin
+          // Sample the transmitted parity bit.
+          if (serial_in)
+            parity_reg <= ~parity_reg;  // Update parity with the parity bit.
+          // After processing 9 bits (8 data + parity), move to stop bit stage.
+          state <= S_STOP;
+        end
+
+        S_STOP: begin
+          // Expect a valid stop bit (logic high).
+          if (serial_in == 1'b1) begin
+            // Stop bit is correct. Only assert 'done' if odd parity condition holds.
+            if (parity_reg == 1'b1) begin
+              done     <= 1'b1;
+              data_out <= data_reg;
+            end 
+            state <= S_IDLE;
+          end else begin
+            // Stop bit not yet received. Remain in a waiting stage.
+            state <= S_WAIT_STOP;
+          end
+        end
+
+        S_WAIT_STOP: begin
+          // Persist until a valid stop bit (logic high) is observed.
+          if (serial_in == 1'b1) begin
+            if (parity_reg == 1'b1) begin
+              done <= 1'b1;
+            end
+            state <= S_IDLE;
+          end
+        end
+
+        default: state <= S_IDLE;
+      endcase
+    end
+  end
+
+endmodule

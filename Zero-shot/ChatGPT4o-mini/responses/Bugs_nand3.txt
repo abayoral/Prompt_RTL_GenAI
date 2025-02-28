@@ -1,0 +1,14 @@
+```
+module andgate (output out, input a, input b, input c, input d, input e);
+    assign out = a & b & c & d & e;
+endmodule
+
+module top_module (input a, input b, input c, output out);
+    wire n1;
+    wire n2;
+
+    andgate inst1 (n1, a, b, c, 1'b1, 1'b1); // Using two dummy inputs for the 5-input AND gate
+    assign out = ~n1; // NAND operation
+
+endmodule
+```

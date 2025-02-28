@@ -1,0 +1,74 @@
+Upon reviewing the provided Verilog code for the frequency divider module, I've identified several issues that can lead to incorrect behavior. Below are the observations and corrections:
+
+### Issues Identified:
+1. **Counter Implementation**: The counter values used to toggle `CLK_10` and `CLK_1` are incorrect. The counters should be adjusted based on how many clock cycles are needed from the input clock to produce the desired output frequency:
+   - For `CLK_10` at 10 MHz, the counter should count to 4, not 2.
+   - For `CLK_1` at 1 MHz, the counter should count to 99, not 49.
+
+2. **Resetting Registers**: The resets for the counters (`cnt_10` and `cnt_100`) should ideally happen outside the conditions checking their value. This ensures there’s no delay in resetting.
+
+3. **Toggle Logic**: The way the clocks are currently toggled is compatible, but it can be optimized for better clarity.
+
+### Corrected Version:
+Here's the corrected code with the adjustments made:
+
+```verilog
+module freq_div (
+    input wire CLK_in,
+    input wire RST,
+    output reg CLK_50,
+    output reg CLK_10,
+    output reg CLK_1
+);
+
+reg [1:0] cnt_10;       // Counter for 10MHz
+reg [6:0] cnt_100;      // Counter for 1MHz
+
+// Toggle CLK_50 every 1 clock cycle (50MHz <- CLK_in)
+always @(posedge CLK_in or posedge RST) begin
+    if (RST) begin
+        CLK_50 <= 0;
+    end else begin
+        CLK_50 <= ~CLK_50; // Toggle CLK_50 on every positive edge
+    end
+end
+
+// Toggle CLK_10 every 4 clock cycles of CLK_in (10MHz)
+always @(posedge CLK_in or posedge RST) begin
+    if (RST) begin
+        CLK_10 <= 0;
+        cnt_10 <= 0;
+    end else begin
+        if (cnt_10 == 3) begin
+            CLK_10 <= ~CLK_10; // Toggle CLK_10 for every four cycles of CLK_in
+            cnt_10 <= 0;       // Reset the counter
+        end else begin
+            cnt_10 <= cnt_10 + 1; // Increment counter
+        end
+    end
+end
+
+// Toggle CLK_1 every 100 clock cycles of CLK_in (1MHz)
+always @(posedge CLK_in or posedge RST) begin
+    if (RST) begin
+        CLK_1 <= 0;
+        cnt_100 <= 0;
+    end else begin
+        if (cnt_100 == 99) begin
+            CLK_1 <= ~CLK_1; // Toggle CLK_1 for every 100 cycles of CLK_in
+            cnt_100 <= 0;    // Reset the counter
+        end else begin
+            cnt_100 <= cnt_100 + 1; // Increment counter
+        end
+    end
+end
+
+endmodule
+```
+
+### Summary of Changes:
+- Adjusted `cnt_10` to toggle `CLK_10` every 4 clock cycles (`cnt_10 == 3`) to achieve 10 MHz output.
+- Adjusted `cnt_100` to toggle `CLK_1` every 100 clock cycles (`cnt_100 == 99`) to achieve 1 MHz output.
+- Ensured that all register resets are performed properly, enhancing readability and maintaining good coding practice.
+
+This updated code should function correctly and meet your design requirements for the specified frequencies.

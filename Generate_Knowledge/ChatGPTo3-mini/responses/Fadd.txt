@@ -1,0 +1,12 @@
+module top_module( 
+    input a, b, cin,
+    output cout, sum );
+
+    // Compute the sum bit as the XOR of all three inputs.
+    assign sum = a ^ b ^ cin;
+    
+    // Compute the carry-out bit.
+    // A carry is produced if any two or more inputs are high.
+    assign cout = (a & b) | (b & cin) | (a & cin);
+
+endmodule

@@ -1,0 +1,15 @@
+```verilog
+module BitDeconstructor (
+    input wire [2:0] in,  // 3-bit input vector
+    output wire o0,       // 1-bit output for bit 0
+    output wire o1,       // 1-bit output for bit 1
+    output wire o2        // 1-bit output for bit 2
+);
+
+// Directly assign the corresponding bits of the input to the outputs
+assign o0 = in[0]; // Least significant bit
+assign o1 = in[1]; // Middle bit
+assign o2 = in[2]; // Most significant bit
+
+endmodule
+```

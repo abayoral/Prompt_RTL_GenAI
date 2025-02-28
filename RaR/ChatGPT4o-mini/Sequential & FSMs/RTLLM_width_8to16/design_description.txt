@@ -1,0 +1,21 @@
+Consider yourself a seasoned designer proficient in Verilog tasked with the objective of developing a circuit that performs data width conversion. Specifically, your focus is on creating a module capable of transforming incoming 8-bit data inputs into a 16-bit data output. The efficient operation of this module—named `width_8to16`—is of paramount importance, and it must not only conduct the conversion seamlessly but also provide a clear signal indicating the validity of the output data.
+
+As you embark on this design project, please clarify the various elements involved, including the precise input and output requirements. 
+
+### Inputs Definition:
+1. **clk:** What is the role of the clock signal in your design, and how will it influence the timing of your operations within the module?
+2. **rst_n:** How does this active-low reset signal integrate into your design? What are the implications of asserting this signal on the internal state and output of your module?
+3. **valid_in:** How do you plan to utilize this signal? What conditions must it meet for the module to consider the incoming data valid and ready for processing?
+4. **data_in:** In what manner will your module receive the 8-bit data? What processes need to be activated upon the arrival of this data in relation to the `valid_in` signal?
+
+### Outputs Specification:
+1. **valid_out:** What mechanisms will you put in place to ensure that this output signal properly reflects the validity of the 16-bit data? How does it correlate with the timing following the reception of valid inputs?
+2. **data_out:** What specifically will this designated output represent? How will it be constructed from the processed 8-bit inputs and what arrangement will it follow to ensure it meets the requirements for a 16-bit output?
+
+### Core Functional Requirements:
+- How will the module respond to events triggered by the positive edge of the clock signal? Can you detail the behavior when a reset event occurs through the negative edge of `rst_n`?
+- Upon the assertion of a reset condition, what steps will you take to ensure that the `data_out` register is cleared, and what design considerations must be made to allow for a fresh start?
+- How does your module plan to handle the storage of the first valid 8-bit input until a second valid input is obtained? What will trigger the transition to creating the 16-bit output, and how will you ensure data integrity during this process?
+- Lastly, what criteria must be met for the module to assert `valid_out` as active, and how will this signal synchronize with the data output to indicate readiness effectively?
+
+Your task is to flesh out a comprehensive implementation in Verilog that encapsulates all these dynamics, ensuring a reliable and efficient approach to data conversion while appropriately signaling for data validity.

@@ -1,0 +1,18 @@
+module top_module (input a, input b, input c, output out);
+    
+    wire and_out;
+    
+    // Instantiate the provided 5-input AND gate.
+    // Tie the unused inputs d and e to constant high (1'b1) so that:
+    // and_out = a & b & c & 1 & 1 = a & b & c.
+    andgate inst1 (and_out, a, b, c, 1'b1, 1'b1);
+    
+    // Invert the AND output to create the NAND gate behavior.
+    assign out = ~and_out;
+
+endmodule
+
+// Provided 5-input AND gate (assumed to be pre-synthesized or otherwise defined).
+module andgate (output out, input a, input b, input c, input d, input e);
+    assign out = a & b & c & d & e;
+endmodule

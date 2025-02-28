@@ -1,0 +1,22 @@
+Please assume the role of a professional Verilog designer tasked with creating a Verilog module that functions as a 3-bit comparator. Specifically, you are required to design the module capable of comparing two 3-bit binary numbers and determining their relational status.
+
+Module Designation:
+- The module should be named `comparator_3bit`.
+
+Input Parameters:
+- The input should consist of two operands: 
+  - An operand labeled 'A' which is a 3-bit input vector (`A[2:0]`). This represents the first binary number in the comparison.
+  - An operand labeled 'B' which is a 3-bit input vector (`B[2:0]`). This represents the second binary number to be compared.
+
+Output Parameters:
+- The module should generate three distinct 1-bit outputs:
+  - `A_greater`: This output should be high (1) if, and only if, the binary number represented by 'A' is greater than that represented by 'B'.
+  - `A_equal`: This output should be high (1) if, and only if, the binary number represented by 'A' is equal to 'B'.
+  - `A_less`: This output should be high (1) if, and only if, the binary number represented by 'A' is less than that of 'B'.
+
+Functional Logic:
+- Implement combinational logic within the module to facilitate the comparison of the numbers 'A' and 'B'. The logic should enable evaluation to determine the relational status (greater than, equal to, or less than) between the two inputs.
+- The logic needs to ensure that the outputs are mutually exclusive, meaning at any given time, precisely one of the outputs (`A_greater`, `A_equal`, `A_less`) should be high, reflecting the accurate relational result of the comparison.
+
+Objective:
+You are requested to provide a complete Verilog code implementation encapsulating the described module that exhibits this functionality. Ensure clarity and precision in adhering to standard Verilog-coding conventions while defining the module, its ports, and its operational logic for comparison.

@@ -1,0 +1,10 @@
+module mux256(
+    input  [255:0] in,   // 256-bit input vector with each bit as a potential input
+    input  [7:0]   sel,  // 8-bit selector signal indicating which bit to choose
+    output         out   // 1-bit output that reflects the selected bit
+);
+
+  // Continuous assignment using variable indexing.
+  assign out = in[sel];
+
+endmodule

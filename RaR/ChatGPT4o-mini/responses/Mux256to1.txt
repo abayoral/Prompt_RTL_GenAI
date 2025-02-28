@@ -1,0 +1,11 @@
+```verilog
+module mux256to1 (
+    input [255:0] in,     // 256-bit input vector
+    input [7:0] sel,      // 8-bit select signal (0 to 255)
+    output wire out       // 1-bit output
+);
+
+    assign out = in[sel]; // Select the appropriate input based on sel
+
+endmodule
+```

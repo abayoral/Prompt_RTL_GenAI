@@ -1,0 +1,11 @@
+module top_module( 
+    input [31:0] in,
+    output [31:0] out 
+); 
+
+    // Reverse the byte order:
+    // Original: {A_plain, B_plain, C_plain, D_plain} = {in[31:24], in[23:16], in[15:8], in[7:0]}
+    // Reversed: {D_plain, C_plain, B_plain, A_plain} = {in[7:0], in[15:8], in[23:16], in[31:24]} 
+    assign out = { in[7:0], in[15:8], in[23:16], in[31:24] };
+
+endmodule

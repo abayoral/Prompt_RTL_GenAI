@@ -1,0 +1,25 @@
+module top_module (
+    input      cpu_overheated,
+    output reg shut_off_computer,
+    input      arrived,
+    input      gas_tank_empty,
+    output reg keep_driving
+);
+
+    // Combinational logic for shutting off the computer only if it's really overheated.
+    always @(*) begin
+        if (cpu_overheated)
+            shut_off_computer = 1;
+        else
+            shut_off_computer = 0;
+    end
+
+    // Combinational logic to keep driving only if you haven't arrived and the gas tank isn't empty.
+    always @(*) begin
+        if (arrived || gas_tank_empty)
+            keep_driving = 0;
+        else
+            keep_driving = 1;
+    end
+
+endmodule

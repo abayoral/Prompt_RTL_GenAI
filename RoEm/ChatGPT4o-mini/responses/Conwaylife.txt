@@ -1,0 +1,57 @@
+```
+module top_module(
+    input clk,
+    input load,
+    input [255:0] data,
+    output reg [255:0] q );
+
+    reg [255:0] next_q;
+
+    always @(posedge clk) begin
+        if (load) begin
+            q <= data; // Load the initial state
+        end else begin
+            q <= next_q; // Update to the next state
+        end
+    end
+
+    // Function to count alive neighbours for a cell at (x, y)
+    function integer count_neighbours(input [255:0] state, input integer x, input integer y);
+        integer count;
+        integer i, j;
+        begin
+            count = 0;
+            for (i = -1; i <= 1; i = i + 1) begin
+                for (j = -1; j <= 1; j = j + 1) begin
+                    if (i == 0 && j == 0) continue; // Skip the cell itself
+                    count = count + state[((x + i + 16) % 16) * 16 + ((y + j + 16) % 16)];
+                end
+            end
+            count_neighbours = count;
+        end
+    endfunction
+
+    // Always block to compute the next state
+    always @* begin
+        for (int x = 0; x < 16; x = x + 1) begin
+            for (int y = 0; y < 16; y = y + 1) begin
+                integer alive_neighbours = count_neighbours(q, x, y);
+                if (q[x * 16 + y] == 1) begin
+                    if (alive_neighbours < 2 || alive_neighbours > 3) begin
+                        next_q[x * 16 + y] = 0; // Cell dies
+                    end else begin
+                        next_q[x * 16 + y] = 1; // Cell remains alive
+                    end
+                end else begin
+                    if (alive_neighbours == 3) begin
+                        next_q[x * 16 + y] = 1; // Cell becomes alive
+                    end else begin
+                        next_q[x * 16 + y] = 0; // Cell remains dead
+                    end
+                end
+            end
+        end
+    end
+
+endmodule
+```

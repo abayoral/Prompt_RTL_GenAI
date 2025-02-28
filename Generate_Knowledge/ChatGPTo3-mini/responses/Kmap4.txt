@@ -1,0 +1,40 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // Analysis:
+    // The given Karnaugh map is arranged with rows labeled by c and d (in the Gray-code order: c'd', c'd, cd, cd')
+    // and columns labeled by a and b (in the Gray-code order: a'b', a'b, ab, ab').
+    //
+    // The K-map is:
+    //           a'b'  a'b   ab   ab'
+    //   c'd'     0     1     0    1
+    //   c'd      1     0     1    0
+    //   cd       0     1     0    1
+    //   cd'      1     0     1    0
+    //
+    // Notice the pattern:
+    //   - When c and d are equal (i.e. c'd' and cd) the entries in the row (from left to right) are: 0, 1, 0, 1.
+    //     That is, the output is 1 when a'b OR ab' is true. In other words, for these rows, out = a ⊕ b.
+    //   - When c and d differ (i.e. c'd and cd') the entries are: 1, 0, 1, 0,
+    //     meaning out = 1 when a'b' or ab is true. Equivalently, for these rows, out = ¬(a ⊕ b).
+    //
+    // This suggests that the output is determined by both (a ⊕ b) and (c ⊕ d). In fact, one can verify:
+    //    out = (a ⊕ b) when c and d are equal (i.e. when c ⊕ d = 0),
+    //    out = ¬(a ⊕ b) when c and d differ (i.e. when c ⊕ d = 1).
+    // Hence, the output can be written as:
+    //    out = (a ⊕ b) ⊕ (c ⊕ d)
+    //
+    // But the XOR operator is associative and commutative, so this is equivalent to:
+    //    out = a ⊕ b ⊕ c ⊕ d
+    //
+    // Either this sum-of-products (or cascade of XOR's) implementation or a product-of-sums version (derived by
+    // further Boolean algebra) is acceptable. The simplest is to use the XOR chain.
+    
+    assign out = a ^ b ^ c ^ d;
+
+endmodule

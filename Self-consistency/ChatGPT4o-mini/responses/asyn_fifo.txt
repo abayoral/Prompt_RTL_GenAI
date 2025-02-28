@@ -1,0 +1,101 @@
+module dual_port_ram #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16
+)(
+    input wire                  wclk,
+    input wire                  wenc,
+    input wire [clog2(DEPTH)-1:0] waddr,
+    input wire [WIDTH-1:0]     wdata,
+    input wire                  rclk,
+    input wire                  renc,
+    input wire [clog2(DEPTH)-1:0] raddr,
+    output reg [WIDTH-1:0]     rdata
+);
+    reg [WIDTH-1:0] ram [0:DEPTH-1];
+
+    always @(posedge wclk) begin
+        if (wenc) begin
+            ram[waddr] <= wdata;
+        end
+    end
+
+    always @(posedge rclk) begin
+        if (renc) begin
+            rdata <= ram[raddr];
+        end
+    end
+endmodule
+
+module asyn_fifo #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16
+)(
+    input wire                  wclk,
+    input wire                  rclk,
+    input wire                  wrstn,
+    input wire                  rrstn,
+    input wire                  winc,
+    input wire                  rinc,
+    input wire [WIDTH-1:0]     wdata,
+    output wire                 wfull,
+    output wire                 rempty,
+    output reg [WIDTH-1:0]     rdata
+);
+    localparam ADDR_WIDTH = clog2(DEPTH);
+    reg [ADDR_WIDTH-1:0] wptr, rptr;
+    reg [ADDR_WIDTH-1:0] wptr_gray, rptr_gray;
+    reg [ADDR_WIDTH-1:0] wptr_bin, rptr_bin;
+
+    // Pointer Synchronization
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            wptr <= 0;
+            wptr_gray <= 0;
+        end else if (winc) begin
+            wptr <= wptr + 1;
+            wptr_gray <= (wptr + 1) ^ ((wptr + 1) >> 1);
+        end
+    end
+
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            rptr <= 0;
+            rptr_gray <= 0;
+        end else if (rinc) begin
+            rptr <= rptr + 1;
+            rptr_gray <= (rptr + 1) ^ ((rptr + 1) >> 1);
+        end
+    end
+
+    // Gray to Binary conversion
+    always @* begin
+        wptr_bin = wptr_gray;
+        for (integer i = ADDR_WIDTH-1; i > 0; i = i - 1)
+            wptr_bin[i-1] = wptr_bin[i] ^ wptr_bin[i-1];
+
+        rptr_bin = rptr_gray;
+        for (integer i = ADDR_WIDTH-1; i > 0; i = i - 1)
+            rptr_bin[i-1] = rptr_bin[i] ^ rptr_bin[i-1];
+    end
+
+    // Instantiate dual-port RAM
+    dual_port_ram #(
+        .WIDTH(WIDTH),
+        .DEPTH(DEPTH)
+    ) ram_inst (
+        .wclk(wclk),
+        .wenc(winc),
+        .waddr(wptr_bin),
+        .wdata(wdata),
+        .rclk(rclk),
+        .renc(rinc),
+        .raddr(rptr_bin),
+        .rdata(rdata)
+    );
+
+    // FIFO full and empty flags
+    assign wfull = (wptr_gray[ADDR_WIDTH-1] ^ rptr_gray[ADDR_WIDTH-1]) 
+                & (wptr_gray[ADDR_WIDTH-2:0] == rptr_gray[ADDR_WIDTH-2:0]);
+    assign rempty = (wptr_gray == rptr_gray);
+
+endmodule

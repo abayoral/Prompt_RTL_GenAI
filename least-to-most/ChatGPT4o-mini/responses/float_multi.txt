@@ -1,0 +1,92 @@
+```
+module float_multi(
+    input clk,
+    input rst,
+    input [31:0] a,
+    input [31:0] b,
+    output reg [31:0] z
+);
+    
+    reg [2:0] counter;
+    reg [23:0] a_mantissa, b_mantissa, z_mantissa;
+    reg [7:0] a_exponent, b_exponent, z_exponent;
+    reg a_sign, b_sign, z_sign;
+    reg [49:0] product;
+    reg guard_bit, round_bit, sticky;
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            counter <= 0;
+            z <= 0;
+        end else begin
+            case (counter)
+                3'b000: begin
+                    // Initialization Phase
+                    counter <= counter + 1;
+                end
+                3'b001: begin
+                    // Input Processing Phase
+                    a_sign <= a[31];
+                    b_sign <= b[31];
+                    a_exponent <= a[30:23];
+                    b_exponent <= b[30:23];
+                    a_mantissa <= {1'b1, a[22:0]}; // Add implicit leading 1
+                    b_mantissa <= {1'b1, b[22:0]}; // Add implicit leading 1
+                    counter <= counter + 1;
+                end
+                3'b010: begin
+                    // Special Case Handling Phase
+                    if (a_exponent == 8'hFF || b_exponent == 8'hFF) begin
+                        if (a_exponent == 8'hFF && (a_mantissa != 24'b0)) // If a is NaN
+                            z <= 32'h7FC00000; // Set z to NaN
+                        else if (b_exponent == 8'hFF && (b_mantissa != 24'b0)) // If b is NaN
+                            z <= 32'h7FC00000; // Set z to NaN
+                        else if (a_exponent == 8'hFF) // If a is Inf
+                            z <= {a_sign ^ b_sign, 8'hFF, 23'b0}; // Result is Inf or NaN
+                        else if (b_exponent == 8'hFF) // If b is Inf
+                            z <= {a_sign ^ b_sign, 8'hFF, 23'b0}; // Result is Inf or NaN
+                        else
+                            z <= 32'h00000000; // Result is 0
+                        counter <= 0; // Reset counter
+                    end else begin
+                        // Normal case
+                        counter <= counter + 1;
+                    end
+                end
+                3'b011: begin
+                    // Multiplication Phase
+                    product = a_mantissa * b_mantissa;
+                    z_sign <= a_sign ^ b_sign;
+                    z_exponent <= a_exponent + b_exponent - 8'h7F; // Adjust for bias
+                    counter <= counter + 1;
+                end
+                3'b100: begin
+                    // Normalization Phase
+                    if (product[49]) begin
+                        z_mantissa = product[48:25]; // Shift down
+                        z_exponent = z_exponent + 1;
+                    end else begin
+                        z_mantissa = product[47:24]; // Normal case
+                    end
+                    counter <= counter + 1;
+                end
+                3'b101: begin
+                    // Rounding Phase
+                    guard_bit = product[24];
+                    round_bit = product[23];
+                    sticky = |product[22:0]; // Sticky bit is any non-zero in lower bits
+                    if (guard_bit & (round_bit | sticky)) begin
+                        z_mantissa = z_mantissa + 1;
+                    end
+                    counter <= 0; // Reset counter and go to output
+                end
+                default: begin
+                    // Output Generation Phase
+                    z <= {z_sign, z_exponent[7:0], z_mantissa[22:0]};
+                end
+            endcase
+        end
+    end
+
+endmodule
+```

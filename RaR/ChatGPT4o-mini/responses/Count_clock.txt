@@ -1,0 +1,45 @@
+```verilog
+module clock_12h (
+    input wire clk,        // Fast clock input (1 Hz clock assumed)
+    input wire ena,       // Enable signal for increment
+    input wire rst,       // Asynchronous reset signal
+    output reg [7:0] hh,  // Hours in BCD (2 digits)
+    output reg [7:0] mm,  // Minutes in BCD (2 digits)
+    output reg [7:0] ss,  // Seconds in BCD (2 digits)
+    output reg am_pm      // AM: 0, PM: 1
+);
+
+    // BCD increment logic for seconds, minutes, and hours
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            hh <= 8'b00010000; // Reset to 12 (BCD: 12)
+            mm <= 8'b00000000; // Reset to 00 (BCD: 00)
+            ss <= 8'b00000000; // Reset to 00 (BCD: 00)
+            am_pm <= 0;        // Set to AM
+        end else if (ena) begin
+            // Increment seconds
+            if (ss == 8'b01011001) begin // 59 in BCD
+                ss <= 8'b00000000; // Reset seconds to 00
+                // Increment minutes
+                if (mm == 8'b01011001) begin // 59 in BCD
+                    mm <= 8'b00000000; // Reset minutes to 00
+                    // Increment hours
+                    if (hh == 8'b00010000) begin // 12 in BCD
+                        hh <= 8'b00000001; // Set hours to 01 in BCD
+                        am_pm <= ~am_pm;   // Toggle AM/PM
+                    end else if (hh == 8'b00000001 && am_pm == 1) begin // 01 PM 
+                        hh <= 8'b00010000; // Set hours to 12 in BCD
+                    end else begin
+                        hh <= hh + 8'b00000001; // Increment hour
+                    end
+                end else begin
+                    mm <= mm + 8'b00000001; // Increment minutes
+                end
+            end else begin
+                ss <= ss + 8'b00000001; // Increment seconds
+            end
+        end
+    end
+
+endmodule
+```

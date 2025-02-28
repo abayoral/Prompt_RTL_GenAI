@@ -1,0 +1,46 @@
+```verilog
+module freq_divbyodd #(
+    parameter integer NUM_DIV = 5 // Default odd divisor
+) (
+    input wire clk,              // Input clock signal
+    input wire rst_n,           // Active low reset signal
+    output reg clk_div          // Divided clock output
+);
+
+    // Internal counters
+    reg [$clog2(NUM_DIV)-1:0] cnt1; // Counter for positive edges
+    reg [$clog2(NUM_DIV)-1:0] cnt2; // Counter for negative edges
+    reg clk_div1, clk_div2;         // Auxiliary clock signals
+
+    // Asynchronous reset and clock division logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt1 <= 0;
+            clk_div1 <= 0;
+        end else if (cnt1 == (NUM_DIV-1)) begin
+            clk_div1 <= ~clk_div1; // Toggle clk_div1
+            cnt1 <= 0; // Reset counter
+        end else begin
+            cnt1 <= cnt1 + 1; // Increment counter
+        end
+    end
+
+    always @(negedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt2 <= 0;
+            clk_div2 <= 0;
+        end else if (cnt2 == (NUM_DIV-1)) begin
+            clk_div2 <= ~clk_div2; // Toggle clk_div2
+            cnt2 <= 0; // Reset counter
+        end else begin
+            cnt2 <= cnt2 + 1; // Increment counter
+        end
+    end
+
+    // Output clock is the logical OR of the two auxiliary clocks
+    always @* begin
+        clk_div = clk_div1 | clk_div2;
+    end
+
+endmodule
+```

@@ -48,27 +48,31 @@ def check_test_results(file_path, is_rtllm):
         return simulation_successful, passed_tests, total_tests if simulation_successful else (False, 0, total_tests)
 
 
-if len(sys.argv) != 2:
-    print("Usage: python script_name.py <framework_name>")
+if len(sys.argv) != 3:
+    print("Usage: python script_name.py <framework_name> <model_name>")
     sys.exit(1)
 
 framework_name = sys.argv[1]
+model_name = sys.argv[2]
+
+os.environ['framework_name'] = framework_name
+os.environ['model_name'] = model_name
+
+framework_directory = os.path.join(os.getcwd(), framework_name, model_name)
+os.makedirs(framework_directory, exist_ok=True)
+
 succ_counter = {}
 pass_k_counter = {}  # Track pass@k success
-os.environ['framework_name'] = framework_name
 
 if framework_name == "RaR":
-    framework_directory = os.path.join(os.getcwd(), "RaR")
     script_path = os.path.join(framework_directory, "rar.py")
 elif framework_name == "RoEm":
-    framework_directory = os.path.join(os.getcwd(), "RoEm")
     script_path = os.path.join(framework_directory, "roem.py")
 else:
-    framework_directory = os.path.join(os.getcwd(), framework_name)
     script_path = None
 
-prompt_directories = ["Sequential & FSMs", "Basic-Combinational", "Arithmetic & Data", "Modular & Advanced"]
-#prompt_directories = ["Sequential & FSMs", "Basic-Combinational"]; 
+#prompt_directories = ["Sequential & FSMs", "Basic-Combinational", "Arithmetic & Data", "Modular & Advanced"]
+prompt_directories = ["Modular & Advanced"]; 
 
 for prompt_dir in prompt_directories:
     prompts_dir = os.path.join(framework_directory, prompt_dir)
@@ -87,7 +91,6 @@ for prompt_dir in prompt_directories:
             except subprocess.CalledProcessError as e:
                 print(f"Error executing {script_path}: {e}")
                 continue
-
         subprocess.run(['python', 'main.py', framework_name, prompt_dir], check=True)
         stats_files = glob.glob(os.path.join(stats_dir, '*.txt'))
 

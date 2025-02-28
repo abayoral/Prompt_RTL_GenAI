@@ -1,0 +1,10 @@
+module top_module(
+    input a,
+    input b,
+    output sum,
+    output cout
+);
+
+// Insert half adder implementation here: logic to compute sum and cout from inputs a and b
+
+endmodule

@@ -1,0 +1,38 @@
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output reg [511:0] q
+);
+
+    integer i;
+    reg [511:0] next_state;
+    reg left, right;
+    
+    always @(posedge clk) begin
+        if (load) begin
+            q <= data;
+        end
+        else begin
+            for (i = 0; i < 512; i = i + 1) begin
+                // For cell i, define the left neighbor (0 if i is 0)
+                if (i == 0)
+                    left = 1'b0;
+                else
+                    left = q[i-1];
+                    
+                // Define the right neighbor (0 if i is 511)
+                if (i == 511)
+                    right = 1'b0;
+                else
+                    right = q[i+1];
+                    
+                // Apply Rule 110
+                // Next state = (center & ~(left & right)) | ((~center) & right)
+                next_state[i] = (q[i] & ~(left & right)) | ((~q[i]) & right);
+            end
+            q <= next_state;
+        end
+    end
+
+endmodule

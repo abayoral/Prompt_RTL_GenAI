@@ -1,0 +1,24 @@
+Assume you have been trained as a professional Verilog hardware designer, equipped with the knowledge to draft and implement digital designs using the Verilog Hardware Description Language (HDL). With this background, imagine that the task at hand is to create a Verilog module for a dual-port Random Access Memory (RAM) structure. This RAM should have specific characteristics: a depth of 8 addresses and each data word is 6 bits wide. Initially, all data locations in this memory should be set to zero, represented as "000000" in binary.
+
+You are to design this RAM with dual-port capability, meaning it supports both reading and writing operations simultaneously. The RAM should have distinct input and output ports for these operations, and should function synchronously with clock input signals. The key functionality is defined by two primary operations:
+
+1. Read Operation: This operation should be enabled when a specific control signal (read_en) is set to high ('1'). The RAM should output data based on the location referenced by an address signal (read_addr). The address decoding should facilitate fetching the exact 6-bit data word stored at the specified location. The output data will then be available on an output port (read_data).
+
+2. Write Operation: Similarly, writing to the RAM should occur when another control signal (write_en) is active ('1'). Here, a data word specified by the input (write_data) should be stored in the memory location identified by the address signal (write_addr).
+
+Your Verilog design should account for the following input ports:
+
+- `clk`: A clock signal dictating the timing of memory operations, allowing them to be synchronized.
+- `rst_n`: An active-low reset signal that resets memory contents when it’s in the '0' state.
+- `write_en`: A signal enabling the execution of the write operation when high.
+- `write_addr`: The address input for specifying the location in memory to write data.
+- `write_data`: The actual data input that will be stored in the selected memory location.
+- `read_en`: A signal enabling the read operation when high.
+- `read_addr`: The address input for specifying the location from which to read data.
+
+Additionally, the output port is:
+- `read_data`: Driven with the value read from the specified memory address.
+
+Furthermore, consider incorporating the necessary parameters to define the bit width (WIDTH = 6) and depth (DEPTH = 8) of the RAM, to ensure the design is both parameterized and flexible.
+
+In the design implementation, two always blocks are recommended – one handling the write process and the other taking care of reading operations. These blocks should be triggered by the logic level changes of the clock and reset inputs, ensuring synchronous operation and proper initialization of the RAM array. When the system reset is active, ensure the data in RAM and any relevant registers are set to zero, thus preparing your RAM for fresh operations. The ensuing Verilog code should encapsulate these features comprehensively.

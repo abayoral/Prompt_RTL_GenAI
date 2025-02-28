@@ -1,0 +1,51 @@
+module width_8to16 (
+    input         clk,       // Clock signal
+    input         rst_n,     // Active-low reset
+    input         valid_in,  // Indicates that data_in is valid
+    input  [7:0]  data_in,   // 8-bit input data
+    output reg        valid_out, // Indicates that data_out is valid (asserted for one cycle)
+    output reg [15:0] data_out   // 16-bit concatenated output data
+);
+
+  // Internal register to temporarily store the first 8-bit input.
+  reg [7:0] stored_data;
+  // State flag: 0 indicates waiting for the first valid input, 1 indicates waiting for the second valid input.
+  reg state;
+  // A register to generate valid_out in the cycle immediately after the second valid input is received.
+  reg next_valid;
+
+  // Sequential block: Synchronous operations for capture, concatenation, and valid output generation.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      // Asynchronous reset: clear all internal registers and outputs.
+      state       <= 1'b0;
+      stored_data <= 8'd0;
+      data_out    <= 16'd0;
+      valid_out   <= 1'b0;
+      next_valid  <= 1'b0;
+    end else begin
+      // Generate valid_out from the next_valid signal.
+      valid_out  <= next_valid;
+      // Clear next_valid to ensure valid_out is only a one-cycle pulse.
+      next_valid <= 1'b0;
+      
+      // Process incoming data when valid_in is asserted.
+      if (valid_in) begin
+        if (state == 1'b0) begin
+          // Capture the first 8-bit word and move to waiting-for-second state.
+          stored_data <= data_in;
+          state       <= 1'b1;
+        end else begin
+          // On receipt of the second valid word:
+          // Concatenate the stored data (first input) as the upper 8 bits with the new data as lower 8 bits.
+          data_out    <= {stored_data, data_in};
+          // Reset state to wait for the next pair of inputs.
+          state       <= 1'b0;
+          // Flag valid output to be asserted in the next cycle.
+          next_valid  <= 1'b1;
+        end
+      end
+    end
+  end
+
+endmodule

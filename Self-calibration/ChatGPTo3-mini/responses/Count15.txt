@@ -1,0 +1,30 @@
+The provided code is already correct in terms of syntax and functionality. It implements a simple 4‐bit counter with a synchronous active‐high reset, and it uses nonblocking assignments (<=) correctly.
+
+However, here are a few best-practice suggestions and minor enhancements:
+
+1. Comment Clarity: Although your comment indicates a synchronous active-high reset, you could include a brief note about the counter wrapping behavior, since a 4-bit counter will naturally roll over from 15 to 0.
+2. Code Formatting: Some designers prefer to write binary numbers with all four bits defined for clarity (e.g., 4'b0000 instead of 4'b0). This is a stylistic preference and not required.
+3. Consistency: Ensure that your file includes a proper header or module documentation if used in larger designs.
+
+Below is the code with these minor stylistic improvements:
+
+------------------------------------------------
+module top_module (
+    input clk,
+    input reset,          // Synchronous active-high reset
+    output reg [3:0] q    // 4-bit counter
+);
+
+    // On each clock edge, if reset is high, clear the counter; 
+    // otherwise, increment it. The counter wraps from 15 back to 0.
+    always @(posedge clk) begin
+        if (reset)
+            q <= 4'b0000;
+        else
+            q <= q + 1;
+    end
+
+endmodule
+------------------------------------------------
+
+In summary, the original code was functionally correct; the changes above are purely for clarity and adherence to common coding style guidelines.

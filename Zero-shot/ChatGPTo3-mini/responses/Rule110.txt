@@ -1,0 +1,67 @@
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output [511:0] q
+);
+
+    reg [511:0] currState;
+    reg [511:0] nextState;
+    
+    // Combinational block to compute next state according to Rule 110.
+    integer i;
+    always @(*) begin
+        for (i = 0; i < 512; i = i + 1) begin
+            // Determine left, center, and right cells;
+            // boundaries: treat cells outside as 0.
+            reg left;
+            reg center;
+            reg right;
+            if(i == 0)
+                left = 1'b0;
+            else
+                left = currState[i-1];
+                
+            center = currState[i];
+            
+            if(i == 511)
+                right = 1'b0;
+            else
+                right = currState[i+1];
+            
+            // Apply Rule 110 based on the triplet {left, center, right}:
+            // Table:
+            // 111 -> 0
+            // 110 -> 1
+            // 101 -> 1
+            // 100 -> 0
+            // 011 -> 1
+            // 010 -> 1
+            // 001 -> 1
+            // 000 -> 0
+            case ({left, center, right})
+                3'b111: nextState[i] = 1'b0;
+                3'b110: nextState[i] = 1'b1;
+                3'b101: nextState[i] = 1'b1;
+                3'b100: nextState[i] = 1'b0;
+                3'b011: nextState[i] = 1'b1;
+                3'b010: nextState[i] = 1'b1;
+                3'b001: nextState[i] = 1'b1;
+                3'b000: nextState[i] = 1'b0;
+                default: nextState[i] = 1'b0; // default is safe
+            endcase
+        end
+    end
+
+    // Sequential block: on each clock cycle, either load or update with the computed next state.
+    always @(posedge clk) begin
+        if (load)
+            currState <= data;
+        else
+            currState <= nextState;
+    end
+
+    // Output the current state.
+    assign q = currState;
+
+endmodule

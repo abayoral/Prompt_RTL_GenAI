@@ -1,0 +1,53 @@
+module synchronizer (
+    input         clk_a,
+    input         clk_b,
+    input         arstn,     // active-low asynchronous reset for clk_a domain
+    input         brstn,     // active-low asynchronous reset for clk_b domain
+    input  [3:0]  data_in,
+    input         data_en,
+    output reg [3:0] dataout
+);
+
+    // Registers in clk_a domain
+    reg [3:0] data_reg;
+    reg       en_data_reg;
+
+    // Registers for synchronizing enable signal in clk_b domain
+    reg       en_clap_one;
+    reg       en_clap_two;
+
+    // Data latching in clk_a domain
+    always @(posedge clk_a or negedge arstn) begin
+        if (!arstn) begin
+            data_reg    <= 4'b0;
+            en_data_reg <= 1'b0;
+        end
+        else begin
+            // Latch the data_in when data_en is high; data_in is assumed to be stable when enabled.
+            if (data_en)
+                data_reg <= data_in;
+            // Always pass the enable (even if low) to capture its current state.
+            en_data_reg <= data_en;
+        end
+    end
+
+    // Synchronization and MUX selection in clk_b domain
+    always @(posedge clk_b or negedge brstn) begin
+        if (!brstn) begin
+            en_clap_one <= 1'b0;
+            en_clap_two <= 1'b0;
+            dataout     <= 4'b0;
+        end
+        else begin
+            // Propagate the enable signal through two stages to delay it by two clk_b cycles
+            en_clap_one <= en_data_reg;
+            en_clap_two <= en_clap_one;
+            
+            // When the final delayed enable signal is active, update dataout with the data sampled in clk_a domain.
+            if (en_clap_two)
+                dataout <= data_reg;
+            // If en_clap_two is inactive, dataout retains its previous value.
+        end
+    end
+
+endmodule

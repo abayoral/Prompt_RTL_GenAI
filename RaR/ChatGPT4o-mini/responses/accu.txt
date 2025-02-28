@@ -1,0 +1,37 @@
+```
+module accu (
+    input wire clk,
+    input wire rst_n,
+    input wire [7:0] data_in,
+    input wire valid_in,
+    output reg valid_out,
+    output reg [9:0] data_out
+);
+
+    reg [9:0] accumulator;
+    reg [2:0] count;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            accumulator <= 10'b0;
+            count <= 3'b0;
+            valid_out <= 1'b0;
+            data_out <= 10'b0;
+        end else if (valid_in) begin
+            if (count < 3'b100) begin // Wait until 4 valid inputs (count 0 to 3)
+                accumulator <= accumulator + data_in;
+                count <= count + 1;
+                valid_out <= 1'b0; // Hold valid_out low until we've got four inputs
+            end
+            if (count == 3'b011) begin // Check if we have received exactly 4 inputs (0 to 3)
+                valid_out <= 1'b1; // Trigger valid output
+                data_out <= accumulator; // Assign accumulated value to output
+                // Prepare for the next accumulation
+                accumulator <= 10'b0; // Reset accumulator for next round
+                count <= 3'b0; // Reset count for next accumulation
+            end
+        end
+    end
+
+endmodule
+```

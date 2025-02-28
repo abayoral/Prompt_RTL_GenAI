@@ -1,0 +1,45 @@
+You're requesting assistance from me, trained as a professional Verilog designer, to create a Verilog implementation of a traffic light controller tailored for a specific scenario. The traffic light system you want should manage an array of signals commonly used for vehicular and pedestrian traffic management, including red, yellow, and green indicators, and incorporate a mechanism for pedestrians to influence the traffic flow. Let's break down the elements of this task for clarity:
+
+**Scenario:**
+You have a traffic light controlling a motor vehicle lane, where the default cycle for the light is as follows: 60 clock cycles of green, 5 clock cycles of yellow, and 10 clock cycles of red. There should also be a pedestrian button implemented. 
+
+**Pedestrian Button Behavior:**
+The functionality of the pedestrian button must be incorporated such that if it's pressed during the time the green light is active and more than 10 clock cycles remain before the light is scheduled to change, the remainder of the green light's duration should be reduced to 10 clock cycles. If fewer than 10 clock cycles remain when the button is pressed, the duration remains unchanged.
+
+**Light Pairing Logic:**
+The behavior of the pedestrian light is paired with the vehicular signals. When the vehicular traffic light is green or yellow, the pedestrian light remains red. Conversely, when the vehicular light turns red, the pedestrian light switches to green, signifying it's safe for pedestrians to cross.
+
+**Traffic Light Controller:**
+You will need a Verilog module named `traffic_light`, incorporating a number of inputs and outputs:
+- **Inputs:**
+  - `rst_n`: A reset signal, which is active low.
+  - `clk`: A clock signal, acting as the timing reference for all operations.
+  - `pass_request`: A signal that influences the decision to allow vehicles to pass or not.
+
+- **Outputs:**
+  - `clock[7:0]`: An 8-bit signal to represent the internal timer's count value, which manages timing for each state.
+  - `red`, `yellow`, `green`: Signals indicating the active traffic light color for vehicles.
+
+**Parameters and State Management:**
+Parameters will include enumerated states like `idle`, `s1_red`, `s2_yellow`, `s3_green` to categorize different stages of the traffic light's operations.
+
+**Counters and State Transitions:**
+The implementation involves registers and wires, particularly:
+- An 8-bit `cnt` register, acting as an internal counter.
+- A 2-bit `state` register to determine the current operational state.
+- Register declarations for previous signal states (`p_red`, `p_yellow`, `p_green`) to track the next values for the red, yellow, and green outputs.
+
+**Design and Implementation Strategy:**
+1. **State Transition Logic:** An always block is needed to manage state transitions based on the current state and input conditions. For example:
+   - Transition from `idle` to `s1_red`.
+   - Transition from `s1_red` to `s3_green` after 3 counts.
+   - Transition from `s2_yellow` to `s1_red` similarly.
+   - Ensure proper handling of pedestrian requests and standard state transitions.
+
+2. **Counter Logic:** Another always block must adjust the internal counter based on the clock and reset signals:
+   - Count down each clock cycle.
+   - Handle special conditions like a reset, pedestrian button press, or state transition triggering a new countdown period based on the light changing.
+
+3. **Signal Outputs:** A final always block will coordinate updating the actual signal outputs (`red`, `yellow`, `green`) based on current and previous states, ensuring transitions coincide with the countdown logic.
+
+Your directive is to craft all these components into a coherent Verilog code snippet that embodies this traffic light controller design. This comprehensive description aims to guide you through setting up the architecture of the Verilog module inline with these outlined functionalities and constraints.

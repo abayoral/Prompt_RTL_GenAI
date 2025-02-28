@@ -1,0 +1,19 @@
+Consider the scenario where you are tasked with creating a Verilog module representing a Read-Only Memory (ROM) system, specializing in the storage and retrieval of predetermined, immutable data sets. Your goal is to design a module named "ROM" capable of efficiently handling these tasks. 
+
+This module should be structured with specific input and output ports:
+- The input port consists of an 8-bit wide address, `addr [7:0]`, which serves as the navigational query for selecting the desired data location within memory. This address essentially points to one of the possible 256 locations within the memory array.
+- The output port, encapsulated in the signal `dout [15:0]`, delivers a 16-bit wide data output. This output corresponds to the content found at the memory address currently designated by the input address.
+
+Within this design:
+- The memory array is defined as `reg [15:0] mem [0:255]`. This definition establishes a structure composed of 256 discrete memory locations, each capable of storing data 16 bits in width.
+
+The initialization of this ROM module is crucial for ensuring that specific memory locations contain predefined data. Within the Initial Block of the module:
+- Particular memory addresses, namely 0 through 3, are assigned specific 16-bit hexadecimal values: 16'hA0A0, 16'hB1B1, 16'hC2C2, and 16'hD3D3, respectively. These values exemplify initial data assignments and suggest that the remainder of the addresses could be similarly populated with other fixed data as required by the application.
+
+In terms of functionality:
+- The behavior of the module is governed by an `always @(*)` block. This sensitivity list implies that the module will dynamically output the data from the memory location marked by `addr` whenever a change occurs, ensuring continuous delivery of the correct data value without explicit clock-driven prompts.
+
+It’s crucial to note the role of a ROM as a read-only entity:
+- This module is strictly limited to read operations, meaning once initialized, the memory content remains unchanged throughout the operation of the system.
+
+Please draft the complete Verilog code implementation for this described ROM module, adhering to these specifications and taking into account best practices for modular design and simulation.

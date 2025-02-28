@@ -1,0 +1,44 @@
+```
+module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );
+
+    wire [15:0] sum1, sum2;
+    wire cout1, cout2;
+    
+    assign {cout1, sum1} = a + b + cin; // Adder 1
+    assign {cout2, sum2} = a + (~b) + cin; // Adder 2 for subtraction
+
+    assign sum = sub ? sum2 : sum1;
+    assign cout = sub ? cout2 : cout1;
+
+endmodule
+
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    input sub,
+    output [31:0] sum
+);
+    
+    wire [15:0] sum_low, sum_high;
+    wire cout_low, cout_high;
+
+    add16 adder_low (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(sub),
+        .sum(sum_low),
+        .cout(cout_low)
+    );
+
+    add16 adder_high (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(sub),
+        .sum(sum_high),
+        .cout(cout_high)
+    );
+
+    assign sum = {sum_high, sum_low};
+
+endmodule
+```

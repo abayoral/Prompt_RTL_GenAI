@@ -1,0 +1,32 @@
+Below is one improved version of the code. Although your original code is functionally correct as a synchronous counter (it counts 1, 2, …, 10 then wraps back to 1), it can be improved by:
+
+• Using the full sensitivity list (adding an asynchronous reset if that is desired), and
+• Including begin…end blocks to make the code clearer and more robust.
+
+For example, if you want an asynchronous, active‐high reset, you might write:
+
+-----------------------------------------------------
+module top_module (
+    input wire clk,
+    input wire reset,
+    output reg [3:0] q
+);
+
+always @(posedge clk or posedge reset) begin
+    if (reset) begin
+        q <= 4'd1;
+    end else if (q == 4'd10) begin
+        q <= 4'd1;
+    end else begin
+        q <= q + 1;
+    end
+end
+
+endmodule
+-----------------------------------------------------
+
+Notes:
+1. In this version, reset is asynchronous (included in the sensitivity list). If you only intend for a synchronous reset, then you can leave reset out of the sensitivity list as in your original design.
+2. The counter resets to 1 on both a reset and when the counter reaches 10. This gives a sequence 1, 2, …, 10, 1, … If you intended a different behavior (for example starting at 0 or counting 0–9), adjust the values accordingly.
+
+This version adheres to best practices by clearly showing the control flows and the proper sensitivity list.

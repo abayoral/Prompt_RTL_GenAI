@@ -1,0 +1,56 @@
+module ps2_message_parser(
+  input         clk,
+  input  [7:0]  in,
+  input         reset,
+  output reg [23:0] out_bytes,
+  output reg    done
+);
+
+  // Define state encoding
+  localparam WAIT  = 2'b00; // waiting for first byte (start byte: in[3]==1)
+  localparam BYTE2 = 2'b01; // capturing second byte
+  localparam BYTE3 = 2'b10; // capturing third byte
+
+  reg [1:0] state;
+
+  always @(posedge clk) begin
+    if (reset) begin
+      state     <= WAIT;
+      done      <= 1'b0;
+      out_bytes <= 24'b0;
+    end else begin
+      // Default: deassert done unless message completed in current cycle.
+      done <= 1'b0;
+      case (state)
+        WAIT: begin
+          // Wait until the start-of-message byte is found.
+          if (in[3] == 1'b1) begin
+            // Capture the first byte into [23:16] of out_bytes.
+            out_bytes[23:16] <= in;
+            state <= BYTE2;
+          end else begin
+            state <= WAIT;
+          end
+        end
+
+        BYTE2: begin
+          // Capture second byte.
+          out_bytes[15:8] <= in;
+          state <= BYTE3;
+        end
+
+        BYTE3: begin
+          // Capture third byte.
+          out_bytes[7:0] <= in;
+          // Assert done signal to indicate the 24-bit message is ready.
+          done <= 1'b1;
+          // Go back to WAIT to search for a new start-of-message byte.
+          state <= WAIT;
+        end
+
+        default: state <= WAIT;
+      endcase
+    end
+  end
+
+endmodule

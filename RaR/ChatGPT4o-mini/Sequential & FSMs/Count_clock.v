@@ -1,0 +1,11 @@
+As a Senior FPGA Design Engineer working at a prominent hardware design firm, you are tasked with the critical development of a Verilog module that plays a vital role in an upcoming next-generation product. The successful implementation of this module is essential not only for the product's functionality but also for sustaining and enhancing your company's reputation within the highly competitive computer hardware industry.
+
+The challenge at hand involves designing a set of counters that will function effectively as part of a 12-hour clock system, which includes an AM/PM indicator. The architecture of these counters requires them to be triggered by a fast-running clock signal (clk) and to increment precisely once per second whenever the enable signal (ena) is pulsed. 
+
+In addition, the module must include a reset functionality that sets the clock to the initial time of 12:00 AM. It is important that this reset action takes precedence over the enable signal, meaning that the clock can be reset even if it is currently not enabled. 
+
+The clock's outputs include hours (hh), minutes (mm), and seconds (ss), each represented as two Binary Coded Decimal (BCD) digits. The specific time formats for these outputs should adhere to certain specifications: for hours, valid representations range from 01 to 12; for both minutes and seconds, valid representations range from 00 to 59. 
+
+A key consideration in this design is the handling of time transitions—most notably, the transition from 11:59:59 PM to 12:00:00 AM, and from 12:59:59 PM to 01:00:00 PM. Notably, it should be recognized that the clock format does not allow for a 00:00:00 representation, which is typically common in 24-hour formats. 
+
+With these parameters and functionalities outlined, the task is to structure the module appropriately while adhering to the specifications and ensuring robust performance. How can you systematically approach the design and implementation of this Verilog module to ensure it meets all the outlined requirements, particularly focusing on the reset prioritization, the correct representation of time, and the transition logic?

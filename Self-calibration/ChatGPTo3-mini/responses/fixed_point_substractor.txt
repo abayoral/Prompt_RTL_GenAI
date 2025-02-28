@@ -1,0 +1,87 @@
+Below is one correct revision. The primary issue was that the original code declared wires and used assign statements inside an always block – which is not legal Verilog. (In an always block you may declare variables (typically reg) but you cannot declare wires with assign.) In the corrected version, the signals used to extract the sign and magnitude are declared as continuous assignments outside of the always block. (Also note that the parameter Q is provided for fixed‐point scaling but is not used in the arithmetic; if needed it can be incorporated later.) 
+
+Here is the corrected version:
+
+------------------------------------------------------------
+module fixed_point_subtractor #(
+    parameter Q = 8,   // Number of fractional bits (unused here but available for scaling)
+    parameter N = 16   // Total number of bits (including sign)
+)
+(
+    input  [N-1:0] a,  // first fixed‐point operand (sign‐magnitude)
+    input  [N-1:0] b,  // second fixed‐point operand (sign‐magnitude)
+    output [N-1:0] c   // result fixed‐point value
+);
+
+  // Extract the sign and magnitude of a and b.
+  // MSB is the sign; the remaining (N-1) bits are the magnitude.
+  wire       a_sign = a[N-1];
+  wire       b_sign = b[N-1];
+  wire [N-2:0] a_mag = a[N-2:0];
+  wire [N-2:0] b_mag = b[N-2:0];
+
+  // Internal register to hold result
+  reg [N-1:0] res;
+  assign c = res;
+
+  // Temporary registers
+  reg         result_sign;
+  reg [N-1:0] mag_tmp;  // Extended (by one bit) intermediate result
+
+  always @(*) begin
+    // If the two inputs are identical, force the result to zero (with a positive sign)
+    if(a == b) begin
+      res = {1'b0, {(N-1){1'b0}}};
+    end
+    else if(a_sign == b_sign) begin
+      // Both operands have the same sign.
+      // We subtract the magnitudes and choose the sign according to
+      // which operand has the larger magnitude.
+      if(a_mag >= b_mag) begin
+        // When a has equal or larger magnitude, subtract: |a| - |b|
+        mag_tmp = {1'b0, a_mag} - {1'b0, b_mag};
+        result_sign = a_sign;  // Same as the inputs’ sign.
+      end
+      else begin
+        // When b has larger magnitude, subtract: |b| - |a|
+        // The resulting sign is the opposite of the input sign.
+        mag_tmp = {1'b0, b_mag} - {1'b0, a_mag};
+        result_sign = ~a_sign;
+      end
+      // Assign result (dropping the extended MSB)
+      res = {result_sign, mag_tmp[N-2:0]};
+    end
+    else begin
+      // Operands have different signs.
+      // In sign‐magnitude, subtraction becomes addition of magnitudes.
+      // For a positive a and negative b, a - (-|b|) = a + |b| (result positive)
+      // For a negative a and positive b, (-|a|) - b = -( |a| + b ) (result negative)
+      mag_tmp = {1'b0, a_mag} + {1'b0, b_mag};
+      if(a_sign == 1'b0 && b_sign == 1'b1) begin
+        // a positive, b negative => result is positive.
+        result_sign = 1'b0;
+      end
+      else begin
+        // a negative, b positive => result is negative.
+        result_sign = 1'b1;
+      end
+      res = {result_sign, mag_tmp[N-2:0]};
+    end
+
+    // If the computed magnitude is zero, force the sign to 0 (positive zero).
+    if(res[N-2:0] == {(N-1){1'b0}})
+      res = {1'b0, {(N-1){1'b0}}};
+  end
+
+endmodule
+------------------------------------------------------------
+
+Explanation of the fixes and improvements:
+
+1. The sign and magnitude signals (a_sign, b_sign, a_mag, b_mag) are now defined outside the always block as wires with continuous assignments. This avoids the illegal use of assign statements inside always blocks.
+
+2. The always block now only contains procedural assignments (using the reg variables).
+
+3. The rest of the module’s functionality (comparing magnitudes, performing subtraction or addition of the extended values, and forcing the result to have a positive sign if the magnitude is zero) remains the same, following the intended sign‐magnitude arithmetic.
+
+This revised module adheres to best practices in Verilog design and resolves the syntax and logical errors from the original code.

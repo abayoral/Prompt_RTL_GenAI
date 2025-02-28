@@ -1,0 +1,33 @@
+```
+module div_16bit (
+    input [15:0] A,       // 16-bit dividend
+    input [7:0] B,        // 8-bit divisor
+    output reg [15:0] result, // 16-bit quotient
+    output reg [15:0] odd       // 16-bit remainder
+);
+
+reg [15:0] a_reg;
+reg [7:0] b_reg;
+
+always @(*) begin
+    a_reg = A;
+    b_reg = B;
+    result = 16'b0;
+    odd = 16'b0;
+
+    // Division process
+    for (int i = 15; i >= 0; i = i - 1) begin
+        odd = {odd[14:0], a_reg[15]}; // Shift left remainder
+        a_reg = {a_reg[14:0], 1'b0};   // Shift left dividend
+
+        if (odd >= b_reg) begin
+            odd = odd - b_reg;         // Subtract divisor from remainder
+            result[i] = 1'b1;          // Set quotient bit
+        end else begin
+            result[i] = 1'b0;          // Set quotient bit
+        end
+    end
+end
+
+endmodule
+```

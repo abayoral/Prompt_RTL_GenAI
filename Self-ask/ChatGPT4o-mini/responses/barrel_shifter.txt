@@ -1,0 +1,29 @@
+```verilog
+module barrel_shifter(
+    input  [7:0] in,       // 8-bit input
+    input  [2:0] ctrl,     // 3-bit control signal
+    output [7:0] out       // 8-bit output
+);
+
+    wire [7:0] shift_1, shift_2, shift_4;
+
+    // Shift by 1
+    assign shift_1 = {in[6:0], in[7]}; // Rotate left by 1
+
+    // Shift by 2
+    assign shift_2 = {in[5:0], in[7:6]}; // Rotate left by 2
+
+    // Shift by 4
+    assign shift_4 = {in[3:0], in[7:4]}; // Rotate left by 4
+
+    // Mux stage for control bit ctrl[2]
+    wire [7:0] mux1_out = ctrl[2] ? shift_4 : in;
+
+    // Mux stage for control bit ctrl[1]
+    wire [7:0] mux2_out = ctrl[1] ? shift_2 : mux1_out;
+
+    // Mux stage for control bit ctrl[0]
+    assign out = ctrl[0] ? shift_1 : mux2_out;
+
+endmodule
+```

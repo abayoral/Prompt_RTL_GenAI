@@ -1,0 +1,9 @@
+As a seasoned Digital Design Engineer in a prominent hardware design firm, you are entrusted with the important responsibility of creating a crucial Verilog module for an upcoming product that is integral to your company's standing in the hardware industry. 
+
+In this scenario, let's analyze the specifics of designing a finite state machine (FSM) that has two primary inputs: s and w. The FSM is designed to begin its operation from a specific reset state, designated as state A. According to the functionality described, the FSM remains in state A as long as the input s holds a value of 0. However, the moment the input s transitions to 1, the FSM switches to state B. 
+
+While in state B, the FSM engages in monitoring the input w over the course of the next three clock cycles. The critical requirement here is that if the w input equals 1 during exactly two out of these three clock cycles, the FSM must respond by setting the output z to 1 during the subsequent clock cycle. Conversely, if the condition of w equaling 1 in precisely two of the clock cycles is not satisfied, the output z must be set to 0.
+
+It's essential to note that the FSM continues to assess the value of w in subsequent sets of three clock cycles, repeating the same logic regarding the output z. Furthermore, we must consider the constraint to utilize the minimum number of states possible in the FSM design. Notably, the input s is only relevant when the FSM is in state A, which simplifies the state considerations when in state B.
+
+In your implementation, please outline how you would structure the finite state machine, taking into account these parameters, and don't forget to include the necessary Verilog code within the designated module framework provided.

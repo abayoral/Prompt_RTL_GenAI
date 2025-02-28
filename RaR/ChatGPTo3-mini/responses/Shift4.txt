@@ -1,0 +1,19 @@
+module top_module(
+    input clk,           // Clock signal
+    input areset,        // Asynchronous active-high reset; clears shift register to zero
+    input load,          // Synchronously loads the shift register with the new data [3:0]
+    input ena,           // Enables the right shift operation (shifts in a zero at q[3])
+    input [3:0] data,    // 4-bit data input used when load is active
+    output reg [3:0] q   // Current state/output of the shift register
+);
+
+    always @(posedge clk or posedge areset) begin
+        if(areset)
+            q <= 4'b0000;
+        else if(load)
+            q <= data;
+        else if(ena)
+            q <= {1'b0, q[3:1]};
+    end
+
+endmodule

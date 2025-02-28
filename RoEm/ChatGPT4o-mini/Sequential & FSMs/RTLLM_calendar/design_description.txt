@@ -1,0 +1,44 @@
+I would like you to please take on the role of a professional Verilog designer. Your task is to design and implement a module for a perpetual calendar. This digital calendar should keep track of time in terms of hours, minutes, and seconds, beginning from an initial value where each of these units—seconds (Secs), minutes (Mins), and hours (Hours)—are set to zero.
+
+**Module Requirements:**
+
+- **Module Name:** The Verilog module should be named `calendar`.
+
+- **Input Ports:**
+  - **CLK**: This is the clock input to the module. The clock signal will dictate the timing of updates to the calendar counts.
+  - **RST**: This is an active-high reset signal. When the reset signal is high, the calendar should reset all counters to zero.
+
+- **Output Ports:**
+  - **Hours**: A 6-bit wide output that represents the current hour, following a 0-23 hour format.
+  - **Mins**: A 6-bit output signifying the current minute, ranging from 0 to 59.
+  - **Secs**: A 6-bit output representing the current second, which will range from 0 to 59 as well.
+
+**Functional Description:**
+
+- **Seconds Handling:** 
+  - The seconds count (Secs) should trigger on every positive edge of the provided clock (CLK) or on a reset signal (RST).
+  - If reset is active, set the seconds to zero.
+  - Without reset, increment seconds by one on every cycle.
+  - Upon reaching 59 seconds, reset to zero and signal the minute count update.
+
+- **Minutes Handling:** 
+  - This count takes cues from both the seconds and its cycle.
+  - When reset is active, set minutes to zero.
+  - When seconds reset from 59 to 0, increment minutes.
+  - On reaching 59 minutes with seconds also at 59, reset to zero and call for hour update.
+
+- **Hours Handling:** 
+  - The hour count reflects the most significant time measurement here, starting at zero.
+  - On reset, hours should be zeroed.
+  - Increment hours when both previous counts—minutes and seconds—have cycled through their full ranges.
+  - Hours should wrap back to zero when 23:59:59 transitions to the next full cycle.
+
+**Implementation Strategy:**
+
+The module will utilize three distinct always blocks. 
+
+- **Seconds Block:** Triggered on the positive clock or reset edge; manages the seconds’ incrementation and reset behavior.
+- **Minutes Block:** Also triggered by the clock or reset; adjusts minutes in response to second changes.
+- **Minutes Block:** Another separate block triggered by similar conditions; updates hour count as per the complete cycle of minutes and seconds.
+
+With this specification in mind, your task would be to draft a complete Verilog code that encapsulates these elements, effectively creating a perpetual calendar module.

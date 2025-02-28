@@ -1,0 +1,53 @@
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output done
+);
+
+    // State encoding: 4 states are used.
+    localparam IDLE      = 2'd0,
+               GOT_FIRST = 2'd1,
+               GOT_SECOND= 2'd2,
+               DONE      = 2'd3;
+               
+    reg [1:0] state, next_state;
+    
+    // Combinational state transition logic.
+    always @(*) begin
+        case(state)
+            // Remain in IDLE until a byte with in[3]==1 is seen.
+            IDLE: begin
+                if(in[3])
+                    next_state = GOT_FIRST;
+                else
+                    next_state = IDLE;
+            end
+            // First byte received, wait for the second byte.
+            GOT_FIRST: begin
+                next_state = GOT_SECOND;
+            end
+            // Second byte received, wait for third byte.
+            GOT_SECOND: begin
+                next_state = DONE;
+            end
+            // In DONE state, assert done for one cycle then return to IDLE.
+            DONE: begin
+                next_state = IDLE;
+            end
+            default: next_state = IDLE;
+        endcase
+    end
+    
+    // Sequential state flip-flops (with synchronous reset).
+    always @(posedge clk) begin
+        if(reset)
+            state <= IDLE;
+        else
+            state <= next_state;
+    end
+    
+    // Output logic: "done" is high only when in the DONE state.
+    assign done = (state == DONE);
+    
+endmodule

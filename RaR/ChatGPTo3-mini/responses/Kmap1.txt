@@ -1,0 +1,27 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    output out
+);
+
+    // The provided Karnaugh map shows that for every combination of a, b, c,
+    // the output is 1. Thus, the Boolean function can be expressed in both SOP and POS forms as:
+    //
+    // Sum-of-Products (SOP) form:
+    //   out = a'b'c' + a'b'c  + a'bc  + a'bc' +
+    //         ab'c'  + ab'c   + abc   + abc'
+    // Since every minterm is present, the simplified SOP form is:
+    //   out = 1
+    //
+    // Product-of-Sums (POS) form:
+    //   out = (a + b + c) (a + b + c') (a + b' + c) (a + b' + c') 
+    //         (a' + b + c) (a' + b + c') (a' + b' + c) (a' + b' + c')
+    // Since every maxterm is included, the simplified POS form is:
+    //   out = 1
+    //
+    // In both cases, the function is constant high (logic 1) for all possible input combinations.
+
+    assign out = 1'b1;
+
+endmodule

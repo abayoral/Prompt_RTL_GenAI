@@ -1,0 +1,57 @@
+```
+module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );
+
+endmodule
+
+module mux2to1_16(input [15:0] in0, input [15:0] in1, input sel, output [15:0] out);
+    assign out = sel ? in1 : in0;
+endmodule
+
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+    wire [15:0] sum0, sum1, sum2;
+    wire cout0, cout1;
+
+    // First adder for least significant bits
+    add16 adder0 (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum0),
+        .cout(cout0)
+    );
+
+    // Second adder for middle bits
+    add16 adder1 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b0),
+        .sum(sum1),
+        .cout(cout1)
+    );
+
+    // Third adder for carry-in
+    add16 adder2 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b1),
+        .sum(sum2),
+        .cout()
+    );
+
+    // Multiplexer to select between the two sums based on carry-out from the first adder
+    mux2to1_16 mux0 (
+        .in0(sum1),
+        .in1(sum2),
+        .sel(cout0),
+        .out(sum[31:16])
+    );
+
+    // Final sum output
+    assign sum[15:0] = sum0;
+
+endmodule
+```

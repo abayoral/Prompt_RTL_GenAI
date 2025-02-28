@@ -1,0 +1,39 @@
+module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );
+
+    wire [15:0] sum_1, sum_2;
+    wire cout_1, cout_2;
+
+    assign {cout_1, sum_1} = a + b + cin;  // 16-bit addition
+
+endmodule
+
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    input sub,
+    output [31:0] sum
+);
+
+    wire [15:0] b_inverted_0, b_inverted_1;
+    wire cout_0, cout_1;
+
+    assign b_inverted_0 = b[15:0] ^ {16{sub}}; // invert lower 16 bits of b if sub is 1
+    assign b_inverted_1 = b[31:16] ^ {16{sub}}; // invert upper 16 bits of b if sub is 1
+
+    add16 adder_0 (
+        .a(a[15:0]),
+        .b(b_inverted_0),
+        .cin(sub),
+        .sum(sum[15:0]),
+        .cout(cout_0)
+    );
+
+    add16 adder_1 (
+        .a(a[31:16]),
+        .b(b_inverted_1),
+        .cin(cout_0),
+        .sum(sum[31:16]),
+        .cout(cout_1)
+    );
+
+endmodule

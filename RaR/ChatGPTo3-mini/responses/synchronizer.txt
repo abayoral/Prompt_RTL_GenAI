@@ -1,0 +1,52 @@
+module synchronizer(
+    input         clk_a,    // Clock domain A: latches incoming data and enable
+    input         arstn,    // Active-low asynchronous reset for clk_a domain
+    input         clk_b,    // Clock domain B: synchronizes the delayed enable and drives output data
+    input         brstn,    // Active-low asynchronous reset for clk_b domain
+    input  [3:0]  data_in,  // 4-bit input data in clk_a domain
+    input         data_en,  // Enable signal in clk_a domain (must be high for at least three clk_b cycles)
+    output reg [3:0] dataout // 4-bit synchronized output data in clk_b domain
+);
+
+// Internal registers in clk_a domain
+reg [3:0] data_reg;    // Captures data_in in clk_a domain
+reg       en_data_reg; // Captures data_en in clk_a domain
+
+// Internal registers in clk_b domain for enable synchronization (2-cycle delay)
+reg en_clap_one;
+reg en_clap_two;
+
+// Operation in clk_a domain: capture data and enable
+always @(posedge clk_a or negedge arstn) begin
+    if (!arstn) begin
+        data_reg    <= 4'b0000;
+        en_data_reg <= 1'b0;
+    end
+    else begin
+        data_reg    <= data_in;
+        en_data_reg <= data_en;
+    end
+end
+
+// Operation in clk_b domain: synchronize enable and update dataout using a MUX-based approach
+always @(posedge clk_b or negedge brstn) begin
+    if (!brstn) begin
+        en_clap_one <= 1'b0;
+        en_clap_two <= 1'b0;
+        dataout     <= 4'b0000;
+    end
+    else begin
+        // Pass the enable signal through two sequential flip-flops for 2-cycle delay
+        en_clap_one <= en_data_reg;
+        en_clap_two <= en_clap_one;
+        
+        // Multiplexer-based update: when delayed enable is high, update dataout with data_reg.
+        // Otherwise, maintain the previous dataout.
+        if (en_clap_two)
+            dataout <= data_reg;
+        else
+            dataout <= dataout;
+    end
+end
+
+endmodule

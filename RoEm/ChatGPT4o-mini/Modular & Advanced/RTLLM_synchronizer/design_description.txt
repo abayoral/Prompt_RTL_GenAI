@@ -1,0 +1,29 @@
+I would like you to take on the role of a professional Verilog designer for the purpose of designing and implementing a specific hardware component using Verilog. Your task is to create a multi-bit MUX-based synchronizer with particular requirements and characteristics detailed as follows:
+
+**Objective:** Create a module called `synchronizer` that facilitates the synchronization of input data across different clock domains using a MUX-based approach. The data will only be considered for synchronization when a certain enable condition is met, and there are specified constraints on the timing and behavior of the input and control signals involved.
+
+**Overall Description:**
+- **Module Name:** `synchronizer`
+- We require a synchronizer that interfaces with two different clock inputs—`clk_a` and `clk_b`.
+- The aim is to synchronize a 4-bit data input (`data_in`) with the clock `clk_b`, only when a control signal (`data_en`) is active. 
+- The enable signal `data_en` remains high for a minimum of three cycles of the `clk_b` clock, ensuring synchronization occurs within these constraints.
+- The `data_in` changes infrequently, with a minimum interval of 10 `clk_b` cycles between changes.
+
+**Inputs:**
+1. **clk_a:** A clock signal corresponding to one domain, relevant for the input data and its enabling signal.
+2. **clk_b:** A second clock signal for the domain where the final synchronization and output happen.
+3. **arstn:** An active-low reset signal associated with `clk_a`, which needs to be defined as logic 0 for reset and logic 1 for normal operation.
+4. **brstn:** Another active-low reset signal associated with `clk_b`, following the same definition as `arstn`.
+5. **data_in:** A 4-bit wide input data signal that is synchronized across domains.
+6. **data_en:** An enable signal controlling when the data synchronization process should begin, taking effect with `clk_a`.
+
+**Outputs:**
+- **dataout:** A 4-bit wide output signal that reflects the synchronized data within the `clk_b` domain.
+
+**Implementation Details:**
+- **Data Register:** The module should have a register (`data_reg`) that temporarily stores `data_in`. This register is updated on the rising edge of `clk_a` or when `arstn` transitions low, indicating a reset.
+- **Enable Data Register:** Similarly, an `en_data_reg` must be established to mirror the `data_en` signal under the same clocking and reset conditions as above.
+- **Enable Control Registers:** Include two additional registers (`en_clap_one` and `en_clap_two`) that manage the proper sequencing and delay necessary to respect the enable signal's pacing requirements. These are defined by the `clk_b` and `brstn`.
+- **Output Assignment:** The final output, `dataout`, is dictated by the state of `en_clap_two`. When this signal is active in the `clk_b` domain, the output should reflect `data_reg`'s value. Otherwise, it should maintain its previous state if the condition is not met.
+
+Given these specifications, provide the complete Verilog code that faithfully implements the requirement outlined. This code should describe how the data is captured, stored, delayed, and eventually output from the `synchronizer` module, all while adhering to the multidomain synchronization constraints and conditions set forth.

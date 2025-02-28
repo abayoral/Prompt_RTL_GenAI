@@ -1,0 +1,63 @@
+module LIFObuffer(
+    input  [3:0] dataIn,   // 4-bit data input that can be pushed onto the buffer
+    input        RW,       // Operation control: 0 for write (push), 1 for read (pop)
+    input        EN,       // Enable signal for buffer operations
+    input        Rst,      // Active high reset signal to initialize the buffer
+    input        Clk,      // Clock signal for synchronous operations
+    output       EMPTY,    // Flag to indicate the buffer is empty
+    output       FULL,     // Flag to indicate the buffer is full
+    output reg [3:0] dataOut   // 4-bit data output for reading from the buffer
+);
+
+    // Declaration of the stack memory array for 4 entries (indices 0 to 3)
+    reg [3:0] stack_mem [0:3];
+    
+    // Stack pointer that tracks the next free location.
+    // Initialized to 4 to denote an empty buffer.
+    // Range of SP: 0 (full) to 4 (empty)
+    reg [2:0] SP;
+    
+    // Continuous assignments for the EMPTY and FULL flags.
+    assign EMPTY = (SP == 4);
+    assign FULL  = (SP == 0);
+    
+    integer i;
+    
+    // Synchronous operations: reset, push, and pop.
+    // Operations occur only when EN is high on the rising edge of the clock.
+    always @(posedge Clk) begin
+        if (Rst) begin
+            // Reset the buffer:
+            // Set the stack pointer to 4 (empty state)
+            SP <= 4;
+            // Clear the data output
+            dataOut <= 4'b0000;
+            // Clear each entry in the stack memory
+            for (i = 0; i < 4; i = i + 1)
+                stack_mem[i] <= 4'b0000;
+        end else if (EN) begin
+            // Write operation (push) when RW is 0 and buffer is not full
+            if (RW == 1'b0) begin
+                if (SP != 0) begin
+                    // Decrement the stack pointer and store the new data
+                    SP <= SP - 1;
+                    stack_mem[SP - 1] <= dataIn;
+                end
+                // If SP is 0, the buffer is full; no operation is done.
+            end 
+            // Read operation (pop) when RW is 1 and buffer is not empty
+            else begin
+                if (SP != 4) begin
+                    // Read the data at the current stack pointer location
+                    dataOut <= stack_mem[SP];
+                    // Clear the pop location in memory
+                    stack_mem[SP] <= 4'b0000;
+                    // Increment the stack pointer to reflect the pop operation
+                    SP <= SP + 1;
+                end
+                // If SP is 4, the buffer is empty; no operation is done.
+            end
+        end
+    end
+
+endmodule

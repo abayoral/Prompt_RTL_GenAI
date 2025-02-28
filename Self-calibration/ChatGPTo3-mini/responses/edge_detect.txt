@@ -1,0 +1,47 @@
+Below is the updated Verilog module with a minor improvement. Although your original code was mostly correct, one common pitfall is the initialization of the stored signal (a_prev) during reset. If a is high when the reset deasserts, initializing a_prev to 0 would cause a spurious rising‐edge pulse immediately after reset. In many systems, you want the edge‐detector to be inactive until a proper change happens; you can achieve that by setting a_prev to the current value of a during reset.
+
+Below is the corrected version following best practices:
+
+----------------------------------------------------
+module edge_detect (
+    input clk,         // Clock signal
+    input rst_n,       // Active low reset
+    input a,           // 1-bit input signal to monitor edges
+    output reg rise,   // Pulses high for one clock cycle on rising edge of 'a'
+    output reg down    // Pulses high for one clock cycle on falling edge of 'a'
+);
+
+    // Register to store previous state of signal a
+    reg a_prev;
+
+    // Edge detection process: asynchronous reset, synchronous operation
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // On reset, initialize a_prev to the current value of 'a' to avoid spurious pulses.
+            a_prev <= a;
+            rise   <= 1'b0;
+            down   <= 1'b0;
+        end else begin
+            // Generate a one-clock pulse for a rising edge: current a is 1 and previous was 0.
+            rise <= a & ~a_prev;
+            
+            // Generate a one-clock pulse for a falling edge: current a is 0 and previous was 1.
+            down <= ~a & a_prev;
+            
+            // Update the previous state with the current value of a.
+            a_prev <= a;
+        end
+    end
+
+endmodule
+----------------------------------------------------
+
+Key Corrections and Best Practices:
+
+1. Reset Initialization: Instead of forcing a_prev to 0 on reset, it is now initialized to a. This prevents an immediate rising edge detection when the system comes out of reset if a is initially high.
+
+2. Combinational Expressions: The assignments for rise and down have been written in a combinational style (using a & ~a_prev and ~a & a_prev) to clearly express the detection logic.
+
+3. Nonblocking Assignments: Nonblocking (<=) assignments are used throughout in the sequential always block, ensuring that all values update correctly at the end of the clock cycle.
+
+This corrected module now adheres to good design practices and should function as intended for edge-detection in your design.

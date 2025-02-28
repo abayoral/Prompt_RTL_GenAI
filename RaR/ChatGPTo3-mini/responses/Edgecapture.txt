@@ -1,0 +1,34 @@
+module top_module (
+    input clk,
+    input reset,
+    input [31:0] in,
+    output reg [31:0] out
+);
+
+    // This register holds the previous cycle's value of 'in'
+    reg [31:0] prev_in;
+    // This register holds the "set" signals scheduled to be applied in the next cycle
+    reg [31:0] set_pending;
+    
+    always @(posedge clk) begin
+        if (reset) begin
+            // Synchronous reset: clear output and scheduled set events.
+            out         <= 32'b0;
+            set_pending <= 32'b0;
+            prev_in     <= in;  // update the previous input value even on reset.
+        end else begin
+            // First, update 'out' with any pending set events,
+            // ensuring that once a bit is set, it remains set until reset.
+            out <= out | set_pending;
+            
+            // Detect one-to-zero transitions on each bit.
+            // For each bit i, if the previous input was 1 and current input is 0,
+            // then schedule that bit to be set in the next cycle.
+            set_pending <= prev_in & ~in;
+            
+            // Update the previous input with the current input for the next cycle's comparison.
+            prev_in <= in;
+        end
+    end
+
+endmodule

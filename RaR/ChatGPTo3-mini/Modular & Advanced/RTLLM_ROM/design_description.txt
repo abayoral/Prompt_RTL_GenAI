@@ -1,0 +1,30 @@
+Imagine you have been assigned the role of a seasoned Verilog hardware designer. Your task is to implement a Read-Only Memory (ROM) module—an essential memory component used frequently in digital systems to store fixed data that remains unchanged during program execution. This module, called "ROM," is responsible for serving predetermined data based on an 8-bit address input, ensuring that the proper memory content is delivered through a 16-bit output.
+
+Below are the detailed specifications you must adhere to while designing the module:
+
+• Module Name: ROM  
+  The module should be defined with the identifier "ROM", which encapsulates all functionality related to this read-only memory.
+
+• Input Port: addr [7:0]  
+  This is an 8-bit input that represents the address line. With a valid address range from 0 to 255, you will use this signal to select one of the 256 possible data locations present in the ROM.
+
+• Output Port: dout [15:0]  
+  The module should have a 16-bit output named dout, which will reflect the data stored in the memory location that corresponds to the provided 8-bit address. The output must accurately represent the stored value in the selected memory slot.
+
+• Memory Array Specification:  
+  A memory structure, represented as reg [15:0] mem [0:255], is required. This array consists of 256 individual registers, each capable of holding 16 bits of data. It defines the storage backend for the ROM where each address corresponds to one of these 16-bit data registers.
+
+• Initial Block for Data Initialization:  
+  You must include an initial block in your Verilog code that loads fixed data into the ROM at the beginning of the simulation. For demonstration purposes, initialize memory locations 0, 1, 2, and 3 with the values 16'hA0A0, 16'hB1B1, 16'hC2C2, and 16'hD3D3, respectively. Note that you have the flexibility to modify or extend this initialization to include additional values as required by your design.
+
+• Operational Behavior:  
+  Incorporate an always block designated by always @(*) to ensure that any change in the address input (addr) is immediately reflected at the output (dout). Since this is a ROM, the design must only support read operations. No provision for writing or modifying the stored data during operation is allowed; the memory should remain constant once initialized.
+
+Task Outline:
+Your assignment is to write a complete Verilog code implementation for the ROM module based on the above specifications. Ensure that:
+  - The module accurately translates the 8-bit address into the corresponding 16-bit data output.
+  - The memory array is correctly initialized during simulation startup.
+  - The module complies with the architecture that supports only reading operations (read-only functionality).
+  - All signals, arrays, and operational blocks are defined and implemented according to the guidelines provided.
+
+Please provide a detailed Verilog code implementation that meets all of these criteria, while refraining from supplying any solutions, answers, or additional explanations regarding internal working or simulation results. This task is aimed solely at verifying your understanding of module definition, signal interfacing, and data retrieval techniques in Verilog.

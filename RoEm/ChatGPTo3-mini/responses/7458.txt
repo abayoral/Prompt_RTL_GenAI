@@ -1,0 +1,39 @@
+module top_module ( 
+    input  p1a, p1b, p1c, p1d, p1e, p1f,
+    output p1y,
+    input  p2a, p2b, p2c, p2d,
+    output p2y );
+
+    // Version 1: Using intermediate wires.
+    // Assume the 7458 implements:
+    //   p1y = (p1a AND p1b AND p1c) OR (p1d AND p1e AND p1f)
+    //   p2y = (p2a AND p2b)       OR (p2c AND p2d)
+    // (For the p2 portion, since our chip’s AND gates are 3‐input, we can tie the unused input to logic 1.)
+    
+    wire and1, and2, and3, and4;
+    
+    // First OR gate (for p1y) is the OR of two 3‐input AND gates.
+    assign and1 = p1a & p1b & p1c;
+    assign and2 = p1d & p1e & p1f;
+    assign p1y  = and1 | and2;
+    
+    // Second OR gate (for p2y) is the OR of two AND gates.
+    // For a 3-input AND gate, we tie the third input to 1.
+    assign and3 = p2a & p2b & 1'b1;  // equivalent to p2a & p2b
+    assign and4 = p2c & p2d & 1'b1;  // equivalent to p2c & p2d
+    assign p2y  = and3 | and4;
+    
+    
+    // -------------------------------------------------------------------------
+    // Version 2: A more concise solution using direct assign statements.
+    // Uncomment the following lines and comment out Version 1 above if you prefer.
+    //
+    // assign p1y = (p1a & p1b & p1c) | (p1d & p1e & p1f);
+    // assign p2y = (p2a & p2b)       | (p2c & p2d);
+    //
+    // Note: For the p2 signals, if you wish to explicitly model a 3-input AND gate,
+    // you could write:
+    // assign p2y = ((p2a & p2b & 1'b1) | (p2c & p2d & 1'b1));
+    // -------------------------------------------------------------------------
+
+endmodule

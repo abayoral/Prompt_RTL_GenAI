@@ -1,0 +1,45 @@
+```verilog
+module full_adder (
+    input a, b, cin,
+    output sum, cout
+);
+    assign sum = a ^ b ^ cin;
+    assign cout = (a & b) | (cin & (a ^ b));
+endmodule
+
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output [99:0] cout,
+    output [99:0] sum );
+
+    wire [99:0] c; // Carry outputs of full adders
+    
+    // Instantiate 100 full adders
+    genvar i;
+    generate
+        for (i = 0; i < 100; i = i + 1) begin : full_adder_instantiation
+            if (i == 0) begin
+                full_adder fa (
+                    .a(a[i]),
+                    .b(b[i]),
+                    .cin(cin),
+                    .sum(sum[i]),
+                    .cout(c[i])
+                );
+            end else begin
+                full_adder fa (
+                    .a(a[i]),
+                    .b(b[i]),
+                    .cin(c[i-1]),
+                    .sum(sum[i]),
+                    .cout(c[i])
+                );
+            end
+        end
+    endgenerate
+
+    assign cout = c; // Final carry outputs
+
+endmodule
+```

@@ -1,0 +1,26 @@
+```verilog
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
+module top_module(
+    input clk,
+    input a,
+    input b,
+    output wire out_assign,
+    output reg out_always_comb,
+    output reg out_always_ff   );
+
+    // XORed outputs
+    assign out_assign = a ^ b; // XOR using an assign statement
+
+    // XOR using a combinational always block
+    always @* begin
+        out_always_comb = a ^ b; // XOR in a combinational always block
+    end
+
+    // XOR using a clocked always block
+    always @(posedge clk) begin
+        out_always_ff <= a ^ b; // XOR in a clocked always block
+    end
+
+endmodule
+```

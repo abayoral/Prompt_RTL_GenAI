@@ -1,0 +1,20 @@
+```
+module top_module(
+    input in,
+    input [3:0] state,
+    output [3:0] next_state,
+    output out);
+
+    parameter A=0, B=1, C=2, D=3;
+
+    // State transition logic: Derive an equation for each state flip-flop.
+    assign next_state[A] = state[A] & ~in; // Remain in A if in=0
+    assign next_state[B] = (state[A] & in) | (state[B] & ~in); // Go to B if in=1 from A or remain in B if in=0
+    assign next_state[C] = (state[B] & in) | (state[C] & ~in); // Go to C if in=1 from B or remain in C if in=0
+    assign next_state[D] = (state[C] & in) | (state[D] & ~in); // Go to D if in=1 from C or remain in D if in=0
+
+    // Output logic: 
+    assign out = state[D]; // Output is 1 only when in state D
+
+endmodule
+```

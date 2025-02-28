@@ -1,0 +1,13 @@
+As a senior Digital Design Engineer at a prominent hardware design company, you have been assigned a crucial task to create a Verilog module that is essential for the upcoming generation of a product. The functionality and performance of this module are vital for upholding the company's reputation within the highly competitive computer hardware industry. 
+
+Your specific assignment is to design a 32-bit global history shift register that is capable of managing historical data effectively, particularly with respect to the processor's branch prediction mechanisms. One of the key requirements for this module is to ensure that it can roll back its state in the event of a pipeline flush, which would typically occur due to a branch misprediction. 
+
+In detail, when a branch prediction is made, indicated by the signal `predict_valid` being set to 1, the module must shift in the value of `predict_taken` starting from the least significant bit (LSB) side to update the branch history register. This means that the newest piece of branch direction information (which is represented by `predict_history[0]`) will always reflect the most recent prediction made.
+
+Conversely, in the instance of a branch misprediction, identified by `train_mispredicted` being set to 1, the design requires that the shift register loads its contents with the appropriate branch history. Specifically, this involves storing the branch history at the time of the misprediction, which is denoted as `train_history`, and appending the actual result of the branch, represented by `train_taken`. 
+
+An important stipulation is that if a prediction and misprediction signal occur simultaneously, the design must prioritize the misprediction. This is based on the assumption that during a pipeline flush, the currently ongoing prediction will be discarded, necessitating a clear state of the shift register.
+
+Your task now is to ascertain how to structure this Verilog module effectively. It should include proper inputs and outputs, ensuring that the design captures all these requirements accurately. Among the various components, `predict_history` will reflect the current state of the branch history register while ensuring that the module can initialize or reset via the `areset` signal, which is an asynchronous reset that sets the history counter back to zero.
+
+With all these considerations in mind, how can this be accomplished in the provided Verilog module framework, ensuring both functionality and adherence to the design specifications?

@@ -1,0 +1,35 @@
+module freq_diveven #(parameter NUM_DIV = 10) (
+    input clk,
+    input rst_n,
+    output reg clk_div
+);
+
+    // The counter is a 4-bit register.
+    reg [3:0] cnt;
+
+    // Ensure NUM_DIV is an even number.
+    initial begin
+        if (NUM_DIV % 2)
+            $display("Error: NUM_DIV must be an even number.");
+    end
+
+    // The divider works by toggling the clock output every (NUM_DIV/2) clock cycles.
+    // For example, if NUM_DIV is 10, then clk_div will toggle every 5 cycles,
+    // resulting in an effective division factor of 10 (i.e. a period of 10 cycles).
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt     <= 4'd0;
+            clk_div <= 1'b0;
+        end else begin
+            // When the counter is less than half of NUM_DIV - 1, simply increment.
+            if (cnt < (NUM_DIV/2 - 1))
+                cnt <= cnt + 4'd1;
+            else begin
+                // When counter reaches (NUM_DIV/2 - 1), reset counter and toggle clk_div.
+                cnt     <= 4'd0;
+                clk_div <= ~clk_div;
+            end
+        end
+    end
+
+endmodule

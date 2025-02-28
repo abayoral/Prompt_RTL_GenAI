@@ -1,0 +1,79 @@
+module freq_divbyfrac(
+    input  wire clk,     // Main clock input
+    input  wire rst_n,   // Active low reset
+    output wire clk_div  // Fractionally divided output clock
+);
+
+  // -----------------------------------------------------------------------
+  // In this design we implement a fractional division of 3.5 by
+  // counting a total of 7 source clock cycles (MUL2_DIV_CLK = 7).
+  // By using double-edge clocking we generate two intermediate clocks:
+  //   • One updated from the positive‐edge of clk, with a “high” period 
+  //     spanning 4 clock cycles (counts 0–3) followed by low for 3 cycles.
+  //   • One updated from the negative‐edge of clk, with a “high” period 
+  //     spanning 3 clock cycles (counts 0–2) followed by low for 4 cycles.
+  //
+  // These two signals are phase adjusted (one is effectively advanced,
+  // the other delayed by half a clock period) so that when OR’ed together
+  // the resulting output, clk_div, exhibits an overall period of 3.5 × Tclk
+  // with improved duty cycle uniformity.
+  // -----------------------------------------------------------------------
+
+  // Internal registers for counting and intermediate clock generation.
+  reg [2:0] count_pos;
+  reg       clk_div_pos;
+  
+  reg [2:0] count_neg;
+  reg       clk_div_neg;
+  
+  // Positive-edge triggered block:
+  //  - Counts from 0 to 6 (a total of 7 cycles) using the main clock.
+  //  - Generates clk_div_pos, which is high for the first 4 counts (0-3)
+  //    and low for the remaining counts (4-6).
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      count_pos    <= 3'd0;
+      clk_div_pos  <= 1'b0;
+    end else begin
+      if (count_pos == 3'd6)
+        count_pos <= 3'd0;
+      else
+        count_pos <= count_pos + 3'd1;
+      
+      // For this branch, high for 4 cycles then low
+      if (count_pos < 3'd4)
+        clk_div_pos <= 1'b1;
+      else
+        clk_div_pos <= 1'b0;
+    end
+  end
+  
+  // Negative-edge triggered block:
+  //  - Similarly, counts from 0 to 6 on the falling edge of clk.
+  //  - Generates clk_div_neg, which is high for the first 3 counts (0-2)
+  //    and low for the remaining 4 counts (3-6). This inherently
+  //    creates an approximate half-cycle phase shift relative to clk_div_pos.
+  always @(negedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      count_neg    <= 3'd0;
+      clk_div_neg  <= 1'b0;
+    end else begin
+      if (count_neg == 3'd6)
+        count_neg <= 3'd0;
+      else
+        count_neg <= count_neg + 3'd1;
+      
+      // For this branch, high for 3 cycles then low
+      if (count_neg < 3'd3)
+        clk_div_neg <= 1'b1;
+      else
+        clk_div_neg <= 1'b0;
+    end
+  end
+  
+  // Combine the two phase-shifted intermediate clock signals using OR.
+  // This ensures that the final divided clock clk_div has a frequency that
+  // is the input frequency divided by 3.5 while minimizing duty-cycle imbalance.
+  assign clk_div = clk_div_pos | clk_div_neg;
+
+endmodule

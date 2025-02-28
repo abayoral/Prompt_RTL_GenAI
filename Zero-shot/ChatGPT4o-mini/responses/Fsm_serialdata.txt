@@ -1,0 +1,84 @@
+```
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg [7:0] out_byte,
+    output reg done
+);
+    
+    // State encoding
+    typedef enum reg [1:0] {
+        IDLE,       // State 0: Waiting for start bit
+        RECEIVE,    // State 1: Receiving bits
+        STOP        // State 2: Checking stop bit
+    } state_t;
+
+    state_t current_state, next_state;
+    reg [2:0] bit_count;               // Count bits received
+    reg [7:0] shift_reg;               // Shift register to hold received byte
+
+    // FSM: State transitions
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+            bit_count <= 3'b000;
+            out_byte <= 8'b0;
+            done <= 1'b0;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+
+    // Next state logic
+    always_comb begin
+        case (current_state)
+            IDLE: begin
+                if (in == 1'b0) begin             // Start bit detected
+                    next_state = RECEIVE;
+                    bit_count = 3'b000;
+                    done = 1'b0;
+                end else begin
+                    next_state = IDLE;
+                end
+            end
+
+            RECEIVE: begin
+                if (bit_count == 3'b111) begin    // 8 bits received
+                    next_state = STOP;
+                end else begin
+                    next_state = RECEIVE;
+                end
+            end
+            
+            STOP: begin
+                if (in == 1'b1) begin              // Stop bit
+                    out_byte = shift_reg;          // Latch the received byte
+                    done = 1'b1;                   // Indicate done
+                    next_state = IDLE;
+                end else begin
+                    next_state = IDLE;             // If stop bit not received, go back to IDLE
+                end
+            end
+
+            default: begin
+                next_state = IDLE;
+            end
+        endcase
+    end
+
+    // Data path: Shift register to capture incoming bits
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            shift_reg <= 8'b0;
+            bit_count <= 3'b0;
+        end else begin
+            if (current_state == RECEIVE) begin
+                shift_reg <= {in, shift_reg[7:1]}; // Shift in the new bit
+                bit_count <= bit_count + 3'b001;   // Increment count
+            end
+        end
+    end
+
+endmodule
+```

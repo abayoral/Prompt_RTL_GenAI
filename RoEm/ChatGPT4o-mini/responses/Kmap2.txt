@@ -1,0 +1,20 @@
+```
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+); 
+    wire n_a, n_b, n_c, n_d;
+    
+    assign n_a = ~a;
+    assign n_b = ~b;
+    assign n_c = ~c;
+    assign n_d = ~d;
+    
+    assign out = (n_a & n_b & n_c & n_d) | (n_a & n_b & c & n_d) | (n_a & b & n_c & n_d) | (n_a & b & c) |
+                 (a & n_b & n_c) | (a & n_b & d) | (a & b & c);
+    
+endmodule
+```

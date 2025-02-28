@@ -1,0 +1,14 @@
+module top_module (
+    input a, b, c, d, e,
+    output [24:0] out
+);
+
+    // We form two 25‐bit vectors.
+    // The left vector concatenates five copies of the complement of each input:
+    //   {5{~a}}, {5{~b}}, {5{~c}}, {5{~d}}, {5{~e}}
+    // The right vector concatenates five copies of the 5‐bit vector {a, b, c, d, e}
+    // so that each bit of the result is computed as ~X ^ Y which equals 1 when X==Y.
+    assign out = { {5{~a}}, {5{~b}}, {5{~c}}, {5{~d}}, {5{~e}} } 
+              ^ { 5{ {a, b, c, d, e} } };
+
+endmodule

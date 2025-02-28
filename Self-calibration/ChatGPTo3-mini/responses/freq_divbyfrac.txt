@@ -1,0 +1,109 @@
+Below is one acceptable “fixed‐and‐improved” solution. In our review we observed that the original code, although “works” in simulation, has two design issues:
+
+1. It uses two separate always blocks that are clocked on opposite edges (one on posedge and one on negedge) yet share a counter that is updated only on posedge. Combining two clock domains via an asynchronous OR can lead to glitches and is generally discouraged in synthesis. (Clock “creep” and metastability may occur when combinational logic “melds” two unsynchronized domains.)
+
+2. The “fractional” division is obtained by toggling one flip–flop after 4 cycles (on the rising edge) and a second after 3 cycles (on the falling edge) and then OR–ing the two results. Although the average toggle period is 3.5 input clock cycles, the output clock is not generated safely from two clock domains.
+
+A recommended “fix” is to move to a single–clock (synchronous) design. One common technique for fractional division is to use a phase accumulator (a simple numerically controlled oscillator) so that the output toggles at a fractional rate on one clock edge. For example, if we want an output whose frequency is fCLK/3.5 (i.e. about 0.2857·fCLK), one can “accumulate” a constant on every rising edge and use a MSB (or another bit) as the output. (The chosen constant sets the effective division ratio.) 
+
+Below are two corrected versions. (A) is a “minimal‐change” version that fixes the race hazards by “registering” the combined output (although note that using both edges is still not best practice – many synthesis tools discourage dual–edge clocks). Version (B) shows a much cleaner, single–clock, phase–accumulator solution.
+
+─────────────────────────────  
+Version (A): Minimal Changes (with Warning)
+─────────────────────────────  
+// NOTE: This version preserves the original idea but “synchronizes” the final output.
+// Although functionally similar to the original, using dual–edge processes (posedge and
+// negedge) and then OR-ing their asynchronous outputs is not good practice. Use with caution.
+module freq_divbyfrac(
+  input  clk,    // main clock input
+  input  rst_n,  // active low reset
+  output clk_div // divided clock output (approximately fCLK/3.5)
+);
+  localparam TOTAL_CYCLES = 7; // counter counts 0 to 6
+  
+  // 3-bit counter: counts input clk cycles (updated on posedge clk).
+  reg [2:0] counter;
+  always @(posedge clk or negedge rst_n)
+    if (!rst_n)
+      counter <= 3'd0;
+    else if (counter == (TOTAL_CYCLES - 1))
+      counter <= 3'd0;
+    else
+      counter <= counter + 3'd1;
+  
+  // clk_div_r toggles on posedge clk when counter reaches 3.
+  reg clk_div_r;
+  always @(posedge clk or negedge rst_n)
+    if (!rst_n)
+      clk_div_r <= 1'b0;
+    else if (counter == 3'd3)
+      clk_div_r <= ~clk_div_r;
+      
+  // clk_div_f toggles on negedge clk when counter reaches 6.
+  reg clk_div_f;
+  always @(negedge clk or negedge rst_n)
+    if (!rst_n)
+      clk_div_f <= 1'b0;
+    else if (counter == 3'd6)
+      clk_div_f <= ~clk_div_f;
+      
+  // Combine the two phase-shifted clocks. (Then register the result on posedge clk.)
+  // This extra register helps “synchronize” the logically OR’ed result.
+  reg clk_div_raw;
+  always @(posedge clk or negedge rst_n)
+    if (!rst_n)
+      clk_div_raw <= 1'b0;
+    else
+      clk_div_raw <= clk_div_r | clk_div_f;
+      
+  // Drive the output.
+  assign clk_div = clk_div_raw;
+  
+endmodule
+
+─────────────────────────────  
+Version (B): Recommended Single–Clock (Phase Accumulator) Approach
+─────────────────────────────  
+// In this version a phase accumulator (a fixed–point counter) is used to divide the
+// input clock frequency by a fractional factor. Using a single always block (with posedge clk)
+// avoids mixing rising/falling edge logic and yields a glitch–free result.
+// The constant (INCR) is chosen so that the output toggles with an average period of 3.5 cycles.
+// (Using an 8-bit accumulator, INCR/256 should equal approximately 1/3.5 = 0.2857.)
+module freq_divbyfrac(
+  input  clk,    // main clock input
+  input  rst_n,  // active low reset
+  output reg clk_div  // divided clock output (approximately fCLK/3.5)
+);
+
+  // Use an 8‐bit phase accumulator.
+  reg [7:0] phase_acc;
+  // The increment value: choose INCR = 73 so that 73/256 ≈ 0.2857.
+  localparam [7:0] INCR = 8'd73;
+  
+  // On every rising edge, update the phase accumulator and set clk_div equal
+  // to the MSB. (This technique is similar to using a numerically controlled oscillator.)
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      phase_acc <= 8'd0;
+      clk_div   <= 1'b0;
+    end
+    else begin
+      phase_acc <= phase_acc + INCR;
+      clk_div   <= phase_acc[7];
+    end
+  end
+  
+endmodule
+
+─────────────────────────────  
+Explanation:
+• In Version (A) we “fix” the original by adding a register on the output and clarifying comments;
+  however, note that using both posedge and negedge processes is not recommended.
+• In Version (B) the fractional–division is achieved with a single–clock design. The phase accumulator
+  adds a constant on each rising edge; when its MSB toggles, the output toggles. With INCR=73 the ratio
+  is about 73/256 ≈ 0.2857 so the output frequency is fCLK × 0.2857 ≈ fCLK/3.5.
+  
+The phase–accumulator method avoids mixing multiple clock edges and is preferred for safe,
+synthesizable fractional–clock division.
+
+Choose the version appropriate to your design constraints and target technology.

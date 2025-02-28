@@ -1,0 +1,71 @@
+```verilog
+module moore_fsm (
+    input wire clk,
+    input wire rst_n,
+    input wire input_signal,
+    output reg output_signal
+);
+
+    // State encoding
+    typedef enum logic [1:0] {
+        STATE_A = 2'b00,
+        STATE_B = 2'b01,
+        STATE_C = 2'b10,
+        STATE_D = 2'b11
+    } state_t;
+
+    state_t current_state, next_state;
+
+    // Asynchronous reset and state update
+    always_ff @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            current_state <= STATE_A; // Reset to state A
+        else
+            current_state <= next_state;
+    end
+
+    // Next state logic
+    always_comb begin
+        case (current_state)
+            STATE_A: begin
+                if (input_signal) 
+                    next_state = STATE_B;
+                else
+                    next_state = STATE_A;
+            end
+            STATE_B: begin
+                if (input_signal) 
+                    next_state = STATE_B;
+                else
+                    next_state = STATE_C;
+            end
+            STATE_C: begin
+                if (input_signal) 
+                    next_state = STATE_D;
+                else
+                    next_state = STATE_A;
+            end
+            STATE_D: begin
+                if (input_signal) 
+                    next_state = STATE_B;
+                else
+                    next_state = STATE_C;
+            end
+            default: 
+                next_state = STATE_A; // Default case to avoid latches
+        endcase
+    end
+
+    // Output logic
+    always_comb begin
+        case (current_state)
+            STATE_A: output_signal = 0;
+            STATE_B: output_signal = 0;
+            STATE_C: output_signal = 0;
+            STATE_D: output_signal = 1;
+            default: output_signal = 0; // Default case
+        endcase
+    end
+
+endmodule
+```

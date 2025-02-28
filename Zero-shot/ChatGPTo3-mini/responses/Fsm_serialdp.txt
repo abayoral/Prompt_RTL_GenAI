@@ -1,0 +1,122 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg [7:0] out_byte,
+    output reg done
+);
+
+    // State encoding
+    localparam IDLE   = 3'd0;
+    localparam START  = 3'd1;
+    localparam DATA   = 3'd2;
+    localparam PARITY = 3'd3;
+    localparam STOP   = 3'd4;
+    
+    reg [2:0] state, next_state;
+    reg [2:0] bit_count;  // to count 8 data bits
+     
+    // We use a separate signal to feed bits into the parity module.
+    // Only in the DATA and PARITY states do we want to count bits.
+    wire parity_bit;
+    assign parity_bit = ((state == DATA) || (state == PARITY)) ? in : 1'b0;
+    
+    // The parity module needs to be reset at the start of each frame.
+    wire parity_reset;
+    assign parity_reset = (state == START);
+
+    // Instantiate the given parity module
+    wire parity_odd;
+    parity parity_inst(
+        .clk(clk),
+        .reset(parity_reset),
+        .in(parity_bit),
+        .odd(parity_odd)
+    );
+    
+    // FSM: Sequential logic for state transitions and datapath
+    always @(posedge clk) begin
+        if (reset) begin
+            state     <= IDLE;
+            bit_count <= 0;
+            out_byte  <= 0;
+            done      <= 0;
+        end
+        else begin
+            case (state)
+                IDLE: begin
+                    done <= 0;
+                    // Wait for start bit (logic 0)
+                    if (in == 1'b0) begin
+                        state <= START;
+                    end
+                    else begin
+                        state <= IDLE;
+                    end
+                end
+                START: begin
+                    // In this state, assert parity_reset (via assigned parity_reset signal)
+                    // Do not sample start bit into data.
+                    bit_count <= 0;
+                    done <= 0;
+                    state <= DATA;
+                end
+                DATA: begin
+                    // Sample each of the 8 data bits, LSB first.
+                    // Store the incoming bit at position indicated by bit_count.
+                    out_byte[bit_count] <= in;
+                    done <= 0;
+                    if (bit_count == 3'd7) begin
+                        state <= PARITY;
+                    end
+                    else begin
+                        bit_count <= bit_count + 1;
+                        state <= DATA;
+                    end
+                end
+                PARITY: begin
+                    // Sample the parity bit. The parity module is already updated with it.
+                    // We don't store the parity bit anywhere, its effect is in parity_odd.
+                    done <= 0;
+                    state <= STOP;
+                end
+                STOP: begin
+                    // Wait for the stop bit.
+                    // If the incoming stop bit is correct (should be 1) then
+                    // check the parity: done is asserted (for one cycle) only if odd parity.
+                    if (in == 1'b1) begin
+                        if (parity_odd) begin
+                            done <= 1'b1;
+                        end
+                        else begin
+                            done <= 1'b0;
+                        end
+                        state <= IDLE;
+                    end
+                    else begin
+                        // If stop bit is 0, remain in STOP until we see a 1.
+                        done <= 0;
+                        state <= STOP;
+                    end
+                end
+                default: begin
+                    state <= IDLE;
+                    done  <= 0;
+                end
+            endcase
+        end
+    end
+
+endmodule
+
+// Provided parity-check module (do not modify)
+module parity (
+    input clk,
+    input reset,
+    input in,
+    output reg odd);
+
+    always @(posedge clk)
+        if (reset) odd <= 0;
+        else if (in) odd <= ~odd;
+endmodule

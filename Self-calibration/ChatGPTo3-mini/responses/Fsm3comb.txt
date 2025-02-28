@@ -1,0 +1,76 @@
+Below is an annotated version of your code with a few minor clean‐ups for clarity and best practices. Functionally the original code was correct; however, the revised version makes the following improvements:
+
+1. It uses default assignments at the beginning of the always block. This style prevents any accidental latch inference and clarifies that every branch assigns a value.
+
+2. It renames the input “state” to “current_state” (this is optional but can help readability, as “state” is also used for the FSM’s internal state).
+
+3. It consolidates the default “out” assignment where possible so that only the branch that changes the output value needs to override it.
+
+Below is a corrected version of the module:
+
+------------------------------------------------------------
+module top_module(
+    input        in,
+    input  [1:0] current_state,  // Renamed for clarity
+    output reg [1:0] next_state,
+    output reg       out
+);
+
+    // Define states
+    parameter A = 2'b00,
+              B = 2'b01,
+              C = 2'b10,
+              D = 2'b11;
+
+    always @(*) begin
+        // Default assignments to prevent latches
+        next_state = current_state;
+        out        = 1'b0;
+
+        case(current_state)
+            A: begin
+                if (in == 1'b0)
+                    next_state = A;
+                else
+                    next_state = B;
+            end
+
+            B: begin
+                if (in == 1'b0)
+                    next_state = C;
+                else
+                    next_state = B;
+            end
+
+            C: begin
+                if (in == 1'b0)
+                    next_state = A;
+                else
+                    next_state = D;
+            end
+
+            D: begin
+                // In state D, out is asserted
+                out = 1'b1;
+                if (in == 1'b0)
+                    next_state = C;
+                else
+                    next_state = B;
+            end
+
+            default: begin
+                next_state = A;
+                // out remains 1'b0 by default
+            end
+        endcase
+    end
+
+endmodule
+------------------------------------------------------------
+
+Explanation of Key Changes:
+• Default Assignments – By assigning default values for next_state and out at the start of the always block, we ensure that every possible branch of the case statement has defined outputs, eliminating any risk of latch inference.
+• Naming – Renaming the state input to current_state makes the role of that signal clear.
+• Consistency – The control flow remains the same as your original design, but having a default “out” and “next_state” avoids repetitious assignments.
+
+This version should be functionally equivalent to your original module while following improved Verilog coding practices.

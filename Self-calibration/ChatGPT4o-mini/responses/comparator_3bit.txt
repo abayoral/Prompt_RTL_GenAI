@@ -1,0 +1,40 @@
+The provided Verilog code for the 3-bit comparator has a logical error in the comparison operations used within the `always` block. Specifically, the comparison operations are valid but may not be the most efficient approach in synthesis for a comparator. 
+
+Moreover, as a best practice, it’s essential to ensure that outputs are straightforwardly assigned within the always block. Also, the logic should clearly convey that only one of the outputs should be high at a time. However, the current implementation does not capture that behavior efficiently.
+
+Below is the corrected and improved version of the Verilog code:
+
+```verilog
+module comparator_3bit (
+    input  [2:0] A,
+    input  [2:0] B,
+    output reg A_greater,
+    output reg A_equal,
+    output reg A_less
+);
+    
+    always @(*) begin
+        // Initialize outputs to 0
+        A_greater = 0;
+        A_equal = 0;
+        A_less = 0;
+
+        // Compare A and B, and set the appropriate outputs
+        if (A > B) begin
+            A_greater = 1;
+        end else if (A == B) begin
+            A_equal = 1;
+        end else begin
+            A_less = 1;
+        end
+    end
+
+endmodule
+```
+
+### Notes on the Corrections:
+1. **Logical Order**: The initial comparison and the subsequent else-if statements are logically fine. However, we improved the flow slightly by changing the final `else if (A < B)` to a concluding `else`, which conveys that if neither of the other conditions apply, `A` must be less than `B`. This makes the logic clearer and eliminates redundancy.
+2. **Output Initialization**: All the output registers are set to `0` at the beginning of the always block, which is important to ensure they are in a known state before deciding their values.
+3. **Sequential Logic**: The sensitivity list `@(*)` allows this block to be evaluated whenever any of the inputs change, ensuring the outputs reflect the latest comparison results.
+
+This module now properly serves its intended function of comparing two 3-bit values, ensuring that only one output is high at a time and maintaining clarity and efficiency in its operation.

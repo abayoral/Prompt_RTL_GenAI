@@ -1,0 +1,72 @@
+module top_module(
+    input clk,
+    input load,
+    input [255:0] data,
+    output reg [255:0] q
+);
+    // Declare the 16x16 grid as a 2D register array.
+    reg [15:0] board [0:15];
+    integer i, j;
+
+    // Sequential block to update board state every clock cycle.
+    always @(posedge clk) begin
+        if (load) begin
+            // Load initial state from the "data" vector.
+            // Row 0 is bits [15:0], row 1 is bits [31:16], etc.
+            for (i = 0; i < 16; i = i + 1) begin
+                board[i] <= data[i*16 +: 16];
+            end
+        end
+        else begin
+            // Temporary array to hold the next state.
+            reg [15:0] next_board [0:15];
+            integer r, c;
+            integer count;
+            // Compute next state for each cell (r, c)
+            for (r = 0; r < 16; r = r + 1) begin
+                for (c = 0; c < 16; c = c + 1) begin
+                    // Wrap-around indices for toroidal addressing.
+                    // r_prev is row above, r_next is row below.
+                    // c_prev is column to the left, c_next is column to the right.
+                    integer r_prev, r_next, c_prev, c_next;
+                    r_prev = (r == 0) ? 15 : r - 1;
+                    r_next = (r == 15) ? 0 : r + 1;
+                    c_prev = (c == 0) ? 15 : c - 1;
+                    c_next = (c == 15) ? 0 : c + 1;
+                    
+                    // Count the alive neighbours.
+                    count = board[r_prev][c_prev] + board[r_prev][c] + board[r_prev][c_next] +
+                            board[r][c_prev]                             + board[r][c_next] +
+                            board[r_next][c_prev] + board[r_next][c] + board[r_next][c_next];
+                    
+                    // Apply Conway's Game of Life rules:
+                    // 3 neighbours -> cell becomes alive.
+                    // 2 neighbours -> cell state remains the same.
+                    // Otherwise -> cell becomes dead.
+                    if (count == 3)
+                        next_board[r][c] = 1'b1;
+                    else if (count == 2)
+                        next_board[r][c] = board[r][c];
+                    else
+                        next_board[r][c] = 1'b0;
+                end
+            end
+
+            // Update the board state with the computed next state.
+            for (i = 0; i < 16; i = i + 1) begin
+                board[i] <= next_board[i];
+            end
+        end
+    end
+
+    // Continuous combinational block to flatten the 2D board to the 256-bit output vector.
+    integer k;
+    always @(*) begin
+        for (k = 0; k < 16; k = k + 1) begin
+            // Each row board[k] forms 16 bits.
+            // According to the specification, q[15:0] is row 0, q[31:16] is row 1, etc.
+            q[k*16 +: 16] = board[k];
+        end
+    end
+
+endmodule

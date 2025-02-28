@@ -1,0 +1,77 @@
+```
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg done
+); 
+
+    typedef enum reg [2:0] {
+        IDLE,
+        START_BIT,
+        DATA_BITS,
+        STOP_BIT,
+        ERROR
+    } state_t;
+
+    state_t current_state, next_state;
+    reg [3:0] bit_count;
+
+    always @(posedge clk) begin
+        if (reset) begin
+            current_state <= IDLE;
+            bit_count <= 0;
+            done <= 0;
+        end else begin
+            current_state <= next_state;
+
+            if (current_state == DATA_BITS) begin
+                bit_count <= bit_count + 1;
+            end else begin
+                bit_count <= 0;
+            end
+            
+            if (current_state == STOP_BIT) begin
+                done <= 1;
+            end else begin
+                done <= 0;
+            end
+        end
+    end
+
+    always @* begin
+        case (current_state)
+            IDLE: begin
+                if (in == 0) begin // Start bit detected
+                    next_state = START_BIT;
+                end else begin
+                    next_state = IDLE;
+                end
+            end
+
+            START_BIT: begin
+                next_state = (in == 0) ? DATA_BITS : ERROR; // Wait for data bits
+            end
+
+            DATA_BITS: begin
+                if (bit_count < 8) begin
+                    next_state = (in == 1) ? STOP_BIT : DATA_BITS; // Collect data bits
+                end else begin
+                    next_state = STOP_BIT; // Data bits collected, go to stop bit
+                end
+            end
+
+            STOP_BIT: begin
+                next_state = (in == 1) ? IDLE : ERROR; // Check stop bit
+            end
+
+            ERROR: begin
+                next_state = (in == 1) ? IDLE : ERROR; // Wait for a stop bit to reset
+            end
+
+            default: next_state = IDLE;
+        endcase
+    end
+
+endmodule
+```

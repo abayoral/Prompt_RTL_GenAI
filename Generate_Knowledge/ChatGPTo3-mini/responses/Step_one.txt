@@ -1,0 +1,4 @@
+module top_module( output one );
+    // The output "one" is permanently set to logic high
+    assign one = 1'b1;
+endmodule

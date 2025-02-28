@@ -1,0 +1,53 @@
+```
+module pulse_detect (
+    input wire clk,
+    input wire rst_n,
+    input wire data_in,
+    output reg data_out
+);
+
+    // State encoding
+    reg [1:0] state; // State: 00 - Idle, 01 - Detecting 1, 10 - Pulse Detected
+
+    // State definitions
+    localparam IDLE = 2'b00;
+    localparam DETECTING = 2'b01;
+    localparam PULSE_DETECTED = 2'b10;
+
+    // Sequential logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset state and output
+            state <= IDLE;
+            data_out <= 1'b0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    if (data_in == 1'b1) begin
+                        state <= DETECTING; // Transition to detecting state
+                    end
+                end
+
+                DETECTING: begin
+                    if (data_in == 1'b0) begin
+                        state <= PULSE_DETECTED; // Transition to pulse detected state
+                    end
+                end
+
+                PULSE_DETECTED: begin
+                    data_out <= 1'b1; // Signal pulse detected
+                    state <= IDLE; // Reset to idle state for new detection
+                end
+            endcase
+        end
+    end
+
+    // Set data_out to 0 after pulse detected
+    always @(posedge clk) begin
+        if (state == PULSE_DETECTED) begin
+            data_out <= 1'b0; // Clear output after one cycle
+        end
+    end
+
+endmodule
+```

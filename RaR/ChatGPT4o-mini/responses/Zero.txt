@@ -1,0 +1,12 @@
+```verilog
+module zero_generator (
+    output reg out
+);
+
+    // Always block to provide a constant zero output
+    always @(*) begin
+        out = 1'b0;
+    end
+
+endmodule
+```

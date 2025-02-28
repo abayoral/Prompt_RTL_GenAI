@@ -1,0 +1,41 @@
+```
+module fixed_point_subtractor #(
+    parameter Q = 16, // Number of fractional bits
+    parameter N = 32  // Total number of bits
+) (
+    input  [N-1:0] a, // First operand
+    input  [N-1:0] b, // Second operand
+    output [N-1:0] c  // Subtraction result
+);
+
+    reg [N-1:0] res; // Intermediate result
+
+    always @(*) begin
+        if (a[N-1] == b[N-1]) begin // Same sign scenario
+            res = a - b;
+        end else begin // Different sign scenario
+            if (a[N-1] == 0 && b[N-1] == 1) begin // a positive, b negative
+                res = a + (~b + 1); // a + |b|
+                if (res[N-1] == 1 && (a < (~b + 1))) // result is negative if |b| > a
+                    res[N-1] = 1; // Keep the negative sign
+                else
+                    res[N-1] = 0; // Postive result
+            end else if (a[N-1] == 1 && b[N-1] == 0) begin // a negative, b positive
+                res = (~a + 1) + b; // |a| + b
+                if (res[N-1] == 0 && ((~a + 1) < b)) // result is negative if |a| > b
+                    res[N-1] = 1; // Keep the negative sign
+                else
+                    res[N-1] = 0; // Postive result
+            end
+        end
+
+        // Clear the sign bit if result is zero
+        if (res == 0) begin
+            res[N-1] = 0; // Set sign bit to zero
+        end
+    end
+
+    assign c = res; // Output the result
+
+endmodule
+```

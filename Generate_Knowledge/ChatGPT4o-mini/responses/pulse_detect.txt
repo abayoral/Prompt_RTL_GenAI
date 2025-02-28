@@ -1,0 +1,63 @@
+```
+module pulse_detect (
+    input wire clk,
+    input wire rst_n,
+    input wire data_in,
+    output reg data_out
+);
+    
+    // State encoding
+    typedef enum reg [1:0] {
+        WAIT_FOR_RISING = 2'b00, // Initial state: waiting for rising edge
+        WAIT_FOR_FALLING = 2'b01, // Intermediate state: waiting for falling edge
+        PULSE_DETECTED = 2'b10    // Final state: pulse detected
+    } state_t;
+
+    state_t state, next_state;
+
+    // State transition and output logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= WAIT_FOR_RISING;
+            data_out <= 0;
+        end else begin
+            state <= next_state;
+            if (next_state == PULSE_DETECTED) begin
+                data_out <= 1; // Set output high when pulse is detected
+            end else begin
+                data_out <= 0; // Reset output otherwise
+            end
+        end
+    end
+
+    // Next state logic
+    always @(*) begin
+        case (state)
+            WAIT_FOR_RISING: begin
+                if (data_in == 1) begin
+                    next_state = WAIT_FOR_FALLING; // Transition to waiting for falling
+                end else begin
+                    next_state = WAIT_FOR_RISING; // Remain in the same state
+                end
+            end
+
+            WAIT_FOR_FALLING: begin
+                if (data_in == 0) begin
+                    next_state = PULSE_DETECTED; // Detect the pulse
+                end else begin
+                    next_state = WAIT_FOR_FALLING; // Remain in the same state
+                end
+            end
+
+            PULSE_DETECTED: begin
+                next_state = WAIT_FOR_RISING; // Prepare for new detection after pulse
+            end
+
+            default: begin
+                next_state = WAIT_FOR_RISING; // Fallback to initial state
+            end
+        endcase
+    end
+
+endmodule
+```

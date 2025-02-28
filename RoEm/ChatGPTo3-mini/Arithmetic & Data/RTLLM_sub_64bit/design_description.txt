@@ -1,0 +1,22 @@
+Contextualize yourself in the role of a seasoned Verilog designer tasked with developing a module that caters to specific high-precision arithmetic requirements. Your objective is to create a robust module designed to handle the subtraction of 64-bit signed integers while meticulously monitoring for any potential overflow incidents.
+
+Module Specification:
+- Title: `sub_64bit`
+
+Input Ports Description:
+- `A [63:0]`: This port functions as the first operand, taking in a 64-bit signed integer. It represents the value from which you will subtract the second operand.
+- `B [63:0]`: This port accepts the second operand, another 64-bit signed integer. This value is subtracted from the first operand, A, to determine the difference.
+
+Output Ports Requirements:
+- `result [63:0]`: Following the subtraction process, this port outputs the 64-bit resultant value. It reveals the difference between A and B post-subtraction.
+- `overflow`: A critical 1-bit flag precisely indicating the presence of an overflow during the subtraction process. This flag is crucial for ensuring calculations are accurate and reliable.
+
+Functional Implementation Details:
+- Subtraction Process: The core functionality revolves around calculating the result by simply performing the binary subtraction of inputs A and B. 
+- Overflow Detection Logic: The module's crucial role extends to determining the overflow, which transpires when the calculated result fails to fall within the signed 64-bit integer range post-subtraction. This involves:
+  - Positive Overflow: Occurs if a substantially large positive A is reduced by a significantly negative B, resulting in an anomalous negative difference.
+  - Negative Overflow: Occurs if a considerable negative A is reduced by a large positive B, leading to an unexpectedly positive outcome.
+
+The overflow output should be set to high (1) when any overflow condition is confirmed, ensuring that this discrepancy is indicated; otherwise, it should remain low (0).
+
+For your role, please provide expansive Verilog code that effectively enacts the aforementioned specifications, accurately executing both subtraction and subsequent overflow detection, while adhering to best practices in Verilog module design.

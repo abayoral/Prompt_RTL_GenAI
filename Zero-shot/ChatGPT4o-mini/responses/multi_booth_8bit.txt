@@ -1,0 +1,59 @@
+```
+module multi_booth_8bit (
+    input wire clk,
+    input wire reset,
+    input wire [7:0] a,
+    input wire [7:0] b,
+    output reg [15:0] p,
+    output reg rdy
+);
+    reg [15:0] multiplier;
+    reg [15:0] multiplicand;
+    reg [4:0] ctr;
+    reg [1:0] state;
+    reg [1:0] next_state;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            multiplier <= {{8{a[7]}}, a};  // Extend 'a' to 16 bits (signed)
+            multiplicand <= {{8{b[7]}}, b}; // Extend 'b' to 16 bits (signed)
+            p <= 16'b0;
+            rdy <= 0;
+            ctr <= 0;
+            state <= 2'b00; // Initial state
+        end else begin
+            state <= next_state;
+        end
+    end
+
+    always @(*) begin
+        next_state = state; // Default case
+        case (state)
+            2'b00: begin // Initial state
+                if (ctr < 16) begin
+                    // Booth's  algorithm checks and operations
+                    if (multiplier[1:0] == 2'b01) begin
+                        p <= p + multiplicand; // Addition operation
+                    end else if (multiplier[1:0] == 2'b10) begin
+                        p <= p - multiplicand; // Subtraction operation
+                    end
+                    if (ctr < 15) begin
+                        // Shift multiplicand left
+                        multiplicand <= multiplicand << 1;
+                        multiplier <= multiplier >> 1; // Shift right to examine next bit
+                    end
+                    ctr <= ctr + 1; // Increment counter
+                    next_state = 2'b00; // Stay in the same state
+                end else begin
+                    rdy <= 1; // Set ready signal
+                    next_state = 2'b01; // Transition to done state
+                end
+            end
+            2'b01: begin // Done state
+                // Remain in done state
+                next_state = 2'b01; 
+            end
+        endcase
+    end
+endmodule
+```

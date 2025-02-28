@@ -1,0 +1,43 @@
+```verilog
+module fixed_point_adder #(
+    parameter integer Q = 8,  // Number of fractional bits
+    parameter integer N = 16   // Total number of bits
+) (
+    input  wire [N-1:0] a,   // First input operand
+    input  wire [N-1:0] b,   // Second input operand
+    output reg  [N-1:0] c     // Output result
+);
+
+    reg [N-1:0] res;          // Internal register to hold results
+    wire [N-1:0] abs_a;       // Absolute value of a
+    wire [N-1:0] abs_b;       // Absolute value of b
+
+    assign abs_a = (a[N-1] == 1'b1) ? ~a + 1'b1 : a;  // Compute absolute value of a
+    assign abs_b = (b[N-1] == 1'b1) ? ~b + 1'b1 : b;  // Compute absolute value of b
+
+    always @(*) begin
+        if (a[N-1] == b[N-1]) begin
+            // Both have the same sign
+            res = a + b; // Perform absolute addition
+            c[N-1] = a[N-1]; // Result sign matches input sign
+        end else begin
+            // Different signs, need to do subtraction
+            if (abs_a > abs_b) begin
+                res = abs_a - abs_b; // a is greater in absolute value
+                c[N-1] = a[N-1]; // Result sign matches the sign of a
+            end else begin
+                res = abs_b - abs_a; // b is greater in absolute value
+                c[N-1] = b[N-1]; // Result sign matches the sign of b
+            end
+        end
+        
+        // Handle overflow: if the result is larger than can be represented in N bits
+        if (res[N-1] != c[N-1]) begin
+            c = (c[N-1] == 1'b1) ? {1'b1, {N-1{1'b0}}} : {1'b0, {N-1{1'b1}}}; // Clamp to extremes
+        end else begin
+            c = res; // Normal case
+        end
+    end
+
+endmodule
+```

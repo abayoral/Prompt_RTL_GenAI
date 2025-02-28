@@ -1,0 +1,22 @@
+Could you please assist as a seasoned Verilog designer by developing a module specifically intended for detecting pulses in a signal? The goal is to create a Verilog module named "pulse_detect" that is capable of identifying a specific pattern in a continuous 1-bit input signal, referred to as "data_in." This signal is synchronized with a clock signal "clk." The pulse is defined by a transition sequence of "data_in" that starts from 0, goes to 1, and then back to 0 over three clock cycles—which is what constitutes a complete "pulse."
+
+Essentially, your task as the designer is to build logic within this Verilog module that will produce an output signal named "data_out." This output should reflect the detection of the pulse by becoming 1 at the very end of the three-cycle sequence and then reverting back to 0, where it remains until a new pulse is detected.
+
+The module has the following specifications:
+- **Input Ports:**
+  - `clk`: A clock signal to synchronize operations.
+  - `rst_n`: An active-low reset signal to initialize or clear the detection logic.
+  - `data_in`: A 1-bit continuous input signal on which pulse detection is performed.
+  
+- **Output Port:**
+  - `data_out`: A signal that indicates when a pulse has been successfully detected by becoming 1.
+
+For implementation:
+1. Declare the module "pulse_detect" with the aforementioned input and output ports.
+2. Utilize a register variable to maintain the current state of the pulse detection process.
+3. Within an always block that is triggered by the rising edge (positive edge) of the "clk" signal and the falling edge (negative edge) of the active-low "rst_n" signal, construct the pulse detection logic.
+4. Under the reset condition, `~rst_n`, initialize all relevant state registers and set the "data_out" to 0, indicating that no pulse is currently detected.
+5. Design a state machine or equivalent logic to transition through different states, verifying the "data_in" input at each state.
+6. Upon identifying the complete cycle of a pulse, set "data_out" to 1 to signify the detection of a pulse, followed by a reversion to 0 to await potential subsequent pulses.
+
+Provide the comprehensive Verilog code that performs these tasks, ensuring clarity and adherence to the described logic and behaviour of the "pulse_detect" module.

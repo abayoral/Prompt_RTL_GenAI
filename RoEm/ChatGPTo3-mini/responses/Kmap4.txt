@@ -1,0 +1,19 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // The Karnaugh map provided simplifies to an odd‐parity function on the four inputs.
+    // In other words:
+    //     out = a ⊕ b ⊕ c ⊕ d
+    //
+    // Explanation:
+    // The K-map values indicate that out = 1 whenever an odd number of the variables are 1.
+    // This can be implemented directly using a chain of XOR gates.
+    
+    assign out = a ^ b ^ c ^ d;
+
+endmodule

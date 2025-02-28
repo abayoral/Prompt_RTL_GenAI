@@ -1,0 +1,49 @@
+The provided Verilog code has a couple of improvements and corrections that can be made for better practice and clarity, though it does function correctly for edge detection of the signal `a`. Here are several points to address:
+
+1. **Signal Initialization**: The `a_prev` should be initialized properly at reset, but in this case, it is done correctly. It will start at `0` on reset.
+
+2. **Output Handling**: It might be useful to "clear" the rise and down outputs after capturing the edge to avoid the output being high for multiple clock cycles.
+
+3. **Use of Non-Blocking Assignments**: Though it works with blocking assignments, it's better to use non-blocking assignments for sequential logic in the always block to avoid synthesizing latches and ensure proper simulation results.
+
+4. **Readability and Code Style**: Using `1'b0` and `1'b1` makes the code clearer, especially in terms of bit width and prevention of accidental logic inference.
+
+Here is the corrected and improved version of your Verilog module:
+
+```verilog
+module edge_detect (
+    input wire clk,
+    input wire rst_n,
+    input wire a,
+    output reg rise,
+    output reg down
+);
+
+reg a_prev;
+
+// Synchronous reset and edge detection logic
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        rise <= 1'b0;
+        down <= 1'b0;
+        a_prev <= 1'b0;
+    end else begin
+        // Detect rising edge
+        rise <= (a == 1'b1 && a_prev == 1'b0) ? 1'b1 : 1'b0;
+        // Detect falling edge
+        down <= (a == 1'b0 && a_prev == 1'b1) ? 1'b1 : 1'b0;
+        // Update previous state
+        a_prev <= a;
+    end
+end
+
+endmodule
+```
+
+### Key Changes:
+1. Added clarity with `1'b1` and `1'b0` for better understanding of the bit widths.
+2. It might also be common to set `rise` and `down` to `0` after they are read to prevent multiple clock cycles of outputs, but that would depend on the usage context of these signals. If meant to pulse (just one clock cycle high), we would need additional logic to ensure this.
+
+### Future Considerations:
+- If you need a one-clock-cycle pulse for `rise` and `down`, consider adding a separate always block or modify this block to pulse once per edge.
+- Make sure to thoroughly test the module under different scenarios for output verifying the edge captures.

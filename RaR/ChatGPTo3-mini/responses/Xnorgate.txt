@@ -1,0 +1,9 @@
+module xnor_gate(
+    input a,
+    input b,
+    output out
+);
+    // Implementing XNOR using bitwise XOR and inversion
+    assign out = ~(a ^ b);
+    
+endmodule

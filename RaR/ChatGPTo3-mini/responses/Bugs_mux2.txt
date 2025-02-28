@@ -1,0 +1,10 @@
+module top_module (
+    input sel,            // Selector signal to choose between the two inputs
+    input [7:0] a,        // 8-bit input 'a'
+    input [7:0] b,        // 8-bit input 'b'
+    output [7:0] out      // 8-bit output signal
+);
+
+    assign out = (~sel & a) | (sel & b);
+
+endmodule

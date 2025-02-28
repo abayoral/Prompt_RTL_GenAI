@@ -1,0 +1,45 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out  ); 
+
+    // The given Karnaugh Map is:
+    //  
+    //         a'b'   a'b    ab    ab'
+    // c'd'    d      0      1     1
+    // c'd     0      0      d     d
+    // cd      0      1      1     1
+    // cd'     0      1      1     1
+    //
+    // One way to approach this problem is to take advantage of the don't‐care 
+    // conditions (noted as “d”) and choose them to be 1 if it helps with grouping.
+    //
+    // For example, if we choose the dont care entries to be 1 then the map becomes:
+    //
+    //         a'b'   a'b   ab   ab'
+    // c'd'    1      0     1    1
+    // c'd     0      0     1    1
+    // cd      0      1     1    1
+    // cd'     0      1     1    1
+    //
+    // One grouping is:
+    //  • Group 1: The two cells in row c'd' (columns ab and ab') and the two cells in row c'd (columns ab and ab').
+    //    In these cells a=1 regardless of b. This gives the term "a".
+    //  • Group 2: In the lower two rows (cd and cd') the column with a'b (where b=1, a=0) and the column
+    //    with ab (where a=1, b=1) both have b=1 and c=1, giving the term "b & c". (You can form a larger group
+    //    with other adjacent cells that all have b=1 and c=1.)
+    //  • The remaining cell in row c'd' at column a'b' (which we set to 1) isn’t covered yet. Notice that
+    //    row c'd' has a 1 in both column a'b' and ab'. These two cells share b'=1 (since for a'b', b=0 and
+    //    for ab', b=0) and also c'=1, d'=1 (because row c'd' means c=0 and d=0). Thus the term "b' & c' & d'"
+    //    covers that grouping.
+    //
+    // So, one simplified sum-of-products form is:
+    //       F = a + (b & c) + ( ~b & ~c & ~d )
+    //
+    // This function is equivalent to the given Karnaugh map (after choosing the dont‐care cells as 1 where it helps).
+    
+    assign out = a | (b & c) | ((~b) & (~c) & (~d));
+
+endmodule

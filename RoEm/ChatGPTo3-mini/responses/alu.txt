@@ -1,0 +1,132 @@
+module alu(
+    input  [31:0] a,
+    input  [31:0] b,
+    input  [5:0]  aluc,
+    output reg [31:0] r,
+    output reg zero,
+    output reg carry,
+    output reg negative,
+    output reg overflow,
+    output reg flag
+);
+
+  // Combinational ALU operation block
+  always @(*) begin
+    // Default values for outputs
+    r        = 32'd0;
+    carry    = 1'b0;
+    overflow = 1'b0;
+    flag     = 1'b0;
+
+    case (aluc)
+      // Arithmetic Operations
+      6'b100000: begin // ADD (signed)
+        // Perform 33-bit addition to capture potential carry-out.
+        {carry, r} = {1'b0, a} + {1'b0, b};
+        // Overflow occurs if the sign bits of the operands are the same 
+        // but differ from the result's sign.
+        overflow = (a[31] == b[31]) && (r[31] != a[31]);
+      end
+
+      6'b100001: begin // ADDU (unsigned)
+        {carry, r} = {1'b0, a} + {1'b0, b};
+        overflow = 1'b0; // Overflow is not flagged in unsigned addition.
+      end
+
+      6'b100010: begin // SUB (signed)
+        // Subtraction using two's complement: a - b = a + (~b) + 1.
+        {carry, r} = {1'b0, a} + {1'b0, ~b} + 33'd1;
+        // Overflow for subtraction: if a and b have different signs and the result’s sign differs from a's sign.
+        overflow = ((a[31] != b[31]) && (r[31] != a[31]));
+      end
+
+      6'b100011: begin // SUBU (unsigned)
+        {carry, r} = {1'b0, a} + {1'b0, ~b} + 33'd1;
+        overflow = 1'b0;
+      end
+
+      // Logical Operations
+      6'b100100: begin // AND
+        r = a & b;
+      end
+
+      6'b100101: begin // OR
+        r = a | b;
+      end
+
+      6'b100110: begin // XOR
+        r = a ^ b;
+      end
+
+      6'b100111: begin // NOR
+        r = ~(a | b);
+      end
+
+      // Comparison Operations
+      6'b101010: begin // SLT (set on less-than, signed comparison)
+        if ($signed(a) < $signed(b)) begin
+          r    = 32'd1;
+          flag = 1'b1;
+        end else begin
+          r    = 32'd0;
+          flag = 1'b0;
+        end
+      end
+
+      6'b101011: begin // SLTU (set on less-than, unsigned comparison)
+        if (a < b) begin
+          r    = 32'd1;
+          flag = 1'b1;
+        end else begin
+          r    = 32'd0;
+          flag = 1'b0;
+        end
+      end
+
+      // Shift Operations
+      // For fixed shift instructions, we assume the shift amount is within b[4:0]
+      6'b000000: begin // SLL - shift left logical (fixed)
+        r = b << b[4:0];
+      end
+
+      6'b000010: begin // SRL - shift right logical (fixed)
+        r = b >> b[4:0];
+      end
+
+      6'b000011: begin // SRA - shift right arithmetic (fixed)
+        r = $signed(b) >>> b[4:0];
+      end
+
+      // For variable shift instructions, the shift amount is taken from a[4:0]
+      6'b000100: begin // SLLV - variable logical shift left
+        r = b << a[4:0];
+      end
+
+      6'b000110: begin // SRLV - variable logical shift right
+        r = b >> a[4:0];
+      end
+
+      6'b000111: begin // SRAV - variable arithmetic shift right
+        r = $signed(b) >>> a[4:0];
+      end
+
+      // Load Upper Immediate
+      6'b001111: begin // LUI - load upper immediate; use b[15:0] as immediate.
+        r = {b[15:0], 16'b0};
+      end
+
+      // Handle undefined operations by setting outputs to high impedance.
+      default: begin
+        r        = 32'bz;
+        carry    = 1'bz;
+        overflow = 1'bz;
+        flag     = 1'bz;
+      end
+    endcase
+
+    // Update status signals based on the computed result.
+    zero     = (r == 32'd0);
+    negative = r[31];
+  end
+
+endmodule

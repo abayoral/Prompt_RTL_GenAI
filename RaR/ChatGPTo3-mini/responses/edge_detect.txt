@@ -1,0 +1,29 @@
+module edge_detect(
+    input clk,
+    input rst_n,
+    input a,
+    output reg rise,
+    output reg down
+);
+
+    reg prev;
+
+    // Synchronous process with asynchronous active-low reset.
+    // On each rising edge of clk, we detect a rising edge (0->1) or a falling edge (1->0) on signal "a".
+    // The outputs "rise" and "down" are asserted for one clock cycle each when the corresponding edge is detected.
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            prev  <= 1'b0;
+            rise  <= 1'b0;
+            down  <= 1'b0;
+        end else begin
+            // Detect a rising edge: previous state was 0 and current state is 1.
+            rise <= (~prev) & a;
+            // Detect a falling edge: previous state was 1 and current state is 0.
+            down <= prev & (~a);
+            // Update the previous state for next cycle.
+            prev <= a;
+        end
+    end
+
+endmodule

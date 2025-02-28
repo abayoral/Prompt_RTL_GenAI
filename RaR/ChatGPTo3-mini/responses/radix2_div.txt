@@ -1,0 +1,173 @@
+module radix2_div (
+    input             clk,
+    input             rst,
+    input             sign,       // 1: signed division; 0: unsigned
+    input      [7:0]  dividend,
+    input      [7:0]  divisor,
+    input             opn_valid,
+    output reg        res_valid,
+    output reg [15:0] result      // [15:8]: remainder, [7:0]: quotient
+);
+
+  // State encoding
+  localparam IDLE = 2'd0,
+             INIT = 2'd1,
+             CALC = 2'd2,
+             DONE = 2'd3;
+
+  reg [1:0] state, next_state;
+
+  // Internal registers
+  reg        dividend_neg, divisor_neg; // sign bits for signed op.
+  reg [7:0]  dividend_abs, divisor_abs; // absolute values of operands
+  reg [7:0]  neg_divisor;               // two's complement of divisor_abs
+
+  // Shift register (accumulator) for division.
+  // It holds the remainder in its high 8 bits and builds the quotient in its low 8 bits.
+  reg [15:0] SR;
+
+  // Counter for iterations (from 0 to 8)
+  reg [3:0] cnt;
+  
+  // Temporary variable for subtraction result
+  reg [7:0] diff;
+
+  // Registers to hold final (possibly sign‐corrected) results,
+  // computed in the DONE state.
+  reg [7:0] quotient_abs;
+  reg [7:0] remainder_abs;
+  reg [7:0] final_quotient;
+  reg [7:0] final_remainder;
+
+  // Synchronous State Machine
+  always @(posedge clk or posedge rst) begin
+    if (rst) begin
+      state         <= IDLE;
+      res_valid     <= 1'b0;
+      result        <= 16'd0;
+      SR            <= 16'd0;
+      cnt           <= 4'd0;
+    end else begin
+      state <= next_state;
+      case (state)
+        // In IDLE, wait for valid operands.
+        IDLE: begin
+          res_valid <= 1'b0;
+          if (opn_valid) begin
+            // Transition to initialization on opn_valid.
+            // (The next_state logic will move to INIT.)
+          end
+        end
+
+        // INIT: capture inputs and initialize registers.
+        INIT: begin
+          // For signed division, compute absolute values.
+          if (sign) begin
+            dividend_neg <= dividend[7];
+            divisor_neg  <= divisor[7];
+            dividend_abs <= (dividend[7]) ? (~dividend + 8'd1) : dividend;
+            divisor_abs  <= (divisor[7])  ? (~divisor  + 8'd1) : divisor;
+          end else begin
+            dividend_neg <= 1'b0;
+            divisor_neg  <= 1'b0;
+            dividend_abs <= dividend;
+            divisor_abs  <= divisor;
+          end
+          // Initialize the shift register:
+          // The high 8 bits (remainder) start at zero and the low 8 bits hold the absolute dividend.
+          SR  <= {8'd0, dividend_abs};
+          // Compute two's complement of divisor_abs.
+          neg_divisor <= ~divisor_abs + 8'd1;
+          // Initialize iteration counter.
+          cnt <= 4'd0;
+        end
+
+        // CALC: perform 8 iterations of the radix-2 division algorithm.
+        CALC: begin
+          // Shift SR left by 1. This shifts in a 0 at LSB.
+          SR <= SR << 1;
+
+          // Compute subtraction: diff = (current remainder) - divisor_abs.
+          // Here the current remainder is in SR[15:8].
+          diff = SR[15:8] + neg_divisor;
+          
+          // If diff is non-negative (i.e. sign bit is 0) then subtraction succeeded.
+          // In 2's complement, if diff[7] is 0 then it is >= 0.
+          if (!diff[7]) begin
+            // Accept the subtraction: update the remainder portion to diff.
+            SR[15:8] <= diff;
+            // Set the least-significant bit (new quotient bit) to 1.
+            SR[0] <= 1'b1;
+          end else begin
+            // Subtraction would go negative: restore the remainder, and the new quotient bit remains 0.
+            // (No need to add back divisor explicitly because we did not update SR[15:8].)
+            SR[0] <= 1'b0;
+          end
+
+          cnt <= cnt + 1;
+        end
+
+        // DONE: apply sign correction (if needed) and indicate that the result is valid.
+        DONE: begin
+          // Capture the absolute quotient and remainder from SR.
+          quotient_abs  <= SR[7:0];
+          remainder_abs <= SR[15:8];
+
+          if (sign) begin
+            // For quotient, the sign is determined by XORing dividend and divisor sign bits.
+            if (dividend_neg ^ divisor_neg)
+              final_quotient <= ~quotient_abs + 8'd1;  // Negative quotient.
+            else
+              final_quotient <= quotient_abs;
+            // Remainder takes the sign of the dividend.
+            if (dividend_neg)
+              final_remainder <= ~remainder_abs + 8'd1;
+            else
+              final_remainder <= remainder_abs;
+          end else begin
+            final_quotient  <= quotient_abs;
+            final_remainder <= remainder_abs;
+          end
+
+          result    <= {final_remainder, final_quotient};
+          res_valid <= 1'b1;
+        end
+      endcase
+    end
+  end
+
+  // Next state logic.
+  always @(*) begin
+    case (state)
+      IDLE: begin
+        if (opn_valid)
+          next_state = INIT;
+        else
+          next_state = IDLE;
+      end
+
+      INIT: begin
+        next_state = CALC;
+      end
+
+      CALC: begin
+        if (cnt == 4'd8)
+          next_state = DONE;
+        else
+          next_state = CALC;
+      end
+
+      DONE: begin
+        // Wait here until the operands are no longer valid.
+        // This ensures the result remains valid for downstream systems.
+        if (!opn_valid)
+          next_state = IDLE;
+        else
+          next_state = DONE;
+      end
+
+      default: next_state = IDLE;
+    endcase
+  end
+
+endmodule

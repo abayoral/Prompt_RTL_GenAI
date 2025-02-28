@@ -1,0 +1,13 @@
+module top_module (
+    input clk,    // Clocks are used in sequential circuits
+    input d,
+    output reg q
+);
+
+    // Always block triggered by the rising edge of clk.
+    // Non-blocking assignment is used to transfer d to q on each positive edge of clk.
+    always @(posedge clk) begin
+        q <= d;
+    end
+
+endmodule

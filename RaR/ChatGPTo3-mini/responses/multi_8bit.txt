@@ -1,0 +1,21 @@
+module multi_8bit (
+    input  wire [7:0] A,       // 8-bit multiplicand
+    input  wire [7:0] B,       // 8-bit multiplier
+    output reg  [15:0] product // 16-bit product output
+);
+
+    integer i;
+
+    // Combinational implementation of 8-bit multiplication using shift-and-add method.
+    // For every bit of B that is 1, add (A shifted left by the bit position) to the product.
+    always @(*) begin
+        product = 16'd0;  // Initialize product to zero
+        for (i = 0; i < 8; i = i + 1) begin
+            if (B[i]) begin
+                // If the i-th bit of B is 1, add the multiplicand shifted left by i bits.
+                product = product + (A << i);
+            end
+        end
+    end
+
+endmodule

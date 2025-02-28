@@ -1,0 +1,9 @@
+As a senior Digital Design Engineer working at a prominent company specializing in hardware design, you have been assigned the crucial responsibility of developing a Verilog module for a next-generation product. The successful implementation of this module is essential for upholding the reputation and standards of your computer hardware firm in the competitive industry landscape.
+
+Your task is to construct a 4-bit priority encoder using Verilog. The specifics of the encoder require that, in scenarios where none of the input bits are set to high (effectively meaning the input value is zero), the module should output a value of zero. To provide further context, it's important to note that a 4-bit binary number can have a total of 16 unique combinations, ranging from 0000 to 1111.
+
+Additionally, it would be beneficial to consider utilizing hexadecimal or decimal number representations (such as 4'hb for hexadecimal or 4'd11 for decimal) instead of purely binary literals for greater efficiency and reduced typing workload when defining your values.
+
+Given your familiarity with the Verilog syntax and the specifications outlined for designing this priority encoder, your module should be structured under the synthesizable standard of Verilog 2001. 
+
+Please detail how you would approach the implementation of the 4-bit priority encoder, considering the input and output requirements, as well as the implications of handling the scenario where all inputs are low. What considerations might you take into account regarding the design, testing, and integration of this module within a larger system? What challenges do you anticipate facing during the development process?

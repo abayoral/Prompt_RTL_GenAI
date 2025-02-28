@@ -1,0 +1,22 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out  
+); 
+
+    // By analyzing the Karnaugh map and using the don’t‐care entries to our advantage,
+    // we can choose values for the don’t‐care cells so that the simplified sum‐of‐products form is:
+    //      f = a + a'b c
+    // This expression can be simplified further because when a = 0 the term a'b c is simply b c.
+    // In other words, the function is equivalent to:
+    //      f = a + (b & c)
+    // Verifying with the map:
+    //   - When a = 1, f = 1 regardless of b, c, d.
+    //   - When a = 0, then f = b & c which matches the ones in the map.
+    // Note: d becomes irrelevant in this simplified expression.
+    
+    assign out = a | (b & c);
+
+endmodule

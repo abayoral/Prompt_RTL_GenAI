@@ -1,0 +1,21 @@
+module priority_encoder(
+    input  [3:0] in,
+    output reg [1:0] pos
+);
+
+always @(*) begin
+    // Check for the highest-order bit first.
+    if (in[3]) begin
+        pos = 2'b11;  // Bit 3 is high.
+    end else if (in[2]) begin
+        pos = 2'b10;  // Bit 2 is high.
+    end else if (in[1]) begin
+        pos = 2'b01;  // Bit 1 is high.
+    end else if (in[0]) begin
+        pos = 2'b00;  // Bit 0 is high.
+    end else begin
+        pos = 2'b00;  // No bits are high.
+    end
+end
+
+endmodule

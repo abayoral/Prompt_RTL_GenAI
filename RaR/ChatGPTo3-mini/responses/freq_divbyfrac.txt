@@ -1,0 +1,64 @@
+module freq_divbyfrac(
+    input  clk,    // primary clock input
+    input  rst_n,  // active-low reset
+    output clk_div // divided output clock (≈ input clock/3.5)
+);
+
+    // In order to achieve a fractional division by 3.5,
+    // the design uses two separate clock paths:
+    // • One triggered on the rising (positive) edge of clk. This path generates a pulse
+    //   after every 4 input clock cycles.
+    // • One triggered on the falling (negative) edge of clk. This path generates a pulse
+    //   after every 3 input clock cycles.
+    //
+    // The two generated clock signals are phase‐shifted relative to one another by roughly
+    // half a clock period. Their combination (via an OR) produces an approximately uniform
+    // output clock with a period corresponding to a division of the input frequency by 3.5.
+    //
+    // To implement this, two counters and two registers are used. The rising edge branch:
+    // counts 0-3 (i.e. 4 cycles), then toggles its output clock. Similarly, the falling edge
+    // branch counts 0-2 (i.e. 3 cycles) and then toggles its output clock.
+    
+    // Rising-edge branch signals and counter
+    reg [2:0] count_r;
+    reg       clk_div_r;
+    
+    // Falling-edge branch signals and counter
+    reg [1:0] count_f;
+    reg       clk_div_f;
+    
+    // Rising edge processing: counts 4 cycles then toggle clk_div_r
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            count_r   <= 3'd0;
+            clk_div_r <= 1'b0;
+        end else begin
+            if (count_r == 3) begin
+                count_r   <= 3'd0;
+                clk_div_r <= ~clk_div_r;
+            end else begin
+                count_r   <= count_r + 1;
+            end
+        end
+    end
+    
+    // Falling edge processing: counts 3 cycles then toggle clk_div_f
+    always @(negedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            count_f   <= 2'd0;
+            clk_div_f <= 1'b0;
+        end else begin
+            if (count_f == 2) begin
+                count_f   <= 2'd0;
+                clk_div_f <= ~clk_div_f;
+            end else begin
+                count_f   <= count_f + 1;
+            end
+        end
+    end
+    
+    // Combine the two phase-adjusted clock signals.
+    // The OR operation roughly overlaps the edges such that the overall duty cycle is made more uniform.
+    assign clk_div = clk_div_r | clk_div_f;
+
+endmodule

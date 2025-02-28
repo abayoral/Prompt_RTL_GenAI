@@ -1,0 +1,10 @@
+CoT/modules/Module_cseladd.v:20: error: Unknown module type: add16
+CoT/modules/Module_cseladd.v:29: error: Unknown module type: add16
+CoT/modules/Module_cseladd.v:38: error: Unknown module type: add16
+4 error(s) during elaboration.
+*** These modules were missing:
+        add16 referenced 3 times.
+***
+Module file path: CoT/modules/Module_cseladd.v
+Testbench file path: hdlbits_testbenches/Module_cseladd_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/Module_cseladd_sim', 'CoT/modules/Module_cseladd.v', 'hdlbits_testbenches/Module_cseladd_0_tb.v']' returned non-zero exit status 4.

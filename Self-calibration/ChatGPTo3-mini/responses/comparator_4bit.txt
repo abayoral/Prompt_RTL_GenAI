@@ -1,0 +1,36 @@
+Below is one acceptable “fixed‐up” version. Functionally your code was correct, but some improvements can be made to clarify intent and use best practices. For example, you can use a reduction OR (|) instead of comparing a 4‑bit vector to zero, and it is generally preferable to use a bitwise AND (&) in these bit-level comparisons rather than the logical && operator. One corrected version is:
+
+------------------------------------------------
+module comparator_4bit(
+    input  [3:0] A,
+    input  [3:0] B,
+    output A_greater,
+    output A_equal,
+    output A_less
+);
+
+  // Extend A and B to 5 bits so that the subtraction 
+  // produces a borrow bit in diff[4] if A < B.
+  wire [4:0] diff;
+  assign diff = {1'b0, A} - {1'b0, B};
+
+  // If the lower 4 bits are zero, then A equals B.
+  assign A_equal = (diff[3:0] == 4'b0000);
+
+  // If a borrow occurred, diff[4] will be high, so A < B.
+  assign A_less  = diff[4];
+
+  // A is greater than B if there is no borrow and the difference is nonzero.
+  // (|diff[3:0]) is a reduction OR that is 1 when any bit is 1.
+  assign A_greater = (~diff[4]) & (|diff[3:0]);
+
+endmodule
+------------------------------------------------
+
+Comments on the changes:
+
+1. Using (|diff[3:0]) replaces (diff[3:0] != 4'b0000) because it directly reduces the lower 4 bits to a 1 when any bit is high.
+2. Replacing the logical && with a bitwise & is advisable since both operands are single-bit signals in this context.
+3. The overall structure and subtraction method remain the same.
+
+This version adheres to best practices and is functionally equivalent to your original code.

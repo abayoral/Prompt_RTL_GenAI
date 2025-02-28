@@ -1,0 +1,24 @@
+```
+module barrel_shifter(
+    input  [7:0] in,
+    input  [2:0] ctrl,
+    output [7:0] out
+);
+  
+    wire [7:0] shift4, shift2, shift1;
+    wire [7:0] sel4, sel2, sel1; 
+
+    // Shift input by 4 bits
+    assign shift4 = {in[3:0], in[7:4]};  // Bit rotation left by 4
+    // Shift input by 2 bits
+    assign shift2 = {in[5:0], in[7:6]};  // Bit rotation left by 2
+    // Shift input by 1 bit
+    assign shift1 = {in[6:0], in[7]};     // Bit rotation left by 1
+    
+    // Mux to determine output based on control signals
+    assign sel4 = (ctrl[2]) ? shift4 : in; // Select either shift4 or in based on ctrl[2]
+    assign sel2 = (ctrl[1]) ? shift2 : sel4; // Select either shift2 or previous selection based on ctrl[1]
+    assign out  = (ctrl[0]) ? shift1 : sel2; // Select either shift1 or previous selection based on ctrl[0]
+
+endmodule
+```

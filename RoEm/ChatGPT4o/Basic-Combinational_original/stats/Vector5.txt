@@ -1,0 +1,14 @@
+Test 0 passed!
+Test 1 passed!
+Test 2 passed!
+Test 3 passed!
+Test 4 passed!
+Test 5 passed!
+Test 6 passed!
+Test 7 passed!
+All tests passed!
+hdlbits_testbenches/Vector5_0_tb.v:124: $finish called at 16000 (10ps)
+Module file path: CoT/modules/Vector5.v
+Testbench file path: hdlbits_testbenches/Vector5_0_tb.v
+Compilation successful. Executable created at CoT/simulations/Vector5_sim
+Simulation completed successfully.

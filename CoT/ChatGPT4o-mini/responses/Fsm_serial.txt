@@ -1,0 +1,64 @@
+```
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output done
+); 
+    // Define states
+    typedef enum logic [1:0] {
+        IDLE,        // Waiting for start bit
+        START,       // Start bit detected
+        DATA,        // Receiving data bits
+        STOP         // Stop bit expected
+    } state_t;
+
+    state_t current_state, next_state;
+    logic [3:0] bit_count; // Counter for data bits
+    assign done = (current_state == STOP && in == 1'b1 && bit_count == 4'd8);
+
+    // Sequential logic for state transitions
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+            bit_count <= 4'd0;
+        end else begin
+            current_state <= next_state;
+            if (current_state == DATA) begin
+                bit_count <= bit_count + 1;
+            end else if (current_state == START) begin
+                bit_count <= 4'd0;
+            end
+        end
+    end
+
+    // Combinational logic for next state
+    always_comb begin
+        case (current_state)
+            IDLE: begin
+                if (in == 1'b0) // Start bit detected
+                    next_state = START;
+                else
+                    next_state = IDLE;
+            end
+            START: begin
+                next_state = DATA; // Move to DATA state after start bit
+            end
+            DATA: begin
+                if (bit_count < 4'd7)
+                    next_state = DATA; // Keep receiving data bits
+                else
+                    next_state = STOP; // All data bits received
+            end
+            STOP: begin
+                if (in == 1'b1) // Stop bit detected
+                    next_state = IDLE; // Return to IDLE
+                else
+                    next_state = STOP; // Wait for correct stop bit
+            end
+            default: next_state = IDLE; // Handle unexpected states
+        endcase
+    end
+
+endmodule
+```

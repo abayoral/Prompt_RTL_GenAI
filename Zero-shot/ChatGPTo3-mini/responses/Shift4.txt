@@ -1,0 +1,21 @@
+module top_module(
+    input clk,
+    input areset,  // asynchronous active-high reset to zero
+    input load,    // synchronous load, high priority over enable
+    input ena,     // enable for shift right operation
+    input [3:0] data,
+    output reg [3:0] q
+);
+
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            q <= 4'b0000;                  // Asynchronous reset: set q to 0
+        else if (load)
+            q <= data;                     // Synchronous load: load data into q
+        else if (ena)
+            q <= {1'b0, q[3:1]};           // Shift right: q[3] becomes 0, q[3:1] shift
+        else
+            q <= q;                        // Hold the current state
+    end
+
+endmodule

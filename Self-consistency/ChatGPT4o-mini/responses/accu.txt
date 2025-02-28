@@ -1,0 +1,38 @@
+module accu (
+    input wire clk,
+    input wire rst_n,
+    input wire [7:0] data_in,
+    input wire valid_in,
+    output reg valid_out,
+    output reg [9:0] data_out
+);
+
+    reg [9:0] sum;
+    reg [1:0] count;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            sum <= 10'b0;
+            count <= 2'b0;
+            valid_out <= 1'b0;
+            data_out <= 10'b0;
+        end else begin
+            if (valid_in) begin
+                sum <= sum + data_in;
+                count <= count + 1;
+
+                if (count == 2'b11) begin // After 4 valid inputs (count goes from 0 to 3)
+                    data_out <= sum;
+                    valid_out <= 1'b1; // Assert valid output signal
+                    sum <= 10'b0; // Reset sum for next accumulation
+                    count <= 2'b0; // Reset count for next round
+                end else begin
+                    valid_out <= 1'b0; // Maintain valid output signal low if not 4 entries yet
+                end
+            end else begin
+                valid_out <= 1'b0; // Maintain valid output signal low if input is invalid
+            end
+        end
+    end
+
+endmodule

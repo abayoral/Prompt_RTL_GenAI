@@ -1,0 +1,30 @@
+Assume you have been tasked with creating a module in Verilog that simulates a dual-port random-access memory (RAM) component. This RAM should have specific characteristics: it must have 8 storage locations or "depth", and each memory location should be able to hold data with a bit width of 6. All stored data should initially be set to the binary value 000000, representing a reset state for each location.
+
+The RAM will have two separate groups of ports: one for reading data and another for writing data. Both reading and writing operations should be capable of occurring simultaneously without interference.
+
+The module to implement this dual-port RAM should be named 'RAM'. It should include several input signals:
+
+- `clk`: This clock signal will be used to synchronize all operations within the module.
+- `rst_n`: An active-low reset signal. When low (0), the RAM should be reset, and when high (1), the RAM is in normal operating mode.
+- `write_en`: A write enable signal. When high, this initiates the write operation to the RAM at a specified address.
+- `write_addr`: This specifies the address in the RAM at which data is to be written.
+- `write_data`: The actual 6-bit data to be stored in the specified RAM address.
+- `read_en`: A read enable signal. When high, the RAM will output the data from the specified read address.
+- `read_addr`: This specifies the address in the RAM from which data is to be read.
+
+The output signal:
+
+- `read_data`: This 6-bit line will carry the output of the data read from the RAM based on the `read_addr`.
+
+The RAM will use two parameters to define its structure: 
+
+- `WIDTH`: Set to 6 bits, determining the size of each memory entry.
+- `DEPTH`: Set to 8, determining the number of memory entries.
+
+Regarding its implementation:
+
+- The RAM should include a register array which can be thought of as a set of rows (depth) each containing 6 individual bits (width).
+- For writing data, there should be an "always" block triggered either on the positive edge of the clock signal or the negative edge of the reset signal. On reset, all RAM locations should be cleared to zero. If the write enable (`write_en`) is active, it should write data from `write_data` to the location specified by `write_addr`.
+- For reading data, there should be another "always" block also triggered by the positive edge of the clock or the negative edge of the reset. On reset, the output data (`read_data`) should be zeroed. If the read enable (`read_en`) is active, it should output the data from the location specified by `read_addr`. If not active, `read_data` should be zero.
+
+Outline the complete Verilog code required to achieve this functionality, ensuring proper functionality of all specified features and robust handling of simultaneous read and write operations.

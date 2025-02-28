@@ -1,0 +1,35 @@
+Imagine you are an experienced Verilog engineer assigned to design a module named pulse_detect. This module must be capable of monitoring a one-bit input stream (data_in) and detecting a distinct pulse pattern based on the following sequence: a transition from 0 to 1 followed by a subsequent transition from 1 back to 0. The timing of these events is governed by a clock signal (clk), and the design must also account for a reset mechanism. Below is an expanded and detailed description of the assignment requirements:
+
+1. Module Objective:  
+   • Develop a pulse_detect module that continuously examines the data_in signal to detect a complete pulse pattern.  
+   • A valid pulse is defined as the sequence occurring over three clock cycles: starting from a low state (0), going high (1), and then returning to low (0).  
+   • Upon detecting a complete pulse, the module should output a high signal (data_out = 1) for the clock cycle when the pulse is fully recognized.
+
+2. Signals and Their Roles:  
+   • clk: The primary clock signal that dictates when operations occur. The module must use the positive edge of clk for all synchronous actions.  
+   • rst_n: An active-low reset input. When rst_n is low, the module should immediately clear any stored state and ensure that the output data_out is reset to 0.  
+   • data_in: A one-bit, continuously provided signal that the module monitors for the specified pulse pattern.  
+   • data_out: The one-bit output that indicates when a valid pulse has been detected. It should be asserted (i.e., set to 1) for one clock cycle upon detecting a complete pulse sequence.
+
+3. Detection Mechanism:  
+   • Introduce an internal register (state) that tracks the progress of the pulse detection process.  
+   • Use a synchronous always block that triggers on the positive edge of clk or the negative edge of rst_n to handle both the pulse detection and reset functionalities.
+
+4. Reset Functionality:  
+   • When rst_n is low, the module must perform the following actions:  
+     - Reset the state register to its default (initial) value, thus canceling any ongoing pulse detection.  
+     - Immediately set data_out to 0, as no pulse detection should occur during or immediately after a reset event.
+
+5. State Transition and Pulse Detection:  
+   • Begin in an initial state, waiting for the input signal data_in to transition from 0 to 1.  
+   • Upon detecting the rising edge (0 → 1), move to an intermediate state and wait for the following transition from 1 back to 0.  
+   • Once the falling edge (1 → 0) is detected, confirm that a valid pulse sequence (0 → 1 → 0) has occurred. At this point:  
+     - Assert data_out to 1 for one clock cycle to signal pulse detection.  
+     - After one cycle, revert data_out back to 0 in preparation for detecting subsequent pulses.
+
+6. Output Handling:  
+   • Ensure that data_out only remains high for a single clock cycle immediately following the full detection of the pulse sequence, maintaining a low state otherwise.
+
+Your goal is to write Verilog code that implements the pulse_detect module with precise control over these behaviors, careful state management, and strict adherence to the synchronous design interfacing with both the clk and rst_n signals. Remember to meticulously handle all edge cases and transitions, ensuring that the module operates correctly even in atypical scenarios.
+
+Please create the Verilog module following these guidelines, ensuring clarity in your state definitions and transition logic, without providing any actual implementation details or code solutions in your response.

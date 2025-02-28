@@ -1,0 +1,19 @@
+You are requesting assistance from a professional Verilog designer for a specific task involving the creation of a frequency divider module. The objective is to design a Verilog module named `freq_divbyodd` that takes in an input clock signal and generates an output clock signal with a frequency that is reduced by an odd divisor. This module should incorporate certain key components and behaviors as outlined below:
+
+1. **Module Functionality**: The purpose of the module is to reduce the input clock frequency by an odd number divisor. The divisor is customizable and is supplied as a parameter called `NUM_DIV`, with a default value set to 5. This means that in its default configuration, the input clock frequency will be divided by 5.
+
+2. **Input Ports**:
+   - `clk`: This is the main input clock signal that will be subjected to frequency division.
+   - `rst_n`: This is an active low reset signal used to initialize the module. When asserted (set low), it should reset all internal states, counters, and outputs to a predefined state.
+
+3. **Output Ports**:
+   - `clk_div`: This serves as the output clock signal after frequency division. Its frequency should be `1/NUM_DIV` of the input clock frequency.
+
+4. **Implementation Details**:
+   - **Counters**: Two separate counters, `cnt1` and `cnt2`, are utilized. These counters are crucial for keeping track of the count up to `NUM_DIV - 1` as they monitor the positive and negative edges of the clock.
+   - **Clock Dividers**: There are two internal signals, `clk_div1` and `clk_div2`, which handle the division process for the positive and negative clock edges, respectively. Each of these signals toggles whenever the associated counter reaches a value equivalent to half of `NUM_DIV`.
+   - **Output Logic**: The final `clk_div` output is obtained by logically OR-ing `clk_div1` and `clk_div2`. This ensures that the division operation is applied symmetrically across both the rising and falling edges of the clock, effectively providing a balanced clock division.
+
+5. **Reset Behavior**: Upon activation of the reset signal (`rst_n` being low), all internal counters (`cnt1` and `cnt2`) and clock divider outputs (`clk_div1`, `clk_div2`, and `clk_div`) must be reset to their initial states. This guarantees a consistent starting point after a reset event.
+
+Your request is to formulate and deliver the complete Verilog code that embodies the above specifications and logic for the `freq_divbyodd` module.

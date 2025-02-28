@@ -1,0 +1,24 @@
+You are a skilled Verilog designer tasked with creating a specific digital module for precise arithmetic operations utilizing fixed-point representation. The primary goal is to implement a fixed-point subtractor module, named `fixed_point_subtractor`, which allows for flexible precision and bit representation based on input parameters.
+
+The subtractor module should be highly configurable through its parameterized values:
+- `Q`, which indicates the number of fractional bits in the fixed-point representation, thereby determining the level of precision for the fractional part of the operands.
+- `N`, which specifies the total number of bits allocated for each input and output, encompassing both integer and fractional parts of the fixed-point data.
+
+The design outlines specific input ports:
+- `a` [N-1:0]: The first operand, an N-bit fixed-point number requiring subtraction.
+- `b` [N-1:0]: The second operand, also an N-bit fixed-point number to be subtracted from `a`.
+
+In terms of output:
+- `c` [N-1:0]: This port will deliver the N-bit result of the subtraction operation in a fixed-point format.
+
+Internally, a register named `res` [N-1:0] is needed to temporarily hold the results of the subtraction operation as computations progress.
+
+The implementation of this module requires careful consideration of numerical operations adhering to fixed-point arithmetic principles:
+- When the signs of both inputs `a` and `b` are identical, both the fractional and integer components should be subtracted directly. The output sign is intended to reflect the sign common to both inputs.
+- In circumstances where the signs differ:
+  * If `a` is positive and `b` is negative, compute the sum of their absolute values. The output's sign should depend on the magnitudes, being positive if `a` exceeds `b` and negative otherwise.
+  * Conversely, if `a` is negative and `b` is positive, apply the same logic, utilizing magnitudes to determine the resultant sign.
+  
+Special attention is necessary for handling scenarios where the resulting subtraction equates to zero, requiring the explicit setting of the sign bit to zero, addressing this particular edge case to maintain consistency in output representation.
+
+The precision maintained through parameters `Q` and `N` is critical, ensuring that both integer and fractional components in the computation respect the predefined bit allocation, thus achieving accurate fixed-point subtraction reflective of the desired precision. As a Verilog designer, your aim is to deliver a comprehensive and precise code solution for this module.

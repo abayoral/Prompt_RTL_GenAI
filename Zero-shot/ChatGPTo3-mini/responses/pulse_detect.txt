@@ -1,0 +1,50 @@
+module pulse_detect(
+    input        clk,
+    input        rst_n,
+    input        data_in,
+    output reg   data_out
+);
+
+    // FSM state encoding:
+    localparam IDLE   = 2'd0, // waiting for rising edge of data_in (0 to 1)
+               HIGH   = 2'd1, // detected high, waiting for falling edge (1 to 0)
+               DETECT = 2'd2; // pulse detected, output pulse for one clock cycle
+
+    reg [1:0] state;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Asynchronous reset: set the FSM to the initial state and clear output.
+            state    <= IDLE;
+            data_out <= 1'b0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    data_out <= 1'b0;  // ensure output remains low
+                    // Wait in idle until a rising edge is detected on data_in.
+                    if (data_in == 1'b1)
+                        state <= HIGH;
+                    else
+                        state <= IDLE;
+                end
+                HIGH: begin
+                    data_out <= 1'b0;  // still no pulse complete
+                    // If data_in falls back to 0, complete the pulse.
+                    if (data_in == 1'b0)
+                        state <= DETECT;
+                    else
+                        state <= HIGH;
+                end
+                DETECT: begin
+                    data_out <= 1'b1;  // pulse detected: signal high for one clock cycle
+                    state    <= IDLE;  // return to idle state for next detection
+                end
+                default: begin
+                    state    <= IDLE;
+                    data_out <= 1'b0;
+                end
+            endcase
+        end
+    end
+
+endmodule

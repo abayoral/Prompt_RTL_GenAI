@@ -1,0 +1,23 @@
+Consider the following design challenge tailored for professionals in Verilog design:
+
+You are tasked with developing a Verilog module titled "pe" that functions as a Multiplying Accumulator (MAC) specifically designed for 32-bit integers. The module’s primary function is to multiply two provided 32-bit operands and then add the resulting product to a cumulative total stored in an output register. The detailed requirements and operational guidelines are outlined below:
+
+1. Inputs:
+   • clk: A clock signal that orchestrates all synchronous operations within the module. It ensures that changes in register states happen on well-defined clock edges.
+   • rst: A reset signal that, when activated (logic high), immediately initializes or clears the accumulator register. When this signal is inactive (logic low), the module continues its typical accumulation operations.
+   • a and b: Two separate 32-bit input operands. The module is expected to multiply these values on each clock cycle.
+
+2. Outputs:
+   • c: A 32-bit output register that holds the accumulated sum of products. The module's behavior regarding this output is two-fold:
+     - Upon assertation of the reset signal (rst active), the register c is promptly set to zero.
+     - When reset is not activated, every clock cycle leads to the multiplication of a and b, and this product is then added to the current value held in c, effectively maintaining an ongoing total.
+
+3. Implementation Guidelines:
+   • The module should incorporate an always block that is sensitive not only to the positive edge of the clock (clk) but also to the positive edge of the reset (rst). This dual edge sensitivity ensures that the module responds immediately to a reset condition and also updates the accumulated value synchronously during normal operation.
+   • Within the always block, the design should first check the state of the rst signal:
+       - If rst is at a high level (asserted), then regardless of the clock state, register c should be reset to zero.
+       - If rst is inactive, then on each positive edge of clk, the module should calculate the product of the 32-bit operands a and b, then add this product to the existing value stored in c. The result should be written back to c as the updated accumulated value.
+     
+Your objective is to design the "pe" module in Verilog by adhering to these specifications, ensuring that the multiplication and accumulation processes operate as expected across all clock cycles, with appropriate reset behavior in place.
+
+Please note: At this stage, you are only required to understand and consider these operational specifications. No solutions or code implementation should be provided as part of this exercise.

@@ -1,0 +1,22 @@
+```verilog
+module min_finder (
+    input [7:0] a, 
+    input [7:0] b, 
+    input [7:0] c, 
+    input [7:0] d, 
+    output [7:0] min_value
+);
+    wire [7:0] min_ab;
+    wire [7:0] min_cd;
+    wire [7:0] min_abc;
+
+    // Two-way minimum circuits
+    assign min_ab = (a < b) ? a : b; // Minimum of a and b
+    assign min_cd = (c < d) ? c : d; // Minimum of c and d
+    assign min_abc = (min_ab < min_cd) ? min_ab : min_cd; // Overall minimum
+
+    // Final output
+    assign min_value = min_abc;
+
+endmodule
+```

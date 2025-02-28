@@ -1,0 +1,53 @@
+module lfsr32 (
+    input  wire        clk,
+    input  wire        reset,
+    output reg [31:0]  lfsr
+);
+
+    // In this 32‐bit Galois LFSR implementation the feedback taps
+    // are at bit positions 32, 22, 2, and 1.
+    // Note: In zero‐based indexing (Verilog) these correspond to bits:
+    //   32 -> index 31 (the feedback source),
+    //   22 -> index 21,
+    //    2 -> index 1,
+    //    1 -> index 0.
+    //
+    // The LFSR is implemented as a vector. On each positive edge of the clock,
+    // if reset is active (synchronous, active‐high), the register is
+    // initialized to 32'h1. Otherwise, the register shifts left by one bit,
+    // with the MSB (bit 31) being used as the feedback bit. This feedback is
+    // then injected (via XOR) into the positions corresponding to taps at
+    // bit positions 22 (index 21), 2 (index 1) and 1 (index 0). In positions
+    // without a tap, the value is simply shifted from the adjacent lower bit.
+    
+    reg [31:0] next_lfsr;
+    wire feedback;
+    
+    assign feedback = lfsr[31];
+    
+    // Combinational calculation of the next LFSR state.
+    always @(*) begin
+        // Bit 31 (tap at position 32 is used as feedback source; no XOR in the shifted value)
+        next_lfsr[31] = lfsr[30];
+        // Bits 30 down to 22 shift normally: these come from bits 29 to 21 of lfsr.
+        next_lfsr[30:22] = lfsr[29:21];
+        // Bit 21 is tapped (corresponding to polynomial tap at bit 22): XOR in feedback.
+        next_lfsr[21] = lfsr[20] ^ feedback;
+        // Bits 20 down to 2 shift normally: take bits 19 downto 1.
+        next_lfsr[20:2] = lfsr[19:1];
+        // Bit 1 is tapped (tap at bit 2): XOR in feedback.
+        next_lfsr[1] = lfsr[0] ^ feedback;
+        // Bit 0 is tapped (tap at bit 1): since there is no lower bit to shift in,
+        // we simply inject the feedback.
+        next_lfsr[0] = feedback;
+    end
+
+    // Sequential block: update LFSR on clock edge, with synchronous active-high reset.
+    always @(posedge clk) begin
+        if (reset)
+            lfsr <= 32'h1;
+        else
+            lfsr <= next_lfsr;
+    end
+
+endmodule

@@ -1,0 +1,27 @@
+As a professional Verilog designer, you are tasked with creating a digital system for an unsigned 16-bit multiplier that employs the shift-and-accumulate method to compute its product, denoted as `yout`. The module you will design is named `multi_16bit`, and it comprises several inputs and outputs. Specifically, the inputs include a clock signal (`clk`), an active-low reset signal (`rst_n`), a start signal (`start`), and two 16-bit inputs representing the multiplicand (`ain`) and the multiplier (`bin`). The outputs of the system will consist of a 32-bit product (`yout`) and a flag (`done`) to indicate when the multiplication is complete.
+
+Your implementation should consider several important aspects related to the procedural logic that governs the operation of the multiplier:
+
+1. **Data Bit Control Logic:** 
+   - You need to establish a mechanism to update a shift count register (`i`) with each rising edge of the clock (`clk`) or falling edge of the reset signal (`rst_n`). 
+   - It is necessary to ensure that when the reset signal (`rst_n`) is asserted (i.e., active-low), the shift count register (`i`) resets to zero.
+   - The logic should also specify that when the start signal (`start`) is active, the shift count register (`i`) should be incremented by one, provided that its current value does not exceed 16.
+   - Moreover, when the start signal is inactive, the shift count register (`i`) must return to zero.
+
+2. **Completion Flag Generation:** 
+   - The design must include a register for the completion flag (`done_r`), which should be updated at the rising edge of the clock or the falling edge of the reset signal.
+   - Under the conditions when the reset signal is active (`rst_n` low), the completion flag should be initialized to zero.
+   - The completion flag must be set to indicate that the multiplication is complete (`done_r` = 1) when the shift count equals 16.
+   - Conversely, when the shift count reaches 17, the completion flag should be reset to zero.
+
+3. **Shift and Accumulate Mechanism:** 
+   - Operational behavior regarding the shift-and-accumulate process should primarily occur on the positive edge of the clock cycle or the falling edge of the reset signal.
+   - The design needs to initialize the multiplicand register (`areg`), the multiplier register (`breg`), and the product register (`yout_r`) to zero upon reset.
+   - With the start signal active, the multiplication sequence should commence.
+   - Particularly when the shift count is at 0, the multiplicand and multiplier must be loaded into their respective registers (`areg` for the multiplicand and `breg` for the multiplier).
+   - For shift counts between 1 and 16, the design should incorporate logic that checks if the bit located at position `i-1` in the multiplicand register is high; if so, the product register should be updated by adding a shifted version of the multiplier, specifically by shifting it left by `i-1` bits and ensuring proper zero-padding at the least significant bit positions.
+
+4. **Output Assignment Logic:** 
+   - Lastly, at the conclusion of the multiplication operation, the value from the product register (`yout_r`) must be assigned to the module's output (`yout`).
+
+As you formulate your Verilog code, be mindful of adhering to the standard syntax and practices within the Verilog hardware description language, ensuring effective and functional implementation of the specified `multi_16bit` system. As you move forward, consider the ramifications of each design decision you make and how they contribute to the overall functionality of the multiplier module.

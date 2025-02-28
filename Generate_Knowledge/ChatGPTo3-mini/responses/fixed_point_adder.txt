@@ -1,0 +1,88 @@
+module fixed_point_adder #(
+    parameter Q = 8,       // Number of fractional bits
+    parameter N = 16       // Total width (1 sign bit + (N-1) magnitude bits)
+)(
+    input  [N-1:0] a,      // First fixed‐point operand
+    input  [N-1:0] b,      // Second fixed‐point operand
+    output reg [N-1:0] c   // Result of the fixed‐point addition
+);
+
+  // Internal register to hold the result
+  reg [N-1:0] res;
+  // Registers for absolute values of a and b
+  reg [N-1:0] abs_a, abs_b;
+  // To hold the sign of the inputs
+  reg         a_sign, b_sign;
+  // Extended register used in addition (N+1 bits) to detect overflow
+  reg [N:0]   tmp;
+  // Register used in subtraction case
+  reg [N-1:0] diff;
+
+  // Local parameter: threshold magnitude.
+  // For a fixed-point number in two's complement with N bits, the magnitude
+  // portion is (N-1) bits; thus the maximum positive number is (2^(N-1)-1)
+  // and the maximum magnitude for a negative number is 2^(N-1).
+  localparam [N:0] THRESHOLD = (1 << (N-1));
+
+  // Combinational logic to perform the fixed-point add/subtract and saturation.
+  always @(*) begin
+    // Extract sign bits (MSB of each operand)
+    a_sign = a[N-1];
+    b_sign = b[N-1];
+
+    // Compute the absolute values. (For two's complement: if negative, take ~value+1)
+    abs_a = a_sign ? (~a + 1) : a;
+    abs_b = b_sign ? (~b + 1) : b;
+
+    // If both numbers have the same sign, perform addition of their magnitudes.
+    if (a_sign == b_sign) begin
+      tmp = abs_a + abs_b;  // Extended addition to detect overflow
+      
+      if (a_sign == 1'b0) begin
+        // Both are positive.
+        // Check if the sum exceeds the maximum representable positive magnitude.
+        if (tmp >= THRESHOLD)
+          // Saturate to maximum positive value: sign bit '0' and all ones in magnitude.
+          res = {1'b0, {(N-1){1'b1}}};
+        else
+          // No overflow: assign the sum (magnitude fits in (N-1) bits) with positive sign.
+          res = {1'b0, tmp[N-2:0]};
+      end
+      else begin
+        // Both are negative.
+        // In two's complement, the largest magnitude that can be represented is 2^(N-1)
+        // (i.e. -2^(N-1) appears as 1 followed by all zeros).
+        if (tmp >= THRESHOLD)
+          // Saturate to the most negative value: -2^(N-1)
+          res = {1'b1, {(N-1){1'b0}}};
+        else
+          // Otherwise, negate the magnitude to get the proper negative result.
+          res = ~{1'b0, tmp[N-2:0]} + 1;
+      end
+    end
+    else begin
+      // The signs differ. In this case the operation is effectively a subtraction
+      // between the magnitudes. We subtract the smaller absolute value from the larger.
+      if (abs_a >= abs_b) begin
+        diff = abs_a - abs_b;
+        // The result takes the sign of a (since its magnitude is greater or equal)
+        if (a_sign == 1'b1 && diff != 0)
+          res = ~diff + 1;  // a was negative, so return a negative result.
+        else
+          res = diff;       // Otherwise result is positive (or zero).
+      end
+      else begin
+        diff = abs_b - abs_a;
+        // The result takes the sign of b.
+        if (b_sign == 1'b1 && diff != 0)
+          res = ~diff + 1;
+        else
+          res = diff;
+      end
+    end
+
+    // Assign the computed result to the output.
+    c = res;
+  end
+
+endmodule

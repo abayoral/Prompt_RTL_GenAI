@@ -1,0 +1,23 @@
+```
+module top_module (
+    input clk,
+    input d,
+    output reg q
+);
+
+    reg d_pos, d_neg;
+
+    always @(posedge clk) begin
+        d_pos <= d; // Capture input on the positive edge
+    end
+
+    always @(negedge clk) begin
+        d_neg <= d; // Capture input on the negative edge
+    end
+
+    always @(posedge clk or negedge clk) begin
+        q <= (d_pos | d_neg); // Update output based on captured values
+    end
+
+endmodule
+```

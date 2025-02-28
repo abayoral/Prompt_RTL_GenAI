@@ -1,0 +1,41 @@
+The provided Verilog code for the `comparator_4bit` module is mostly correct in terms of logic. However, there are a couple of points to address:
+
+1. **Output Declaration**: Although the code successfully assigns the outputs based on the comparison, using `reg` for the output signals is good practice, particularly because they are driven within an always block. It is generally acceptable to use `reg` here, but consider the use of `logic` in SystemVerilog for better type safety.
+  
+2. **Output Logic**: The behavior of the module is correctly implemented for the 4-bit comparison. However, to enhance clarity and maintainability, we can include additional comments and some minor formatting.
+
+Here is the revised version of the code that incorporates best practices:
+
+```verilog
+module comparator_4bit (
+    input wire [3:0] A,
+    input wire [3:0] B,
+    output reg A_greater,
+    output reg A_equal,
+    output reg A_less
+);
+
+always @(*) begin
+    // Default output values
+    A_greater = 1'b0;
+    A_equal = 1'b0;
+    A_less = 1'b0;
+
+    // Compare inputs A and B
+    if (A > B) begin
+        A_greater = 1'b1; // A is greater than B
+    end else if (A < B) begin
+        A_less = 1'b1;    // A is less than B
+    end else begin
+        A_equal = 1'b1;   // A is equal to B
+    end
+end
+
+endmodule
+```
+
+### Explanation of Corrections:
+- **Comments**: Additional comments were added to clarify the purpose of each comparison.
+- **Formatting**: The formatting remains consistent for readability.
+  
+This version maintains the same functionality while enhancing clarity. The original logic is retained, and since there were no syntactical errors, the code is essentially valid.

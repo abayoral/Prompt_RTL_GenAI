@@ -1,0 +1,41 @@
+module parallel2serial(
+    input wire clk,          // Clock input
+    input wire rst_n,        // Active-low reset
+    input wire [3:0] d,      // 4-bit parallel data input
+    output reg valid_out,    // Valid signal indicating output bit is valid
+    output reg dout        // Serial data output
+);
+
+    // Counter to select which bit of 'd' to output.
+    // It cycles through 0 to 3 corresponding to bits d[3] (MSB) to d[0] (LSB).
+    reg [1:0] cnt;
+    
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Active-low reset: Initialize counter and outputs.
+            cnt <= 2'b00;
+            dout <= 1'b0;
+            valid_out <= 1'b0;
+        end
+        else begin
+            // Set valid_out high since we output a valid serial bit each clock cycle.
+            valid_out <= 1'b1;
+            
+            // Select bit from input 'd' based on the counter value.
+            case(cnt)
+                2'b00: dout <= d[3]; // MSB
+                2'b01: dout <= d[2];
+                2'b10: dout <= d[1];
+                2'b11: dout <= d[0]; // LSB
+                default: dout <= 1'b0;
+            endcase
+            
+            // Increment counter or reset if at the last bit (cnt==3)
+            if (cnt == 2'b11)
+                cnt <= 2'b00;
+            else
+                cnt <= cnt + 1;
+        end
+    end
+
+endmodule

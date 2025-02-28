@@ -1,0 +1,141 @@
+module traffic_light(
+    input         rst_n,         // active-low reset
+    input         clk,           // clock signal driving the system
+    input         pass_request,  // pedestrian request button
+    output reg [7:0] clock,      // internal counter display
+    output reg    red,           // traffic red light
+    output reg    yellow,        // traffic yellow light
+    output reg    green          // traffic green light
+);
+
+// State parameter definitions
+parameter idle     = 2'b00,
+          s1_red   = 2'b01,  // red light active (duration: 10 cycles)
+          s2_yellow= 2'b10,  // yellow light active (duration: 5 cycles)
+          s3_green = 2'b11;  // green light active (duration: 60 cycles normally, but may be shortened)
+
+// Internal registers
+reg [1:0] state;
+reg [7:0] cnt;      // internal timing counter
+reg       p_red, p_yellow, p_green; // stored (historical) signals for outputs
+
+//*************************************************
+// State Transition Logic
+//*************************************************
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+        state <= idle;
+    else begin
+        case (state)
+            idle:
+                state <= s1_red;  // Immediately start with red light phase
+            s1_red:
+                if (cnt == 0)
+                    state <= s3_green;
+                else
+                    state <= s1_red;
+            s3_green:
+                if (cnt == 0)
+                    state <= s2_yellow;
+                else
+                    state <= s3_green;
+            s2_yellow:
+                if (cnt == 0)
+                    state <= s1_red;
+                else
+                    state <= s2_yellow;
+            default:
+                state <= idle;
+        endcase
+    end
+end
+
+//*************************************************
+// Counter Management
+//*************************************************
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        // Initialize counter for red phase duration when reset
+        cnt <= 8'd10;
+    end else begin
+        case (state)
+            idle: begin
+                // Not used during idle; immediately goes to red phase.
+                cnt <= 8'd0;
+            end
+            s1_red: begin
+                if (cnt == 0)
+                    // Upon completion of red phase, load green duration (60 cycles)
+                    cnt <= 8'd60;
+                else
+                    cnt <= cnt - 1;
+            end
+            s3_green: begin
+                // Check for pedestrian request and shorten if more than 10 cycles remain.
+                if (pass_request && (cnt > 8'd10)) begin
+                    cnt <= 8'd10;
+                end else begin
+                    if (cnt == 0)
+                        // Upon completion of green phase, load yellow duration (5 cycles)
+                        cnt <= 8'd5;
+                    else
+                        cnt <= cnt - 1;
+                end
+            end
+            s2_yellow: begin
+                if (cnt == 0)
+                    // Upon completion of yellow phase, load red duration (10 cycles)
+                    cnt <= 8'd10;
+                else
+                    cnt <= cnt - 1;
+            end
+            default: cnt <= cnt;
+        endcase
+    end
+end
+
+//*************************************************
+// Output Assignment and Historical Signal Update
+//*************************************************
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        p_red    <= 1'b0;
+        p_yellow <= 1'b0;
+        p_green  <= 1'b0;
+        red      <= 1'b0;
+        yellow   <= 1'b0;
+        green    <= 1'b0;
+        clock    <= 8'd0;
+    end else begin
+        // Update the stored light signals based on current state.
+        case (state)
+            s1_red: begin
+                p_red    <= 1'b1;
+                p_yellow <= 1'b0;
+                p_green  <= 1'b0;
+            end
+            s2_yellow: begin
+                p_red    <= 1'b0;
+                p_yellow <= 1'b1;
+                p_green  <= 1'b0;
+            end
+            s3_green: begin
+                p_red    <= 1'b0;
+                p_yellow <= 1'b0;
+                p_green  <= 1'b1;
+            end
+            default: begin
+                p_red    <= 1'b0;
+                p_yellow <= 1'b0;
+                p_green  <= 1'b0;
+            end
+        endcase
+        // Assign the internal registers to the module outputs.
+        red   <= p_red;
+        yellow<= p_yellow;
+        green <= p_green;
+        clock <= cnt;  // External clock output shows current counter value
+    end
+end
+
+endmodule

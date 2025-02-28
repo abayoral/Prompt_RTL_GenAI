@@ -1,0 +1,37 @@
+module barrel_shifter(
+    input  [7:0] in,      // 8-bit input data
+    input  [2:0] ctrl,    // 3-bit control: ctrl[2] for 4-bit, ctrl[1] for 2-bit, ctrl[0] for 1-bit rotate
+    output [7:0] out      // 8-bit output data after rotation
+);
+
+  // Internal wires for each stage of rotation.
+  // The barrel shifter performs a left rotate by (4*ctrl[2] + 2*ctrl[1] + 1*ctrl[0]) positions.
+  // Each stage uses a 2-to-1 multiplexer behavior (mux2X1) to choose between no shift and a fixed rotate.
+  
+  wire [7:0] stage0;
+  wire [7:0] stage1;
+  wire [7:0] stage2;
+  wire [7:0] stage3;
+  
+  // Initial stage: simply assign the input.
+  assign stage0 = in;
+  
+  // Stage 1: 4-bit left rotate.
+  // Using mux2X1 behavior: if ctrl[2] is high, perform a rotate by 4 bits; otherwise, pass the data unchanged.
+  // A 4-bit left rotate takes the lower 4 bits of stage0 (bits [3:0]) to the high order and the upper 4 bits (bits [7:4]) to the lower order.
+  assign stage1 = ctrl[2] ? { stage0[3:0], stage0[7:4] } : stage0;
+  
+  // Stage 2: 2-bit left rotate.
+  // If ctrl[1] is high, rotate stage1 by 2 bits; otherwise, pass stage1 unchanged.
+  // A 2-bit left rotate moves bits: { stage1[5:0], stage1[7:6] }.
+  assign stage2 = ctrl[1] ? { stage1[5:0], stage1[7:6] } : stage1;
+  
+  // Stage 3: 1-bit left rotate.
+  // If ctrl[0] is high, rotate stage2 by 1 bit; otherwise, pass stage2 unchanged.
+  // A 1-bit left rotate gives: { stage2[6:0], stage2[7] }.
+  assign stage3 = ctrl[0] ? { stage2[6:0], stage2[7] } : stage2;
+  
+  // Final output assignment, combining all shifting stages.
+  assign out = stage3;
+
+endmodule

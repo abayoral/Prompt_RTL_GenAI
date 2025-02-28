@@ -1,0 +1,59 @@
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output reg done
+);
+
+    // State encoding
+    localparam WAIT = 2'd0,
+               BYTE1 = 2'd1,
+               BYTE2 = 2'd2,
+               DONE = 2'd3;
+    
+    reg [1:0] current_state, next_state;
+    
+    // Combinational state transition logic
+    always @(*) begin
+        case (current_state)
+            WAIT: begin
+                // Wait for a byte with in[3]==1 to be treated as the first byte of a message
+                if (in[3])
+                    next_state = BYTE1;
+                else
+                    next_state = WAIT;
+            end
+            BYTE1: begin
+                // Received first byte, advance to next byte irrespective of its value
+                next_state = BYTE2;
+            end
+            BYTE2: begin
+                // Received second byte, next byte will complete the message.
+                next_state = DONE;
+            end
+            DONE: begin
+                // Assert done for one cycle and then transition back to WAIT for the next message
+                next_state = WAIT;
+            end
+            default: next_state = WAIT;
+        endcase
+    end
+
+    // Sequential logic: state flip-flops with synchronous reset
+    always @(posedge clk) begin
+        if (reset)
+            current_state <= WAIT;
+        else
+            current_state <= next_state;
+    end
+
+    // Output logic
+    // 'done' is asserted only in the cycle immediately after receipt of third byte (i.e. in DONE state)
+    always @(*) begin
+        if (current_state == DONE)
+            done = 1'b1;
+        else
+            done = 1'b0;
+    end
+
+endmodule

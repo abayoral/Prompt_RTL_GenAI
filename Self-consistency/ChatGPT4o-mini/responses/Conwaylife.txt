@@ -1,0 +1,52 @@
+module top_module(
+    input clk,
+    input load,
+    input [255:0] data,
+    output reg [255:0] q ); 
+
+    reg [255:0] next_q;
+
+    always @(posedge clk) begin
+        if (load) begin
+            q <= data;
+        end else begin
+            q <= next_q;
+        end
+    end
+
+    always @* begin
+        next_q = 256'b0; // Initialize next_q to all dead cells
+
+        for (int i = 0; i < 16; i++) begin
+            for (int j = 0; j < 16; j++) begin
+                int count = 0;
+                
+                // Count neighbors in the toroidal grid
+                for (int dx = -1; dx <= 1; dx++) begin
+                    for (int dy = -1; dy <= 1; dy++) begin
+                        if (dx == 0 && dy == 0) continue; // Skip the cell itself
+                        int ni = (i + dx + 16) % 16; // Wrap around in rows
+                        int nj = (j + dy + 16) % 16; // Wrap around in columns
+                        count += q[ni * 16 + nj]; // Count alive neighbors
+                    end
+                end
+
+                // Determine the next state of the cell
+                if (q[i * 16 + j] == 1) begin
+                    if (count < 2 || count > 3) begin
+                        next_q[i * 16 + j] = 0; // Cell dies
+                    end else begin
+                        next_q[i * 16 + j] = 1; // Cell remains alive
+                    end
+                end else begin
+                    if (count == 3) begin
+                        next_q[i * 16 + j] = 1; // Cell becomes alive
+                    end else begin
+                        next_q[i * 16 + j] = 0; // Cell remains dead
+                    end
+                end
+            end
+        end
+    end
+
+endmodule

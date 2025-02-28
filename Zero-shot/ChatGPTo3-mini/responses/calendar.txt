@@ -1,0 +1,50 @@
+module calendar(
+    input CLK,
+    input RST,
+    output reg [5:0] Secs,
+    output reg [5:0] Mins,
+    output reg [5:0] Hours
+);
+
+    // Seconds counter: Counts from 0 to 59, then wraps to 0.
+    always @(posedge CLK or posedge RST) begin
+        if (RST)
+            Secs <= 6'd0;
+        else if (Secs == 6'd59)
+            Secs <= 6'd0;
+        else
+            Secs <= Secs + 1;
+    end
+
+    // Minutes counter: Increments when Secs reach 59.
+    always @(posedge CLK or posedge RST) begin
+        if (RST)
+            Mins <= 6'd0;
+        // Only update minutes when seconds complete a minute.
+        else if (Secs == 6'd59) begin
+            if (Mins == 6'd59)
+                Mins <= 6'd0;
+            else
+                Mins <= Mins + 1;
+        end
+        else
+            Mins <= Mins;
+    end
+
+    // Hours counter: Increments when both Secs and Mins reach 59.
+    always @(posedge CLK or posedge RST) begin
+        if (RST)
+            Hours <= 6'd0;
+        // When seconds and minutes both complete their cycle,
+        // it's the top of a new hour.
+        else if ((Secs == 6'd59) && (Mins == 6'd59)) begin
+            if (Hours == 6'd23)
+                Hours <= 6'd0;
+            else
+                Hours <= Hours + 1;
+        end
+        else
+            Hours <= Hours;
+    end
+
+endmodule

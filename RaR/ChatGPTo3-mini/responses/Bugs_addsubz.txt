@@ -1,0 +1,20 @@
+module adder_subtractor (
+    input  [7:0] a,
+    input  [7:0] b,
+    input        do_sub,
+    output reg [7:0] result,
+    output       zero
+);
+
+    // Combinational logic for addition or subtraction
+    always @(*) begin
+        if (do_sub)
+            result = a - b;
+        else
+            result = a + b;
+    end
+
+    // Zero flag is asserted when the result equals zero
+    assign zero = (result == 8'b00000000);
+
+endmodule

@@ -1,0 +1,15 @@
+```verilog
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output cout,
+    output [99:0] sum );
+
+    wire [100:0] full_sum;
+
+    assign full_sum = {1'b0, a} + {1'b0, b} + cin; // Extend a and b to 101 bits for overflow
+    assign sum = full_sum[99:0]; // Take the lower 100 bits as the sum
+    assign cout = full_sum[100]; // The carry out is the 101st bit
+
+endmodule
+```

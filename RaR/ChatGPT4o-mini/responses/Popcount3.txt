@@ -1,0 +1,10 @@
+```verilog
+module population_count(
+    input wire [2:0] in_vector,
+    output wire [1:0] count
+);
+
+    assign count = in_vector[0] + in_vector[1] + in_vector[2];
+
+endmodule
+```

@@ -1,0 +1,91 @@
+```verilog
+module float_multi (
+    input clk,
+    input rst,
+    input [31:0] a,
+    input [31:0] b,
+    output reg [31:0] z
+);
+
+    reg [2:0] counter;
+    
+    reg [23:0] a_mantissa, b_mantissa, z_mantissa;
+    reg [7:0] a_exponent, b_exponent, z_exponent;
+    reg a_sign, b_sign, z_sign;
+    
+    reg [49:0] product;
+    reg guard_bit, round_bit, sticky;
+
+    // Initialization Phase
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            counter <= 3'b000;
+            z <= 32'b0;
+        end else begin
+            case (counter)
+                3'b000: begin
+                    // Extract sign, exponent, and mantissa
+                    a_sign <= a[31];
+                    a_exponent <= a[30:23];
+                    a_mantissa <= {1'b1, a[22:0]}; // Added implicit leading 1
+                    
+                    b_sign <= b[31];
+                    b_exponent <= b[30:23];
+                    b_mantissa <= {1'b1, b[22:0]}; // Added implicit leading 1
+
+                    counter <= counter + 1;
+                end
+                
+                3'b001: begin
+                    // Handle special cases
+                    if (a_exponent == 8'hFF || b_exponent == 8'hFF) begin  // NaN or Infinity
+                        z <= 32'h7FC00000; // Return NaN as output
+                        counter <= 3'b000; // Reset counter after operation
+                    end else begin
+                        // Normal calculation
+                        z_sign <= a_sign ^ b_sign; // Determine the sign of the result
+                        z_exponent <= a_exponent + b_exponent - 8'd127; // Exponent adjustment
+                        counter <= counter + 1;
+                    end
+                end
+                
+                3'b010: begin
+                    // Multiplication Phase
+                    product <= a_mantissa * b_mantissa;
+                    // Capture bits for rounding
+                    guard_bit <= product[24];
+                    round_bit <= product[23];
+                    sticky <= |product[22:0]; // Any non-zero bit in the lower part
+                    counter <= counter + 1;
+                end
+                
+                3'b011: begin
+                    // Rounding Phase
+                    if (guard_bit && (round_bit || sticky || (z_mantissa[0]))) begin
+                        z_mantissa <= product[49:26] + 1; // Round up
+                    end else begin
+                        z_mantissa <= product[49:26]; // No rounding
+                    end
+
+                    // Normalize Phase
+                    if (z_mantissa[23] == 0) begin
+                        z_mantissa <= z_mantissa << 1; // Shift left to normalize
+                        z_exponent <= z_exponent - 1; // Decrease exponent
+                    end
+                    
+                    // Check for overflow and underflow
+                    if (z_exponent >= 8'hFF) begin
+                        z <= {z_sign, 8'hFF, 23'b0}; // Saturate to infinity
+                    end else begin
+                        z <= {z_sign, z_exponent[7:0], z_mantissa[22:0]}; // Formulate final output
+                    end
+
+                    counter <= 3'b000; // Reset counter after operation
+                end
+                
+                default: counter <= 3'b000; // Reset on invalid state
+            endcase
+        end
+    end
+endmodule
+```

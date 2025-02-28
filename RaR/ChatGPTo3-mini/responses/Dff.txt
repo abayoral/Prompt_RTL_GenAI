@@ -1,0 +1,12 @@
+module top_module(
+    input clk,     // Clock signal for sequential operations
+    input d,       // Data input to be sampled on the rising edge of clk
+    output reg q   // Registered output that holds the sampled value
+);
+
+    // On every rising edge of the clock, transfer the value of 'd' to 'q'
+    always @(posedge clk) begin
+        q <= d;  // Non-blocking assignment used for proper sequential logic
+    end
+
+endmodule

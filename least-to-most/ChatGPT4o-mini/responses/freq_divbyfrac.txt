@@ -1,0 +1,66 @@
+```verilog
+module freq_divbyfrac (
+    input clk,
+    input rst_n,
+    output reg clk_div
+);
+
+    // Parameters for frequency division
+    parameter integer MUL2_DIV_CLK = 7;
+    parameter integer DIV_4_CYCLES = 4;
+    parameter integer DIV_3_CYCLES = 3;
+
+    // Internal signals
+    reg [2:0] count;        // 3-bit counter for the 7 cycles
+    reg clk_div_a;          // Intermediate clock signal A (4 cycles)
+    reg clk_div_b;          // Intermediate clock signal B (3 cycles)
+    reg clk_div_buf;        // Buffer for clk_div to implement phase shift
+
+    // Counter for determining when to toggle clk_div_a and clk_div_b
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            count <= 0;
+            clk_div_a <= 0;
+            clk_div_b <= 0;
+        end else begin
+            if (count < MUL2_DIV_CLK - 1) begin
+                count <= count + 1;
+            end else begin
+                count <= 0;
+            end
+            
+            // Generate clk_div_a and clk_div_b based on counts
+            if (count < DIV_4_CYCLES) begin
+                clk_div_a <= 1;
+            end else begin
+                clk_div_a <= 0;
+            end
+            
+            if (count < DIV_3_CYCLES) begin
+                clk_div_b <= 1;
+            end else begin
+                clk_div_b <= 0;
+            end
+        end
+    end
+
+    // Phase shifting by half a clock period for clk_div_b
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            clk_div_buf <= 0;
+        end else begin
+            clk_div_buf <= clk_div_a; // Create phase-shifted version
+        end
+    end
+
+    // Combine the two intermediate clocks
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            clk_div <= 0;
+        end else begin
+            clk_div <= clk_div_a | clk_div_buf; // OR operation to generate final output
+        end
+    end
+
+endmodule
+```

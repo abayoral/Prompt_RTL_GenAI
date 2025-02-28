@@ -1,0 +1,30 @@
+```verilog
+module freq_diveven #(
+    parameter NUM_DIV = 4  // Division factor, must be an even number
+)(
+    input wire clk,         // Input clock signal
+    input wire rst_n,      // Active-low reset signal
+    output reg clk_div      // Divided clock output signal
+);
+
+reg [3:0] cnt; // 4-bit counter
+
+// Always block triggered on the positive edge of the clock
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        // Reset state
+        cnt <= 4'b0000;      // Reset counter
+        clk_div <= 1'b0;     // Reset divided clock
+    end else begin
+        // Count the clock cycles
+        if (cnt < (NUM_DIV / 2 - 1)) begin
+            cnt <= cnt + 1;  // Increment the counter
+        end else begin
+            cnt <= 4'b0000;   // Reset the counter
+            clk_div <= ~clk_div; // Toggle the divided clock output
+        end
+    end
+end
+
+endmodule
+```

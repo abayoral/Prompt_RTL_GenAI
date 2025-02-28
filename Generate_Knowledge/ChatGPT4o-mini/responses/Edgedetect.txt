@@ -1,0 +1,16 @@
+```
+module top_module (
+    input clk,
+    input [7:0] in,
+    output reg [7:0] pedge
+);
+
+    reg [7:0] in_delayed;
+
+    always @(posedge clk) begin
+        pedge <= in & ~in_delayed; // Set pedge to 1 where in changes from 0 to 1
+        in_delayed <= in;          // Delay input for the next cycle
+    end
+
+endmodule
+```

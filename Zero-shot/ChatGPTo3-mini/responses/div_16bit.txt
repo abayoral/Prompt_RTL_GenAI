@@ -1,0 +1,64 @@
+module div_16bit(
+    input  [15:0] A,     // 16-bit dividend
+    input  [7:0]  B,     // 8-bit divisor
+    output reg [15:0] result, // 16-bit quotient (lower 8-bits contain valid quotient)
+    output reg [15:0] odd     // 16-bit remainder (lower 8-bits contain valid remainder)
+);
+
+    // Internal registers to hold the inputs.
+    reg [15:0] a_reg;
+    reg [7:0]  b_reg;
+
+    // First combinational always block:
+    // Capture the input values into internal registers.
+    always @(*) begin
+        a_reg = A;
+        b_reg = B;
+    end
+
+    // Second combinational always block:
+    // Perform the iterative division process using combinational logic.
+    always @(*) begin
+        integer i;
+        reg [7:0] quot;      // Will hold the computed quotient bits (8 bits relative to our iterative process)
+        reg [8:0] rem;       // 9-bit temporary remainder to accommodate subtraction and shifting
+        
+        // Handle division by zero: In this case, define quotient as zero and remainder as the dividend.
+        if(b_reg == 0) begin
+            result = 16'd0;
+            odd    = a_reg;
+        end
+        else begin
+            // Initialize the remainder with the upper 8 bits of the dividend.
+            rem  = {1'b0, a_reg[15:8]};
+            quot = 8'd0;
+            
+            // Process the remaining 8 bits of the dividend.
+            // For each bit (from bit position 7 downto 0 of the dividend) do:
+            //   - Shift left the remainder and bring in the next bit.
+            //   - Compare the new remainder with the divisor.
+            //   - If the remainder is greater than or equal to the divisor,
+            //     subtract the divisor and set the corresponding quotient bit.
+            for(i = 7; i >= 0; i = i - 1) begin
+                // Concatenate the next lower-order bit of a_reg into the remainder.
+                rem = {rem[7:0], a_reg[i]};
+                
+                // If the remainder is larger than or equal to the divisor, subtract and record a '1' in the quotient.
+                if (rem >= {1'b0, b_reg}) begin
+                    rem   = rem - {1'b0, b_reg};
+                    quot[i] = 1'b1;
+                end
+                else begin
+                    quot[i] = 1'b0;
+                end
+            end
+            
+            // The quotient is stored in the lower 8 bits.
+            // Place leading zeros in the upper 8 bits to form the 16-bit result.
+            result = {8'd0, quot};
+            // The final remainder is contained in the lower 8 bits of "rem".
+            odd    = {8'd0, rem[7:0]};
+        end
+    end
+
+endmodule

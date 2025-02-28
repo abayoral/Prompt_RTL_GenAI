@@ -1,0 +1,25 @@
+```
+module xor_gate (
+    input wire clk,
+    input wire a,
+    input wire b,
+    output wire out_assign,
+    output reg out_always_comb,
+    output reg out_always_ff
+);
+
+// Implementation using assign statement
+assign out_assign = a ^ b; // XOR operation using assign statement
+
+// Implementation using combinational always block
+always @* begin
+    out_always_comb = a ^ b; // Combinational logic
+end
+
+// Implementation using clocked always block
+always @(posedge clk) begin
+    out_always_ff <= a ^ b; // Sequential logic triggered on clock edge
+end
+
+endmodule
+```

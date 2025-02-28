@@ -1,0 +1,12 @@
+```verilog
+module ModuleA (
+    input wire [31:0] x, // 32-bit input x
+    input wire [31:0] y, // 32-bit input y
+    output wire [31:0] z // 32-bit output z
+);
+
+    // Logic to compute z = (x ^ y) & x
+    assign z = (x ^ y) & x;
+
+endmodule
+```

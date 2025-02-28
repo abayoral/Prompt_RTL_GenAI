@@ -1,0 +1,95 @@
+```
+module traffic_light (
+    input wire rst_n,
+    input wire clk,
+    input wire pass_request,
+    output reg [7:0] clock,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+    // Parameters for states
+    parameter idle = 2'b00, s1_red = 2'b01, s2_yellow = 2'b10, s3_green = 2'b11;
+    
+    // Registers to manage state and counter
+    reg [1:0] state, next_state;
+    reg [7:0] cnt;
+    
+    // Output registers to track previous state
+    reg p_red, p_yellow, p_green;
+
+    // State transitions
+    always @ (posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= idle;
+            cnt <= 8'd0;
+            clock <= 8'd0;
+        end else begin
+            state <= next_state;
+            clock <= cnt;
+        end
+    end
+
+    // Next state logic and counter logic
+    always @ (*) begin
+        next_state = state; // default next state
+        case (state)
+            idle: begin
+                if (cnt == 8'd0) begin
+                    next_state = s3_green; // move to green when idle
+                end
+            end
+            s1_red: begin
+                if (cnt == 8'd10) begin
+                    next_state = s2_yellow; // move to yellow after red
+                end
+            end
+            s2_yellow: begin
+                if (cnt == 8'd5) begin
+                    next_state = s3_green; // move to green after yellow
+                end
+            end
+            s3_green: begin
+                if (cnt == 8'd60) begin
+                    next_state = s1_red; // move to red after green
+                end else if (pass_request && (60 - cnt) > 10) begin
+                    cnt <= 8'd10; // reduce green duration to 10 cycles
+                end
+            end
+        endcase
+    end
+
+    // Counter logic
+    always @ (posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt <= 8'd0;
+        end else begin
+            if (state == s1_red) begin
+                cnt <= cnt + 1;
+            end else if (state == s2_yellow) begin
+                cnt <= cnt + 1;
+            end else if (state == s3_green) begin
+                cnt <= cnt + 1;
+            end else begin
+                cnt <= 8'd0; // reset when in idle
+            end
+        end
+    end
+
+    // Output logic
+    always @ (*) begin
+        // Default outputs
+        red = 1'b0;
+        yellow = 1'b0;
+        green = 1'b0;
+        
+        case (state)
+            s1_red: red = 1'b1;
+            s2_yellow: yellow = 1'b1;
+            s3_green: green = 1'b1;
+        endcase
+    end
+
+endmodule
+```

@@ -1,0 +1,27 @@
+As a professional Verilog designer, you are tasked with designing and implementing a module for a 3-bit binary comparator. This module, named `comparator_3bit`, is responsible for comparing two 3-bit binary numbers and outputs three signals indicating the result of this comparison. The details of the task are as follows:
+
+1. Module Name:
+   - The module should be named `comparator_3bit`.
+
+2. Input Ports:
+   - The module requires two input operands, each being a 3-bit binary number:
+     - `A [2:0]`: This is the first 3-bit input operand. It represents the first binary number in the comparison operation.
+     - `B [2:0]`: This is the second 3-bit input operand. It represents the second binary number that is compared against `A`.
+
+3. Output Ports:
+   - The module produces three output signals, each a 1-bit value, reflecting the relationship between the two input operands:
+     - `A_greater`: This signal indicates whether the first operand `A` is greater than the second operand `B`. If `A > B`, `A_greater` should be high (1).
+     - `A_equal`: This signal indicates whether `A` is equal to `B`. If `A` equals `B`, then `A_equal` should be high (1).
+     - `A_less`: This signal indicates whether `A` is less than `B`. If `A < B`, `A_less` should be high (1).
+
+4. Implementation:
+   - The comparison logic utilized within the module is based on combinational logic. This ensures that the comparison between the two numbers happens instantaneously without any memory or state retention.
+   - The design should ensure that the outputs `A_greater`, `A_equal`, and `A_less` are mutually exclusive. This means that at any given time, only one of these outputs will be high (1), while the others remain low (0), depending on the result of the comparison.
+
+5. Output Encoding:
+   - The output encoding is designed such that the mutually exclusive nature of the outputs simplifies the interpretation of the result. Specifically, based on the comparison:
+     - If `A` is greater than `B`, `A_greater` will be high, and both `A_equal` and `A_less` will be low.
+     - If `A` is equal to `B`, `A_equal` will be high, and both `A_greater` and `A_less` will be low.
+     - If `A` is less than `B`, `A_less` will be high, and both `A_greater` and `A_equal` will be low.
+
+Your task is to write the complete Verilog code for this module, ensuring that it conforms to the requirements outlined above. Consider the efficient use of combinational logic to achieve the desired functionality.

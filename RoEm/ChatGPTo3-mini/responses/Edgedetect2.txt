@@ -1,0 +1,19 @@
+module top_module (
+    input clk,
+    input [7:0] in,
+    output reg [7:0] anyedge
+);
+
+    // Register to hold delayed version of the input
+    reg [7:0] prev;
+
+    always @(posedge clk) begin
+        // Detect a rising edge on each bit
+        // Only a 0-to-1 transition (rising edge) will yield a '1' in the corresponding bit of anyedge.
+        anyedge <= (~prev) & in;
+        
+        // Update the stored previous value for edge detection on the next clock cycle
+        prev <= in;
+    end
+
+endmodule

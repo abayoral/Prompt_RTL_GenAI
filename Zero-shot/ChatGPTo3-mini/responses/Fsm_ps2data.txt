@@ -1,0 +1,54 @@
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output reg [23:0] out_bytes,
+    output reg done
+);
+
+    // Define state encoding
+    localparam S0 = 2'd0,  // Waiting for first byte with bit[3]=1
+               S1 = 2'd1,  // Second byte
+               S2 = 2'd2;  // Third byte
+
+    reg [1:0] state;
+
+    // Synchronous FSM and datapath
+    always @(posedge clk) begin
+        if (reset) begin
+            state     <= S0;
+            out_bytes <= 24'd0;
+            done      <= 1'b0;
+        end else begin
+            // Default: done is low
+            done <= 1'b0;
+            case (state)
+                S0: begin
+                    // Look for the start byte with bit3 == 1
+                    if (in[3]) begin
+                        out_bytes[23:16] <= in;
+                        state <= S1;
+                    end
+                end
+
+                S1: begin
+                    // Capture the second byte
+                    out_bytes[15:8] <= in;
+                    state <= S2;
+                end
+
+                S2: begin
+                    // Capture the third byte and signal done
+                    out_bytes[7:0] <= in;
+                    done <= 1'b1;
+                    state <= S0;
+                end
+
+                default: begin
+                    state <= S0;
+                end
+            endcase
+        end
+    end
+
+endmodule

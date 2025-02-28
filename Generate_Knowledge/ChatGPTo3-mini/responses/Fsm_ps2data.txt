@@ -1,0 +1,56 @@
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output [23:0] out_bytes,
+    output reg done
+);
+
+    // State encoding
+    localparam WAIT  = 2'b00,
+               BYTE2 = 2'b01,
+               BYTE3 = 2'b10;
+               
+    reg [1:0] state;
+    reg [23:0] out_bytes_reg;
+    
+    // Synchronous FSM and datapath: capture incoming bytes on valid boundaries
+    always @(posedge clk) begin
+        if (reset) begin
+            state         <= WAIT;
+            out_bytes_reg <= 24'd0;
+            done          <= 1'b0;
+        end 
+        else begin
+            // Default: done de-asserted
+            done <= 1'b0;
+            case(state)
+                WAIT: begin
+                    // Wait for a byte with bit[3]==1 (candidate for first byte of message)
+                    if (in[3]) begin
+                        out_bytes_reg[23:16] <= in;  // capture first byte
+                        state <= BYTE2;
+                    end 
+                    else
+                        state <= WAIT; // keep waiting
+                end
+                BYTE2: begin
+                    out_bytes_reg[15:8] <= in;  // capture second byte
+                    state <= BYTE3;
+                end
+                BYTE3: begin
+                    out_bytes_reg[7:0] <= in;   // capture third byte
+                    state <= WAIT;              // reset state for next packet
+                    done <= 1'b1;               // signal completion of one 3-byte message
+                end
+                default: begin
+                    state <= WAIT;
+                end
+            endcase
+        end
+    end
+
+    // Connect datapath register to output
+    assign out_bytes = out_bytes_reg;
+
+endmodule

@@ -1,0 +1,53 @@
+```
+module pulse_detect (
+    input wire clk,
+    input wire rst_n,
+    input wire data_in,
+    output reg data_out
+);
+
+    // State encoding
+    reg [1:0] state;
+    
+    // State definitions
+    localparam IDLE = 2'b00;
+    localparam HIGH = 2'b01;
+    localparam LOW = 2'b10;
+
+    // Always block for pulse detection logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset state and output
+            state <= IDLE;
+            data_out <= 0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    if (data_in) begin
+                        // Transition from IDLE to HIGH
+                        state <= HIGH;
+                    end
+                end
+                
+                HIGH: begin
+                    if (!data_in) begin
+                        // Transition from HIGH to LOW
+                        state <= LOW;
+                    end
+                end
+
+                LOW: begin
+                    // Pulse detected, set output
+                    data_out <= 1;
+                    // Go back to IDLE waiting for the next pulse
+                    state <= IDLE;
+                end
+
+                default: begin
+                    state <= IDLE; // Default case safety
+                end
+            endcase
+        end
+    end
+endmodule
+```

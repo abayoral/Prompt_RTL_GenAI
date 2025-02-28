@@ -1,0 +1,102 @@
+module traffic_light (
+    input wire rst_n,
+    input wire clk,
+    input wire pass_request,
+    output reg [7:0] clock,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+    parameter idle = 2'b00, s1_red = 2'b01, s2_yellow = 2'b10, s3_green = 2'b11;
+    reg [1:0] state, next_state;
+    reg [7:0] cnt;
+    reg [7:0] green_duration = 60;
+    reg [7:0] yellow_duration = 5;
+    reg [7:0] red_duration = 10;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= idle;
+            cnt <= 0;
+        end else begin
+            if (cnt == 0) begin
+                state <= next_state;
+            end else begin
+                cnt <= cnt - 1;
+            end
+        end
+    end
+
+    always @(*) begin
+        case (state)
+            idle: begin
+                next_state = s1_red;
+                cnt = red_duration;
+            end
+            s1_red: begin
+                if (cnt > 0) begin
+                    next_state = s1_red;
+                    cnt = cnt; // Stay in red
+                end else begin
+                    next_state = s3_green;
+                    cnt = green_duration; // Move to green
+                end
+            end
+            s2_yellow: begin
+                if (cnt > 0) begin
+                    next_state = s2_yellow;
+                    cnt = cnt; // Stay in yellow
+                end else begin
+                    next_state = s1_red;
+                    cnt = red_duration; // Move to red
+                end
+            end
+            s3_green: begin
+                if (pass_request && cnt > 10) begin
+                    cnt = 10; // Reduce green duration if request is made
+                end
+                if (cnt > 0) begin
+                    next_state = s3_green;
+                    cnt = cnt; // Stay in green
+                end else begin
+                    next_state = s2_yellow;
+                    cnt = yellow_duration; // Move to yellow
+                end
+            end
+            default: begin
+                next_state = idle; // Fallback state
+                cnt = 0;
+            end
+        endcase
+    end
+
+    always @(*) begin
+        // Output logic based on state
+        case (state)
+            s1_red: begin
+                red = 1;
+                yellow = 0;
+                green = 0;
+            end
+            s2_yellow: begin
+                red = 0;
+                yellow = 1;
+                green = 0;
+            end
+            s3_green: begin
+                red = 0;
+                yellow = 0;
+                green = 1;
+            end
+            default: begin
+                red = 0;
+                yellow = 0;
+                green = 0; // In idle state
+            end
+        endcase
+    end
+
+    assign clock = cnt;
+
+endmodule

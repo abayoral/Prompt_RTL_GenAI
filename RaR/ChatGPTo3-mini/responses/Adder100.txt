@@ -1,0 +1,13 @@
+module binary_adder_100(
+    input  [99:0] a,
+    input  [99:0] b,
+    input         c_in,
+    output [99:0] sum,
+    output        c_out
+);
+
+    // Perform the addition of the two 100-bit numbers with the carry-in.
+    // The concatenation {c_out, sum} is a 101-bit vector where the MSB is the carry-out.
+    assign {c_out, sum} = a + b + c_in;
+
+endmodule

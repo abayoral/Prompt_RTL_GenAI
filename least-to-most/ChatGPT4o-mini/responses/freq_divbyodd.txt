@@ -1,0 +1,46 @@
+```verilog
+module freq_divbyodd #(parameter NUM_DIV = 5) (
+    input wire clk,
+    input wire rst_n,
+    output reg clk_div
+);
+
+    reg [31:0] cnt1; // Counter for positive edges
+    reg [31:0] cnt2; // Counter for negative edges
+    reg clk_div1, clk_div2; // Intermediate divided clock signals
+
+    always @(posedge clk or negedge rst_n) begin
+        if (~rst_n) begin
+            cnt1 <= 0;
+            clk_div1 <= 0;
+        end else begin
+            if (cnt1 == (NUM_DIV - 1)) begin
+                clk_div1 <= ~clk_div1; // Toggle clk_div1
+                cnt1 <= 0; // Reset counter
+            end else begin
+                cnt1 <= cnt1 + 1; // Increment counter
+            end
+        end
+    end
+
+    always @(negedge clk or negedge rst_n) begin
+        if (~rst_n) begin
+            cnt2 <= 0;
+            clk_div2 <= 0;
+        end else begin
+            if (cnt2 == (NUM_DIV - 1)) begin
+                clk_div2 <= ~clk_div2; // Toggle clk_div2
+                cnt2 <= 0; // Reset counter
+            end else begin
+                cnt2 <= cnt2 + 1; // Increment counter
+            end
+        end
+    end
+
+    // Combine the two divided clock signals
+    always @(*) begin
+        clk_div = clk_div1 | clk_div2; // OR operation of the two clock signals
+    end
+
+endmodule
+```

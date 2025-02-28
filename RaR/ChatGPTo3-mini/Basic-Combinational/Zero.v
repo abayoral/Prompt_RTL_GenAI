@@ -1,0 +1,5 @@
+Imagine you are a Senior Digital Design Engineer working at a top hardware design company, where your expertise in Verilog and digital circuit design is crucial. Your next assignment is to create a Verilog module for an upcoming, high-profile product. The quality and reliability of this module are essential, as it plays a significant role in upholding the company's esteemed reputation in the competitive computer hardware industry.
+
+Your task is to design a digital circuit that has no input signals and only one output signal. This output must consistently provide a constant logic value of 0 under all circumstances. Essentially, you need to write the Verilog code for a module that, upon instantiation, immediately supplies a stable low (logic 0) output without depending on any input conditions.
+
+Please develop the Verilog module code according to these specifications, ensuring clarity, correctness, and adherence to best practices in digital circuit design. Note that this exercise focuses solely on the process of coding a module that meets the stated behavior, and does not require any additional functionality beyond what is described.

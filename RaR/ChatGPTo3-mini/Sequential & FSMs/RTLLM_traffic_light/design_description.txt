@@ -1,0 +1,47 @@
+Consider the following detailed design problem that you are being asked to address using Verilog, a hardware description language suitable for digital circuit design. The task is to implement a traffic light controller with certain specific behaviors, supporting both vehicle and pedestrian traffic flows. Your design should include several components, well-defined states, and mechanisms to handle input conditions, such as the pedestrian request. Below is an expanded breakdown of the assignment:
+
+1. Scenario Overview:
+   • The controller is responsible for a single traffic light managing a motor vehicle lane.
+   • The normal operation of the vehicle's traffic lights proceeds with a timing cycle: green remains active for 60 clock cycles, yellow for 5 clock cycles, and red for 10 clock cycles.
+   • A dedicated pedestrian button is available for users to signal a request to cross, affecting the light timing.
+
+2. Pedestrian Button Behavior:
+   • When the pedestrian button is pressed while the vehicular traffic light is in its green state, the controller should compare the remaining number of clock cycles until the next scheduled state change.
+   • If there are more than 10 clock cycles remaining in the green phase at the moment of the button press, the green phase should be truncated so that only 10 cycles remain.
+   • If there are fewer than 10 cycles remaining on the green phase when the button is pressed, then the cycle’s duration should remain unchanged.
+  
+3. Traffic Light Pairing and Signal Coordination:
+   • The design should also manage the pedestrian signal alongside the vehicular lights.
+   • When the vehicular signals are green or yellow, the pedestrian signal should display red, indicating that pedestrians should not cross.
+   • Conversely, when the vehicular light turns to red, the pedestrian signal should switch to green to indicate it is safe for pedestrians to cross.
+
+4. Module Interface Requirements:
+   • Create a Verilog module named “traffic_light” that encapsulates the entire controller design.
+   • Inputs to the module should include:
+     - rst_n: An active-low reset signal.
+     - clk: The clock signal that drives all internal timing operations.
+     - pass_request: A signal which models the pedestrian button press.
+   • Outputs from the module should include:
+     - clock[7:0]: An 8-bit bus representing the internal countdown timer that manages the duration of each light state.
+     - red, yellow, green: Individual signals representing the current state of the vehicle’s traffic lights.
+
+5. Internal State Management and Parameters:
+   • You should define parameters or enumerations for different states, such as idle, the red state (s1_red), yellow state (s2_yellow), and green state (s3_green), to clearly mark each phase of the traffic light cycle.
+   • Your internal design should include state registers (for example, using a 2-bit state register) to track the current operating mode.
+
+6. Implementation of Counters and State Transitions:
+   • Implement a counter, using an 8-bit register (such as “cnt”), that decrements with each clock cycle and resets or adjusts based on the current state or when a pedestrian request occurs.
+   • Develop state transition logic within an always block that:
+     - Transitions from an idle state to the first red phase (s1_red).
+     - Advances from red to green (s3_green) after a preset count.
+     - Transitions from yellow to red (returning to s1_red) following the proper countdown.
+     - Incorporates conditions to address the pedestrian request—modifying the green state's remaining time if necessary.
+   • Ensure that the state transitions and countdown adjustments coordinate correctly with the pedestrian request input.
+
+7. Output Signal Handling:
+   • A separate always block should manage the output signals (red, yellow, green) based on the present and previous state data.
+   • This block should ensure that the transitions in the display output match those of the internal state and counter logic, especially once any modification (such as the truncation of the green light) is triggered.
+
+In summary, your design must integrate state machine-based control, careful counter management, and proper output signaling to implement a robust traffic light controller. The goal is to produce a coherent Verilog implementation that adheres to the specified timing cycles, correctly incorporates the pedestrian button input, and ensures that vehicular and pedestrian signals are updated consistently with the defined behavior.
+
+This expanded description is intended to provide you with additional clarity on the task details and design considerations. Remember, the focus is solely on understanding and elaborating the problem statement without including any actual solution code.

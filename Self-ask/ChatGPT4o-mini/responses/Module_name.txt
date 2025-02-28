@@ -1,0 +1,1 @@
+What specific logic or functionality should `mod_a` implement to combine the inputs `in1`, `in2`, `in3`, and `in4` to produce the outputs `out1` and `out2`?

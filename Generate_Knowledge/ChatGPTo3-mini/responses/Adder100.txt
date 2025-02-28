@@ -1,0 +1,15 @@
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output cout,
+    output [99:0] sum 
+);
+    // Create a 101-bit intermediate result to store the sum of a, b, and cin.
+    wire [100:0] result;
+    
+    assign result = a + b + cin; // Behavioral adder adding a, b, and carry-in.
+    
+    assign sum  = result[99:0];  // Lower 100 bits are the sum.
+    assign cout = result[100];    // The 101st bit is the final carry-out.
+
+endmodule

@@ -1,0 +1,7 @@
+Imagine you are a senior Digital Design Engineer working for a leading company in the field of hardware design. In this pivotal role, you have been entrusted with the responsibility to create an essential Verilog module that plays a crucial part in a next-generation product the company plans to launch. The successful development and implementation of this module are vital for sustaining the reputation and standing of your company within the highly competitive computer hardware industry.
+
+Your task is to design a 100-bit wide 2-to-1 multiplexer. The multiplexer should function based on a selection input. Specifically, when the selection signal, labeled as "sel", is set to 0, the output of the multiplexer should reflect the input "a". Conversely, when "sel" is set to 1, the output should display the value of input "b". 
+
+It is worth noting that utilizing the ternary operator, which follows the syntax (condition ? true_case : false_case), may contribute to enhancing the readability of your code, making it easier for others to understand its functionality at a glance.
+
+Given this context and requirement, how would you approach the implementation of this 100-bit wide 2-to-1 multiplexer in the Verilog programming language? Consider your design strategy, code clarity, and overall functionality in your response.

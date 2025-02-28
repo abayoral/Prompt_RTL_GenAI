@@ -1,0 +1,68 @@
+module multi_16bit(
+    input         clk,
+    input         rst_n,
+    input         start,
+    input  [15:0] ain,
+    input  [15:0] bin,
+    output [31:0] yout,
+    output        done
+);
+
+  reg [15:0] areg;
+  reg [15:0] breg;
+  reg [31:0] yout_r;
+  reg  [4:0] i;       // Counter: needs to count from 0 to 17, so 5 bits.
+  reg        done_r;
+
+  // Output assignments
+  assign yout = yout_r;
+  assign done = done_r;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      areg   <= 16'b0;
+      breg   <= 16'b0;
+      yout_r <= 32'b0;
+      i      <= 5'b0;
+      done_r <= 1'b0;
+    end else begin
+      // If start is not asserted, clear counter and done flag.
+      if (!start) begin
+        i      <= 5'b0;
+        done_r <= 1'b0;
+      end else begin
+        // When start is active, begin processing.
+        if (i == 0) begin
+          // Load multiplicand and multiplier, clear accumulated product.
+          areg   <= ain;
+          breg   <= bin;
+          yout_r <= 32'b0;
+          done_r <= 1'b0;
+          i      <= i + 1;
+        end else if (i <= 16) begin
+          // If the current LSB of areg is 1, add breg to the output accumulator.
+          if (areg[0] == 1'b1)
+            yout_r <= yout_r + breg;
+          else
+            yout_r <= yout_r;
+  
+          // Shift areg right by one and shift breg left by one for the next cycle.
+          areg <= areg >> 1;
+          breg <= breg << 1;
+  
+          // Increment loop counter.
+          i <= i + 1;
+  
+          // When the last valid bit (i==16) has been processed, assert done flag.
+          if (i == 16)
+            done_r <= 1'b1;
+        end else if (i == 17) begin
+          // One extra cycle: reset the done flag and counter for a fresh start.
+          i      <= 5'b0;
+          done_r <= 1'b0;
+        end
+      end
+    end
+  end
+
+endmodule

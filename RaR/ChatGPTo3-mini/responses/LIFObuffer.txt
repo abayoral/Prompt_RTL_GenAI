@@ -1,0 +1,58 @@
+module LIFObuffer(
+    input         Clk,
+    input         Rst,       // Active-high synchronous reset
+    input         EN,        // Enable signal
+    input         RW,        // Read/Write control: 1 for pop (read), 0 for push (write)
+    input  [3:0]  dataIn,    // 4-bit input data for push
+    output reg [3:0] dataOut, // 4-bit output data for pop
+    output        EMPTY,     // Flag: High when buffer is empty
+    output        FULL       // Flag: High when buffer is full
+);
+
+    // Define stack memory of 4 entries of 4-bit each.
+    reg [3:0] stack_mem [0:3];
+    // The stack pointer SP manages the top-of-stack. 
+    // We use a convention where SP=4 indicates an empty stack,
+    // and SP=0 indicates that the buffer is full.
+    reg [2:0] sp; // Possible values: 0 to 4 (we need 3 bits to represent 0-4)
+
+    // Drive EMPTY and FULL status flags based on the current value of sp.
+    assign EMPTY = (sp == 3'd4);
+    assign FULL  = (sp == 3'd0);
+
+    integer i;
+    // Synchronous operations occur at the rising edge of Clk
+    always @(posedge Clk) begin
+        if (Rst) begin
+            // On reset, initialize SP to 4 (empty state) and clear dataOut and memory.
+            sp <= 3'd4;
+            dataOut <= 4'd0;
+            for (i = 0; i < 4; i = i + 1) begin
+                stack_mem[i] <= 4'd0;
+            end
+        end 
+        else if (EN) begin
+            // When enabled, determine if we perform a push (RW=0) or pop (RW=1)
+            if (RW == 1'b0) begin
+                // PUSH Operation: If the LIFO is not full, push new data onto the stack.
+                if (!FULL) begin
+                    // Decrement the stack pointer and then write dataIn into the new top of stack.
+                    // Note that in non-blocking assignment the right-hand side uses the old value of sp.
+                    stack_mem[sp - 1] <= dataIn;
+                    sp <= sp - 1;
+                end
+            end 
+            else begin
+                // POP Operation: If the LIFO is not empty, pop data from the top of stack.
+                if (!EMPTY) begin
+                    // Output the data at the current top-of-stack, then clear that memory location.
+                    dataOut <= stack_mem[sp];
+                    stack_mem[sp] <= 4'd0;
+                    sp <= sp + 1;
+                end
+            end
+        end
+        // If EN is low, no operations occur in this clock cycle
+    end
+
+endmodule

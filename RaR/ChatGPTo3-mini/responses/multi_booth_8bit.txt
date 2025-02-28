@@ -1,0 +1,84 @@
+module multi_booth_8bit(
+    input         clk,
+    input         reset,  // asynchronous active‐high reset
+    input  [7:0]  a,      // 8‐bit multiplier
+    input  [7:0]  b,      // 8‐bit multiplicand
+    output reg [15:0] p,  // 16‐bit product output
+    output reg    rdy   // ready flag (high when multiplication is complete)
+);
+
+  // Internal registers:
+  // We extend the 8‐bit inputs to 16 bits for proper signed arithmetic.
+  // Using a standard iterative Booth algorithm (Radix–2 version) on a 16–bit multiplier.
+  // Although a true Radix–4 Booth multiplier would normally process 2 bits per cycle,
+  // here a 5–bit counter is used to run the iterative process for 16 clock cycles.
+  //
+  // The multiplier is held in Q and the accumulation in A.
+  // An auxiliary bit Q_1 is maintained for Booth’s decision.
+  // After 16 cycles, the lower 16 bits (stored in Q) are output as the product.
+  
+  reg  signed [16:0] A;  // Accumulator, one bit wider than Q (17 bits) for proper sign handling.
+  reg  signed [15:0] Q;  // Multiplier register (16 bits, sign–extended version of input "a")
+  reg                Q_1; // Extra bit used for Booth encoding
+  reg  signed [15:0] M;  // Multiplicand, 16 bits (sign–extended version of input "b")
+  reg [4:0]         ctr; // 5–bit counter to count up to 16 cycles
+  
+  // Sequential always block with asynchronous reset.
+  // On reset, the registers are initialized:
+  // • a and b are sign–extended to 16 bits and loaded into Q and M, respectively.
+  // • The accumulator A and Booth helper bit Q_1 are cleared.
+  // • The counter is reset and the ready flag deasserted.
+  always @(posedge clk or posedge reset) begin
+    if (reset) begin
+      // Sign–extend the 8–bit inputs to 16 bits.
+      Q    <= { {8{a[7]}}, a };
+      M    <= { {8{b[7]}}, b };
+      A    <= 0;
+      Q_1  <= 0;
+      ctr  <= 0;
+      rdy  <= 0;
+      p    <= 0;
+    end
+    else if (!rdy) begin
+      // Only process if the multiplication is not yet complete.
+      if (ctr < 16) begin
+        // Temporary variables to hold the new values computed in this cycle.
+        // Use blocking assignments for the temporary computation.
+        reg signed [16:0] A_temp;
+        reg signed [15:0] Q_temp;
+        reg               Q1_temp;
+        
+        A_temp = A;
+        // Booth encoding decision:
+        // If the current LSB of Q is 0 and the extra bit Q_1 is 1, then add the multiplicand.
+        // If Q[0] is 1 and Q_1 is 0, then subtract the multiplicand.
+        if (Q[0] == 1'b0 && Q_1 == 1'b1)
+          A_temp = A_temp + M;
+        else if (Q[0] == 1'b1 && Q_1 == 1'b0)
+          A_temp = A_temp - M;
+        // Else, no operation.
+        
+        // Now perform an arithmetic right shift on the concatenated {A, Q, Q_1}.
+        // The standard Booth algorithm shifts the triple (A, Q, Q_1) together by 1 bit.
+        // The new extra bit (Q_1_new) becomes the old Q[0]. 
+        Q1_temp = Q[0];                      // Capture Q[0] as the new Q_1.
+        Q_temp  = { A_temp[0], Q[15:1] };      // New Q: shift in the LSB of the updated A_temp.
+        // For A, perform an arithmetic right shift (replicate its sign bit).
+        A      <= { A_temp[16], A_temp[16:1] };
+        Q      <= Q_temp;
+        Q_1    <= Q1_temp;
+        
+        // Increment the cycle counter.
+        ctr <= ctr + 1;
+      end
+      else begin
+        // After 16 cycles, the multiplication is complete.
+        rdy <= 1;
+        // For an 8–bit multiplication the final 16–bit product is contained in Q.
+        // (The upper portion in A is redundant due to sign extension.)
+        p   <= Q;
+      end
+    end
+  end
+
+endmodule

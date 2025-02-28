@@ -1,0 +1,58 @@
+module top_module(
+    input clk,
+    input reset,    // Active‐high, synchronous reset to 32'h1
+    output [31:0] q
+);
+
+    reg [31:0] lfsr;
+    reg [31:0] next_state;
+    integer i;
+
+    // Combinational block to compute next state of the LFSR.
+    // This LFSR is implemented as a 32‐bit Galois LFSR that shifts left.
+    // The characteristic polynomial is x^32 + x^22 + x^2 + x + 1.
+    // In a Galois LFSR using the MSB (bit 31) as the feedback source,
+    // during each shift, the bit coming in at bit0 is the current MSB.
+    // Additionally, the feedback (old lfsr[31]) is XORed into
+    // bits that correspond to the tapped positions (excluding the x^32 term).
+    // Since indices in the register run from 31 downto 0 and represent x^32 to x^1,
+    // the taps at positions 22, 2, and 1 correspond to bits:
+    //   - 22  => index 21?  [But here we use the “shift‐left” formulation]
+    // To use a uniform formulation, we let the shifting be:
+    //   next_state[31] = lfsr[30]
+    //   for bits 1 <= i <= 30:
+    //      next_state[i] = lfsr[i-1] XOR { lfsr[31] if i is one of the tapped bit positions (22,2,1), else 0 }
+    //   next_state[0] = lfsr[31]
+    //
+    // Note: With this convention, the bit positions in the polynomial
+    // map to the following register indices:
+    //   - The x^32 term is the feedback (lfsr[31]) and is used in the XOR.
+    //   - The x^22 term affects next_state[22]   (i == 22)
+    //   - The x^2  term affects next_state[2]    (i == 2)
+    //   - The x^1  term affects next_state[1]    (i == 1)
+    always @(*) begin
+        // The most-significant bit gets the next bit with no XOR (tap not used for bit31)
+        next_state[31] = lfsr[30];
+        // For bits 1 to 30, shift left from lfsr[i-1] and XOR if the tap is present.
+        for (i = 1; i < 31; i = i + 1) begin
+            if ((i == 22) || (i == 2) || (i == 1))
+                next_state[i] = lfsr[i-1] ^ lfsr[31];
+            else
+                next_state[i] = lfsr[i-1];
+        end
+        // The least-significant bit gets the feedback (lfsr[31]).
+        next_state[0] = lfsr[31];
+    end
+
+    // Sequential block to update the LFSR on each rising edge of clk.
+    // On reset, lfsr is initialized to 32'h1.
+    always @(posedge clk) begin
+        if (reset)
+            lfsr <= 32'h1;
+        else
+            lfsr <= next_state;
+    end
+
+    assign q = lfsr;
+
+endmodule

@@ -1,0 +1,50 @@
+module top_module(
+    input in,
+    input [3:0] state,
+    output [3:0] next_state,
+    output out
+);
+
+    // One-hot state encoding indices:
+    // A: bit 0, B: bit 1, C: bit 2, D: bit 3
+    // Table:
+    //          Next state          Output
+    //   State      in=0   in=1     (Moore machine so output depends only on state)
+    //     A         A      B       0
+    //     B         C      B       0
+    //     C         A      D       0
+    //     D         C      B       1
+
+    // Derivation for next_state bits:
+    // next_state[A] (bit 0): comes from transitions that land in state A:
+    // - From A if in==0
+    // - From C if in==0
+    // So, next_state[A] = (state[A] OR state[C]) AND (NOT in)
+
+    // next_state[B] (bit 1): comes from transitions that land in state B:
+    // - From A if in==1
+    // - From B if in==1
+    // - From D if in==1
+    // So, next_state[B] = (state[A] OR state[B] OR state[D]) AND in
+
+    // next_state[C] (bit 2): comes from transitions that land in state C:
+    // - From B if in==0
+    // - From D if in==0
+    // So, next_state[C] = (state[B] OR state[D]) AND (NOT in)
+
+    // next_state[D] (bit 3): comes from transitions that land in state D:
+    // - Only from C if in==1
+    // So, next_state[D] = state[C] AND in
+
+    // Output logic: Moore machine output depends only on the current state.
+    // The output is 1 only when the machine is in state D.
+    // So, out = state[D]
+
+    assign next_state[0] = (state[0] | state[2]) & ~in;          // A
+    assign next_state[1] = (state[0] | state[1] | state[3]) & in;   // B
+    assign next_state[2] = (state[1] | state[3]) & ~in;             // C
+    assign next_state[3] = state[2] & in;                           // D
+
+    assign out = state[3];
+
+endmodule

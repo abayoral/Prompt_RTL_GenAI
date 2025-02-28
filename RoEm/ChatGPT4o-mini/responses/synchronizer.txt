@@ -1,0 +1,44 @@
+```verilog
+module synchronizer (
+    input wire clk_a,
+    input wire clk_b,
+    input wire arstn,
+    input wire brstn,
+    input wire [3:0] data_in,
+    input wire data_en,
+    output reg [3:0] dataout
+);
+
+    reg [3:0] data_reg;
+    reg en_data_reg;
+    reg en_clap_one;
+    reg en_clap_two;
+
+    // Capture the data and enable signal in the clk_a domain
+    always @(posedge clk_a or negedge arstn) begin
+        if (~arstn) begin
+            data_reg <= 4'b0;
+            en_data_reg <= 1'b0;
+        end else begin
+            data_reg <= data_in;
+            en_data_reg <= data_en;
+        end
+    end
+
+    // Synchronize the enable signal with clk_b with proper delay
+    always @(posedge clk_b or negedge brstn) begin
+        if (~brstn) begin
+            en_clap_one <= 1'b0;
+            en_clap_two <= 1'b0;
+            dataout <= 4'b0;
+        end else begin
+            en_clap_one <= en_data_reg; // Capture first enable
+            en_clap_two <= en_clap_one;  // Delay it for one cycle
+            if (en_clap_two == 1'b1) begin
+                dataout <= data_reg; // Update output if enable signal is active
+            end
+        end
+    end
+
+endmodule
+```

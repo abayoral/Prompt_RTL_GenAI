@@ -1,0 +1,19 @@
+Could you please assist with developing a Verilog module that is able to detect both rising and falling edges of a slowly changing 1-bit input signal, referred to as "a"? The desired module should be named "edge_detect" and should include specific input and output ports in the following manner:
+
+1. Input Ports:
+   - `clk`: This input represents the clock signal that will be utilized to synchronize operations. The detection of edges should happen on the positive edge of this clock signal.
+   - `rst_n`: This is an active-low reset signal used to initialize or reset the module. Upon activation of this reset signal, both output signals should reset to their default state.
+   - `a`: The 1-bit input signal for which edge detection needs to be performed. This signal can switch between 0 and 1, and the goal is to detect these transitions.
+
+2. Output Ports:
+   - `rise`: This output signal should be asserted (i.e., set to 1) when a rising edge is detected in the input signal `a`, meaning that the signal has transitioned from 0 to 1.
+   - `down`: This output signal should be asserted (set to 1) when a falling edge is detected, indicating that the signal `a` has transitioned from 1 to 0.
+
+3. Functional Requirements:
+   - The module should monitor changes in `a` and assert the `rise` output when the transition from 0 to 1 occurs, and assert the `down` output when the transition from 1 to 0 occurs.
+   - Both `rise` and `down` should be active for only one clock cycle following the detection of their respective edges, after which they should automatically reset to 0 unless another edge is detected.
+   - Ensure synchronization of the rise and fall detections with the clock `clk`.
+   - Implement edge detection logic that checks for edge transitions and appropriately sets the output signals on the subsequent clock cycle.
+   - During initialization or when the `rst_n` signal is low, the outputs should default to an inactive state (both `rise` and `down` set to 0).
+
+Please provide a comprehensive Verilog code for this edge detection module, ensuring that it adheres to the specifications outlined above, including any necessary logic or state tracking mechanisms to achieve the desired functionality.

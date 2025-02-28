@@ -1,0 +1,26 @@
+module top_module(
+    input in,
+    input [3:0] state,
+    output [3:0] next_state,
+    output out
+);
+
+    parameter A = 0, B = 1, C = 2, D = 3;
+
+    // State transition logic: 
+    // Next state A is reached from current state A with in=0 or from current state C with in=0.
+    assign next_state[A] = (~in) & (state[A] | state[C]);
+
+    // Next state B is reached from current state A with in=1, from current state B with in=1, or from current state D with in=1.
+    assign next_state[B] = in & (state[A] | state[B] | state[D]);
+
+    // Next state C is reached from current state B with in=0 or from current state D with in=0.
+    assign next_state[C] = (~in) & (state[B] | state[D]);
+
+    // Next state D is reached solely from current state C with in=1.
+    assign next_state[D] = in & state[C];
+
+    // Output logic: The output is 1 only when the machine is in state D.
+    assign out = state[D];
+
+endmodule

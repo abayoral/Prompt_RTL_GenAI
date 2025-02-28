@@ -1,0 +1,41 @@
+```
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    input sub,
+    output [31:0] sum
+);
+
+    wire [15:0] sum_low, sum_high;
+    wire cout_low, cout_high;
+    wire [15:0] b_inverted;
+
+    // Invert b when sub is 1
+    assign b_inverted = b[15:0] ^ {16{sub}};
+    
+    // Instantiate the first 16-bit adder/subtractor
+    add16 adder_low (
+        .a(a[15:0]),
+        .b(b_inverted),
+        .cin(sub),
+        .sum(sum_low),
+        .cout(cout_low)
+    );
+    
+    // Invert b when sub is 1 for the upper 16 bits
+    assign b_inverted = b[31:16] ^ {16{sub}};
+    
+    // Instantiate the second 16-bit adder/subtractor
+    add16 adder_high (
+        .a(a[31:16]),
+        .b(b_inverted),
+        .cin(cout_low),
+        .sum(sum_high),
+        .cout(cout_high)
+    );
+
+    // Concatenate the results
+    assign sum = {sum_high, sum_low};
+
+endmodule
+```

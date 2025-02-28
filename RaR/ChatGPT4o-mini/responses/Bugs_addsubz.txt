@@ -1,0 +1,22 @@
+```verilog
+module adder_subtractor (
+    input wire [7:0] a,
+    input wire [7:0] b,
+    input wire select, // 0 for addition, 1 for subtraction
+    output wire [7:0] out,
+    output wire result_is_zero
+);
+
+    wire [7:0] b_neg; // Two's complement of b for subtraction
+
+    // Create a two's complement of b for subtraction
+    assign b_neg = ~b + 1'b1;
+
+    // Perform addition or subtraction based on select signal
+    assign out = (select) ? (a + b_neg) : (a + b);
+
+    // Determine if the result is zero
+    assign result_is_zero = (out == 8'd0);
+
+endmodule
+```

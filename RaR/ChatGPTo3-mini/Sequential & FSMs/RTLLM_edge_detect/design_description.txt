@@ -1,0 +1,28 @@
+Below is a rephrased and expanded version of the question:
+
+You are tasked with designing a Verilog module named "edge_detect" that can detect both rising and falling edges on a 1-bit input signal. The primary objective of this module is to monitor an input signal, referred to as "a", and generate two specific output signals, "rise" and "down", to indicate the detection of a rising edge (transition from 0 to 1) or a falling edge (transition from 1 to 0), respectively. The entire operation must be clock-synchronized and capable of being reset to a known state.
+
+Key Requirements:
+
+1. Module Name and Objective:
+   • The module should be named "edge_detect".
+   • Its main function is to identify when the input signal "a" transitions between logic states—specifically monitoring for rising and falling edges.
+   • Upon detecting a rising edge on "a", the module should assert the output signal "rise" for one clock cycle.
+   • Conversely, upon detecting a falling edge, it should assert the output signal "down" for one clock cycle.
+  
+2. Input Ports:
+   • clk: This clock input serves as the timing reference for the circuit. All state changes, including edge detection, must be synchronized with the positive edge of clk.
+   • rst_n: This is an active low reset signal. When this signal is held low, the module must reset its internal states and output signals, ensuring it begins operations from a defined starting state.
+   • a: The signal "a" is a single-bit input on which the edge detection is to be performed. Monitoring of this signal should be done on every rising edge of clk.
+
+3. Output Ports:
+   • rise: A 1-bit output intended to signal the occurrence of a rising edge on the input signal "a". It should be driven high when a 0 to 1 transition is detected and should stay high for exactly one clock cycle.
+   • down: A 1-bit output that signals a falling edge on the input "a". It should be asserted high only for one clock cycle immediately following a 1 to 0 transition, then return to a low state.
+
+4. Implementation Considerations:
+   • The design should involve storage elements (e.g., registers) to hold a previous state of the input signal "a". This historical data is crucial for comparing with the current state to determine whether a rising or falling edge has occurred.
+   • The module must include appropriate logic to accommodate an active low reset (rst_n), ensuring that when the reset is activated, the system returns to a known and safe state.
+   • The edge detection must be fully synchronized to the rising edge of the clock (clk), so that all changes in the input and corresponding output signals occur synchronously.
+   • The outputs "rise" and "down" must be configured to be high only for the duration of a single clock cycle after detecting their respective transitions, prior to being reset, thereby allowing the module to accurately and repeatedly respond to successive changes in input "a".
+
+Please develop a detailed Verilog design implementing this functionality, ensuring the module adheres to all the described specifications. Do not include any solutions or code in your response; focus solely on clarifying and specifying the question requirements.

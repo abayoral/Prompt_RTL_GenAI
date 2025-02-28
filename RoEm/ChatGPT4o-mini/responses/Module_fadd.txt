@@ -1,0 +1,64 @@
+```
+module add1 (
+    input a,
+    input b,
+    input cin,
+    output sum,
+    output cout
+);
+    assign sum = a ^ b ^ cin; // Sum is A XOR B XOR Cin
+    assign cout = (a & b) | (cin & (a ^ b)); // Carry-out is (A AND B) OR (Cin AND (A XOR B))
+endmodule
+
+module add16 (
+    input [15:0] a,
+    input [15:0] b,
+    input cin,
+    output [15:0] sum,
+    output cout
+);
+    wire [15:0] c; // Intermediate carry wires
+
+    // Instantiate 16 full adders
+    genvar i;
+    generate
+        for (i = 0; i < 16; i = i + 1) begin : user_fadd
+            if (i == 0) begin
+                add1 fa (.a(a[i]), .b(b[i]), .cin(cin), .sum(sum[i]), .cout(c[i]));
+            end else begin
+                add1 fa (.a(a[i]), .b(b[i]), .cin(c[i-1]), .sum(sum[i]), .cout(c[i]));
+            end
+        end
+    endgenerate
+
+    assign cout = c[15]; // Connect the final carry-out
+endmodule
+
+module top_module (
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+    wire cout1, cout2;
+    wire [15:0] sum1, sum2;
+
+    // Instantiate two add16 modules
+    add16 adder_lower (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0), // No carry-in for the lower bits
+        .sum(sum1),
+        .cout(cout1)
+    );
+
+    add16 adder_upper (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b0), // No carry-in for the upper bits
+        .sum(sum2),
+        .cout(cout2)
+    );
+
+    assign sum = {sum2, sum1}; // Concatenate results for the final output
+endmodule
+```

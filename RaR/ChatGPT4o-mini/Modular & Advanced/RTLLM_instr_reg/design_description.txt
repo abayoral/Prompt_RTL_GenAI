@@ -1,0 +1,26 @@
+I would like to request a thorough and fully developed Verilog HDL code implementation for a module referred to as `instr_reg`. The primary function of this module is to serve as an instruction register that captures CPU instructions and processes them by breaking them down into their specific fields for subsequent operations within the CPU. To ensure clarity and adherence to the required specifications, here is a detailed outline of the module’s structure and specifications:
+
+**Module Name:**
+- `instr_reg`
+
+**Input Ports:**
+1. `clk`: This input serves as the clock signal, which is crucial for synchronization purposes within the module's operations.
+2. `rst`: This is an active low reset signal. When this signal is activated (asserted low), it should reset the instruction register to a predefined, known state.
+3. `fetch [1:0]`: This 2-bit control input dictates the source of the instruction. Specifically, a value of `01` indicates that the instruction should be fetched from the register, while a value of `10` indicates that the instruction should be fetched from RAM or ROM.
+4. `data [7:0]`: This is an 8-bit input signal that carries the instruction data that may be fetched by the module.
+
+**Output Ports:**
+1. `ins [2:0]`: This output provides the high 3 bits of the fetched instruction, representing the operation code (opcode).
+2. `ad1 [4:0]`: This output emits the low 5 bits of the instruction, which correspond to the register address.
+3. `ad2 [7:0]`: This output returns the complete 8-bit instruction data when it has been fetched from the second source.
+
+**Implementation Details:**
+- Within the module, there are two 8-bit registers named `ins_p1` and `ins_p2`, each designed to hold the instructions fetched from the different sources as indicated by the `fetch` control signal.
+- On each rising edge of the `clk`, the module evaluates the `rst` signal. If the `rst` signal is asserted low (indicating a reset), then both registers, `ins_p1` and `ins_p2`, should be initialized to zero.
+- The behavior of the module is primarily governed by the value of the `fetch` control signal:
+  - If `fetch` is equal to `2'b01`, the module should take the instruction data from the `data` input and store it within `ins_p1`.
+  - If `fetch` equals `2'b10`, the instruction should be captured from the `data` input and stored in `ins_p2`.
+  - In cases where the `fetch` signal does not match either of these values, the current contents of `ins_p1` and `ins_p2` should remain unchanged, effectively retaining their previous values.
+- The output signals, `ins`, `ad1`, and `ad2`, are subsequently derived from the contents of `ins_p1` and `ins_p2` for further use in the CPU architecture.
+
+Could you please provide the complete Verilog code that accurately implements all these functionalities while conforming to the specified requirements?

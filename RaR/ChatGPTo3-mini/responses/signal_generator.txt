@@ -1,0 +1,38 @@
+module signal_generator(
+    input clk,
+    input rst_n,
+    output reg [4:0] wave
+);
+
+    // State register: 0 for incrementing, 1 for decrementing
+    reg state;
+
+    // Always block sensitive to rising edge of clock and active-low reset
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset condition: initialize both wave and state to 0
+            wave  <= 5'b0;
+            state <= 1'b0;
+        end else begin
+            case (state)
+                1'b0: begin // Incrementing mode
+                    if (wave == 5'd31)
+                        state <= 1'b1; // Switch to decrementing when max reached
+                    else
+                        wave <= wave + 5'd1;
+                end
+                1'b1: begin // Decrementing mode
+                    if (wave == 5'd0)
+                        state <= 1'b0; // Switch to incrementing when min reached
+                    else
+                        wave <= wave - 5'd1;
+                end
+                default: begin
+                    state <= 1'b0;
+                    wave  <= 5'b0;
+                end
+            endcase
+        end
+    end
+
+endmodule

@@ -1,0 +1,34 @@
+```
+module instr_reg (
+    input wire clk,
+    input wire rst,
+    input wire [1:0] fetch,
+    input wire [7:0] data,
+    output reg [2:0] ins,
+    output reg [4:0] ad1,
+    output reg [7:0] ad2
+);
+    reg [7:0] ins_p1;
+    reg [7:0] ins_p2;
+
+    always @(posedge clk or negedge rst) begin
+        if (!rst) begin
+            ins_p1 <= 8'b0;
+            ins_p2 <= 8'b0;
+        end else begin
+            case (fetch)
+                2'b01: ins_p1 <= data;  // Capture instruction in ins_p1
+                2'b10: ins_p2 <= data;  // Capture instruction in ins_p2
+                default: ;               // Do nothing to retain previous values
+            endcase
+        end
+    end
+
+    always @(*) begin
+        // Derive outputs from the most recent instruction fetched
+        ins = ins_p1[7:5];  // Extract the 3 most significant bits for opcode
+        ad1 = ins_p1[4:0];   // Extract the 5 least significant bits as address
+        ad2 = ins_p2;        // Provide the full 8-bit data from the second source
+    end
+endmodule
+```

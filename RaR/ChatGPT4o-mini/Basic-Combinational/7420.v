@@ -1,0 +1,9 @@
+As a senior Digital Design Engineer at a prominent hardware design company, your current project involves the development of a highly critical Verilog module that is essential for the success of an upcoming next-generation product. Given the strategic importance of this product for the company's standing in the competitive computer hardware market, achieving an effective and efficient design is imperative. 
+
+Specifically, your task is to design a module that replicates the functionality of the 7420 integrated circuit, which consists of two 4-input NAND gates capable of performing digital logic operations. The module you are expected to create should accommodate 8 input signals and produce 2 output signals, thus expanding upon the original capabilities of the 7420 chip.
+
+To elaborate, the input signals for your module will comprise four inputs for each of the two NAND gates (labelled as p1a, p1b, p1c, p1d for the first gate and p2a, p2b, p2c, p2d for the second). The outputs should yield the results of the NAND operations, represented by the signals p1y and p2y, respectively.
+
+The design must ensure that these output signals reflect the logical operation defined by the NAND gate, which outputs a low signal only when all its inputs are high. Your approach must consider factors such as signal integrity, timing, and overall performance to ensure that the module fulfills the required specifications and contributes positively to the product's success.
+
+With this context established, what are the precise methodologies and considerations that need to be executed to implement the functionality of the 7420 chip while ensuring the reliability and efficiency of the resulting Verilog module?

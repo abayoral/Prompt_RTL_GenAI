@@ -1,0 +1,74 @@
+module top_module(
+    input clk,
+    input reset,
+    input ena,
+    output pm,
+    output [7:0] hh,
+    output [7:0] mm,
+    output [7:0] ss
+);
+
+    // We use binary counters internally and then convert to two‐digit BCD.
+    // Seconds and minutes count 0–59 (6‐bit counters) and hour counts 1–12 (4‐bit counter).
+    // pm is 0 for AM and 1 for PM.
+    //
+    // Reset sets the time to 12:00:00 AM.
+    // When ena is high (once per second), we increment the seconds counter.
+    // On rollover (59 seconds), minutes are incremented, and on minute rollover (59 minutes)
+    // the hours counter is updated. The hours counter is updated with special handling:
+    //  • If the hour is 11 then the next hour is 12 and the am/pm indicator toggles.
+    //  • If the hour is 12 then the next hour is 1 (without toggling pm).
+    // For all other cases, a normal increment occurs.
+    
+    reg [5:0] sec;   // Range 0-59
+    reg [5:0] min;   // Range 0-59
+    reg [3:0] hour;  // Range 1-12 (we only need 4 bits to hold numbers up to 12)
+    reg pm_reg;      // 0 = AM, 1 = PM
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            // Reset the clock to 12:00:00 AM
+            sec    <= 6'd0;
+            min    <= 6'd0;
+            hour   <= 4'd12;
+            pm_reg <= 1'b0;
+        end 
+        else if (ena) begin
+            if (sec == 6'd59) begin
+                sec <= 6'd0;
+                if (min == 6'd59) begin
+                    min <= 6'd0;
+                    // Hours update with special handling:
+                    // 11:59:59 -> 12:00:00 and toggle pm,
+                    // 12:59:59 -> 01:00:00 and pm remains the same.
+                    if (hour == 4'd11) begin
+                        hour   <= 4'd12;
+                        pm_reg <= ~pm_reg;
+                    end 
+                    else if (hour == 4'd12) begin
+                        hour <= 4'd1;
+                    end 
+                    else begin
+                        hour <= hour + 1;
+                    end
+                end 
+                else begin
+                    min <= min + 1;
+                end
+            end 
+            else begin
+                sec <= sec + 1;
+            end
+        end
+    end
+    
+    // Convert the binary counters to two-digit BCD outputs.
+    // For seconds and minutes, the tens digit is (value/10) and the ones digit is (value % 10).
+    // For hours, we also output a two-digit BCD; for hours < 10 the tens digit is 0.
+    assign ss = { (sec / 10), (sec % 10) };
+    assign mm = { (min / 10), (min % 10) };
+    assign hh = { (hour / 10), (hour % 10) };
+    
+    assign pm = pm_reg;
+
+endmodule

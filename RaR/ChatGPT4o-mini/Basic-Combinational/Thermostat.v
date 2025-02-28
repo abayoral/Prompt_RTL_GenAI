@@ -1,0 +1,13 @@
+Consider this scenario: You are in the position of a senior Digital Design Engineer at a prominent hardware design company. Your current assignment involves the development of a critical Verilog module intended for a next-generation product. The successful implementation of this module is essential not only for the functionality of the product but also for safeguarding the reputation of your company in the competitive landscape of computer hardware.
+
+The module you are tasked with designing is intended to govern the operations of a heating and cooling thermostat, which has the capability to manage both heating systems (for winter use) and air conditioning systems (for summer use). The central challenge you face is to create a circuit that effectively activates and deactivates the heater, air conditioner, and blower fan based on varying temperature conditions and user inputs.
+
+The thermostat operates in one of two distinct modes: heating (expressed as mode = 1) and cooling (expressed as mode = 0). In heating mode, the heater should be activated when the input signal indicating "too_cold" is true (i.e., too_cold = 1), while the air conditioning system must remain inactive. Conversely, in cooling mode, the air conditioning unit should be turned on if the input signal "too_hot" is true (i.e., too_hot = 1), while the heater must not be operational.
+
+An additional requirement is that whenever either the heater or the air conditioning is turned on, the blower fan should also be engaged to facilitate air circulation. Moreover, the design must account for a situation in which the user can manually request the fan to be turned on, independent of the state of the heater or air conditioning systems (represented by the input signal fan_on = 1).
+
+In developing this Verilog module, you are encouraged to utilize only assign statements, thereby translating the problem specifications into a straightforward arrangement of logic gates. 
+
+As you approach the problem, consider employing a reverse engineering mindset, where you begin by analyzing the outputs of your design before tracing back to understand the necessary inputs. 
+
+Given these parameters and requirements, how can you systematically outline your approach to design the Verilog module ensuring that each functional condition of the heating and cooling thermostat is met effectively? What considerations will you need to account for when mapping the logic circuit to produce the desired outputs based on the various input signals?

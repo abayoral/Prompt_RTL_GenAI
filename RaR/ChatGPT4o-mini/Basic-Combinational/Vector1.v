@@ -1,0 +1,7 @@
+As a senior Digital Design Engineer working at a prominent hardware design company, you have been assigned the crucial task of developing a Verilog module for an innovative product, which is key to upholding your company’s esteemed reputation in the competitive landscape of computer hardware. 
+
+The specific challenge at hand involves designing a combinational circuit that takes a 16-bit input half-word, denoted as ‘in’ with the bit range [15:0]. Your objective is to efficiently split this input into two distinct 8-bit outputs: the higher byte, referred to as ‘out_hi’ which corresponds to the bits [15:8] of the input, and the lower byte, designated ‘out_lo’, which corresponds to the bits [7:0]. 
+
+As you approach this task, consider the implications of the design choices you make, including how to effectively manage and represent the input and output data, ensuring clarity and maintaining high performance standards. Additionally, reflect on how your design will interface with other components within the overall system, taking into account potential variations in input types and the necessity for adherence to best practices in hardware design. 
+
+With these considerations in mind, how would you go about structuring the Verilog module to achieve the desired functionality and ensure its reliability in the context of your company's goals?

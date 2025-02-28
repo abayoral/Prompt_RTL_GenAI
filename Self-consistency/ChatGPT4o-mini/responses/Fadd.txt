@@ -1,0 +1,8 @@
+module top_module( 
+    input a, b, cin,
+    output cout, sum );
+
+    assign sum = a ^ b ^ cin;        // Sum = A XOR B XOR Cin
+    assign cout = (a & b) | (cin & (a ^ b)); // Carry out = (A AND B) OR (Cin AND (A XOR B))
+
+endmodule

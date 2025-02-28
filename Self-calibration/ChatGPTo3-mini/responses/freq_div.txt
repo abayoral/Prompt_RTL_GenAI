@@ -1,0 +1,78 @@
+Below is an improved version of the code with a few enhancements and corrections. Although the original code was mostly functional, the following improvements have been made:
+
+1. Parameterization of the counter maximum values (magic numbers have been replaced by parameters) so that changes can be made easily in the future.
+2. Using an asynchronous reset in the sensitivity list. (If you prefer a synchronous reset, you can remove RST from the sensitivity list and retain your “if (RST)” check on the clock edge.)
+3. Some comments have been clarified to explain the division factors.
+
+Below is the corrected and improved Verilog module:
+
+--------------------------------------------------
+module freq_div(
+    input  wire CLK_in,   // Assume CLK_in is 100 MHz
+    input  wire RST,      // Asynchronous active-high reset
+    output reg  CLK_50,   // 50 MHz output (divide-by-2 of CLK_in)
+    output reg  CLK_10,   // 10 MHz output (divide-by-10 of CLK_in)
+    output reg  CLK_1     // 1 MHz output (divide-by-100 of CLK_in)
+);
+
+    // Parameters for counter maximum values for toggling.
+    // For a 10MHz clock from a 100MHz input, we toggle every 5 cycles (half period)
+    parameter CNT10_MAX  = 4;   // When count reaches 4, toggle CLK_10 (counts 0 to 4 = 5 states)
+    // For a 1MHz clock from a 100MHz input, we toggle every 50 cycles (half period)
+    parameter CNT100_MAX = 49;  // When count reaches 49, toggle CLK_1 (counts 0 to 49 = 50 states)
+
+    // Counters for clock division
+    reg [2:0] cnt_10;   // 3-bit counter (enough for values 0 to CNT10_MAX)
+    reg [5:0] cnt_100;  // 6-bit counter (enough for values 0 to CNT100_MAX)
+
+    // Asynchronous reset is used here. If you require a synchronous reset,
+    // remove "or posedge RST" from the sensitivity list.
+    always @(posedge CLK_in or posedge RST) begin
+        if (RST) begin
+            // Reset all outputs and counters
+            CLK_50  <= 1'b0;
+            CLK_10  <= 1'b0;
+            CLK_1   <= 1'b0;
+            cnt_10  <= 3'd0;
+            cnt_100 <= 6'd0;
+        end else begin
+            // Generate the 50MHz clock by toggling on every clock edge.
+            // (Assumes CLK_in is 100MHz so that toggling yields a 50MHz clock.)
+            CLK_50 <= ~CLK_50;
+            
+            // Generate the 10MHz clock using the counter.
+            // Toggle CLK_10 when cnt_10 reaches CNT10_MAX, then reset the counter.
+            if (cnt_10 == CNT10_MAX) begin
+                cnt_10 <= 3'd0;
+                CLK_10 <= ~CLK_10;
+            end else begin
+                cnt_10 <= cnt_10 + 3'd1;
+            end
+            
+            // Generate the 1MHz clock using its counter.
+            // Toggle CLK_1 when cnt_100 reaches CNT100_MAX, then reset the counter.
+            if (cnt_100 == CNT100_MAX) begin
+                cnt_100 <= 6'd0;
+                CLK_1 <= ~CLK_1;
+            end else begin
+                cnt_100 <= cnt_100 + 6'd1;
+            end
+        end
+    end
+
+endmodule
+--------------------------------------------------
+
+Key Points:
+• The parameters CNT10_MAX and CNT100_MAX replace the hardcoded values (4 and 49) making the design easier to modify.
+• If a synchronous reset is specifically desired (or required by your design standards), update the always block as follows:
+
+  always @(posedge CLK_in) begin
+      if (RST) begin
+          // reset logic...
+      end else begin
+           // normal operations...
+      end
+  end
+
+This version adheres to best practices by using parameters, clear comments, and offering a choice between asynchronous and synchronous reset strategies.

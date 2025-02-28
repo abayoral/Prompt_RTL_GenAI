@@ -1,0 +1,38 @@
+```
+module width_8to16(
+    input clk,
+    input rst_n,
+    input valid_in,
+    input [7:0] data_in,
+    output reg valid_out,
+    output reg [15:0] data_out
+);
+
+    reg [7:0] first_byte;
+    reg byte_ready;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            data_out <= 16'b0;  // Reset the output
+            valid_out <= 1'b0;   // Reset valid output
+            byte_ready <= 1'b0;  // Clear byte readiness
+        end else begin
+            if (valid_in) begin
+                if (!byte_ready) begin
+                    // Capture the first byte
+                    first_byte <= data_in;
+                    byte_ready <= 1'b1; // Indicate first byte is ready
+                end else begin
+                    // Capture the second byte and form the output
+                    data_out <= {first_byte, data_in}; // Concatenate
+                    valid_out <= 1'b1; // Mark output as valid
+                    byte_ready <= 1'b0; // Reset byte readiness for next pair
+                end
+            end else begin
+                valid_out <= 1'b0; // No valid input means output is not valid
+            end
+        end
+    end
+
+endmodule
+```

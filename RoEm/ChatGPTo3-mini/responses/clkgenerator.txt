@@ -1,0 +1,17 @@
+module clkgenerator;
+  // Parameter definition for clock period (default value is 10 time units)
+  parameter PERIOD = 10;
+
+  // Declare the output clock signal as a reg type since it will be driven procedurally.
+  output reg clk;
+
+  // Initialize the clock signal to 0 at simulation time 0.
+  initial begin
+    clk = 0;
+  end
+   
+  // Create a toggling clock signal that alternates every half PERIOD time.
+  always begin
+    #(PERIOD/2) clk = ~clk;
+  end
+endmodule

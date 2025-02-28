@@ -1,0 +1,16 @@
+module phone_alert(
+    input  ring,
+    input  vibrate_mode,
+    output ringer,
+    output motor
+);
+    // When there is an incoming call and the phone is in vibrate mode,
+    // only the motor is activated.
+    // When there is an incoming call and the phone is not in vibrate mode,
+    // only the ringer is activated.
+    // Both outputs remain off if there is no incoming call.
+    
+    assign motor  = ring & vibrate_mode;
+    assign ringer = ring & ~vibrate_mode;
+
+endmodule

@@ -1,0 +1,43 @@
+module top_module(
+    input clk,
+    input reset,    // Active‐high synchronous reset to 32'h1
+    output [31:0] q
+);
+
+    // 32‐bit Galois LFSR with taps at bit positions 32, 22, 2, and 1.
+    // The corresponding polynomial is: x^32 + x^22 + x^2 + x + 1.
+    //
+    // In our register we index bits 31 downto 0, where:
+    //   - bit 31 corresponds to tap x^32,
+    //   - bit 21 corresponds to tap x^22,
+    //   - bit 1  corresponds to tap x^2,
+    //   - bit 0  corresponds to tap x.
+    //
+    // One compact way to implement a Galois LFSR is to shift the register and, based on the 
+    // feedback extracted from the MSB, conditionally XOR a constant mask into the LFSR.
+    //
+    // In our shift‐left implementation the MSB (bit 31) is used as the feedback.
+    // On each clock cycle:
+    //   - We shift left: {lfsr[30:0], 1’b0}
+    //   - If the feedback (lfsr[31]) is 1, we XOR in the mask: 
+    //         mask = 32’b00_0010_0000_0000_0000_0000_0000_0011
+    //     where bit positions 0, 1 and 21 are 1. (Taps corresponding to x, x^2 and x^22.)
+    //   - The tap at x^32 is used to produce the feedback.
+    
+    reg [31:0] lfsr;
+    wire feedback = lfsr[31];
+    
+    // Mask with ones at positions corresponding to taps x (bit0), x^2 (bit1), x^22 (bit21).
+    localparam [31:0] TAP_MASK = 32'h00200003; // 0x00200000 | 0x00000003
+
+    always @(posedge clk) begin
+        if (reset)
+            lfsr <= 32'h1;
+        else
+            // Shift left by 1 and conditionally XOR the tap mask if feedback is 1.
+            lfsr <= {lfsr[30:0], 1'b0} ^ ({32{feedback}} & TAP_MASK);
+    end
+
+    assign q = lfsr;
+
+endmodule

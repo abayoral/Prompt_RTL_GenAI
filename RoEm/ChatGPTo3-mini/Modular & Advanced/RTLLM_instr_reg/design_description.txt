@@ -1,0 +1,29 @@
+I would like you to write the complete Verilog code for a module called `instr_reg`, which is designed to function as an instruction register module in a CPU. This module is responsible for capturing incoming CPU instructions from different sources, specifically either a register or RAM/ROM, and then separating these instructions into distinct fields to be used in further processing. The intention is to ensure that the module operates in a synchronized manner with the system clock and is able to reset its state whenever necessary.
+
+To clarify the expectations, here is a detailed breakdown of the requirements:
+
+1. **Module Name:**
+   - The module must be named `instr_reg`.
+
+2. **Input Ports:**
+   - `clk`: This input port represents the clock signal, which is used for synchronizing operations within the module.
+   - `rst`: An active low reset input, which initializes the register values to zero when asserted.
+   - `fetch [1:0]`: A 2-bit control input signal that dictates the source of the instruction to be fetched. When `fetch` is `2'b01`, the instruction comes from a register, and when `fetch` is `2'b10`, it is sourced from RAM or ROM.
+   - `data [7:0]`: An 8-bit data input that contains the new instruction to be loaded into the instruction register, depending on the source indicated by the `fetch` signal.
+
+3. **Output Ports:**
+   - `ins [2:0]`: Represents the high-order 3 bits of the current instruction, typically used to indicate the operation code or opcode.
+   - `ad1 [4:0]`: Corresponds to the lower 5 bits of the instruction, which are used to specify a register address.
+   - `ad2 [7:0]`: An 8-bit output that reflects the complete data input from the second source when `fetch` is set to `2'b10`.
+
+4. **Implementation Details:**
+   - The module employs two 8-bit registers, `ins_p1` and `ins_p2`, to store instructions from the aforementioned sources.
+   - On each rising edge of the `clk`, the module should check the state of the `rst` signal.
+   - When `rst` is low (active), both `ins_p1` and `ins_p2` should be initialized to zero, effectively resetting the module.
+   - Depending on the `fetch` signal's value:
+     - If `fetch` equals `2'b01`, load the instruction from the `data` input into the `ins_p1` register.
+     - If `fetch` equals `2'b10`, load the instruction from the `data` input into the `ins_p2` register.
+     - If neither of these conditions is met, retain the existing values within `ins_p1` and `ins_p2`.
+   - Details on how the outputs `ins`, `ad1`, and `ad2` are derived from the contents of `ins_p1` and `ins_p2` should be articulated, ensuring clarity on how each output correlates to either register.
+
+This breakdown should assist in producing a precise and fully functional Verilog code for the specified `instr_reg` module. Please focus on ensuring that all conditions and signal operations are thoroughly incorporated into the code structure.

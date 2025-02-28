@@ -1,0 +1,24 @@
+module top_module(
+    input in,
+    input [3:0] state,
+    output [3:0] next_state,
+    output out);
+
+    // One-hot decoding: A = bit0, B = bit1, C = bit2, D = bit3
+    
+    // next_state[A] is reached if current state is A with in=0, or C with in=0.
+    assign next_state[0] = ~in & (state[0] | state[2]);
+    
+    // next_state[B] is reached if current state is A with in=1, B with in=1, or D with in=1.
+    assign next_state[1] = in & (state[0] | state[1] | state[3]);
+    
+    // next_state[C] is reached if current state is B with in=0 or D with in=0.
+    assign next_state[2] = ~in & (state[1] | state[3]);
+    
+    // next_state[D] is reached if current state is C with in=1.
+    assign next_state[3] = in & state[2];
+    
+    // Output logic: Output is 1 only when in state D.
+    assign out = state[3];
+
+endmodule

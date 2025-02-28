@@ -1,0 +1,191 @@
+Below is one corrected version of the module. In this version the “next‐pointer” logic used for full‐flag detection has been adjusted so that the computed next pointer is consistent with the update (using (winc && !wfull) rather than only checking winc) and some minor clean‐ups have been made. (Note that many “redundant” assignments such as “wbin <= wbin;” are syntactically legal but have been removed for clarity.) 
+
+--------------------------------------------------
+module dual_port_ram #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16,
+    parameter ADDR_WIDTH = $clog2(DEPTH)
+)(
+    input                     wclk,
+    input                     wenc,
+    input  [ADDR_WIDTH-1:0]   waddr,
+    input  [WIDTH-1:0]        wdata,
+    input                     rclk,
+    input                     renc,
+    input  [ADDR_WIDTH-1:0]   raddr,
+    output reg [WIDTH-1:0]    rdata
+);
+    // Memory array.
+    reg [WIDTH-1:0] mem [0:DEPTH-1];
+
+    // Write port: synchronous write.
+    always @(posedge wclk) begin
+        if (wenc)
+            mem[waddr] <= wdata;
+    end
+
+    // Read port: synchronous read with registered output.
+    always @(posedge rclk) begin
+        if (renc)
+            rdata <= mem[raddr];
+    end
+endmodule
+
+
+module asyn_fifo #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16,
+    // ADDR_WIDTH = number of bits needed for addressing the RAM.
+    parameter ADDR_WIDTH = $clog2(DEPTH),
+    // PTR_WIDTH = ADDR_WIDTH+1 for pointer comparisons (full/empty detection)
+    parameter PTR_WIDTH  = ADDR_WIDTH + 1
+)(
+    input                 wclk,    // Write clock domain.
+    input                 rclk,    // Read clock domain.
+    input                 wrstn,   // Active low reset for write domain.
+    input                 rrstn,   // Active low reset for read domain.
+    input                 winc,    // Write increment signal.
+    input                 rinc,    // Read increment signal.
+    input  [WIDTH-1:0]    wdata,   // Data to be written.
+    output                wfull,   // FIFO full flag (write domain).
+    output                rempty,  // FIFO empty flag (read domain).
+    output [WIDTH-1:0]    rdata    // Data read from FIFO.
+);
+
+    // Internal pointer registers.
+    // Write side binary and Gray pointers.
+    reg [PTR_WIDTH-1:0] wbin;
+    reg [PTR_WIDTH-1:0] wgray;
+    // Read side binary and Gray pointers.
+    reg [PTR_WIDTH-1:0] rbin;
+    reg [PTR_WIDTH-1:0] rgray;
+
+    // Synchronized pointer signals.
+    // In write clock domain we synchronize the read pointer (Gray code).
+    reg [PTR_WIDTH-1:0] rgray_sync_0;
+    reg [PTR_WIDTH-1:0] rgray_sync_1;
+    // In read clock domain we synchronize the write pointer (Gray code).
+    reg [PTR_WIDTH-1:0] wgray_sync_0;
+    reg [PTR_WIDTH-1:0] wgray_sync_1;
+
+    //--------------------------------------------------------------------------
+    // Functions: conversion between binary and Gray codes.
+    //--------------------------------------------------------------------------
+
+    // Convert a binary number to Gray code.
+    function automatic [PTR_WIDTH-1:0] bin2gray;
+        input [PTR_WIDTH-1:0] bin;
+        begin
+            bin2gray = bin ^ (bin >> 1);
+        end
+    endfunction
+
+    // Convert a Gray code number back to binary.
+    // (Not used for flag comparison, but provided for completeness.)
+    function automatic [PTR_WIDTH-1:0] gray2bin;
+        input [PTR_WIDTH-1:0] gray;
+        integer i;
+        reg [PTR_WIDTH-1:0] bin;
+        begin
+            bin[PTR_WIDTH-1] = gray[PTR_WIDTH-1];
+            for (i = PTR_WIDTH-2; i >= 0; i = i - 1)
+                bin[i] = bin[i+1] ^ gray[i];
+            gray2bin = bin;
+        end
+    endfunction
+
+    //--------------------------------------------------------------------------
+    // Write pointer update (Write clock domain)
+    //--------------------------------------------------------------------------
+
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            wbin  <= 0;
+            wgray <= 0;
+        end
+        else begin
+            if (winc && !wfull)
+                wbin <= wbin + 1;
+            // Update Gray pointer using the actual increment condition.
+            wgray <= bin2gray(wbin + (winc && !wfull ? 1'b1 : 1'b0));
+        end
+    end
+
+    // Synchronize read pointer (rgray) into write clock domain.
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            rgray_sync_0 <= 0;
+            rgray_sync_1 <= 0;
+        end
+        else begin
+            rgray_sync_0 <= rgray;
+            rgray_sync_1 <= rgray_sync_0;
+        end
+    end
+
+    // FIFO full detection in write clock domain.
+    // Full when the next Gray-coded write pointer equals the read pointer with its MSB inverted.
+    wire [PTR_WIDTH-1:0] wgray_next;
+    assign wgray_next = bin2gray(wbin + (winc && !wfull ? 1'b1 : 1'b0));
+    assign wfull = (wgray_next == {~rgray_sync_1[PTR_WIDTH-1], rgray_sync_1[PTR_WIDTH-2:0]});
+
+    //--------------------------------------------------------------------------
+    // Read pointer update (Read clock domain)
+    //--------------------------------------------------------------------------
+
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            rbin  <= 0;
+            rgray <= 0;
+        end
+        else begin
+            if (rinc && !rempty)
+                rbin <= rbin + 1;
+            rgray <= bin2gray(rbin + (rinc && !rempty ? 1'b1 : 1'b0));
+        end
+    end
+
+    // Synchronize write pointer (wgray) into read clock domain.
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            wgray_sync_0 <= 0;
+            wgray_sync_1 <= 0;
+        end
+        else begin
+            wgray_sync_0 <= wgray;
+            wgray_sync_1 <= wgray_sync_0;
+        end
+    end
+
+    // FIFO empty detection in read clock domain.
+    assign rempty = (rgray == wgray_sync_1);
+
+    //--------------------------------------------------------------------------
+    // Dual-Port RAM instantiation.
+    // The RAM address is taken from the lower ADDR_WIDTH bits of the pointer.
+    //--------------------------------------------------------------------------
+
+    dual_port_ram #(
+        .WIDTH(WIDTH),
+        .DEPTH(DEPTH),
+        .ADDR_WIDTH(ADDR_WIDTH)
+    ) ram_inst (
+        .wclk  (wclk),
+        .wenc  (winc && !wfull),
+        .waddr (wbin[ADDR_WIDTH-1:0]),
+        .wdata (wdata),
+        .rclk  (rclk),
+        .renc  (rinc && !rempty),
+        .raddr (rbin[ADDR_WIDTH-1:0]),
+        .rdata (rdata)
+    );
+
+endmodule
+--------------------------------------------------
+
+Key Corrections and Improvements:
+1. In the write‐pointer full detection logic, the next pointer is computed with the same enable condition (winc && !wfull) as used in the pointer update. This prevents a mismatch when the FIFO is full.
+2. Redundant assignments (such as reassigning a register to itself) were removed for clarity.
+3. Comments were kept to explain the design choices.
+
+This version now adheres more closely to best practices for asynchronous FIFO design in Verilog.

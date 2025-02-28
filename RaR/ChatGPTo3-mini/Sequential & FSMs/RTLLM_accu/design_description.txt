@@ -1,0 +1,23 @@
+Imagine you have a project where you must develop a Verilog module that is responsible for accumulating serial input data. The module, meant to be highly professional and robust, will collect data samples and produce an output once certain criteria are met. Your design must follow the detailed specifications provided below:
+
+1. Module Identification:
+   • The module must be named "accu" to clearly indicate its accumulation functionality.
+
+2. Input Specifications:
+   • clk: A clock input that acts as the timing backbone of the module. All synchronous activities—including data capture and output generation—should be coordinated with this signal.
+   • rst_n: An active-low reset input. This means that when rst_n is de-asserted (logic low), the module must immediately revert to its initial state, clearing any stored information and state flags.
+   • data_in[7:0]: An 8-bit wide data bus carrying the serial input values. Each value on this bus is to be handled as an unsigned integer. The module should accumulate these values sequentially.
+   • valid_in: A control signal that indicates when the data on data_in is valid and ready to be processed. On the positive edge of clk, when valid_in is asserted, the module should capture the corresponding 8-bit data.
+
+3. Output Specifications:
+   • valid_out: A control output signal that becomes active (logic high) for one clock cycle only when the module has successfully accumulated four valid data inputs. This signal serves as an indicator that the computed sum is now available.
+   • data_out[9:0]: A 10-bit wide output representing the sum of exactly four accumulated 8-bit data entries. The wattage is purposefully set to 10 bits to accommodate the largest possible sum (4 times the maximum 8-bit value).
+
+4. Operational Behavior and Design Requirements:
+   • Synchronous Operation: All operations should be designed to be synchronous with the clk signal. This includes the timing of data capture, accumulation, and toggling of output signals.
+   • Reset Functionality: Whenever rst_n is asserted low, the module must clear its internal sum register and ensure that the valid_out signal is reset. This reset operation is crucial to prevent any carry-over effects from previous operations.
+   • Data Accumulation Process: Each time valid_in is asserted, the module should capture the current data_in value and add it to an internal accumulator. The procedure must be repeated until a total of four valid inputs have been received.
+   • Output Condition: Only after four valid data inputs have been collected should the module generate an output. At that moment, data_out should reflect the accumulated sum and valid_out should go high for a single clock cycle to indicate that the computation is complete.
+   • Interim Conditions: The module should not produce any output nor toggle any signals until the four valid inputs have been completely accumulated. The design must handle the interim state appropriately, ensuring that incomplete data accumulation does not lead to unintended outputs.
+
+Based on these detailed guidelines, your task is to produce a full Verilog implementation of the "accu" module. Remember, your focus is on ensuring that every aspect of these requirements—ranging from synchronous data handling to precise reset behavior and proper accumulation logic—is correctly implemented. No output should be generated, and no intermediate accumulation should be considered valid until the four valid data pieces have been successfully processed.

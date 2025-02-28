@@ -1,0 +1,23 @@
+Consider the following scenario:
+
+You are a seasoned Verilog designer tasked with creating a module whose primary purpose is to generate a periodic clock signal—a classic square wave. Here are the expanded and clarified requirements for the design:
+
+1. Module Identifier:  
+   • The Verilog module must be explicitly named "clkgenerator".
+
+2. Parameter Configuration:  
+   • A key parameter, "PERIOD", plays a pivotal role.  
+   • This parameter has a default value set to 10, and it determines the entire cycle length of the clock signal.  
+   • The periodicity of the toggle behavior is derived from this parameter—for a perfect square wave, the clock should toggle its output state every half PERIOD.
+
+3. Output Pin Functionality:  
+   • The module should include one principal output port, labeled "clk".  
+   • The role of this port is to output the generated clock signal continuously.
+
+4. Design and Behavioral Requirements:  
+   • At the start of the simulation, the clock output should be initialized to a logic level of 0, ensured by using an "initial" block.  
+   • The core behavior of the module involves switching the state of "clk" at an interval of half the PERIOD value. This toggling mechanism is fundamental for producing a clock signal that faithfully adheres to the required frequency and square wave characteristics.
+
+Your challenge is to develop the complete Verilog code for this "clkgenerator" module. The code must strictly conform to the above specifications, ensuring that the module reliably produces a periodic square wave clock signal.  
+
+Please ensure that your submission contains only the Verilog code implementing the module as per these instructions, without any additional commentary or explanations.

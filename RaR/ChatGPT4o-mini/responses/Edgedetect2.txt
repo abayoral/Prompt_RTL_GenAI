@@ -1,0 +1,16 @@
+```
+module top_module (
+    input wire clk,
+    input wire [7:0] data_in,
+    output reg [7:0] data_out
+);
+    reg [7:0] prev_data;
+
+    always @(posedge clk) begin
+        // Detect changes
+        data_out <= data_in & ~prev_data;  // Set output for rising edges
+        prev_data <= data_in;               // Update previous data
+    end
+
+endmodule
+```

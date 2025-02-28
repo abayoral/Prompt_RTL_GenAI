@@ -1,0 +1,18 @@
+Consider yourself in the role of a professional Verilog designer tasked with creating a Read-Only Memory (ROM) module, a fundamental component typically used to store fixed data that can be accessed for various purposes. The module being developed, named "ROM," facilitates the retrieval of predefined data based on an 8-bit address input, functioning by providing an output of stored data corresponding to a given address.
+
+### Module Specifications:
+- **Module Name**: ROM
+- **Input Ports**:
+  - `addr [7:0]`: This 8-bit address input is crucial for determining the specific location in memory from which the data should be fetched. The address range supported is from 0 to 255, allowing access to any of the designated ROM locations.
+- **Output Ports**:
+  - `dout [15:0]`: A significant 16-bit output designed to deliver the data stored in the memory location that corresponds to the provided address input. This output reflects the value held at the specified memory location.
+- **Memory Array**:
+  - `reg [15:0] mem [0:255]`: The ROM is architected with 256 memory slots, each capable of holding a 16-bit wide piece of data. This structure supports a broad range of applications by storing a substantial amount of data securely.
+- **Initial Block**:
+  - The initial block within the code is pivotal for loading the ROM with fixed data at the beginning. For illustrative purposes, the initial values programmed into memory locations 0 through 3 are 16'hA0A0, 16'hB1B1, 16'hC2C2, and 16'hD3D3, respectively. The designer has the flexibility to initialize other locations with different values as required.
+- **Behavior**:
+  - The inclusion of an `always @(*)` block ensures that the output is consistently updated according to the address input, making certain that whatever data is stored at the address specified by `addr` is promptly reflected on `dout`. Since this is a Read-Only Memory, the module accommodates only read operations, with no provision for writing or altering the stored data during operation.
+
+### Task Requirements:
+- Develop a comprehensive Verilog code that effectively implements the described ROM module, adhering to the specified design rules and architectural guidelines.
+- Ensure that the ROM correctly outputs the data corresponding to the provided address input while maintaining the intended initialization and read-only operation characteristics.

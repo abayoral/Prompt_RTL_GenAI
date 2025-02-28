@@ -1,0 +1,63 @@
+Certainly! Here is a detailed and refined explanation of your task as a professional Verilog designer. The objective is to design and implement a traffic light controller with specific functionalities and characteristics, all of which should be incorporated into a Verilog module. 
+
+**Objective**: 
+Design a Verilog module to control a traffic light system incorporating red, yellow, and green indicators, alongside a pedestrian request button. The system revolves around a set pattern for traffic signal timing and a mechanism to handle pedestrian crossing requests efficiently and safely. 
+
+**Traffic Light Timing**:
+- **Default States**:
+  - The green light for motor vehicles remains on for 60 clock cycles.
+  - The yellow light is activated for 5 clock cycles.
+  - The red light lasts for 10 clock cycles.
+  
+- **Pedestrian Button Impact**:
+  - When the pedestrian button is pressed, the countdown of the green light is observed:
+    - If the active green light has more than 10 clock cycles remaining, it is shortened to exactly 10 cycles.
+    - If there are 10 or fewer cycles remaining, the countdown will proceed without adjustment.
+
+- **Synchronization of Lights**:
+  - The lane, meaning the one used by vehicles, and sidewalk lights should operate in sync:
+    - If the vehicle lane light is either green or yellow, the pedestrian sidewalk light should show red.
+    - Conversely, when the lane light is red, the pedestrian sidewalk light should show green.
+
+**Module Specifications**:
+- **Module Name**:
+  - `traffic_light`
+
+- **Inputs**:
+  - `rst_n`: An active-low reset signal that initializes the system state.
+  - `clk`: The clock signal that drives the operational timing of the system.
+  - `pass_request`: This signal acts as the pedestrian request indication.
+
+- **Outputs**:
+  - `clock[7:0]`: An 8-bit output displaying the current value of the internal counter.
+  - `red, yellow, green`: Entry points signifying the status of traffic lights through binary signals.
+
+- **Parameters**:
+  - `idle`, `s1_red`, `s2_yellow`, `s3_green`: Constants that represent enumerated states for the traffic light controller, denoting different phases of light operation.
+
+- **Registers and Wires**:
+  - `cnt`: An 8-bit register serving as an internal timing counter to track the clock cycles for each light state. 
+  - `state`: A 2-bit register to hold the current operational state of the traffic light system.
+  - `p_red`, `p_yellow`, `p_green`: These 1-bit registers store the historical signal states for red, yellow, and green signals, respectively, assisting in determining transitions and assignments.
+
+**Implementation Details**:
+- **State Transition Logic**:
+  - A case statement within the first always block governs transitions between states.
+    - **idle**: Default starting state where all signal outputs are deactivated. The system transitions to `s1_red` immediately.
+    - **s1_red**: Activates the red signal; once the counter completes the required count, system transitions to `s3_green`.
+    - **s2_yellow**: Engages the yellow signal, waiting for its cycle count to fulfill, then shifts back to `s1_red`.
+    - **s3_green**: The green signal turns active, after its duration, the state moves to `s2_yellow`.
+
+- **Counter Management**:
+  - A secondary always block is tasked with modifying the internal counter (`cnt`).
+    - If a reset (`!rst_n`) is detected, the counter initializes to 10.
+    - The counter is reset based on active signals and prior states:
+      - Green state shortened to 10 when `pass_request` is active.
+      - Transition from past states triggers reinitialization to respective durations (60, 5, 10).
+
+- **Output Assignments**:
+  - The final always block updates traffic light outputs on clock edges or reset.
+  - Assign the internal counter to the external `clock` output.
+  - Align the previous states via registers (`p_red`, `p_yellow`, `p_green`) to output signals (`red`, `yellow`, `green`).
+
+By executing this plan, you'll develop an effectively synchronized and responsive traffic control system in Verilog, accommodating both vehicular and pedestrian needs through logical signal management and state transitions.

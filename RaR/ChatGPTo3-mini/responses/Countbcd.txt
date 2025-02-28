@@ -1,0 +1,54 @@
+module top_module (
+    input clk,
+    input reset,   // Synchronous active-high reset
+    output [3:1] ena,
+    output reg [15:0] q
+);
+
+    // The BCD counter stores 4 digits:
+    // q[3:0]   - ones digit
+    // q[7:4]   - tens digit
+    // q[11:8]  - hundreds digit
+    // q[15:12] - thousands digit
+
+    // Generate the enable signals for the tens, hundreds, and thousands digits.
+    // Each enable goes high when the lower-order digits are at '9' so that the cascade
+    // increment can occur.
+    assign ena[1] = (q[3:0] == 4'd9);
+    assign ena[2] = (q[3:0] == 4'd9) && (q[7:4] == 4'd9);
+    assign ena[3] = (q[3:0] == 4'd9) && (q[7:4] == 4'd9) && (q[11:8] == 4'd9);
+
+    // Sequential block with synchronous reset and BCD counting logic.
+    always @(posedge clk) begin
+        if (reset) begin
+            q <= 16'b0;
+        end else begin
+            // Check if the ones digit has reached 9.
+            if (q[3:0] == 4'd9) begin
+                // Reset ones digit to 0.
+                q[3:0] <= 4'd0;
+                // Cascade increment for tens digit.
+                if (q[7:4] == 4'd9) begin
+                    q[7:4] <= 4'd0;
+                    // Cascade increment for hundreds digit.
+                    if (q[11:8] == 4'd9) begin
+                        q[11:8] <= 4'd0;
+                        // Cascade increment for thousands digit.
+                        if (q[15:12] == 4'd9)
+                            q[15:12] <= 4'd0; // Roll over thousands digit.
+                        else
+                            q[15:12] <= q[15:12] + 4'd1;
+                    end else begin
+                        q[11:8] <= q[11:8] + 4'd1;
+                    end
+                end else begin
+                    q[7:4] <= q[7:4] + 4'd1;
+                end
+            end else begin
+                // Simply increment the ones digit.
+                q[3:0] <= q[3:0] + 4'd1;
+            end
+        end
+    end
+
+endmodule

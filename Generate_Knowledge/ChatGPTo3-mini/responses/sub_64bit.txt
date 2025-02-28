@@ -1,0 +1,16 @@
+module sub_64bit(
+    input signed [63:0] A,
+    input signed [63:0] B,
+    output signed [63:0] result,
+    output overflow
+);
+
+  // Compute the 64-bit subtraction
+  assign result = A - B;
+
+  // Overflow conditions are:
+  // 1. A positive number (A[63]==0) minus a negative number (B[63]==1) resulting in a negative result (result[63]==1)
+  // 2. A negative number (A[63]==1) minus a positive number (B[63]==0) resulting in a positive result (result[63]==0)
+  assign overflow = ((~A[63] & B[63] & result[63]) | (A[63] & ~B[63] & ~result[63]));
+
+endmodule

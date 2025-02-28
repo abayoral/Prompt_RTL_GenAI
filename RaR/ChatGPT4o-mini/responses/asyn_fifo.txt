@@ -1,0 +1,90 @@
+```verilog
+module asyn_fifo #(
+    parameter WIDTH = 8,      // width of the FIFO
+    parameter DEPTH = 16      // depth of the FIFO
+)(
+    input wire                 wclk,    // write clock
+    input wire                 wrstn,   // write reset active low
+    input wire                 winc,    // write increment
+    input wire [WIDTH-1:0]    wdata,   // data input
+    output reg                wfull,    // FIFO full flag
+
+    input wire                 rclk,    // read clock
+    input wire                 rrstn,   // read reset active low
+    input wire                 rinc,    // read increment
+    output reg [WIDTH-1:0]    rdata,   // data output
+    output reg                rempty    // FIFO empty flag
+);
+
+    localparam ADDR_WIDTH = $clog2(DEPTH);
+    
+    reg [ADDR_WIDTH-1:0] wptr_bin, wptr_gray, wptr_gray_sync;
+    reg [ADDR_WIDTH-1:0] rptr_bin, rptr_gray, rptr_gray_sync;
+
+    reg [WIDTH-1:0] ram [(2**ADDR_WIDTH)-1:0]; // Dual-port RAM instance
+
+    // Write Pointer Logic
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            wptr_bin <= 0;
+        end else if (winc && !wfull) begin
+            wptr_bin <= wptr_bin + 1;
+        end
+    end
+
+    // Read Pointer Logic
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            rptr_bin <= 0;
+        end else if (rinc && !rempty) begin
+            rptr_bin <= rptr_bin + 1;
+        end
+    end
+
+    // Convert binary pointer to Gray code
+    always @* begin
+        wptr_gray = (wptr_bin >> 1) ^ wptr_bin;
+        rptr_gray = (rptr_bin >> 1) ^ rptr_bin;
+    end
+
+    // Synchronize write pointer to read clock
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            wptr_gray_sync <= 0;
+        end else begin
+            wptr_gray_sync <= wptr_gray;
+        end
+    end
+
+    // Synchronize read pointer to write clock
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            rptr_gray_sync <= 0;
+        end else begin
+            rptr_gray_sync <= rptr_gray;
+        end
+    end
+
+    // Check for full and empty status
+    always @* begin
+        wfull = (wptr_gray[ADDR_WIDTH-1] ^ rptr_gray_sync[ADDR_WIDTH-1]) && 
+                (wptr_gray[ADDR_WIDTH-2:0] == rptr_gray_sync[ADDR_WIDTH-2:0]);
+        rempty = (wptr_gray == rptr_gray_sync);
+    end
+
+    // Writing data into RAM
+    always @(posedge wclk) begin
+        if (winc && !wfull) begin
+            ram[wptr_bin] <= wdata;
+        end
+    end
+
+    // Reading data from RAM
+    always @(posedge rclk) begin
+        if (rinc && !rempty) begin
+            rdata <= ram[rptr_bin];
+        end
+    end
+
+endmodule
+```

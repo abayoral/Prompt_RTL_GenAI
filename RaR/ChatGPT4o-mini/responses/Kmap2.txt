@@ -1,0 +1,14 @@
+```verilog
+module kmap_function (
+    input wire a,
+    input wire b,
+    input wire c,
+    input wire d,
+    output wire out
+);
+
+// Boolean expression derived from the K-map simplification
+assign out = (a & ~b & c) | (a & b & ~d) | (~a & b & c) | (b & c & d);
+
+endmodule
+```

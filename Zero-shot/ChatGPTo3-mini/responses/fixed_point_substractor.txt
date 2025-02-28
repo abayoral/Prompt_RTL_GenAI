@@ -1,0 +1,56 @@
+module fixed_point_subtractor #(parameter Q = 8,         // number of fractional bits
+                                 parameter N = 16)        // total number of bits (1 sign + N-1 magnitude bits)
+   (input  [N-1:0] a,   // first fixed-point operand (sign-magnitude format)
+    input  [N-1:0] b,   // second fixed-point operand (sign-magnitude format)
+    output [N-1:0] c);  // result fixed-point number (sign-magnitude format)
+
+  // We assume that the MSB is the sign bit and the remaining (N-1) bits represent the magnitude.
+  localparam MAG_BITS = N - 1;
+
+  wire s_a = a[N-1];               // sign of a (0 for positive, 1 for negative)
+  wire s_b = b[N-1];               // sign of b
+  wire [MAG_BITS-1:0] mag_a = a[MAG_BITS-1:0];  // magnitude of a
+  wire [MAG_BITS-1:0] mag_b = b[MAG_BITS-1:0];  // magnitude of b
+
+  reg res_sign;                    // sign for the result
+  reg [MAG_BITS-1:0] res_mag;      // magnitude for the result
+  reg [N-1:0] res;                // internal register to hold final result
+
+  // For the addition in the different sign case, the sum of two (N-1)-bit numbers might result in
+  // an extra carry bit. Here, we assume that any overflow is truncated (as no overflow handling is specified).
+  wire [MAG_BITS:0] add_result = mag_a + mag_b;
+
+  always @(*) begin
+    // Case 1: a and b have the same sign => perform direct subtraction of magnitudes.
+    if (s_a == s_b) begin
+      if (mag_a >= mag_b) begin
+        res_mag  = mag_a - mag_b;
+        res_sign = s_a;         // keep the common sign
+      end
+      else begin
+        res_mag  = mag_b - mag_a;
+        // If the result of the subtraction yields a negative value,
+        // then the sign is the opposite of the original operand sign.
+        res_sign = ~s_a;
+      end
+    end
+    // Case 2: a and b have different signs.
+    // Algebraically: a - b becomes a + |b| (if b is negative) or -( |a| + b ) (if a is negative).
+    // Therefore, simply add the two magnitudes and use a's sign to indicate the overall sign.
+    else begin
+      res_mag  = add_result[MAG_BITS-1:0];  // truncating any overflow bit if necessary
+      res_sign = s_a;  // when a is positive and b negative, result is positive [since a - (-|b|) = a+|b|],
+                       // and when a is negative and b positive, result remains negative.
+    end
+
+    // In the special event that the computed magnitude is zero, force the sign bit to 0.
+    if (res_mag == 0)
+      res_sign = 1'b0;
+
+    // Combine the sign and the magnitude into a fixed-point number.
+    res = {res_sign, res_mag};
+  end
+
+  assign c = res;
+
+endmodule

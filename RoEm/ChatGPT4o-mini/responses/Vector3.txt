@@ -1,0 +1,17 @@
+```
+module top_module (
+    input [4:0] a, b, c, d, e, f,
+    output [7:0] w, x, y, z );
+
+    // Concatenate the input vectors and two additional bits
+    wire [29:0] concatenated_inputs = {a, b, c, d, e, f};
+    wire [31:0] full_output = {concatenated_inputs, 2'b00}; // two 1 bits are added at the end
+
+    // Split the concatenated output into the required output vectors
+    assign w = full_output[31:24];
+    assign x = full_output[23:16];
+    assign y = full_output[15:8];
+    assign z = full_output[7:0];
+
+endmodule
+```

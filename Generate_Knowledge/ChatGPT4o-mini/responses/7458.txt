@@ -1,0 +1,30 @@
+```
+module top_module ( 
+    input p1a, p1b, p1c, p1d, p1e, p1f,
+    output p1y,
+    input p2a, p2b, p2c, p2d,
+    output p2y );
+
+    wire and1_out, and2_out, and3_out, and4_out;
+
+    // Four AND gates for the first output
+    assign and1_out = p1a & p1b;
+    assign and2_out = p1c & p1d;
+    assign and3_out = p1e & p1f;
+    assign and4_out = and1_out & and2_out;
+
+    // Two OR gates for the p1y output
+    assign p1y = and4_out | and3_out;
+
+    // Intermediate wires for the second output
+    wire or1_out, or2_out;
+
+    // Two AND gates for the second output
+    assign or1_out = p2a & p2b;
+    assign or2_out = p2c & p2d;
+
+    // One OR gate for the p2y output
+    assign p2y = or1_out | or2_out;
+
+endmodule
+```

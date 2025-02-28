@@ -1,0 +1,62 @@
+```verilog
+module freq_divbyfrac (
+    input wire clk,
+    input wire rst_n,
+    output reg clk_div
+);
+
+    parameter integer MUL2_DIV_CLK = 7;  // Total count for 3.5 division
+    parameter integer DIV_CLK_1 = 4;      // Clock cycles for first pulse
+    parameter integer DIV_CLK_2 = 3;      // Clock cycles for second pulse
+
+    reg [2:0] counter;                    // 3-bit counter for the division
+    reg clk_phase_1;                      // First phase of the output clock
+    reg clk_phase_2;                      // Second phase of the output clock
+
+    // Counter for clock cycles
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            counter <= 0;
+            clk_div <= 0;
+            clk_phase_1 <= 0;
+            clk_phase_2 <= 0;
+        end else begin
+            if (counter < MUL2_DIV_CLK - 1) begin
+                counter <= counter + 1;
+            end else begin
+                counter <= 0;  // Reset the counter after reaching the total count
+            end
+        end
+    end
+
+    // Phase shifting to create the divided clock signal
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            clk_phase_1 <= 0;
+            clk_phase_2 <= 0;
+        end else begin
+            if (counter < DIV_CLK_1) begin
+                clk_phase_1 <= 1;  // Active for first 4 clock cycles
+            end else begin
+                clk_phase_1 <= 0;  // Inactive after that
+            end
+
+            if (counter < DIV_CLK_2) begin
+                clk_phase_2 <= 1;  // Active for subsequent 3 clock cycles
+            end else begin
+                clk_phase_2 <= 0;  // Inactive after that
+            end
+        end
+    end
+
+    // Generate the output clock signal by combining phase shifts
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            clk_div <= 0;
+        end else begin
+            clk_div <= clk_phase_1 | clk_phase_2; // OR to create the final output clock
+        end
+    end
+
+endmodule
+```

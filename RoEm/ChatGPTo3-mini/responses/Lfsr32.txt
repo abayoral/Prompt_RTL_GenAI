@@ -1,0 +1,53 @@
+module top_module(
+    input clk,
+    input reset,    // Active‐high synchronous reset to 32'h1
+    output reg [31:0] q
+);
+
+    // 
+    // We interpret our 32-bit register such that:
+    //   q[31] corresponds to x^32,
+    //   q[30] to x^31, …, down to q[0] corresponding to x^1.
+    //
+    // The given primitive polynomial is:
+    //        x^32 + x^22 + x^2 + x + 1.
+    //
+    // In a Galois configuration the register is shifted such that the MSB (q[31])
+    // is used as the "feedback" bit. Then, only the bits corresponding to the non‐zero
+    // coefficients of the polynomial (aside from the constant term) are modified by XORing in that feedback.
+    // Here, the tapped bits correspond to:
+    //      x^32  -> register index 31,
+    //      x^22  -> register index 21,
+    //      x^2   -> register index 1,
+    //      x^1   -> register index 0.
+    //
+    // The update is done by shifting the register left by one. For every new bit that is shifted in,
+    // if its destination is one of the tapped positions, it is formed as:
+    //      new_bit = (bit shifted in from the next-high bit) XOR feedback.
+    // Otherwise, it is simply the shifted value.
+    //
+    // Hence, the new state bits (from MSB to LSB) are computed as:
+    //   new[31]       = q[30] XOR q[31]        // tapped (x^32)
+    //   new[30:22]    = q[29:21]               // not tapped
+    //   new[21]       = q[20] XOR q[31]        // tapped (x^22)
+    //   new[20:2]     = q[19:1]                // not tapped
+    //   new[1]        = q[0] XOR q[31]         // tapped (x^2)
+    //   new[0]        = q[31]                  // tapped (x^1)
+    //
+    // This produces a 32‐bit Galois LFSR with the desired taps.
+    
+    always @(posedge clk) begin
+        if (reset)
+            q <= 32'h1;  // Synchronous reset sets state to 1
+        else begin
+            q <= { (q[30] ^ q[31]),   // new bit31 (tap for x^32)
+                   q[29:21],         // new bits30 downto 22 (no tap)
+                   (q[20] ^ q[31]),   // new bit21 (tap for x^22)
+                   q[19:1],          // new bits20 downto 2 (no tap)
+                   (q[0] ^ q[31]),    // new bit1 (tap for x^2)
+                   q[31]             // new bit0 (tap for x^1)
+                 };
+        end
+    end
+
+endmodule

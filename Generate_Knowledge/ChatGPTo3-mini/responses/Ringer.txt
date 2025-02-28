@@ -1,0 +1,16 @@
+module top_module (
+    input ring,
+    input vibrate_mode,
+    output ringer,       // Make sound
+    output motor         // Vibrate
+);
+
+    // The ringer will be on when there's an incoming call (ring = 1)
+    // and the phone is NOT in vibrate mode.
+    assign ringer = ring & ~vibrate_mode;
+    
+    // The motor will be on when there's an incoming call (ring = 1)
+    // and the phone is in vibrate mode.
+    assign motor = ring & vibrate_mode;
+
+endmodule

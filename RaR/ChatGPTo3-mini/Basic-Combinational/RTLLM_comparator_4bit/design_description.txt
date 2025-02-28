@@ -1,0 +1,28 @@
+Consider the following project assignment:
+
+You have been designated as a professional Verilog designer and tasked with developing a digital logic module that functions as a 4-bit comparator. Your design must rely exclusively on combinational logic, meaning the outputs are solely a function of the current inputs without any memory elements or sequential dependencies.
+
+Below are the detailed specifications and guidelines for the module:
+
+1. Module Name:
+   • The module must be named "comparator_4bit."
+
+2. Input Ports:
+   • A [3:0]: A 4-bit input that represents the first binary number to be compared.
+   • B [3:0]: A 4-bit input that represents the second binary number to be compared.
+
+3. Output Ports:
+   • A_greater: This single-bit output should be high (logic 1) if the value of input A is greater than input B.
+   • A_equal: This single-bit output should be high (logic 1) if the two inputs, A and B, are exactly equal.
+   • A_less: This single-bit output should be high (logic 1) if A is less than B.
+
+4. Implementation Strategy:
+   • The comparator must be implemented using combinational logic. This means the output results depend directly on the current input values without any form of storage or sequential logic.
+   • The comparison is to be accomplished by performing a subtraction between the two input values, specifically calculating A - B.
+   • The behavior of the subtraction operation should be analyzed as follows:
+       - If a borrow is required during the subtraction process, it implies that A is less than B, and thus the A_less output should be set to high.
+       - If no borrow occurs and the result of the subtraction is non-zero, that indicates A is greater than B; accordingly, the A_greater output must be set to high.
+       - If subtracting B from A results in a zero value, then this indicates that A and B are equal, and the A_equal output should be set to high.
+   • Additionally, the logic design must ensure that the outputs (A_greater, A_equal, A_less) are mutually exclusive. At any given moment, only one of these outputs should assert a high state to indicate the correct comparative condition.
+
+Your task is to draft the complete Verilog code for this 4-bit comparator module, strictly following these detailed specifications and ensuring the implementation aligns perfectly with the described combinational logic and output behavior requirements. Remember, the goal is to accurately capture the comparison operation through the subtraction method described, while ensuring that the outputs are one-hot (mutually exclusive) as per the project criteria.

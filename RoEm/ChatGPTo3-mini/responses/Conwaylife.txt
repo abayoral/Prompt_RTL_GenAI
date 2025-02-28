@@ -1,0 +1,60 @@
+module top_module(
+    input clk,
+    input load,
+    input [255:0] data,
+    output [255:0] q
+);
+
+    reg [255:0] state;
+    reg [255:0] next_state;
+    integer r, c;
+    integer r_up, r_down, c_left, c_right;
+    integer neighbor_count;
+    
+    // The current state is output as q.
+    assign q = state;
+    
+    always @(posedge clk) begin
+        if (load)
+            state <= data;
+        else
+            state <= next_state;
+    end
+
+    // Compute next state of the 16x16 toroidal grid
+    always @(*) begin
+        // Iterate through each cell (row r, column c).
+        for (r = 0; r < 16; r = r + 1) begin
+            for (c = 0; c < 16; c = c + 1) begin
+                // Compute neighbor indices with wrap-around (toroidal)
+                r_up   = (r == 0)   ? 15 : r - 1;
+                r_down = (r == 15)  ? 0  : r + 1;
+                c_left = (c == 0)   ? 15 : c - 1;
+                c_right= (c == 15)  ? 0  : c + 1;
+                
+                // Sum up the 8 neighbors
+                neighbor_count = 0;
+                neighbor_count = neighbor_count + state[r_up*16 + c_left];
+                neighbor_count = neighbor_count + state[r_up*16 + c];
+                neighbor_count = neighbor_count + state[r_up*16 + c_right];
+                neighbor_count = neighbor_count + state[r*16 + c_left];
+                neighbor_count = neighbor_count + state[r*16 + c_right];
+                neighbor_count = neighbor_count + state[r_down*16 + c_left];
+                neighbor_count = neighbor_count + state[r_down*16 + c];
+                neighbor_count = neighbor_count + state[r_down*16 + c_right];
+                
+                // Apply Conway's Game of Life rules:
+                //  - If exactly 3 neighbors, cell becomes alive.
+                //  - If exactly 2 neighbors, cell keeps its current state.
+                //  - Otherwise, cell dies.
+                if (neighbor_count == 3)
+                    next_state[r*16 + c] = 1'b1;
+                else if (neighbor_count == 2)
+                    next_state[r*16 + c] = state[r*16 + c];
+                else
+                    next_state[r*16 + c] = 1'b0;
+            end
+        end
+    end
+
+endmodule

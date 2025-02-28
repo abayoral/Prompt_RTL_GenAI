@@ -1,0 +1,16 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    output out
+);
+
+    // After analyzing the Karnaugh map:
+    // The K-map covers all combinations of a, b, and c and all cells are 1.
+    // This means that no matter what the input values are, the output is always 1.
+    // Both the Sum-of-Products (SOP) simplification and the Product-of-Sums (POS) form
+    // reduce to 1. Thus, the simplified circuit is simply:
+    
+    assign out = 1'b1;
+
+endmodule

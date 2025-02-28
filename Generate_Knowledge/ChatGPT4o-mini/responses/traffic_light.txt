@@ -1,0 +1,133 @@
+```
+module traffic_light (
+    input wire rst_n,
+    input wire clk,
+    input wire pass_request,
+    output reg [7:0] clock,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+    // Parameter definitions for states
+    typedef enum reg [1:0] {
+        idle = 2'b00,
+        s1_red = 2'b01,
+        s2_yellow = 2'b10,
+        s3_green = 2'b11
+    } state_t;
+
+    state_t state, next_state;
+    reg [7:0] cnt;
+    reg [7:0] green_time = 60, yellow_time = 5, red_time = 10;
+    reg [7:0] green_remaining;
+
+    // Initial conditions
+    initial begin
+        state = idle;
+        cnt = 0;
+        clock = 0;
+        red = 0;
+        yellow = 0;
+        green = 0;
+    end
+
+    // State transition logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= idle;
+        end else begin
+            state <= next_state;
+        end
+    end
+
+    always @(*) begin
+        case (state)
+            idle: next_state = s1_red;
+            s1_red: begin
+                if (cnt == red_time) next_state = s2_yellow; else next_state = s1_red;
+            end
+            s2_yellow: begin
+                if (cnt == yellow_time) next_state = s3_green; else next_state = s2_yellow;
+            end
+            s3_green: begin
+                if (cnt == green_remaining) next_state = s1_red; else next_state = s3_green;
+            end
+            default: next_state = idle;
+        endcase
+    end
+
+    // Counter and timing logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt <= 0;
+            green_remaining <= green_time;
+        end else begin
+            if (state == s1_red) begin
+                cnt <= cnt + 1;
+            end else if (state == s2_yellow) begin
+                cnt <= cnt + 1;
+            end else if (state == s3_green) begin
+                cnt <= cnt + 1;
+            end else begin
+                cnt <= 0;
+            end
+            
+            // Manage pedestrian button pressing logic
+            if (state == s3_green && pass_request) begin
+                if (green_remaining > 10) begin
+                    green_remaining <= 10;
+                end
+            end
+        end
+    end
+
+    // Output logic for traffic lights
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            red <= 1;
+            yellow <= 0;
+            green <= 0;
+        end else begin
+            case (state)
+                s1_red: begin
+                    red <= 1;
+                    yellow <= 0;
+                    green <= 0;
+                end
+                s2_yellow: begin
+                    red <= 0;
+                    yellow <= 1;
+                    green <= 0;
+                end
+                s3_green: begin
+                    if (green_remaining > 0) begin
+                        red <= 0;
+                        yellow <= 0;
+                        green <= 1;
+                    end else begin
+                        red <= 1;
+                        yellow <= 0;
+                        green <= 0;
+                    end
+                end
+                default: begin
+                    red <= 1;
+                    yellow <= 0;
+                    green <= 0;
+                end
+            endcase
+        end
+    end
+
+    // Internal clock output
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            clock <= 0;
+        end else begin
+            clock <= cnt;
+        end
+    end
+
+endmodule
+```

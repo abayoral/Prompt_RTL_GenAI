@@ -1,0 +1,16 @@
+```
+module top_module (
+    input clk,
+    input [7:0] in,
+    output reg [7:0] pedge
+);
+
+    reg [7:0] in_delay;
+
+    always @(posedge clk) begin
+        pedge <= in & ~in_delay; // Set output high on transition from 0 to 1
+        in_delay <= in; // Store current input for next clock cycle
+    end
+
+endmodule
+```

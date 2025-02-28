@@ -1,0 +1,73 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output done
+); 
+
+    reg [3:0] state;
+    reg [3:0] next_state;
+    reg [7:0] data;
+    reg done_reg;
+    
+    localparam IDLE     = 4'b0000,
+               START    = 4'b0001,
+               DATA     = 4'b0010,
+               STOP     = 4'b0011;
+
+    assign done = done_reg;
+
+    // State transition logic
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            state <= IDLE;
+            done_reg <= 0;
+        end else begin
+            state <= next_state;
+        end
+    end
+
+    // Next state logic
+    always @(*) begin
+        done_reg = 0;
+        case (state)
+            IDLE: begin
+                if (in == 0) begin // Start bit detected
+                    next_state = START;
+                end else begin
+                    next_state = IDLE;
+                end
+            end
+            START: begin
+                next_state = DATA; // Move to data state after start bit
+            end
+            DATA: begin
+                if (data_count < 8) begin
+                    data[data_count] = in; // Shift in data bits
+                    if (data_count == 7) begin
+                        next_state = STOP; // All 8 data bits received
+                    end else begin
+                        next_state = DATA;
+                    end
+                end
+            end
+            STOP: begin
+                if (in == 1) begin // Stop bit verified
+                    done_reg = 1; // Indicate valid byte received
+                end
+                next_state = IDLE; // Move back to idle for next byte
+            end
+            default: next_state = IDLE;
+        endcase
+    end
+
+    integer data_count;
+    always @(posedge clk) begin
+        if (state == DATA) begin
+            data_count <= data_count + 1;
+        end else if (state == IDLE) begin
+            data_count <= 0;
+        end
+    end
+
+endmodule

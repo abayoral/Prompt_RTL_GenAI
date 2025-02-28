@@ -1,0 +1,21 @@
+module top_module(
+    input a,
+    input b,
+    input sel_b1,
+    input sel_b2,
+    output wire out_assign,
+    output reg out_always
+);
+    // Continuous assignment implementation using verilog_2001 standard
+    // When both sel_b1 and sel_b2 are asserted, output b. Otherwise, output a.
+    assign out_assign = (sel_b1 & sel_b2) ? b : a;
+    
+    // Procedural block implementation using an always block with if statement.
+    // This block ensures combinational logic synthesis.
+    always @(*) begin
+        if (sel_b1 & sel_b2)
+            out_always = b;
+        else
+            out_always = a;
+    end
+endmodule

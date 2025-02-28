@@ -1,0 +1,9 @@
+module top_module( 
+    input [255:0] in,
+    input [7:0] sel,
+    output out 
+);
+    // Directly index the input vector to pick the selected bit.
+    assign out = in[sel];
+    
+endmodule

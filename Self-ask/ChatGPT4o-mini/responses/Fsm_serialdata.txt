@@ -1,0 +1,1 @@
+What are the specific transitions and conditions that trigger the state changes of the FSM, including how the input signal `in` affects each state?

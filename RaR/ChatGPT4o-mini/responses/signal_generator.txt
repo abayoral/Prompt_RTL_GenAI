@@ -1,0 +1,33 @@
+```verilog
+module signal_generator (
+    input wire clk,
+    input wire rst_n,
+    output reg [4:0] wave
+);
+
+reg state; // 0 for incrementing, 1 for decrementing
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        state <= 0;
+        wave <= 0;
+    end else begin
+        case (state)
+            0: begin // Increment phase
+                if (wave < 31) 
+                    wave <= wave + 1;
+                else 
+                    state <= 1; // Switch to decrement phase
+            end
+            1: begin // Decrement phase
+                if (wave > 0) 
+                    wave <= wave - 1;
+                else 
+                    state <= 0; // Switch to increment phase
+            end
+        endcase
+    end
+end
+
+endmodule
+```

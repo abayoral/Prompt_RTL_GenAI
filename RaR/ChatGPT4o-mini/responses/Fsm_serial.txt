@@ -1,0 +1,75 @@
+```verilog
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg done
+); 
+
+    typedef enum reg [2:0] {
+        IDLE = 3'b000,
+        START = 3'b001,
+        DATA = 3'b010,
+        STOP = 3'b011,
+        ERROR = 3'b100
+    } state_type;
+
+    state_type current_state, next_state;
+    reg [3:0] bit_count; // To count the number of bits received (0 to 8 for data bits)
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+            done <= 0;
+            bit_count <= 0;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+
+    always @(*) begin
+        // Default assignments
+        next_state = current_state;
+        done = 0;
+
+        case (current_state)
+            IDLE: begin
+                if (in == 1'b0) // Start bit detected
+                    next_state = START;
+            end
+
+            START: begin
+                // Wait for some clock cycles before starting data reception
+                next_state = DATA;
+                bit_count = 0;
+            end
+
+            DATA: begin
+                if (bit_count < 8) begin
+                    bit_count = bit_count + 1;
+                end else begin
+                    next_state = STOP; // Move to stop state after 8 data bits
+                end
+            end
+
+            STOP: begin
+                if (in == 1'b1) begin // Check for stop bit
+                    done = 1; // Byte received successfully
+                    next_state = IDLE; // Return to IDLE
+                end else begin
+                    next_state = ERROR; // Invalid stop condition
+                end
+            end
+
+            ERROR: begin
+                // Remain in error state until reset or valid data detected
+                if (in == 1'b0) // Try to find the next start bit
+                    next_state = START;
+            end
+
+            default: next_state = IDLE; // Safety case
+        endcase
+    end
+
+endmodule
+```

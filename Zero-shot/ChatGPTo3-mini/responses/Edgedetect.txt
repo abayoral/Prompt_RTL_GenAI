@@ -1,0 +1,25 @@
+module top_module (
+    input clk,
+    input [7:0] in,
+    output reg [7:0] pedge
+);
+
+    // Register to hold the previous cycle's input value
+    reg [7:0] prev_in;
+    // Register to hold the detection result (delayed one cycle)
+    reg [7:0] detection_dly;
+    
+    always @(posedge clk) begin
+        // Compute detection using the previous cycle's input and current input.
+        // A 0-to-1 transition is detected if the previous value is 0 and the current value is 1.
+        detection_dly <= (~prev_in) & in;
+        
+        // The output is updated with the detection result from the previous clock cycle,
+        // making the pedge signal go high one cycle after the transition.
+        pedge <= detection_dly;
+        
+        // Update the previous input register
+        prev_in <= in;
+    end
+
+endmodule

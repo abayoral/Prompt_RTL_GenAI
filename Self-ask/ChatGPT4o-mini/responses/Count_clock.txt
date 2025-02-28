@@ -1,0 +1,51 @@
+```
+module top_module(
+    input clk,
+    input reset,
+    input ena,
+    output reg pm,
+    output reg [7:0] hh,
+    output reg [7:0] mm,
+    output reg [7:0] ss);
+
+    reg [25:0] counter; // to count clock cycles for 1 second
+    parameter MAX_COUNT = 26'd50_000_000; // Assuming a 50 MHz clock
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            hh <= 8'b00000000; // reset hours to 12:00 AM
+            mm <= 8'b00000000; // reset minutes to 00
+            ss <= 8'b00000000; // reset seconds to 00
+            pm <= 1'b0; // set AM
+            counter <= 0; // reset counter
+        end else begin
+            if (ena) begin
+                if (counter == MAX_COUNT - 1) begin
+                    counter <= 0;
+                    // Increment seconds
+                    if (ss == 59) begin
+                        ss <= 0;
+                        // Increment minutes
+                        if (mm == 59) begin
+                            mm <= 0;
+                            // Increment hours
+                            if (hh == 8'b00001100) begin // 12 in BCD
+                                hh <= 8'b00000001; // reset to 1
+                                pm <= ~pm; // toggle AM/PM
+                            end else begin
+                                hh <= hh + 1; // increment hours
+                            end
+                        end else begin
+                            mm <= mm + 1; // increment minutes
+                        end
+                    end else begin
+                        ss <= ss + 1; // increment seconds
+                    end
+                end else begin
+                    counter <= counter + 1; // count clock cycles
+                end
+            end
+        end
+    end
+endmodule
+```

@@ -1,0 +1,32 @@
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    input sub,
+    output [31:0] sum
+);
+
+    wire [31:0] b_modified;
+    wire c1;
+
+    // Invert b when performing subtraction by XORing with the replicated sub bit
+    assign b_modified = b ^ {32{sub}};
+
+    // Instantiate lower 16-bit adder: use sub as the initial carry-in
+    add16 add_lower (
+        .a(a[15:0]),
+        .b(b_modified[15:0]),
+        .cin(sub),
+        .sum(sum[15:0]),
+        .cout(c1)
+    );
+
+    // Instantiate upper 16-bit adder: use the carry-out from lower adder as carry-in
+    add16 add_upper (
+        .a(a[31:16]),
+        .b(b_modified[31:16]),
+        .cin(c1),
+        .sum(sum[31:16]),
+        .cout()
+    );
+
+endmodule

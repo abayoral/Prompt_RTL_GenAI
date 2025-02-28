@@ -1,0 +1,55 @@
+```
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output reg done
+);
+
+    typedef enum logic [1:0] {
+        IDLE,       // Waiting for the first byte with bit[3] = 1
+        BYTE1,      // First byte received
+        BYTE2,      // Second byte received
+        DONE        // Message completed
+    } state_t;
+
+    state_t current_state, next_state;
+
+    // State transition logic (combinational)
+    always @* begin
+        case (current_state)
+            IDLE: begin
+                if (in[3] == 1) 
+                    next_state = BYTE1;
+                else 
+                    next_state = IDLE;
+            end
+            BYTE1: begin
+                next_state = BYTE2;
+            end
+            BYTE2: begin
+                next_state = DONE;
+            end
+            DONE: begin
+                next_state = IDLE; // Return to IDLE after done
+            end
+            default: next_state = IDLE;
+        endcase
+    end
+
+    // State flip-flops (sequential)
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+            done <= 0;
+        end else begin
+            current_state <= next_state;
+            if (next_state == DONE) 
+                done <= 1;
+            else 
+                done <= 0; // Reset done signal unless in DONE state
+        end
+    end
+
+endmodule
+```

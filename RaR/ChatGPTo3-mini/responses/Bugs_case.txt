@@ -1,0 +1,62 @@
+module keyboard_decoder (
+    input  [7:0] scancode,
+    output reg [3:0] number,
+    output reg       valid
+);
+
+always @(*) begin
+    // Default outputs when no valid key is detected
+    valid = 1'b0;
+    number = 4'd0;
+    
+    // Use a case statement with consistent 8-bit hexadecimal representations
+    case (scancode)
+        8'h45: begin  // Key '0'
+            number = 4'd0;
+            valid  = 1'b1;
+        end
+        8'h16: begin  // Key '1'
+            number = 4'd1;
+            valid  = 1'b1;
+        end
+        8'h1E: begin  // Key '2'
+            number = 4'd2;
+            valid  = 1'b1;
+        end
+        8'h26: begin  // Key '3'
+            number = 4'd3;
+            valid  = 1'b1;
+        end
+        8'h25: begin  // Key '4'
+            number = 4'd4;
+            valid  = 1'b1;
+        end
+        8'h2E: begin  // Key '5'
+            number = 4'd5;
+            valid  = 1'b1;
+        end
+        8'h36: begin  // Key '6'
+            number = 4'd6;
+            valid  = 1'b1;
+        end
+        8'h3D: begin  // Key '7'
+            number = 4'd7;
+            valid  = 1'b1;
+        end
+        8'h3E: begin  // Key '8'
+            number = 4'd8;
+            valid  = 1'b1;
+        end
+        8'h46: begin  // Key '9'
+            number = 4'd9;
+            valid  = 1'b1;
+        end
+        default: begin
+            // Keep valid low and number at zero when no recognized scancode is received
+            number = 4'd0;
+            valid  = 1'b0;
+        end
+    endcase
+end
+
+endmodule

@@ -1,0 +1,29 @@
+As a professional Verilog designer, you are assigned the task of designing a digital logic module intended to perform the function of a 4-bit comparator. The objective is to utilize combinational logic principles throughout your design process. Let's break down the specifics of this project further to ensure a clear understanding of the requirements and expectations involved.
+
+**Project Overview:**
+- The module will be designated the name `comparator_4bit`, clearly indicating its purpose.
+- **Input Ports:** 
+  - The module will take two input ports: 
+    - `A [3:0]`: A 4-bit input that represents one of the binary numbers you will compare.
+    - `B [3:0]`: A second 4-bit input that serves as the other binary number in the comparison.
+- **Output Ports:**
+  - Three output signals will be generated based on the comparison results:
+    - `A_greater`: This is a single-bit output that will output a high signal (`1`) when the value of `A` is greater than that of `B`.
+    - `A_equal`: This output will also be a single bit that goes high (`1`) if `A` and `B` are exactly equal.
+    - `A_less`: This output will similarly be a single-bit signal that will become high (`1`) if the value of `A` is less than that of `B`.
+
+**Implementation Requirements:**
+- **Combinational Logic Design:** 
+  - It's imperative that your design uses combinational logic. This means that the module's output should be entirely dependent on the current inputs without any influence from previous states or stored values. This simplicity is crucial for reliable comparative analysis.
+  
+- **Comparison Methodology:**
+  - A subtraction-based approach will be employed for performing the comparison between the two inputs. Specifically, you will calculate `A - B`, which will help establish the relationship between the two numbers.
+  - **Analysis of Borrow and Results:**
+    - During the subtraction process, if at any point a borrow occurs, this condition signifies that the value of `A` is less than `B`, thus setting `A_less` to high.
+    - On the other side, if the subtraction can be executed without emerging borrows and the result produced is non-zero, it indicates that `A` is greater than `B`, leading to the output `A_greater` being activated.
+    - A result of zero from the subtraction signifies that both inputs are equal, which will cause the output `A_equal` to become high.
+
+**Output Conditions:**
+- The design of the output signals must adhere to the principle of mutual exclusivity. This means that at any one time, only one of the outputs (`A_greater`, `A_equal`, `A_less`) should be outputting a high signal (`1`), thereby distinctly indicating which condition holds true regarding the values of `A` and `B`.
+
+With this detailed explanation of the specifications and expectations for the project, you are now prepared to advance to the next step. Please compile the complete Verilog code for the 4-bit comparator, ensuring that all specified logic and output behaviors are accurately captured in your implementation.

@@ -1,0 +1,54 @@
+```
+module LIFObuffer (
+    input  [3:0]  dataIn,
+    input         RW,
+    input         EN,
+    input         Rst,
+    input         Clk,
+    output reg    EMPTY,
+    output reg    FULL,
+    output reg [3:0] dataOut
+);
+    
+    reg [3:0] stack_mem [0:3]; // 4 entries each 4 bits wide
+    reg [1:0] SP; // Stack Pointer (2-bit as max depth is 4(00 to 11))
+
+    // Initial conditions
+    initial begin
+        SP = 2'b00;
+        EMPTY = 1'b1;
+        FULL = 1'b0;
+        dataOut = 4'b0000;
+    end
+
+    always @(posedge Clk or posedge Rst) begin
+        if (Rst) begin
+            // Reset the stack and flags
+            SP <= 2'b00;
+            EMPTY <= 1'b1;
+            FULL <= 1'b0;
+            dataOut <= 4'b0000;
+            // Clear the stack memory
+            stack_mem[0] <= 4'b0000;
+            stack_mem[1] <= 4'b0000;
+            stack_mem[2] <= 4'b0000;
+            stack_mem[3] <= 4'b0000;
+        end else if (EN) begin
+            if (RW == 1'b0 && !FULL) begin // Push operation
+                stack_mem[SP] <= dataIn;
+                SP <= SP + 1'b1;
+
+            end else if (RW == 1'b1 && !EMPTY) begin // Pop operation
+                SP <= SP - 1'b1;
+                dataOut <= stack_mem[SP];
+                stack_mem[SP] <= 4'b0000; // Clear data from stack after popping
+            end
+
+            // Update EMPTY and FULL flags
+            EMPTY <= (SP == 2'b00);
+            FULL <= (SP == 2'b10);
+        end
+    end
+
+endmodule
+```

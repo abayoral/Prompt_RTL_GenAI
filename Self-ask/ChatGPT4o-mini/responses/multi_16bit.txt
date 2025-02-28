@@ -1,0 +1,55 @@
+```verilog
+module multi_16bit(
+    input wire clk,
+    input wire rst_n,
+    input wire start,
+    input wire [15:0] ain,
+    input wire [15:0] bin,
+    output reg [31:0] yout,
+    output reg done
+);
+    reg [3:0] i;                // Shift count, 4 bits to count 0-16
+    reg [15:0] areg;           // Multiplicand register
+    reg [15:0] breg;           // Multiplier register
+    reg [31:0] yout_r;         // Product register
+    reg done_r;                // Completion flag register
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            i <= 4'd0;         // Reset the shift count
+            areg <= 16'd0;     // Reset the multiplicand
+            breg <= 16'd0;     // Reset the multiplier
+            yout_r <= 32'd0;   // Reset the product
+            done_r <= 1'b0;    // Reset done flag
+        end else begin
+            if (start) begin
+                if (i < 4'd16) begin
+                    i <= i + 1; // Increment shift count
+                end
+            end else begin
+                i <= 4'd0;       // Reset shift count
+            end
+
+            // Multiplication completion flag logic
+            if (i == 4'd16) done_r <= 1'b1; // Set done when finished
+            if (i == 4'd17) done_r <= 1'b0; // Reset done after completion
+            
+            // Shift and accumulate logic
+            if (i == 4'd0) begin
+                areg <= ain;   // Load multiplicand
+                breg <= bin;   // Load multiplier
+            end else if (i > 0 && i <= 16) begin
+                if (areg[i - 1]) begin
+                    yout_r <= yout_r + (breg << (i - 1)); // Accumulate shifted multiplier
+                end
+            end
+        end
+    end
+
+    // Output assignment
+    always @(posedge clk) begin
+        yout <= yout_r;          // Assign product output
+        done <= done_r;          // Assign done flag
+    end
+endmodule
+```

@@ -1,0 +1,24 @@
+```verilog
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out 
+); 
+
+    // Simplifying using Karnaugh map
+    // K-map: 
+    //        cd
+    //      00  01  11  10
+    //    +-----------------
+    //  ab| 0   1   1   1  // c'd', c'd, cd
+    //    | 1   1   1   0  // c'd', c'd, cd'
+    
+    // From K-map we can deduce the simplified expression:
+    // out = c'd' + c'b + ab' 
+
+    assign out = (c ~| d) | (c & ~b) | (a & b & ~c);
+
+endmodule
+```

@@ -1,0 +1,25 @@
+Could you please take on the role of a seasoned Verilog designer and draft a fully functional code module named `freq_diveven`? The objective of this module is to serve as a frequency divider that specifically divides an input clock signal by even numbers. This is to be achieved by generating a reduced frequency output clock signal that toggles based on a parameter referred to as `NUM_DIV`.
+
+To ensure clarity in your implementation, please take into account the following detailed specifications and requirements for the module:
+
+### Input Ports:
+1. **`clk`**: This is the primary input clock signal that will undergo division.
+2. **`rst_n`**: This is an active-low reset signal. When asserted low, it should reset the internal states of the module.
+
+### Output Ports:
+1. **`clk_div`**: This output represents the divided clock signal, which should exhibit a reduced frequency in accordance with the division performed.
+
+### Implementation Instructions:
+1. The core of the module will involve a counter known as `cnt`, which is tasked with counting the number of input clock cycles.
+2. The division factor is determined by the `NUM_DIV` parameter, which is mandated to be an even integer.
+3. If the `rst_n` signal is low (inactive), both the counter (`cnt`) and the divided clock output (`clk_div`) must be reset to their initial values.
+4. On each positive edge of the input clock signal (`clk`):
+   - If the current value of the counter is less than half of `NUM_DIV - 1`, the counter should increment, but the `clk_div` output should remain unchanged.
+   - Once the counter reaches the designated full cycle, which is specified by `NUM_DIV`, it should reset back to zero and concurrently toggle the output `clk_div` to reflect the frequency division.
+5. The counter itself should be defined as a 4-bit register (`cnt`) to accurately track the number of clock cycles up to the established limit.
+
+### Additional Notes:
+- Ensure that all conditions regarding the reset functionality and the behavior of the counter and output clock signal are carefully observed and implemented.
+- The implementation should be robust and follow best practices in Verilog design.
+
+With these detailed requirements in mind, I kindly ask you to provide a comprehensive implementation of the `freq_diveven` module in Verilog, ensuring that all specifications are thoroughly addressed and adhered to in your code.

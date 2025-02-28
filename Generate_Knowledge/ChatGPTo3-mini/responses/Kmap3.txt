@@ -1,0 +1,22 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out  
+); 
+
+    // The Karnaugh map has been simplified to the following expression:
+    // out = a(c + ~d) + ~a * b * c
+    // Explanation:
+    // 1. Grouping the ones in the rows where c=1 (regardless of d) for terms with a=1 gives a*c.
+    // 2. The ones in the c'd' row where a=1 yield a*~c*~d.
+    // 3. The column with b=1 and c=1 from the rows with a=0 gives ~a*b*c.
+    // Notice that a(c + ~d) expands to (a*c + a*~d), but the reduction here is valid when you observe that a*~d is active only under ~c as well from our map.
+    // By regrouping a*c (from cases when c=1) and a*~c*~d (from the row c'd'), we can factor a as a(c + ~c*~d).
+    // And since (c + ~c*~d) is equivalent to (c + ~d), the final expression becomes:
+    // out = a(c + ~d) + ~a*b*c
+
+    assign out = (a & (c | ~d)) | ((~a) & b & c);
+
+endmodule

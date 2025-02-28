@@ -1,0 +1,44 @@
+module accu (
+    input         clk,
+    input         rst_n,
+    input  [7:0]  data_in,
+    input         valid_in,
+    output reg    valid_out,
+    output reg [9:0] data_out
+);
+
+    // Internal accumulator and counter for valid data inputs.
+    reg [9:0] acc;      // 10-bit accumulation register (max possible sum: 4*255 = 1020)
+    reg [1:0] count;    // 2-bit counter (0 to 3)
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Asynchronous active-low reset: clear accumulator, counter, outputs.
+            acc       <= 10'd0;
+            count     <= 2'd0;
+            data_out  <= 10'd0;
+            valid_out <= 1'b0;
+        end else begin
+            // Default output is not valid unless four samples were just accumulated.
+            valid_out <= 1'b0;  
+            
+            if (valid_in) begin
+                // Check if this is the fourth valid input sample.
+                if (count == 2'd3) begin
+                    // Output the final accumulation including this sample.
+                    data_out  <= acc + data_in;
+                    valid_out <= 1'b1; 
+                    // Reset accumulator and counter for next set.
+                    acc   <= 10'd0;
+                    count <= 2'd0;
+                end else begin
+                    // Accumulate the valid data sample.
+                    acc   <= acc + data_in;
+                    // Increment the counter.
+                    count <= count + 2'd1;
+                end
+            end
+        end
+    end
+
+endmodule

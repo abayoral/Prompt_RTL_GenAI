@@ -1,0 +1,14 @@
+module top_module( 
+    input a, 
+    input b,
+    output cout, 
+    output sum 
+);
+
+    // The sum is the XOR of the two inputs
+    assign sum = a ^ b;
+    
+    // The carry-out is the AND of the two inputs
+    assign cout = a & b;
+
+endmodule

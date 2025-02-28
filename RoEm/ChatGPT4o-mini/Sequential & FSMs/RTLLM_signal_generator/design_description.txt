@@ -1,0 +1,31 @@
+As a professional Verilog designer working with data and knowledge up until October 2023, I would like you to assist in designing a Verilog module named `signal_generator`. This module's purpose is to generate a Triangle Wave signal, where the waveform continuously cycles between the numerical values of 0 and 31. This is achieved by either incrementing or decrementing a 5-bit signal, aptly named "wave."
+
+**Key Requirements and Considerations:**
+
+1. **Module Name:** 
+   - `signal_generator`
+
+2. **Input Ports:**
+   - `clk`: This is the clock input signal that will coordinate the synchronous operation of the module.
+   - `rst_n`: This is an active-low reset signal. It becomes active when set to 0, triggering a reset condition, and is inactive when set to 1, allowing normal operation to proceed.
+
+3. **Output Ports:**
+   - `wave`: This is a 5-bit wide output signal. The primary objective of the module is to output this signal in such a way that it represents the triangle waveform being generated.
+
+4. **Implementation Details:**
+   - **Waveform State Management:** 
+     - The module should contain a register called `state`, which monitors and dictates the state of the waveform generation process.
+     - Another register named `wave`, which is 5 bits wide, should hold the actual waveform value that changes over time.
+   - **Register Updates:**
+     - Both `state` and `wave` registers must be updated within an `always` block that is sensitive to the positive edge of the `clk` and the negative edge of `rst_n`. This ensures synchronous updates and allows for asynchronous reset.
+   - **Reset Logic:**
+     - When a reset occurs (active when `~rst_n`), both the `state` and `wave` registers should be reset to 0. This means upon reset, the waveform generation should start anew from 0.
+   - **Waveform Generation Logic:**
+     - Use a `case` statement driven by the `state` to manage waveform transitions:
+        - If the `state` is 0, the `wave` value should increment by 1 on each cycle.
+        - Upon reaching the maximum value of 31, the `state` should transition to 1.
+        - When the `state` is 1, the `wave` value should decrement by 1 on each cycle.
+        - Upon reaching the value 0, the `state` should transition back to 0.
+   - This logic results in a continuous cycling of the `wave` value from 0 to 31 and back, creating a triangular waveform pattern.
+
+Could you please ensure all the key points above are integrated correctly into a Verilog code implementation?

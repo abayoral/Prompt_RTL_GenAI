@@ -1,0 +1,49 @@
+```verilog
+module pulse_detect (
+    input wire clk,
+    input wire rst_n,
+    input wire data_in,
+    output reg data_out
+);
+
+    reg [1:0] state; // State register (00 - waiting for pulse, 01 - pulse detected, 10 - acknowledging pulse)
+
+    // State encoding
+    localparam WAITING = 2'b00;
+    localparam PULSE_DETECTED = 2'b01;
+    localparam ACKNOWLEDGE = 2'b10;
+
+    // always block for pulse detection logic
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset condition
+            state <= WAITING;
+            data_out <= 0;
+        end else begin
+            case (state)
+                WAITING: begin
+                    if (data_in) begin
+                        state <= PULSE_DETECTED; // Detect rising edge
+                    end
+                end
+
+                PULSE_DETECTED: begin
+                    if (!data_in) begin
+                        data_out <= 1; // Set the output high to indicate pulse detected
+                        state <= ACKNOWLEDGE; // Move to acknowledge state
+                    end
+                end
+
+                ACKNOWLEDGE: begin
+                    data_out <= 0; // Reset output after one cycle
+                    state <= WAITING; // Return to waiting for next pulse
+                end
+                
+                default: begin
+                    state <= WAITING; // Fallback to waiting state
+                end
+            endcase
+        end
+    end
+endmodule
+```

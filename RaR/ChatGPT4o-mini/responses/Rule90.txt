@@ -1,0 +1,25 @@
+```
+module rule90 (
+    input wire clk,
+    input wire load,
+    input wire [511:0] data,
+    output reg [511:0] q
+);
+
+    integer i;
+
+    always @(posedge clk) begin
+        if (load) begin
+            q <= data; // Load initial state
+        end else begin
+            reg [511:0] next_q;
+            // Update the cellular automaton based on Rule 90
+            for (i = 0; i < 512; i = i + 1) begin
+                next_q[i] = (i == 0) ? 1'b0 : (i == 511) ? 1'b0 : (q[i-1] ^ q[i+1]);
+            end
+            q <= next_q; // Transition to the next state
+        end
+    end
+
+endmodule
+```

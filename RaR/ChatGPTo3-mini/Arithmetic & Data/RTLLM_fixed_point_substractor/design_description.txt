@@ -1,0 +1,25 @@
+Consider a scenario in which you are provided with data current as of October 2023 and are expected to leverage your extensive experience in Verilog design to create a specialized module. The goal is to design a module, named fixed_point_subtractor, that performs fixed-point subtraction operations with strict and predetermined precision. This precision applies uniformly to both the integer and fractional parts of the numbers being processed.
+
+Your design must be adaptable through the use of two key parameters:
+• Q: This parameter represents the number of bits allocated to the fractional part of the fixed-point number.
+• N: This parameter defines the total number of bits used for representing each number, covering both the integer and fractional parts.
+
+The module will work with two fixed-point input operands, each represented using N bits:
+• a [N-1:0]: The first input operand.
+• b [N-1:0]: The second input operand.
+
+After processing, the module must output a single N-bit result:
+• c [N-1:0]: This output represents the final result of the subtraction operation.
+
+Internally, your design should employ a register:
+• res [N-1:0]: This temporary register will store the intermediate result of the subtraction prior to any final adjustments, ensuring that the output is correctly formatted.
+
+Moreover, your implementation must handle various conditions to ensure the correct outcome:
+1. In cases where both operands (a and b) share the same sign, the module should directly subtract the corresponding integer and fractional portions, with the resulting sign mirroring that of the original operands.
+2. When the operands have opposite signs, a different process must be applied:
+  a. If operand a is positive and operand b is negative, the operation should effectively add their absolute values. The final sign of the result will depend on the magnitude comparison between a and b.
+  b. If operand a is negative and operand b is positive, the process is similar to the previous case. The module must add their absolute values and decide on the resulting sign based on which operand’s magnitude is larger.
+
+Additionally, the design should include a specific mechanism to deal with a result that evaluates to zero. In such a situation, the sign bit must be explicitly set to zero to accurately represent the zero value.
+
+In summary, your task is to develop a detailed Verilog module—the fixed_point_subtractor—that incorporates these requirements. The design must ensure precise handling of fixed-point arithmetic subtraction, adherence to the parameterized bit widths (Q and N), correct sign management, and a special case for representing zero. Focus on clarity and precision in your implementation, while taking into account the impact of both the integer and fractional components as dictated by the parameter settings.

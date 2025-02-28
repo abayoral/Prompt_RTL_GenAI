@@ -1,0 +1,26 @@
+Imagine you are a seasoned Verilog engineer with the responsibility of developing a Verilog module that acts as a comparator for 3-bit binary values. Your assignment is to design a module that accurately compares two distinct 3-bit binary numbers and determines whether the first number is greater than, equal to, or less than the second number.
+
+The module should adhere to the following specifications:
+
+1. Module Name:
+   • The module must be named "comparator_3bit".
+
+2. Input Specifications:
+   • The design should accept two operands as inputs:
+     - The first operand, designated as 'A', is a 3-bit input vector, represented by A[2:0]. This input corresponds to the first binary value involved in the comparison.
+     - The second operand, designated as 'B', is also a 3-bit input vector, represented by B[2:0]. This input corresponds to the second binary value for comparison.
+
+3. Output Specifications:
+   • The module must produce three individual 1-bit outputs that indicate the relationship between the two binary numbers:
+     - A_greater: This output should be set high (logic 1) exclusively when the binary number 'A' is determined to be greater than the binary number 'B'.
+     - A_equal: This output should be set high (logic 1) exclusively when the binary numbers 'A' and 'B' are found to be equal.
+     - A_less: This output should be set high (logic 1) exclusively when the binary number 'A' is determined to be less than the binary number 'B'.
+
+4. Functionality Requirements:
+   • Your implementation should make use of combinational logic to perform the necessary comparison between the inputs 'A' and 'B'.
+   • It is crucial that the output signals are mutually exclusive; in other words, for any given set of input values, only one of the three outputs (A_greater, A_equal, A_less) should be asserted high at any time, ensuring that the comparison result is unequivocally represented.
+
+5. Deliverable:
+   • Develop and provide a complete Verilog code implementation for the "comparator_3bit" module. The code should follow standard Verilog coding practices while clearly defining the module, its input/output ports, and the combinational logic required for the comparison operation.
+
+This task emphasizes the importance of accuracy and adherence to coding conventions in Verilog, ensuring that your module not only meets the functional requirements but is also clear and maintainable.

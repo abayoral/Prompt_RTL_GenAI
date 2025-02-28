@@ -1,0 +1,50 @@
+module parallel2serial(
+    input         clk,
+    input         rst_n,
+    input  [3:0]  d,
+    output reg    valid_out,
+    output reg    dout
+);
+
+    // Internal registers
+    reg [1:0] cnt;       // 2-bit counter to count 0 to 3
+    reg [3:0] latched_d; // Latches the input parallel data
+
+    // At every clock cycle, perform the parallel-to-serial conversion.
+    // The process works in 4 clock cycles:
+    //   - At cnt == 0, the input d is latched and its MSB is output.
+    //   - In subsequent cycles, the next bits (from bit2 to bit0) are output.
+    // The valid_out signal is asserted high whenever a serial bit is available.
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt       <= 2'd0;
+            latched_d <= 4'd0;
+            dout      <= 1'b0;
+            valid_out <= 1'b0;
+        end else begin
+            // Latch the input data when starting a new conversion (when cnt == 0)
+            if (cnt == 2'd0)
+                latched_d <= d;
+            
+            // Output the bit according to the current count.
+            // Starting from the MSB (bit3) down to the LSB (bit0)
+            case (cnt)
+                2'd0: dout <= latched_d[3];
+                2'd1: dout <= latched_d[2];
+                2'd2: dout <= latched_d[1];
+                2'd3: dout <= latched_d[0];
+                default: dout <= 1'b0;
+            endcase
+            
+            // Assert valid_out during the entire conversion sequence
+            valid_out <= 1'b1;
+            
+            // Increment counter; reset to 0 after processing the fourth bit
+            if (cnt == 2'd3)
+                cnt <= 2'd0;
+            else
+                cnt <= cnt + 2'd1;
+        end
+    end
+
+endmodule

@@ -1,0 +1,8 @@
+module constant_low(
+    output wire out
+);
+
+    // Constant assignment: out is always 0.
+    assign out = 1'b0;
+
+endmodule

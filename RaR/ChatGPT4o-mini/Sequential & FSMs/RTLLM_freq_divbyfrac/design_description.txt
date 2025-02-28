@@ -1,0 +1,17 @@
+I would like to request your assistance in designing a Verilog module specifically named `freq_divbyfrac`. The purpose of this module is to create a frequency divider that can effectively reduce the input clock signal frequency by a fractional value. In this case, the target is to achieve a frequency division by a factor of 3.5x.
+
+To clarify the requirements further, this design should utilize a double-edge clocking technique to accommodate the nuances of half-integer division. This approach necessitates careful consideration of potential duty cycle imbalances that may arise during the operation. Therefore, how should we go about managing the uneven division of clock cycles and integrating phase-shifting methods to ensure the output clock signal is generated smoothly and effectively?
+
+It's important to outline the structure of the Verilog module, which will have clearly defined input and output ports:
+- **Input Port:**
+  - `clk`: This serves as the primary clock signal input for the division process.
+  - `rst_n`: An active-low signal used for resetting the module, thereby initializing its internal state.
+
+- **Output Port:**
+  - `clk_div`: This output port will provide the clock signal that reflects the frequency division as defined by the specified fractional value.
+
+The implementation of the frequency division should focus on a counting methodology that reflects the cyclical nature of the input clock. For a division factor of 3.5x, the mechanism would involve cycling through 7 clock periods, which acts as the multiplier for the division process (designated as MUL2_DIV_CLK = 7). Within this framework, it will be essential to establish two distinct clock periods: one representing 4 cycles of the source clock and the other representing 3 cycles.
+
+Additionally, could you elaborate on the application of phase-shifting techniques to create two distinct versions of the divided clock signal? One version would need to be delayed by half a clock period, while the other would be advanced by the same amount. When these phase-adjusted signals are combined through a logical OR operation, they should yield the final output clock signal, ensuring that it maintains a consistent and uniform period throughout its operation.
+
+With all these specifications and requirements in mind, would you be able to provide a complete implementation in Verilog for this frequency division task? Please ensure that the solution pays careful attention to detail and aligns with the outlined characteristics of the design.

@@ -1,0 +1,24 @@
+Assume you are in the role of an experienced Verilog designer tasked with implementing a data width conversion circuit. Your goal is to design a module that accepts an 8-bit input data stream and converts it into a 16-bit output. This task involves generating two key output signals: one (valid_out) to signify when the output data is valid, and another (data_out) that represents the converted 16-bit data.
+
+The specifics of this implementation are as follows:
+
+**Module Details:**
+- **Module Name:** width_8to16
+- **Input Ports:**
+  - **clk:** This is the clock signal essential for synchronous operations, triggering processes on its positive edge.
+  - **rst_n:** This is an active-low reset signal, meaning the system is reset when this signal is 0. It becomes inactive when set to 1.
+  - **valid_in:** A signal that indicates whether the input data is valid and ready for processing.
+  - **data_in:** The 8-bit wide input data that needs conversion.
+
+- **Output Ports:**
+  - **valid_out:** This output signal flags the validity of the output data, ensuring that subsequent stages know when the data_out signal holds a legitimate value.
+  - **data_out:** This is the 16-bit wide output data that results from the conversion of two 8-bit inputs.
+
+**Operational Logic:**
+- The circuit must concatenate two successive 8-bit data inputs to produce a single 16-bit output.
+- When the first 8-bit data arrives, it is stored temporarily until the next piece of 8-bit data is received.
+- The first piece of data will occupy the higher byte (higher 8 bits) of the 16-bit `data_out` output.
+- Once the second piece of 8-bit data is received, both pieces are combined to form the 16-bit result, and the `valid_out` signal is asserted in the clock cycle following the arrival of the second input.
+- A reset condition, when activated (!rst_n), clears the data_out to zero, ensuring a clean start for new operations.
+
+Focus on creating a Verilog code structure that fulfills these requirements, keeping in mind the need for synchronized operations with the clock signal and managing data validity effectively. Ensure robustness in handling sequential data inputs and generating the necessary outputs only when fully valid, especially in scenarios where only partial data is received initially.

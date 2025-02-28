@@ -1,0 +1,26 @@
+```verilog
+module ROM (
+    input [7:0] addr,
+    output reg [15:0] dout
+);
+    
+    // Memory array declaration
+    reg [15:0] mem [0:255];
+
+    // Initialization block
+    initial begin
+        // Assigning values to specific addresses
+        mem[0] = 16'hA0A0;
+        mem[1] = 16'hB1B1;
+        mem[2] = 16'hC2C2;
+        mem[3] = 16'hD3D3;
+        // Additional initialization can be done here as needed
+    end
+
+    // Always block for dynamic data output based on addr
+    always @(*) begin
+        dout = mem[addr];
+    end
+
+endmodule
+```

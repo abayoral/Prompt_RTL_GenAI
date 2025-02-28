@@ -1,0 +1,59 @@
+```verilog
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output reg [23:0] out_bytes,
+    output reg done
+);
+    // State encoding
+    typedef enum reg [1:0] {
+        IDLE,       // Waiting for the first byte of a message
+        BYTE1,      // First byte received
+        BYTE2,      // Second byte received
+        BYTE3       // Third byte received, message complete
+    } state_t;
+
+    state_t current_state, next_state;
+
+    // State machine
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+            out_bytes <= 24'b0; // Output zero when reset
+            done <= 0;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+
+    // Define the next state logic and output logic
+    always @* begin
+        next_state = current_state;
+        done = 0;
+        case (current_state)
+            IDLE: begin
+                if (in[3]) begin
+                    out_bytes[23:16] = in; // First byte
+                    next_state = BYTE1;
+                end
+            end
+            BYTE1: begin
+                out_bytes[15:8] = in; // Second byte
+                next_state = BYTE2;
+            end
+            BYTE2: begin
+                out_bytes[7:0] = in; // Third byte
+                next_state = BYTE3;
+                done = 1; // Signal completion of message
+            end
+            BYTE3: begin
+                if (in[3]) begin
+                    out_bytes[23:16] = in; // New first byte
+                    next_state = BYTE1;
+                end
+            end
+        endcase
+    end
+endmodule
+```

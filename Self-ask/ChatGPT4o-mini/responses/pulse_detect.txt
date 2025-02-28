@@ -1,0 +1,41 @@
+```verilog
+module pulse_detect (
+    input wire clk,
+    input wire rst_n,
+    input wire data_in,
+    output reg data_out
+);
+    reg [1:0] state; // State register
+
+    localparam IDLE = 2'd0, 
+               RISING = 2'd1, 
+               FALLING = 2'd2;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= IDLE;
+            data_out <= 0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    if (data_in == 1) begin
+                        state <= RISING;
+                    end
+                end
+                RISING: begin
+                    if (data_in == 0) begin
+                        state <= FALLING;
+                    end
+                end
+                FALLING: begin
+                    data_out <= 1; // Pulse detected
+                    state <= IDLE; // Go back to initial state
+                end
+                default: begin
+                    state <= IDLE; // Fail-safe state
+                end
+            endcase
+        end
+    end
+endmodule
+```

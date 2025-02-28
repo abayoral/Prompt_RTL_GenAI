@@ -1,0 +1,26 @@
+```verilog
+module three_input_nand (
+    input wire a,
+    input wire b,
+    input wire c,
+    output wire y
+);
+
+    wire and_output;
+
+    // Using a 5-input AND gate to simulate the NAND functionality
+    // Connect inputs a, b, c to the AND gate, and tie the extra two inputs to '1' (logic high)
+    and and_gate (
+        .a(a),
+        .b(b),
+        .c(c),
+        .d(1'b1),
+        .e(1'b1),
+        .y(and_output)
+    );
+
+    // Invert the output of the AND gate to get NAND functionality
+    assign y = ~and_output;
+
+endmodule
+```

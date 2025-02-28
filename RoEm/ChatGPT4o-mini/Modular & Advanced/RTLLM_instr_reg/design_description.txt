@@ -1,0 +1,29 @@
+As a professional Verilog designer, you are tasked with implementing an instruction register module named `instr_reg` that is crucial for managing the flow of CPU instructions. The module's primary role is to capture incoming instructions from diverse sources, process them, and separate them into distinct fields for further computation. 
+
+Here are the specifications for the instruction register:
+
+1. **Ports:**
+
+   - **Input Ports:**
+     - `clk`: This is a clock signal used to synchronize the operations within the module.
+     - `rst`: An active low reset signal is provided to initialize or reset the register. When this signal is low, the register should reset its contents.
+     - `fetch [1:0]`: A 2-bit control signal is provided to indicate the source from which the instruction should be fetched. For instance, `01` could imply the instruction should be fetched from a register source, while `10` specifies fetching from RAM or ROM.
+     - `data [7:0]`: An 8-bit data input that represents the instruction to be fetched and stored within the register.
+
+   - **Output Ports:**
+     - `ins [2:0]`: This output consists of the three most significant bits of the instruction, typically representing the opcode or operation code.
+     - `ad1 [4:0]`: This represents the five least significant bits of the instruction, which are used as the address of a register.
+     - `ad2 [7:0]`: This holds the full 8-bit data from the second source for further use or processing.
+
+2. **Implementation Details:**
+
+   The instruction register makes use of two internal 8-bit registers, `ins_p1` and `ins_p2`, to temporarily store instructions from different sources:
+
+   - On the rising edge of the `clk` signal, the module should check the `rst` signal. If the `rst` signal is low, both `ins_p1` and `ins_p2` should be initialized to zero, effectively resetting the register contents.
+   - The handling of the `fetch` signal dictates how the instructions are managed:
+     - If the `fetch` signal is '01', the instruction from the `data` input should be captured into `ins_p1`.
+     - If the `fetch` signal is '10', the instruction should be stored in `ins_p2`.
+     - If neither of these conditions is true, the contents of `ins_p1` and `ins_p2` should remain unchanged, retaining the previous values.
+   - The outputs `ins`, `ad1`, and `ad2` are to be derived from the content of `ins_p1` and `ins_p2`. Specifically, `ins` extracts the high 3 bits as the opcode from the last fetched instruction, while `ad1` contains the low 5 bits as an address from the same.
+
+With these specifications in mind, your task is to design and code this `instr_reg` module following the digital design conventions and Verilog syntax. Ensure that the functionality precisely adheres to the above descriptions and leverages the hardware design principles.

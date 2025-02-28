@@ -1,0 +1,27 @@
+```verilog
+module concat_and_add(
+    input [4:0] a,
+    input [4:0] b,
+    input [4:0] c,
+    input [4:0] d,
+    input [4:0] e,
+    input [4:0] f,
+    output reg [7:0] w,
+    output reg [7:0] x,
+    output reg [7:0] y,
+    output reg [7:0] z
+);
+
+always @(*) begin
+    // Concatenate inputs a, b, c, d, e, f to form a 30-bit vector
+    wire [29:0] concat_input = {a, b, c, d, e, f};
+    
+    // Assign output vectors
+    w = concat_input[29:22]; // First 8 bits
+    x = concat_input[21:14]; // Next 8 bits
+    y = concat_input[13:6];  // Next 8 bits
+    z = {concat_input[5:0], 2'b11}; // Last 6 bits plus two 1's
+end
+
+endmodule
+```

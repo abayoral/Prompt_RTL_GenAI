@@ -1,0 +1,23 @@
+```verilog
+module full_adder (
+    input  wire a,      // First input bit
+    input  wire b,      // Second input bit
+    input  wire cin,    // Carry input bit
+    output wire sum,    // Sum output bit
+    output wire cout     // Carry output bit
+);
+
+// Internal wire declarations for intermediate sums
+wire s1, c1, c2;
+
+// Sum calculation
+assign s1 = a ^ b;       // First stage sum
+assign sum = s1 ^ cin;   // Final sum output
+
+// Carry calculations
+assign c1 = a & b;       // Carry from a and b
+assign c2 = s1 & cin;    // Carry from sum and cin
+assign cout = c1 | c2;   // Final carry output
+
+endmodule
+```

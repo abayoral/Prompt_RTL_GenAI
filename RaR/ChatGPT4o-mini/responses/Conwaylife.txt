@@ -1,0 +1,57 @@
+```verilog
+module game_of_life (
+    input clock,
+    input reset,
+    input [255:0] initial_state,
+    output reg [255:0] current_state
+);
+
+    reg [255:0] next_state;
+
+    // Function to count alive neighbors in a toroidal manner
+    function [3:0] count_neighbors;
+        input [255:0] state;
+        input [3:0] x;
+        input [3:0] y;
+        integer i, j;
+        begin
+            count_neighbors = 0;
+            for (i = -1; i <= 1; i = i + 1) begin
+                for (j = -1; j <= 1; j = j + 1) begin
+                    // Skip the cell itself
+                    if (i == 0 && j == 0) continue;
+                    // Calculate the neighbor's position with wrapping
+                    count_neighbors = count_neighbors + state[ ((x + i + 16) % 16) * 16 + ((y + j + 16) % 16) ];
+                end
+            end
+        end
+    endfunction
+
+    // Update the state based on the Game of Life rules
+    always @* begin
+        for (int x = 0; x < 16; x = x + 1) begin
+            for (int y = 0; y < 16; y = y + 1) begin
+                integer alive_neighbors = count_neighbors(current_state, x, y);
+                // Apply the rules of Game of Life
+                if (current_state[x * 16 + y] == 1) begin
+                    // Any live cell with two or three live neighbours survives
+                    next_state[x * 16 + y] = (alive_neighbors == 2 || alive_neighbors == 3) ? 1 : 0;
+                end else begin
+                    // Any dead cell with exactly three live neighbours becomes a live cell
+                    next_state[x * 16 + y] = (alive_neighbors == 3) ? 1 : 0;
+                end
+            end
+        end
+    end
+
+    // Sequential logic to update the state
+    always @(posedge clock or posedge reset) begin
+        if (reset) begin
+            current_state <= initial_state;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+
+endmodule
+```

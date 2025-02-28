@@ -1,0 +1,12 @@
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output cout,
+    output [99:0] sum
+);
+
+    // Concatenate the output carry with the sum.
+    // The addition of two 100-bit numbers and a carry results in a 101-bit value.
+    assign {cout, sum} = a + b + cin;
+
+endmodule

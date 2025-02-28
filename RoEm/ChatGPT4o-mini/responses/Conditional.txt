@@ -1,0 +1,18 @@
+```verilog
+module top_module (
+    input [7:0] a, b, c, d,
+    output [7:0] min
+);
+    wire [7:0] min_ab, min_cd;
+
+    // Two-way minimum for a and b
+    assign min_ab = (a < b) ? a : b;
+    
+    // Two-way minimum for c and d
+    assign min_cd = (c < d) ? c : d;
+
+    // Four-way minimum
+    assign min = (min_ab < min_cd) ? min_ab : min_cd;
+
+endmodule
+```

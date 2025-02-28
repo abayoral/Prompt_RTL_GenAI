@@ -1,0 +1,14 @@
+module top_module ( 
+    input wire [2:0] vec,
+    output wire [2:0] outv,
+    output wire o2,
+    output wire o1,
+    output wire o0  
+); 
+
+assign outv = vec;  // Output the same vector
+assign o0 = vec[0]; // Connect o0 to position 0
+assign o1 = vec[1]; // Connect o1 to position 1
+assign o2 = vec[2]; // Connect o2 to position 2
+
+endmodule

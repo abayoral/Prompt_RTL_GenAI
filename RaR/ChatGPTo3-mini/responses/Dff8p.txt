@@ -1,0 +1,18 @@
+module top_module (
+    input        clk,
+    input        reset,  // synchronous active high reset
+    input  [7:0] d,
+    output reg [7:0] q
+);
+
+    // Eight D flip-flops are implemented as an 8-bit register.
+    // The register is updated on the falling edge of clk.
+    // On a synchronous high reset, each flip-flop sets to 0x34.
+    always @(negedge clk) begin
+        if (reset)
+            q <= 8'h34;
+        else
+            q <= d;
+    end
+
+endmodule

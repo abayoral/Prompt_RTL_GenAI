@@ -1,0 +1,21 @@
+```
+module d_flip_flops (
+    input wire clk,
+    input wire rst,
+    input wire [7:0] d, 
+    output reg [7:0] q
+);
+
+    // Constant reset value
+    localparam RESET_VALUE = 8'h34;
+
+    always @(negedge clk or posedge rst) begin
+        if (rst) begin
+            q <= RESET_VALUE; // Reset to 0x34
+        end else begin
+            q <= d; // Load data on negative edge of the clock
+        end
+    end
+
+endmodule
+```

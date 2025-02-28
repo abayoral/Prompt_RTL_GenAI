@@ -1,0 +1,57 @@
+module pulse_detect(
+    input  clk,
+    input  rst_n,
+    input  data_in,
+    output reg data_out
+);
+
+  // State encoding
+  localparam STATE_IDLE     = 2'b00; // Waiting for a rising edge (0->1)
+  localparam STATE_HIGH     = 2'b01; // Rising edge detected, waiting for falling edge (1->0)
+  localparam STATE_DETECT   = 2'b10; // Complete pulse detected, output asserted for one cycle
+
+  reg [1:0] state;
+
+  // Synchronous process with asynchronous active-low reset
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      state    <= STATE_IDLE; // Reset state to idle
+      data_out <= 1'b0;       // Reset output to 0
+    end else begin
+      case (state)
+        STATE_IDLE: begin
+          data_out <= 1'b0; // Ensure output remains 0 in idle state
+          // Look for transition from 0 to 1. Since we are in idle we expect data_in to be 0 initially.
+          if (data_in) begin
+            state <= STATE_HIGH;
+          end else begin
+            state <= STATE_IDLE;
+          end
+        end
+
+        STATE_HIGH: begin
+          data_out <= 1'b0; // Maintain output low during high state
+          // Wait for falling edge transition: from 1 to 0.
+          if (!data_in) begin
+            state    <= STATE_DETECT;
+            data_out <= 1'b1; // Assert pulse detection for one clock cycle
+          end else begin
+            state <= STATE_HIGH;
+          end
+        end
+
+        STATE_DETECT: begin
+          // Clear data_out after one cycle and return to idle.
+          data_out <= 1'b0;
+          state    <= STATE_IDLE;
+        end
+
+        default: begin
+          state    <= STATE_IDLE;
+          data_out <= 1'b0;
+        end
+      endcase
+    end
+  end
+
+endmodule

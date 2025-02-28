@@ -1,0 +1,62 @@
+```
+module ps2_mouse_fsm (
+    input wire clk,
+    input wire reset,
+    input wire [7:0] in,
+    output reg done
+);
+
+    // Define states
+    typedef enum reg [1:0] {
+        IDLE = 2'b00,     // Waiting for the start of a message
+        RECEIVE1 = 2'b01, // Received first byte of the message
+        RECEIVE2 = 2'b10, // Received second byte of the message
+        DONE = 2'b11      // Completed the message
+    } state_t;
+    
+    state_t current_state, next_state;
+    
+    // State transition logic
+    always @ (posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+            done <= 0;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+    
+    // Next state and output logic
+    always @ (*) begin
+        // Default values
+        next_state = current_state;
+        done = 0;
+        
+        case (current_state)
+            IDLE: begin
+                if (in[3] == 1'b1) begin
+                    next_state = RECEIVE1; // Found start of message
+                end
+            end
+            
+            RECEIVE1: begin
+                next_state = RECEIVE2; // Read second byte
+            end
+            
+            RECEIVE2: begin
+                next_state = DONE; // Read third byte
+            end
+            
+            DONE: begin
+                done = 1; // Signal completion of message
+                next_state = IDLE; // Prepare for the next message
+            end
+            
+            default: begin
+                next_state = IDLE; // Fallback to IDLE
+            end
+        endcase
+    end
+
+endmodule
+```

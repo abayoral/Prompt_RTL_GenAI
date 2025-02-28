@@ -1,0 +1,44 @@
+```
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output [99:0] cout,
+    output [99:0] sum );
+
+    wire [99:0] carry; // Internal carry signals
+
+    // Instantiate the first full adder separately for simplicity
+    full_adder FA0 (
+        .a(a[0]), 
+        .b(b[0]), 
+        .cin(cin), 
+        .sum(sum[0]), 
+        .cout(carry[0])
+    );
+
+    generate
+        genvar i;
+        for (i = 1; i < 100; i = i + 1) begin: full_adder_instantiation
+            full_adder FA (
+                .a(a[i]), 
+                .b(b[i]), 
+                .cin(carry[i-1]), 
+                .sum(sum[i]), 
+                .cout(carry[i])
+            );
+        end
+    endgenerate
+    
+    // Final carry out
+    assign cout = carry; // Connect cout output to internal carry signals
+
+endmodule
+
+module full_adder(
+    input a, b, cin,
+    output sum, cout
+);
+    assign sum = a ^ b ^ cin;       // Sum calculation
+    assign cout = (a & b) | (cin & (a ^ b)); // Carry out calculation
+endmodule
+```

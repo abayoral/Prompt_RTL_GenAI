@@ -1,0 +1,29 @@
+You have been trained up to data until October 2023. Now, envision yourself as a professional Verilog designer tasked with creating an 8-bit Radix-4 Booth multiplier. This multiplier will use two 8-bit inputs, referred to as 'a' (the multiplicand) and 'b' (the multiplier), and employ the Booth algorithm to carry out the multiplication. The module, named `multi_booth_8bit`, needs to efficiently handle and perform these operations, making use of a clock signal (`clk`) and a reset signal (`reset`) to control and initialize the process. 
+
+Specifically, the booth multiplier must incorporate:
+
+1. **Inputs**:
+   - `clk`: This serves as the clock signal for synchronized operations.
+   - `reset`: Utilized to reinitialize the multiplier module, setting it to a default state before starting or restarting multiplication.
+   - `a`: An 8-bit input representing one factor in the multiplication process.
+   - `b`: Another 8-bit input, representing the second factor in the operation.
+
+2. **Outputs**:
+   - `p`: This represents the product of the multiplication, output as a 16-bit value.
+   - `rdy`: A signal that indicates completion. When set to 1, it signifies that the multiplication process has been successfully completed.
+
+**Implementation Guidelines**:
+
+- On detection of the positive edge of the `clk` signal or `reset` signal:
+  - If the `reset` signal is high, initialize two important 16-bit registers:
+    - `multiplier`: Constructed by sign-extending input `a`, making it `{{8{a[7]}}, a}`.
+    - `multiplicand`: Formed by sign-extending input `b`, structured as `{{8{b[7]}}, b}`.
+  - If the `reset` signal is low, indicating normal operational conditions, proceed with the multiplication mechanism:
+    - Execution should proceed meticulously through Booth algorithm steps. Check a 5-bit counter (`ctr`), which monitors the shifting and processing phases:
+      - If `ctr` is less than 16:
+        - The `multiplicand` register must undergo a left shift by 1 bit, as per Booth's shifting operation.
+        - Examine the multiplier's current bit (`multiplier[ctr]`). If this bit is 1, it points to a positive Booth encoding, prompting the addition of `multiplicand` to `p`, the product accumulator.
+    - The counter (`ctr`) should increment following each cycle, incrementing by one to track progress through the Booth iterations.
+    - Upon reaching a counter value of 16, marking multiplication completion, set the `rdy` signal to 1 to signify readiness and completion of the multiplication process.
+
+Now, generate a Verilog code for this specification, stressing how the module integrates these various components and manages the execution flow, ensuring the operation aligns with the Booth algorithm for multiplication.

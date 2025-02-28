@@ -1,0 +1,19 @@
+module top_module (
+    input too_cold,
+    input too_hot,
+    input mode,    // 1 for heating, 0 for cooling
+    input fan_on,  // manual override for fan
+    output heater,
+    output aircon,
+    output fan
+);
+
+    // In heating mode: Activate heater when too_cold is true,
+    // In cooling mode: Activate aircon when too_hot is true.
+    assign heater = mode & too_cold;
+    assign aircon = (~mode) & too_hot;
+    
+    // The fan runs if either the heater or aircon is active, or if fan_on is set.
+    assign fan = heater | aircon | fan_on;
+
+endmodule

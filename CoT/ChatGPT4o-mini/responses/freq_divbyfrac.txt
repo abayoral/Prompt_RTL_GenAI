@@ -1,0 +1,47 @@
+```verilog
+module freq_divbyfrac (
+    input wire clk,
+    input wire rst_n,
+    output reg clk_div
+);
+
+    parameter MUL2_DIV_CLK = 7;              // Total count for 3.5 division
+    parameter COUNTER_MAX = MUL2_DIV_CLK - 1; // Counter max value
+    reg [2:0] counter;                        // 3-bit counter to count clock cycles
+    reg clk_int;                              // Intermediate clock signal
+    reg clk_int_delayed;                      // Delayed version of intermediate clock
+    reg clk_int_advanced;                     // Advanced version of intermediate clock
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            counter <= 3'b0;
+            clk_int <= 1'b0;
+            clk_div <= 1'b0;
+        end else begin
+            if (counter < COUNTER_MAX) begin
+                counter <= counter + 3'b1;
+            end else begin
+                counter <= 3'b0;
+                clk_int <= ~clk_int; // Toggle intermediate clock
+            end
+        end
+    end
+
+    always @(posedge clk) begin
+        // Creating the phase-adjusted versions of clk_int
+        clk_int_delayed <= clk_int; // Intermediate clock signal
+        clk_int_advanced <= clk_int; // Capturing the same clock for advanced phase
+        
+        if (counter < 4) begin
+            clk_int_delayed <= ~clk_int; // Phase shift: delayed by half a clock cycle
+        end else begin
+            clk_int_advanced <= ~clk_int; // Phase shift: advanced by half a clock cycle
+        end
+    end
+    
+    always @(*) begin
+        clk_div = clk_int | clk_int_delayed | clk_int_advanced; // Combining phase-adjusted clocks
+    end
+
+endmodule
+```

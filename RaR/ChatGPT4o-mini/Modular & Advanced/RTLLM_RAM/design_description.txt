@@ -1,0 +1,29 @@
+Let’s consider a scenario where you possess expertise as a professional Verilog hardware designer, with an extensive understanding of the Verilog Hardware Description Language (HDL) to create and implement complex digital designs. For your next project, you are tasked with the development of a dual-port Random Access Memory (RAM) module that must adhere to certain specifications and functionalities.
+
+To begin with, the RAM should have a total depth accommodating 8 addresses, where each data entry consists of 6 bits. This means that upon initialization, every memory location in this RAM should start with the value of zero, which is expressed as "000000" in binary format.
+
+The dual-port architecture of the RAM implies that it will facilitate simultaneous read and write operations. To achieve this, the module will need to be designed with separate input and output ports dedicated to these operations, ensuring they can occur independently within the same clock cycle. 
+
+The functionality of the RAM is characterized by two principal operations:
+
+1. The **Read Operation** must be initiated when a control signal, named `read_en`, is asserted (set to high, or '1'). During this operation, the RAM should utilize the address provided by the `read_addr` signal to access the specific memory location and output the corresponding 6-bit data word on the `read_data` output port. The design should ensure accurate address decoding to retrieve the precise data stored at that requested address.
+
+2. The **Write Operation** is similarly dependent on an enabling control signal called `write_en`, which must also be asserted when executing this operation (again high, or '1'). This process involves taking the data specified by the `write_data` input and storing it in the memory location identified by the `write_addr` signal.
+
+Your design should clearly define and incorporate the following input ports:
+
+- `clk`: Serving as the clock signal, this determines the timing of all memory operations, ensuring that they are synchronized with the clock edges.
+- `rst_n`: An active-low reset signal intended to reset the contents of the memory, effectively reinitializing the data to zero when this signal is asserted to '0'.
+- `write_en`: This signal, when high, allows the RAM to perform the write operation, storing data in the specified location.
+- `write_addr`: This input will determine where in memory data is to be written.
+- `write_data`: This is the data input that is to be saved in the memory location specified by the `write_addr` signal.
+- `read_en`: Similar to `write_en`, this signal needs to be high for the RAM to carry out a read operation.
+- `read_addr`: This input specifies the address from which data is to be read.
+
+Additionally, you must provide an output port named `read_data`, which will carry the value retrieved from the defined memory location.
+
+Moreover, it is essential to make your design modular and adaptable by including parameters that set the bit width (WIDTH = 6) and the depth (DEPTH = 8) of the RAM.
+
+In your implementation of the Verilog code, you should consider utilizing two distinct always blocks. One of these blocks should be designated for managing the write operations while the other addresses the read functionality. Both blocks would need to respond to changes in the clock and reset signals to guarantee that memory operations remain synchronous. When the reset condition is active, measures should be taken to ensure that the memory is cleared and that all relevant registers are set to zero, effectively preparing your RAM for new operations. 
+
+Your task now involves crafting Verilog code that fully encapsulates these requirements and functionalities, showcasing a comprehensive approach to building a dual-port RAM module as specified.

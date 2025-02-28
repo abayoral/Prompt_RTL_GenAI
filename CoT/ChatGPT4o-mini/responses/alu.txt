@@ -1,0 +1,93 @@
+```
+module alu (
+    input  [31:0] a,
+    input  [31:0] b,
+    input  [5:0]  aluc,
+    output reg [31:0] r,
+    output reg       zero,
+    output reg       carry,
+    output reg       negative,
+    output reg       overflow,
+    output reg       flag
+);
+
+always @(*) begin
+    // Initialize outputs
+    r = 32'b0;
+    zero = 1'b0;
+    carry = 1'b0;
+    negative = 1'b0;
+    overflow = 1'b0;
+    flag = 1'b0;
+
+    case (aluc)
+        6'b100000: begin // ADD
+            {carry, r} = a + b;
+            overflow = (a[31] == b[31]) && (r[31] != a[31]);
+        end
+        6'b100001: begin // ADDU
+            r = a + b;
+        end
+        6'b100010: begin // SUB
+            {carry, r} = a - b;
+            overflow = (a[31] != b[31]) && (r[31] != a[31]);
+        end
+        6'b100011: begin // SUBU
+            r = a - b;
+        end
+        6'b100100: begin // AND
+            r = a & b;
+        end
+        6'b100101: begin // OR
+            r = a | b;
+        end
+        6'b100110: begin // XOR
+            r = a ^ b;
+        end
+        6'b100111: begin // NOR
+            r = ~(a | b);
+        end
+        6'b101010: begin // SLT
+            r = (a < b) ? 32'b1 : 32'b0;
+        end
+        6'b101011: begin // SLTU
+            r = ($unsigned(a) < $unsigned(b)) ? 32'b1 : 32'b0;
+        end
+        6'b000000: begin // SLL
+            r = b << a[4:0];
+        end
+        6'b000010: begin // SRL
+            r = b >> a[4:0];
+        end
+        6'b000011: begin // SRA
+            r = $signed(b) >>> a[4:0];
+        end
+        6'b000100: begin // SLLV
+            r = b << a[10:6];
+        end
+        6'b000110: begin // SRLV
+            r = b >> a[10:6];
+        end
+        6'b000111: begin // SRAV
+            r = $signed(b) >>> a[10:6];
+        end
+        6'b001111: begin // LUI
+            r = {a[15:0], 16'b0};
+        end
+        default: begin // Default case
+            r = 32'bz; // High impedance state if operation is not defined
+        end
+    endcase
+
+    // Update zero, negative, and flag outputs
+    zero = (r == 32'b0);
+    negative = r[31];
+    
+    // For SLT and SLTU, we only set the flag output
+    if (aluc == 6'b101010 || aluc == 6'b101011) begin
+        flag = (r == 32'b1) ? 1'b1 : 1'b0;
+    end
+end
+
+endmodule
+```

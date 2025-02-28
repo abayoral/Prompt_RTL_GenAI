@@ -1,0 +1,26 @@
+I kindly ask you to provide a detailed and comprehensive Verilog HDL code implementation for an instruction register module named `instr_reg`. This module is tasked with holding and processing CPU instructions by capturing incoming data, separating it into distinct fields, and outputting those fields for further processing. Here is a clear breakdown of the module's structure and requirements:
+
+**Module Name:**  
+- `instr_reg` 
+
+**Input Ports:**  
+1. `clk`: This is the clock signal used for synchronization within the module.
+2. `rst`: An active low reset signal which, when activated, initializes the instruction register to a known state.
+3. `fetch [1:0]`: A 2-bit control signal that determines the source from which the instruction should be fetched. A value of `01` indicates fetching from the register, whereas a value of `10` signifies fetching from RAM or ROM.
+4. `data [7:0]`: An 8-bit data input signal representing the instruction that may be fetched by the module.
+
+**Output Ports:**  
+1. `ins [2:0]`: Outputs the high 3 bits of the fetched instruction, serving as the operation code or opcode.
+2. `ad1 [4:0]`: Outputs the low 5 bits of the instruction, which represent the register address.
+3. `ad2 [7:0]`: Outputs the complete 8-bit data when the instruction is fetched from the second source.
+
+**Implementation Details:**  
+- The module incorporates two 8-bit registers, named `ins_p1` and `ins_p2`, both of which are tasked with holding instructions fetched from different sources.
+- On the rising edge of the `clk` (clock signal), the module checks the `rst` (reset) signal. If `rst` is asserted low (active), both registers `ins_p1` and `ins_p2` are initialized to zero.
+- The functionality of the module is dictated by the `fetch` control signal:
+  - When `fetch` is `2'b01`, the module fetches the instruction from the `data` input and stores it in `ins_p1`.
+  - When `fetch` is `2'b10`, the instruction is fetched and stored in `ins_p2`.
+  - If the `fetch` signal indicates neither of these conditions, the current values in `ins_p1` and `ins_p2` are retained.
+- The outputs `ins`, `ad1`, and `ad2` are then derived based on the instructions stored in these registers for further processing within the CPU architecture.
+
+Please provide the full Verilog code that accurately represents these functionalities and adheres to these specifications.

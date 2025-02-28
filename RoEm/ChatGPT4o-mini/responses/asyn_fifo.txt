@@ -1,0 +1,72 @@
+```verilog
+module asyn_fifo #(parameter DEPTH = 16, parameter WIDTH = 8) (
+    input wire wclk,
+    input wire rclk,
+    input wire wrstn,
+    input wire rrstn,
+    input wire winc,
+    input wire rinc,
+    input wire [WIDTH-1:0] wdata,
+    output reg wfull,
+    output reg rempty,
+    output reg [WIDTH-1:0] rdata
+);
+
+    // Address width calculation
+    localparam ADDR_WIDTH = $clog2(DEPTH);
+    reg [WIDTH-1:0] ram [0:DEPTH-1];
+
+    // Pointers for read and write
+    reg [ADDR_WIDTH-1:0] wptr, rptr, wptr_gray, rptr_gray;
+    reg [ADDR_WIDTH-1:0] wptr_bin, rptr_bin;
+
+    // Two-stage synchronizers for pointers
+    reg [ADDR_WIDTH-1:0] rptr_sync;
+    reg [ADDR_WIDTH-1:0] wptr_sync;
+
+    // Write and Read Controllers
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            wptr <= 0;
+            wfull <= 0;
+        end else if (winc && !wfull) begin
+            ram[wptr] <= wdata;
+            wptr <= wptr + 1;
+        end
+    end
+
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            rptr <= 0;
+            rdata <= 0;
+            rempty <= 1;
+        end else if (rinc && !rempty) begin
+            rdata <= ram[rptr];
+            rptr <= rptr + 1;
+        end
+    end
+
+    // Gray code generation
+    always @(*) begin
+        wptr_gray = wptr ^ (wptr >> 1);
+        rptr_gray = rptr ^ (rptr >> 1);
+    end
+
+    // Pointer Synchronization
+    always @(posedge wclk) begin
+        rptr_sync <= rptr_gray;
+    end
+
+    always @(posedge rclk) begin
+        wptr_sync <= wptr_gray;
+    end
+
+    // Empty and Full Conditions
+    always @(*) begin
+        rempty = (wptr_sync == rptr_gray);
+        wfull = ((wptr_sync[ADDR_WIDTH-1] != rptr_gray[ADDR_WIDTH-1]) && 
+                  (wptr_sync[ADDR_WIDTH-2:0] == rptr_gray[ADDR_WIDTH-2:0]));
+    end
+
+endmodule
+```

@@ -1,0 +1,53 @@
+```
+module multi_booth_8bit(
+    input [7:0] a,
+    input [7:0] b,
+    input clk,
+    input reset,
+    output reg [15:0] p,
+    output reg rdy
+);
+    reg [15:0] multiplicand;
+    reg [15:0] multiplier;
+    reg [4:0] ctr;
+    reg [1:0] state;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            // Extend inputs a and b to 16 bits
+            multiplicand <= {{8{b[7]}}, b}; // Sign-extend b
+            multiplier <= {{8{a[7]}}, a};   // Sign-extend a
+            p <= 16'b0;                     // Clear product
+            ctr <= 5'b0;                    // Clear counter
+            rdy <= 1'b0;                    // Clear ready signal
+            state <= 2'b00;                 // Initial state
+        end else begin
+            case (state)
+                2'b00: begin // Start State
+                    if (ctr < 16) begin
+                        // Check last two bits of multiplier to decide on action
+                        case (multiplier[1:0])
+                            2'b01: p <= p + multiplicand; // Add
+                            2'b10: p <= p - multiplicand; // Subtract
+                            default: ; // Do nothing, for 00 and 11
+                        endcase
+                        // Prepare for the next cycle
+                        multiplicand <= multiplicand << 1; // Shift left
+                        multiplier <= {multiplier[14:0], 1'b0}; // Shift right
+                        ctr <= ctr + 1; // Increment counter
+                        if (ctr == 15) begin
+                            state <= 2'b01; // Move to finish state
+                        end
+                    end
+                end
+                
+                2'b01: begin // Finish State
+                    rdy <= 1'b1; // Set ready signal
+                end
+                
+                default: state <= 2'b00; // Default state
+            endcase
+        end
+    end
+endmodule
+```

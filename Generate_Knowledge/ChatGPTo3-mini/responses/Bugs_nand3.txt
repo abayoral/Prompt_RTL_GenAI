@@ -1,0 +1,37 @@
+module top_module (
+    input a,
+    input b,
+    input c,
+    output out
+);
+
+  // Intermediate signal for the AND gate's output.
+  wire and_out;
+  
+  // Instantiate the provided 5-input AND gate.
+  // Tie the unused d and e inputs to logic high (1'b1).
+  andgate inst1 (
+      .out(and_out),
+      .a(a),
+      .b(b),
+      .c(c),
+      .d(1'b1),
+      .e(1'b1)
+  );
+  
+  // Invert the result of the AND gate to implement the NAND functionality.
+  assign out = ~and_out;
+
+endmodule
+
+// Provided module definition (assumed to be pre-built).
+module andgate (
+    output out,
+    input a,
+    input b,
+    input c,
+    input d,
+    input e
+);
+  assign out = a & b & c & d & e;
+endmodule

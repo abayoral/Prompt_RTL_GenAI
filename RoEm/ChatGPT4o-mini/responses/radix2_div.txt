@@ -1,0 +1,82 @@
+```verilog
+module radix2_div (
+    input wire clk,
+    input wire rst,
+    input wire opn_valid,
+    input wire sign,
+    input wire [7:0] dividend,
+    input wire [7:0] divisor,
+    output reg [15:0] result,
+    output reg res_valid
+);
+  
+    reg [15:0] SR; // Shift register for quotient and remainder
+    reg [7:0] NEG_DIVISOR;
+    reg [3:0] cnt; // Counter for iterations
+    reg start_cnt; // Control signal to start counting
+    reg [7:0] abs_dividend;
+    reg [7:0] abs_divisor;
+  
+    initial begin
+        result = 16'd0;
+        res_valid = 1'b0;
+        cnt = 4'd0;
+        start_cnt = 1'b0;
+    end
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            result <= 16'd0;
+            res_valid <= 1'b0;
+            cnt <= 4'd0;
+            start_cnt <= 1'b0;
+        end else begin
+            if (opn_valid && !res_valid) begin
+                // Initialization phase
+                abs_dividend = (dividend[7] && sign) ? ~dividend + 1 : dividend; // Absolute value
+                abs_divisor = (divisor[7] && sign) ? ~divisor + 1 : divisor; // Absolute value
+                NEG_DIVISOR = ~abs_divisor + 1; // Two's complement of divisor
+                SR = {8'd0, abs_dividend}; // Load dividend into shift register
+                
+                // Reset the count
+                cnt <= 4'd0;
+                start_cnt <= 1'b1;
+            end
+            
+            if (start_cnt) begin
+                // Division process (iterating 8 times)
+                if (cnt < 4'd8) begin
+                    // Subtract NEG_DIVISOR from the shifted part of SR
+                    SR[15:8] = SR[15:8] + NEG_DIVISOR;
+                    
+                    // Check if subtraction led to a positive or negative
+                    if (SR[15] == 1'b0) begin
+                        // Successful subtraction
+                        SR[15:8] = SR[15:8] + 1; // Increment quotient
+                    end else begin
+                        // Restore value if subtraction is invalid
+                        SR[15:8] = SR[15:8] - NEG_DIVISOR; // Undo the addition
+                    end
+                    
+                    // Shift left for the next operation
+                    SR = {SR[14:0], 1'b0}; 
+
+                    // Increment the counter
+                    cnt <= cnt + 1;
+                end else begin
+                    // Division complete
+                    result <= SR; // Store the result
+                    res_valid <= 1'b1; // Set result valid
+                    start_cnt <= 1'b0; // Stop the iteration
+                end
+            end
+            
+            // Reset result valid on new operation
+            if (opn_valid && res_valid) begin
+                res_valid <= 1'b0;
+            end
+        end
+    end
+
+endmodule
+```

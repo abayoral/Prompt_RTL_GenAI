@@ -1,0 +1,20 @@
+You have been trained on data available up until October 2023. We're seeking to leverage your expertise as a professional Verilog designer for creating a specific digital design module. This module, titled `freq_div`, is intended to function as a frequency divider circuit. The primary objective is to take an input clock signal, `CLK_in`, operating at a frequency of 100MHz, and generate three distinct lower-frequency output clock signals: 
+
+1. `CLK_50`, which will be exactly half the frequency of the input clock signal, effectively generating a 50MHz output.
+2. `CLK_10`, designed to be one-tenth of the input clock frequency, resulting in a 10MHz output.
+3. `CLK_1`, which will be one-hundredth of the input clock frequency, giving a 1MHz output.
+
+For this module, the input ports are as follows:
+- `CLK_in`: This is the main clock signal input, operating at 100MHz.
+- `RST`: This signal is the reset input, which, when active, is responsible for reinitializing the outputs and counters within the module to ensure proper restart functionality.
+
+The output ports you need to define will produce the following signals:
+- `CLK_50`: Represents the clock signal output at 50MHz.
+- `CLK_10`: Outputs the clock signal at a frequency of 10MHz.
+- `CLK_1`: Outputs the clock signal at a reduced frequency of 1MHz.
+
+The planned implementation involves using three separate counters that each track the necessary oscillations of the input clock to achieve the desired frequency division. For generating `CLK_50`, a basic toggle logic is applied to divide the frequency by two. Both `CLK_10` and `CLK_1` involve incrementing counters that will toggle their respective clock outputs once the counter reaches a predefined value, indicative of the division achieved (4 for `CLK_10` and 49 for `CLK_1`).
+
+The goal is to have a robust method of toggling the output signals based on their respective counting mechanisms while ensuring that the reset functionality (`RST`) accurately reinitializes the module state when triggered. The counters must increment on each positive edge of `CLK_in` unless reset by `RST`, at which point they should return to zero. This ensures accurate timing and synchronization with the input clock. Additionally, logic must handle the reset condition to guarantee that each output clock starts from a known state when `RST` is asserted.
+
+Please provide the complete Verilog code for this module based on the specifications and behavior detailed.

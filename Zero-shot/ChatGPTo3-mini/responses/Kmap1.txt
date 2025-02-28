@@ -1,0 +1,14 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    output out
+); 
+    // The Karnaugh map provided indicates that for every combination of inputs
+    // (a, b, c), the output is 1. Both the product-of-sums and sum-of-products
+    // simplifications reduce to the constant 1.
+    //
+    // Therefore, the simplified implementation is simply:
+    assign out = 1'b1;
+
+endmodule

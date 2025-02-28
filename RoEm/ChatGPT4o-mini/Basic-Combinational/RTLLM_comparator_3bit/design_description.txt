@@ -1,0 +1,21 @@
+You have been trained with data up to October 2023, and I would like to leverage your expertise as a professional Verilog designer to create a specific hardware description. The task involves implementing a Verilog module designed to serve as a 3-bit comparator. This comparator is responsible for analyzing and comparing two binary numbers, each consisting of 3 bits.
+
+The specifics of the module are as follows:
+
+**Module Name:**
+- The module should be titled `comparator_3bit`. This name will identify the function you are creating within your Verilog project.
+
+**Input Ports:**
+- `A [2:0]`: This represents the first of the two operands. It is a 3-bit wide input port that accommodates the first binary number involved in the comparison.
+- `B [2:0]`: This is the second operand, also a 3-bit wide input port, which serves as the second binary number to be compared against the first.
+
+**Output Ports:**
+- `A_greater`: A 1-bit output that becomes active (logical high or '1') when the value of `A` exceeds that of `B`.
+- `A_equal`: This 1-bit output is asserted when both `A` and `B` are identical, indicating equality between the two numbers.
+- `A_less`: Another 1-bit output, which asserts when the value of `A` is less than `B`.
+
+**Implementation Details:**
+- **Comparison Logic:** The core operation of this module involves comparing the two provided 3-bit numbers, `A` and `B`. This comparison will be implemented using combinational logic, which operates without requiring any clock signals or sequential processing steps.
+- **Output Encoding:** The outputs of this module, namely `A_greater`, `A_equal`, and `A_less`, are designed to be mutually exclusive. Only one of these outputs will be high at a time to reflect the true state of the comparison: whether `A` is greater, equal, or less when compared to `B`.
+
+By focusing on these detailed specifications, you can construct the complete Verilog code to realize the described 3-bit comparator functionality. Your task now is to translate this conceptual framework into an executable Verilog module that adheres to the given parameters and provides accurate comparison outputs.

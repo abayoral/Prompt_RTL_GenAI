@@ -1,0 +1,9 @@
+As a senior Digital Design Engineer at a prominent hardware design firm, you are assigned with the critical task of developing an essential Verilog module for a new-generation product, which is vital for upholding your company's reputation in the competitive landscape of computer hardware. 
+
+You are required to design a digital circuit that operates with two 3-bit input vectors. Specifically, this module should accomplish several tasks concurrently: first, it must compute the bitwise-OR operation between the two input vectors; second, it must perform a logical-OR operation on the same inputs; and third, it must produce the inverted outputs for both vectors (also known as the NOT operation). 
+
+Furthermore, the output wiring for the inverted vectors must be structured such that the inversion of the second input vector, denoted as 'b,' occupies the upper half of a 6-bit output vector called `out_not`, specifically occupying bits 5 through 3. Conversely, the inversion of the first input vector, 'a,' should occupy the lower half of the same output vector, occupying bits 2 through 0.
+
+It's worth noting that while you are restricted from assigning values to a wire more than once, you have the flexibility to utilize part-selection on the left-hand side of an assignment. This means you can manipulate specific segments of a vector output in unique statements rather than being confined to a single comprehensive assignment for the entire vector output.
+
+Taking these considerations into account, how would you approach the requirement of creating this Verilog module to ensure that it meets all specifications? What design strategies would you leverage to effectively implement the bitwise and logical operations as well as the inversion of the input vectors while adhering to the defined output structure?

@@ -1,0 +1,85 @@
+module top_module (
+    input clk,
+    input reset,   // Synchronous active-high reset
+    output [3:1] ena,
+    output [15:0] q
+);
+
+    // Internal wires for carry outputs between digit counters
+    wire c0, c1, c2, c3; // c0: ones->tens, c1: tens->hundreds, c2: hundreds->thousands, c3 unused
+
+    // Ones digit counter: always enabled.
+    decade_counter ones (
+        .clk(clk),
+        .reset(reset),
+        .ena(1'b1),
+        .q(q[3:0]),
+        .cout(c0)
+    );
+
+    // Tens digit counter: enabled when ones digit rolls over.
+    decade_counter tens (
+        .clk(clk),
+        .reset(reset),
+        .ena(c0),
+        .q(q[7:4]),
+        .cout(c1)
+    );
+
+    // Hundreds digit counter: enabled when tens digit rolls over.
+    decade_counter hundreds (
+        .clk(clk),
+        .reset(reset),
+        .ena(c1),
+        .q(q[11:8]),
+        .cout(c2)
+    );
+
+    // Thousands digit counter: enabled when hundreds digit rolls over.
+    decade_counter thousands (
+        .clk(clk),
+        .reset(reset),
+        .ena(c2),
+        .q(q[15:12]),
+        .cout(c3)
+    );
+
+    // Enable outputs for the upper three digits.
+    // ena[1] is the enable for tens digit; ena[2] for hundreds; ena[3] for thousands.
+    assign ena[1] = c0;
+    assign ena[2] = c1;
+    assign ena[3] = c2;
+
+endmodule
+
+// One-digit decade counter module.
+// This module counts from 0 to 9 and then rolls over to 0, producing a carry pulse (cout)
+// on the cycle when the count resets from 9 back to 0.
+module decade_counter (
+    input clk,
+    input reset,   // Synchronous active-high reset
+    input ena,     // Enable signal. When high, the counter increments.
+    output reg [3:0] q,
+    output reg cout  // Carry output: goes high for one clock cycle when q rolls over from 9 to 0.
+);
+
+    always @(posedge clk) begin
+        if (reset) begin
+            q <= 4'd0;
+            cout <= 1'b0;
+        end else if (ena) begin
+            if (q == 4'd9) begin
+                q <= 4'd0;
+                cout <= 1'b1;
+            end else begin
+                q <= q + 4'd1;
+                cout <= 1'b0;
+            end
+        end else begin
+            // If not enabled, hold the current count and no carry is generated.
+            q <= q;
+            cout <= 1'b0;
+        end
+    end
+
+endmodule

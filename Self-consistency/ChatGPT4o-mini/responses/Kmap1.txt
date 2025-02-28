@@ -1,0 +1,10 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    output out  
+); 
+
+    assign out = 1'b1; // Given the K-map is true for all combinations
+
+endmodule

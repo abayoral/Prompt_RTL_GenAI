@@ -1,0 +1,74 @@
+module multi_16bit(
+    input         clk,
+    input         rst_n,
+    input         start,
+    input  [15:0] ain,
+    input  [15:0] bin,
+    output [31:0] yout,
+    output        done
+);
+
+    // Shift count: range from 0 to 17 (5 bits are enough)
+    reg [4:0] i;
+    // Internal done flag register
+    reg done_r;
+    // Internal registers for multiplicand, multiplier, and accumulator product
+    reg [15:0] areg;
+    reg [15:0] breg;
+    reg [31:0] yout_r;
+    
+    // Data Bit Control and Multiplication Completion flag generation
+    // This block updates the shift count "i" and the "done_r" flag
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            i      <= 5'd0;
+            done_r <= 1'b0;
+        end else begin
+            if (start) begin
+                // Increment shift counter if it's less than 17
+                if (i < 5'd17)
+                    i <= i + 5'd1;
+                // When the shift count reaches 16, signal multiplication completion
+                if (i == 5'd16)
+                    done_r <= 1'b1;
+                // Once the shift count goes to 17, clear the completion flag
+                else if (i == 5'd17)
+                    done_r <= 1'b0;
+            end else begin
+                // When start is inactive, reset the shift count
+                i <= 5'd0;
+            end
+        end
+    end
+
+    // Shift and Accumulate Operation: 
+    // Load the registers and perform accumulation based on the current count.
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            areg    <= 16'd0;
+            breg    <= 16'd0;
+            yout_r  <= 32'd0;
+        end else if (start) begin
+            if (i == 5'd0) begin
+                // For the initial clock cycle when starting, load inputs into registers.
+                areg   <= ain;
+                breg   <= bin;
+                yout_r <= 32'd0;
+            end else if (i >= 5'd1 && i <= 5'd16) begin
+                // Check if the (i-1)th bit of areg is 1.
+                // If yes, add the shifted breg into the product accumulator.
+                if (areg[i-1])
+                    yout_r <= yout_r + ( {16'd0, breg} << (i-1) );
+                else
+                    yout_r <= yout_r;
+            end
+            // When i==17, no further accumulation is performed.
+        end
+        // If start is not active, maintain current values.
+    end
+
+    // Assign internal registers to module outputs.
+    assign yout = yout_r;
+    assign done = done_r;
+
+endmodule

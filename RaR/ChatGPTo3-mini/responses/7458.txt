@@ -1,0 +1,45 @@
+module chip7458(
+    input  wire p1a,  // First input for p1 output AND gate 1
+    input  wire p1b,  // Second input for p1 output AND gate 1
+    input  wire p1c,  // First input for p1 output AND gate 2
+    input  wire p1d,  // Second input for p1 output AND gate 2
+    input  wire p1e,  // Extra input on group 1 (not used in basic 7458 function)
+    input  wire p2a,  // First input for p2 output AND gate 1
+    input  wire p2b,  // Second input for p2 output AND gate 1
+    input  wire p2c,  // First input for p2 output AND gate 2
+    input  wire p2d,  // Second input for p2 output AND gate 2
+    input  wire p2e,  // Extra input on group 2 (not used in basic 7458 function)
+    output wire p1y,  // Final output 1
+    output wire p2y   // Final output 2
+);
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  // Method 1: Direct continuous assignment using assign statements.
+  // Note: In this approach the extra inputs (p1e and p2e) are not used.
+  // Uncomment the following two lines to use Method 1 exclusively.
+  //
+  // assign p1y = (p1a & p1b) | (p1c & p1d);
+  // assign p2y = (p2a & p2b) | (p2c & p2d);
+  //
+  //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  // Method 2: Use intermediate wires for the outputs of the four AND gates,
+  // then combine these with two OR operations.
+  //
+  // Four 2-input AND gates:
+  wire and1, and2, and3, and4;
+  assign and1 = p1a & p1b;
+  assign and2 = p1c & p1d;
+  assign and3 = p2a & p2b;
+  assign and4 = p2c & p2d;
+  
+  // Two 2-input OR gates to combine AND gate outputs:
+  wire or1, or2;
+  assign or1 = and1 | and2;
+  assign or2 = and3 | and4;
+  
+  // The final output assignments (extra inputs p1e and p2e are not used
+  // in the basic 7458 functionality, but they are part of the interface).
+  assign p1y = or1;
+  assign p2y = or2;
+  
+endmodule

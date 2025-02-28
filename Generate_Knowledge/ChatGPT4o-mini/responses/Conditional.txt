@@ -1,0 +1,19 @@
+```
+module top_module (
+    input [7:0] a, b, c, d,
+    output [7:0] min
+);
+    wire [7:0] min_ab;
+    wire [7:0] min_cd;
+    
+    // Two-way minimum comparator for a and b
+    assign min_ab = (a < b) ? a : b;
+    
+    // Two-way minimum comparator for c and d
+    assign min_cd = (c < d) ? c : d;
+    
+    // Final minimum comparator for the results of the previous comparisons
+    assign min = (min_ab < min_cd) ? min_ab : min_cd;
+
+endmodule
+```

@@ -1,0 +1,39 @@
+```
+module accu (
+    input wire clk,
+    input wire rst_n,
+    input wire [7:0] data_in,
+    input wire valid_in,
+    output reg valid_out,
+    output reg [9:0] data_out
+);
+
+    reg [9:0] sum;                  // 10-bit register to store accumulated sum
+    reg [1:0] count;               // Counter for the number of valid inputs received
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            sum <= 10'b0;          // Reset sum to 0
+            count <= 2'b0;        // Reset count to 0
+            valid_out <= 1'b0;    // Deactivate valid output
+        end else begin
+            if (valid_in) begin
+                sum <= sum + data_in; // Accumulate the incoming data
+                count <= count + 1;   // Increment the count of valid data
+                
+                if (count == 2'b11) begin // When 4 pieces of data have been accumulated
+                    valid_out <= 1'b1;   // Activate valid output
+                    data_out <= sum;     // Output the accumulated sum
+                    sum <= 10'b0;        // Reset the sum for the next accumulation
+                    count <= 2'b0;       // Reset count for the next cycle
+                end else begin
+                    valid_out <= 1'b0;   // Keep valid output inactive until four inputs received
+                end
+            end else begin
+                valid_out <= 1'b0;       // If no valid input, keep valid output low
+            end
+        end
+    end
+
+endmodule
+```

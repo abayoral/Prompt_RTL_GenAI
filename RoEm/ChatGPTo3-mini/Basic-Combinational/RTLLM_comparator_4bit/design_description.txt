@@ -1,0 +1,20 @@
+As an expert in Verilog design, consider crafting a module named `comparator_4bit` that acts as a comparator for two 4-bit binary numbers. The task involves constructing combinational logic based on bit-level comparisons to compare the input signals accurately. You are provided with the following components and requirements for this task, which require careful attention to detail:
+
+1. **Module Declaration**:
+   - Name the module `comparator_4bit`.
+   - Define the input ports as two 4-bit numbers: `A [3:0]` and `B [3:0]`.
+   - Outline the output ports: `A_greater`, `A_equal`, and `A_less`, which are 1-bit signals indicating the relationship between `A` and `B`.
+
+2. **Comparative Logic**:
+   - Implement the logic that compares the two 4-bit inputs using combinational circuitry.
+   - Start by performing a bitwise subtraction of `B` from `A`. This involves sequential bit comparisons to determine the presence of borrow bits.
+   - Establish conditions for the outputs:
+     - `A_greater` should be high if `A` is greater than `B`. This can occur if no borrow is generated and the net result of subtraction is non-zero.
+     - `A_equal` should be high if `A` is equal to `B`, indicated by a zero result from the bitwise subtraction.
+     - `A_less` should be high if `A` is less than `B`, marked by a borrow occurring during the subtraction process.
+
+3. **Output Logic**:
+   - Ensure the outputs are mutually exclusive, meaning only one output can be high at any given moment. This necessitates specific conditional logic to address scenarios where overlapping conditions might otherwise occur.
+   - Validate that the logic accounts for all possible combinations of `A` and `B` such that only one condition—`greater`, `equal`, or `less`—is satisfied.
+
+The goal is to develop a fully functional Verilog module capable of accurately determining the relationship between two 4-bit binary numbers using efficient combinational logic design. Be mindful of the clarity and efficiency of your code, and ensure it captures the entire specification as described.

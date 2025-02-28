@@ -1,0 +1,47 @@
+```verilog
+module fixed_point_adder #(
+    parameter Q = 16,  // Number of fractional bits
+    parameter N = 32   // Total number of bits (including integer and fractional parts)
+) (
+    input [N-1:0] a,  // First operand (fixed-point)
+    input [N-1:0] b,  // Second operand (fixed-point)
+    output reg [N-1:0] c // Result of the addition (fixed-point)
+);
+
+reg [N-1:0] res; // Internal register to hold the result
+
+always @(*) begin
+    // Check if the MSBs (sign bits) of a and b are the same
+    if (a[N-1] == b[N-1]) begin
+        // Absolute value addition
+        res = a + b;
+        // Adjust the sign of the result
+        c = res[N-1] ? res : res; // Sign remains same as input
+    end else begin
+        // If MSBs are different, perform absolute value subtraction
+        if (a[N-1] == 1'b0 && b[N-1] == 1'b1) begin // a positive, b negative
+            res = a + (~b + 1'b1);  // a - (-b) = a + b
+        end else if (a[N-1] == 1'b1 && b[N-1] == 1'b0) begin // a negative, b positive
+            res = b + (~a + 1'b1);  // b - (-a) = b + a
+        end
+
+        // Determine the sign of the result based on the magnitudes
+        if (a[N-1] == 1'b0 && b[N-1] == 1'b1) begin
+            c = (a >= ~b + 1'b1) ? res : (~res + 1'b1); // Preserve sign
+        end else if (a[N-1] == 1'b1 && b[N-1] == 1'b0) begin
+            c = (b >= ~a + 1'b1) ? res : (~res + 1'b1); // Preserve sign
+        end
+    end
+
+    // Overflow management
+    // If the result has overflowed from both operands, we may need to handle it
+    if ((a[N-1] == b[N-1]) && (c[N-1] != a[N-1])) begin
+        c = {N{1'b1}}; // Indicating overflow
+    end else if ((a[N-1] != b[N-1]) && (c[N-1] != a[N-1]) && (c[N-1] != b[N-1])) begin
+        c = {N{1'b1}}; // Indicating overflow
+    end
+    
+end
+
+endmodule
+```

@@ -1,0 +1,28 @@
+As a professional Verilog designer, you have been assigned the responsibility of developing a logic module named `pulse_detect`. This module is specifically tasked with identifying particular patterns within a one-bit continuous digital signal referred to as `data_in`, leveraging a clock signal known as `clk` for timing reference. 
+
+To clarify the requirements and objectives of this task, consider the following detailed components:
+
+1. **Objective of the Module**: The primary function of the `pulse_detect` module is to accurately detect a distinct pattern in the input signal. This pattern is characterized by the signal transitioning from a low state (0) to a high state (1) and subsequently returning back to a low state (0) within the span of three clock cycles. This entire transition sequence is identified as a "pulse."
+
+2. **Signal Definitions and Roles**: 
+   - **`clk`**: This clock signal fundamentally drives the timing of the module's operations. It is essential that all actions within the module occur synchronously with the rising edges of this clock signal to ensure proper functionality.
+   - **`rst_n`**: This is an active-low reset signal that, when asserted low, should initiate a complete reset of the module's internal state and any outputs. This reset capability is critical for managing the module's state effectively over time.
+   - **`data_in`**: The core input signal that is the focus of the `pulse_detect` module. It constitutes a continuous one-bit stream that the module monitors in order to identify the defined pulse pattern.
+   - **`data_out`**: This output signal is designed to communicate the successful detection of a pulse. It should indicate a high state (1) at the conclusion of the pulse detection cycle—specifically, on the third clock cycle of the pulse transition (0 to 1 and back to 0)—and revert to a low state (0) at all other times.
+
+3. **Pulse Detection Process**: 
+   - An internal state register named `state` should be created to track the current phase of the pulse detection process. This state management is crucial for recognizing each stage of the pulse transition correctly.
+   - The behavioral logic should be implemented within an `always` block that is sensitive to the positive edge of the `clk` signal and the negative edge of the `rst_n` signal to ensure proper response to both clock cycles and reset conditions.
+
+4. **Reset Logic Implementation**: When the `rst_n` signal is detected in a low state, the module should:
+   - Reset the `state` register to its initial condition, effectively preparing the module to process new pulse detections once the reset state is cleared.
+   - Ensure that the output `data_out` is set to a low state (0), as pulse detection cannot take place during the reset.
+
+5. **State Transition Management**: As the clock progresses, the module must continuously evaluate the state of `data_in` to identify the necessary transitions:
+   - **Initial State**: In the absence of pulse detection, the module should wait for an event where `data_in` transitions from 0 to 1.
+   - **Intermediate State**: After successfully detecting the rise from 0 to 1, the module must be prepared to monitor for the subsequent fall from 1 to 0.
+   - **Final State**: Once both transitions (`0 -> 1` followed by `1 -> 0`) have been completed, the module should confirm that a pulse has been detected and subsequently set `data_out` to high (1) for one clock cycle to indicate this detection event.
+
+6. **Output Logic Behavior**: Post-detection, the `data_out` signal should be activated briefly (set to 1) and then revert back to a low state (0). This requires careful management to ensure that the output reliably indicates the detection of a pulse, while remaining responsive to any new occurrences of the pattern.
+
+Your overall task involves writing the Verilog code that encapsulates this specified behavior within the `pulse_detect` module. It is important to consider the precision needed in handling edge cases and to ensure that the transitions between states are meticulously managed throughout the detection process. Could you describe or outline how you would approach coding this module while satisfying these outlined requirements?

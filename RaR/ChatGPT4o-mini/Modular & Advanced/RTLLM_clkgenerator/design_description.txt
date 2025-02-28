@@ -1,0 +1,11 @@
+As an expert in Verilog design, you are presented with a task that involves crafting a specific module aimed at generating a periodic clock signal. Let's break down the requirements and elaborate on the expectations surrounding the development of this `clkgenerator` module.
+
+1. **Module Identification**: To begin with, the module you are to define is to be identified by the name `clkgenerator`. This name should be consistently used throughout the code to maintain clarity and alignment with the intended functionality.
+
+2. **Parameter Definition**: A significant aspect to take into account is the parameter labeled `PERIOD`. This parameter is fundamental since it determines the total duration of one complete cycle of the clock signal. Notably, the default value of `PERIOD` is set at 10, which will influence the timing characteristics of the clock output. It is essential to contemplate how adjustments to this parameter might affect the operational frequency of the generated clock signal.
+
+3. **Output Specification**: The design must encapsulate an output port designated as `clk`. This port serves the crucial role of transmitting the generated clock signal to other components or modules in your design. It is imperative that this output accurately reflects the toggling behavior dictated by the specified PERIOD.
+
+4. **Core Implementation Requirements**: Your implementation should begin with an initial block that establishes the state of the `clk` signal. Initially, this clock signal must be set to 0 to ensure the correct starting condition of the signal. Subsequently, within your implementation, the clock's toggling should be orchestrated to occur every half-period of the defined `PERIOD`. This characteristic is essential for creating a square wave form of the clock signal, which is typically required for reliable digital circuit operation.
+
+Ultimately, your goal is to produce a comprehensive and functional Verilog code for the `clkgenerator` module that adheres strictly to the stipulations and attributes laid out above. The finished product should not only demonstrate the requisite functionality in generating a clock signal but also remain clear and maintainable to facilitate future enhancements or modifications.

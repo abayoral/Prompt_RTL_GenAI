@@ -1,0 +1,25 @@
+module pedge_detector(
+    input  clk,         // system clock
+    input  [7:0] in,    // 8-bit input signal
+    output reg [7:0] pedge  // 8-bit output signal for positive edge detection
+);
+
+    // Internal register to hold the previous state of the input signal.
+    // This enables us to compare the previous and current values on each clock cycle.
+    reg [7:0] prev_in;
+
+    // On each rising edge of the clock, perform two main actions:
+    // 1. Compute the positive edge detection result for each bit.
+    //    This is done by checking where the previous bit value was 0 (i.e., ~prev_in)
+    //    and the current bit value is 1. This combination indicates a 0-to-1 transition.
+    //    The result is stored in the output register 'pedge', which effectively
+    //    delays the detected transition by one clock cycle.
+    //
+    // 2. Update the 'prev_in' register with the current input value so that the next
+    //    cycle's detection logic has the correct historical data.
+    always @(posedge clk) begin
+        pedge   <= (~prev_in) & in;
+        prev_in <= in;
+    end
+
+endmodule

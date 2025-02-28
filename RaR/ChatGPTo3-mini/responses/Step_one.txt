@@ -1,0 +1,8 @@
+module constant_output();
+  // Declare a single output and tie it to logic high (1)
+  output wire out;
+  
+  // Continuously drive the output to a logic high (1)
+  assign out = 1'b1;
+  
+endmodule

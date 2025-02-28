@@ -1,0 +1,79 @@
+Below is one acceptable “fixed‐up” version. Although the original code was largely correct (and would synthesize in many tools), it had two points that can be improved:
+
+1. It is best practice when dealing with signed multiplication (and its iterations) to declare the internal registers as signed. This lets you use the built‐in arithmetic shift operators (especially the right shift “>>>”) rather than the “{mult[15], mult[15:1]}” trick.
+
+2. Using the shift operators (<<< and >>>) makes the code clearer and more idiomatic; it also shows that you really mean an arithmetic shift right.
+
+The corrected module below makes these improvements while keeping the overall algorithm structure identical. (Note that you could also simply leave everything unsigned and “simulate” an arithmetic right shift via concatenation. However, declaring the numbers as signed is clearer if you intend to multiply signed quantities.)
+
+────────────────────────────────────────────────────────────
+module multi_booth_8bit(
+    input              clk,
+    input              reset,
+    input       [7:0]  a,
+    input       [7:0]  b,
+    output reg  [15:0] p,
+    output reg         rdy
+);
+
+  // Declare the internal registers as signed so that arithmetic shifts
+  // and signed additions/subtractions work as expected.
+  reg signed [15:0] multiplicand; // Holds sign‐extended version of b (and shifted left)
+  reg signed [15:0] multiplier;   // Holds sign‐extended version of a (and shifted right)
+  reg               booth_prev;   // Extra booth bit (initialized to 0)
+
+  // 5–bit counter to track cycles (up to 16 cycles)
+  reg [4:0] ctr;
+
+  // On each rising clock (or asynchronous reset) do the multiplication.
+  always @(posedge clk or posedge reset) begin
+    if (reset) begin
+      // Sign–extend the 8–bit inputs to 16 bits.
+      multiplier   <= { {8{a[7]}}, a };
+      multiplicand <= { {8{b[7]}}, b };
+      p            <= 16'd0;
+      booth_prev   <= 1'b0;
+      ctr          <= 5'd0;
+      rdy          <= 1'b0;
+    end 
+    else if (!rdy) begin
+      // Decide what to do based on the Booth recoding pair (multiplier[0], booth_prev)
+      // If the pair is "01", add multiplicand into p.
+      // If it is "10", subtract multiplicand from p.
+      // Otherwise, do nothing.
+      case ({multiplier[0], booth_prev})
+        2'b01: p <= p + multiplicand;
+        2'b10: p <= p - multiplicand;
+        default: p <= p;  // No operation
+      endcase
+      
+      // Shift the multiplicand left by one bit (logical left shift is the same as arithmetic left shift)
+      multiplicand <= multiplicand <<< 1;
+      
+      // Save the current LSB of multiplier for the next Booth decision.
+      booth_prev <= multiplier[0];
+      
+      // Arithmetic right shift of multiplier.
+      multiplier <= multiplier >>> 1;
+      
+      // Increment the cycle counter.
+      ctr <= ctr + 1;
+      
+      // After 16 cycles, signal that the product is ready.
+      if (ctr == 5'd15)
+        rdy <= 1'b1;
+    end
+  end
+
+endmodule
+────────────────────────────────────────────────────────────
+
+Explanation of the changes:
+
+• By declaring multiplier and multiplicand as signed, we can write:
+  multiplier <= multiplier >>> 1;
+instead of manually concatenating the MSB. (Likewise, we can use the arithmetic left shift operator <<< although for left shifts the effect is the same for signed and unsigned types.)
+
+• The overall structure of the algorithm remains that on each cycle the Booth decision is made using the low–order bit of the multiplier together with a stored extra bit (booth_prev), the partial product (p) is updated, the multiplicand is shifted left, and the multiplier is shifted right. After 16 cycles (ctr counting from 0 to 15), rdy is asserted to indicate that the final product is available.
+
+Any functionally equivalent corrected version that follows good Verilog style and security practices is acceptable.

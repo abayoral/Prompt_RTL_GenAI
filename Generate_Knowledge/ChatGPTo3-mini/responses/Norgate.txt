@@ -1,0 +1,8 @@
+module top_module(
+    input a,
+    input b,
+    output out
+);
+    // Implementing NOR gate: OR the inputs then invert the result
+    assign out = ~(a | b);
+endmodule

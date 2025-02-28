@@ -1,0 +1,84 @@
+module top_module(
+    input clk,
+    input reset,
+    input ena,
+    output pm,
+    output [7:0] hh,
+    output [7:0] mm,
+    output [7:0] ss);
+
+    // Internal registers: BCD encoded.
+    // For seconds and minutes, valid range is 00 to 59.
+    // For hours, valid BCD values are 01, 02,...,09, 10, 11, 12.
+    reg [7:0] sec;
+    reg [7:0] min;
+    reg [7:0] hr;
+    reg pm_reg;
+
+    // Combinational assignments to outputs.
+    assign ss = sec;
+    assign mm = min;
+    assign hh = hr;
+    assign pm = pm_reg;
+
+    // Sequential block: reset has highest priority.
+    // The ena signal is used to make one-second-tick updates.
+    // We perform proper BCD counting for seconds/minutes.
+    // Hours are handled with a case statement to accommodate the 12-hour clock with am/pm toggle.
+    always @(posedge clk) begin
+        if (reset) begin
+            // Reset to 12:00:00 AM.
+            sec <= 8'h00;
+            min <= 8'h00;
+            hr  <= 8'h12;
+            pm_reg <= 1'b0;
+        end else if (ena) begin
+            // Handle seconds count.
+            if (sec == 8'h59) begin
+                // Seconds roll over
+                sec <= 8'h00;
+                // Now update minutes.
+                if (min == 8'h59) begin
+                    min <= 8'h00;
+                    // Minutes rolled over: increment hour.
+                    case (hr)
+                        8'h01: hr <= 8'h02;
+                        8'h02: hr <= 8'h03;
+                        8'h03: hr <= 8'h04;
+                        8'h04: hr <= 8'h05;
+                        8'h05: hr <= 8'h06;
+                        8'h06: hr <= 8'h07;
+                        8'h07: hr <= 8'h08;
+                        8'h08: hr <= 8'h09;
+                        8'h09: hr <= 8'h10;
+                        8'h10: hr <= 8'h11;
+                        8'h11: begin 
+                                hr <= 8'h12; 
+                                pm_reg <= ~pm_reg; // Toggle AM/PM when going from 11 to 12.
+                              end
+                        8'h12: hr <= 8'h01; // After 12 comes 1.
+                        default: hr <= 8'h01;
+                    endcase
+                end else begin
+                    // Increment minutes in BCD.
+                    if (min[3:0] == 4'd9) begin
+                        // Ones digit reaches 9: reset ones to 0 and increment tens.
+                        min <= {min[7:4] + 4'd1, 4'd0};
+                    end else begin
+                        // Otherwise, simply increment the ones digit.
+                        min <= {min[7:4], min[3:0] + 4'd1};
+                    end
+                end
+            end else begin
+                // Increment seconds in BCD.
+                if (sec[3:0] == 4'd9) begin
+                    // If ones digit is 9 then roll it over.
+                    sec <= {sec[7:4] + 4'd1, 4'd0};
+                end else begin
+                    sec <= {sec[7:4], sec[3:0] + 4'd1};
+                end
+            end
+        end
+    end
+
+endmodule

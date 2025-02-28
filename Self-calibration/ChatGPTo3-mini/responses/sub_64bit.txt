@@ -1,0 +1,30 @@
+Below is one acceptable corrected version. Note that your original code was essentially correct. One common best‐practice improvement is to simplify the overflow detection by noting that, for subtraction in two’s complement, overflow occurs when the sign of A differs from the sign of B and the sign of the result differs from the sign of A. That condition can be written more compactly as:
+
+  overflow = (A[63] ^ B[63]) & (A[63] ^ result[63]);
+
+Below is the revised module incorporating that improvement along with a few minor stylistic changes for clarity.
+
+------------------------------------------------------------
+module sub_64bit(
+    input  signed [63:0] A,
+    input  signed [63:0] B,
+    output signed [63:0] result,
+    output              overflow
+);
+
+    // Subtract B from A
+    assign result = A - B;
+    
+    // Overflow detection for two's complement subtraction:
+    // Overflow occurs if the sign of A and B are different, but the sign of A
+    // does not match the sign of the result.
+    assign overflow = (A[63] ^ B[63]) & (A[63] ^ result[63]);
+
+endmodule
+------------------------------------------------------------
+
+Explanation of changes:
+1. The overflow expression was changed to a more compact form. It is mathematically equivalent to your original formulation.
+2. Comments were updated to clearly explain the overflow condition.
+
+Either formulation is correct; this version just follows a common best-practice style.

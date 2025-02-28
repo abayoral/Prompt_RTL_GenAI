@@ -1,0 +1,83 @@
+module bcd_digit (
+    input clk,
+    input reset,   // Synchronous active‐high reset
+    input inc,     // Increment enable
+    output reg [3:0] digit,
+    output carry // Carry‐out; high for one cycle when digit rolls over from 9 to 0
+);
+    // On the rising edge, if enable is asserted, increment the BCD digit.
+    // When the current digit is 9 and inc is high, the digit resets to 0 and carry is produced.
+    always @(posedge clk) begin
+        if (reset)
+            digit <= 4'd0;
+        else if (inc) begin
+            if (digit == 4'd9)
+                digit <= 4'd0;
+            else
+                digit <= digit + 4'd1;
+        end
+    end
+
+    // The carry is generated when the counter is enabled and its current value is 9.
+    assign carry = inc && (digit == 4'd9);
+endmodule
+
+
+module top_module (
+    input clk,
+    input reset,   // Synchronous active-high reset
+    output [3:1] ena,  // Enable outputs for the tens, hundreds, and thousands digits
+    output [15:0] q   // q[3:0]: ones, q[7:4]: tens, q[11:8]: hundreds, q[15:12]: thousands
+);
+
+    // Internal wires for the rollover (carry) from each digit.
+    wire ones_carry;
+    wire tens_carry;
+    wire hundreds_carry;
+    
+    // The ones digit always counts (inc is tied high).
+    bcd_digit ones_digit (
+        .clk(clk),
+        .reset(reset),
+        .inc(1'b1),
+        .digit(q[3:0]),
+        .carry(ones_carry)
+    );
+
+    // The tens digit is incremented only when the ones digit rolls over.
+    bcd_digit tens_digit (
+        .clk(clk),
+        .reset(reset),
+        .inc(ones_carry),
+        .digit(q[7:4]),
+        .carry(tens_carry)
+    );
+
+    // The hundreds digit is incremented when the tens digit rolls over.
+    bcd_digit hundreds_digit (
+        .clk(clk),
+        .reset(reset),
+        .inc(tens_carry),
+        .digit(q[11:8]),
+        .carry(hundreds_carry)
+    );
+
+    // The thousands digit increments when the hundreds digit rolls over.
+    // Its carry output is not used.
+    bcd_digit thousands_digit (
+        .clk(clk),
+        .reset(reset),
+        .inc(hundreds_carry),
+        .digit(q[15:12]),
+        .carry()  // Unconnected carry
+    );
+
+    // Drive the enable outputs for the upper three digits.
+    // ena[1] corresponds to the tens digit's increment enable (ones digit rollover),
+    // ena[2] to the hundreds digit's enable (tens digit rollover),
+    // and ena[3] to the thousands digit's enable (hundreds digit rollover).
+    assign ena[1] = ones_carry;
+    assign ena[2] = tens_carry;
+    assign ena[3] = hundreds_carry;
+    
+endmodule

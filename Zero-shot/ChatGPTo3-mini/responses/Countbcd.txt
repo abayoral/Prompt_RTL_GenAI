@@ -1,0 +1,92 @@
+module top_module (
+    input clk,
+    input reset,   // Synchronous active-high reset
+    output [3:1] ena,   // Enable signals for tens, hundreds, thousands digits
+    output [15:0] q     // q[3:0]: ones, q[7:4]: tens, q[11:8]: hundreds, q[15:12]: thousands
+);
+
+    // Wires for rollover signals from each one-digit counter
+    wire rollover_ones;
+    wire rollover_tens;
+    wire rollover_hundreds;
+    
+    // Instantiation of the 4 one-digit decade counters.
+    // Ones digit counter: always enabled.
+    decade_counter ones (
+        .clk(clk),
+        .reset(reset),
+        .ena(1'b1),
+        .q(q[3:0]),
+        .rollover(rollover_ones)
+    );
+    
+    // Tens digit counter: enabled when ones digit rolls over from 9 to 0.
+    decade_counter tens (
+        .clk(clk),
+        .reset(reset),
+        .ena(rollover_ones),
+        .q(q[7:4]),
+        .rollover(rollover_tens)
+    );
+    
+    // Hundreds digit counter: enabled when tens digit rolls over.
+    decade_counter hundreds (
+        .clk(clk),
+        .reset(reset),
+        .ena(rollover_tens),
+        .q(q[11:8]),
+        .rollover(rollover_hundreds)
+    );
+    
+    // Thousands digit counter: enabled when hundreds digit rolls over.
+    // Its rollover is not cascaded further.
+    decade_counter thousands (
+        .clk(clk),
+        .reset(reset),
+        .ena(rollover_hundreds),
+        .q(q[15:12]),
+        .rollover()  // Unconnected since we don't cascade further.
+    );
+    
+    // Assign enable outputs for the upper three digits
+    assign ena[1] = rollover_ones;     // Tens digit enable
+    assign ena[2] = rollover_tens;       // Hundreds digit enable
+    assign ena[3] = rollover_hundreds;   // Thousands digit enable
+
+endmodule
+
+
+// One-digit BCD (decade) counter module.
+// Counts from 0 to 9. When enabled, the counter increments; 
+// on counting 9 and receiving an enable pulse, it resets to 0
+// and asserts a rollover signal.
+module decade_counter (
+    input clk,
+    input reset,         // Synchronous active-high reset
+    input ena,           // Enable signal to count
+    output reg [3:0] q,  // BCD digit output (0-9)
+    output reg rollover  // Signal asserted when counter goes from 9 to 0
+);
+
+    always @(posedge clk) begin
+        if (reset) begin
+            q <= 4'd0;
+            rollover <= 1'b0;
+        end
+        else if (ena) begin
+            if (q == 4'd9) begin
+                q <= 4'd0;
+                rollover <= 1'b1;
+            end
+            else begin
+                q <= q + 4'd1;
+                rollover <= 1'b0;
+            end
+        end
+        else begin
+            // When not enabled, make sure rollover is low.
+            rollover <= 1'b0;
+        end
+    end
+
+endmodule

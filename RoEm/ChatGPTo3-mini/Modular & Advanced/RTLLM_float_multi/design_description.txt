@@ -1,0 +1,23 @@
+As a professional Verilog designer tasked with designing and implementing a 32-bit floating-point multiplier module adhering to the IEEE-754 single-precision arithmetic standard, your goal is to create a Verilog module named `float_multi`. This module will be responsible for performing multiplication on 32-bit single-precision floating-point numbers, with meticulous attention paid to maintaining the precision and accuracy that the IEEE 754 standard mandates.
+
+To effectively implement this module, consider the following essential components and processes:
+
+1. **Module Declaration**: Begin by defining the module `float_multi` with the specified input and output ports. This includes the clock (`clk`) for synchronous operations, a reset signal (`rst`) that initializes or resets the module's state, and the inputs `a` and `b`, both 32-bit wide representing floating-point numbers in IEEE 754 format. The output `z` should also be 32-bit wide, indicating the result of the multiplication.
+
+2. **Internal Signals**: Introduce internal registers and wires necessary for handling intermediate computations:
+   - `counter` (3-bit register) will manage the sequencing of operations across clock cycles.
+   - Mantissa registers (`a_mantissa`, `b_mantissa`, `z_mantissa`) and exponent registers (`a_exponent`, `b_exponent`, `z_exponent`) are required to handle the unpacked components of the floating-point numbers.
+   - Sign registers (`a_sign`, `b_sign`, `z_sign`) will track the sign bits of the input and output numbers.
+   - A `product` register (50-bit) is used to accommodate the extended precision required during mantissa multiplication.
+   - Rounding-related control signals such as `guard_bit`, `round_bit`, and `sticky` are crucial for the rounding stage to comply with IEEE 754 accuracy.
+
+3. **Implementation Stages**:
+   - **Initialization**: Use the `rst` signal to reset the `counter` and any other stateful components. This ensures the module starts from a known clean state when reset is activated.
+   - **Input Processing**: During the initial clock cycles, extract the mantissas, exponents, and signs from the input operands `a` and `b`. This involves bit manipulation to separate these components accurately from the 32-bit representation.
+   - **Special Cases**: The module must handle edge cases such as Not-a-Number (NaN) and infinity. You must detect these situations early and prepare the module to output the correct results according to IEEE specifications.
+   - **Normalization**: If necessary, adjust the extracted mantissas to keep them normalized. This is a preparation step before the multiplication process.
+   - **Multiplication**: Perform the multiplication of the mantissas, while appropriately combining the signs and adjusting the exponents of the result. This step is critical and must ensure the extended precision (via the `product` register) is accounted for.
+   - **Rounding and Adjustment**: Apply rounding to the result as per IEEE standards and adjust the exponent to fit within the single-precision format while managing edge cases like overflow or underflow.
+   - **Output Generation**: Once all computations are complete, format the result in IEEE 754 format, to be assigned to the output `z`, ensuring all special cases (e.g., very large or very small results) are properly handled.
+
+Compile this information into a coherent and functional Verilog code for the `float_multi` module, ensuring that each part of the process is efficiently implemented. The code should consider pipeline and synchronization issues if implemented in a real-world application.

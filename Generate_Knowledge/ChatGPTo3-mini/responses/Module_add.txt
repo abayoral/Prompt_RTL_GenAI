@@ -1,0 +1,29 @@
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+
+    // Intermediate wires to hold carry-out signals.
+    wire lower_cout;
+    wire upper_cout; // This will be unused overall.
+
+    // Add lower 16 bits of a and b with an initial carry-in of 0.
+    add16 lower_adder(
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum[15:0]),
+        .cout(lower_cout)
+    );
+
+    // Add upper 16 bits of a and b with the carry-out from the lower adder.
+    add16 upper_adder(
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(lower_cout),
+        .sum(sum[31:16]),
+        .cout(upper_cout)
+    );
+
+endmodule

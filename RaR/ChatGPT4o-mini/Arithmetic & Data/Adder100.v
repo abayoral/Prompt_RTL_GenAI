@@ -1,0 +1,9 @@
+Imagine you are a senior Digital Design Engineer employed at a prominent company specializing in hardware design, and you have been assigned a crucial task: to create a Verilog module for a next-generation product that is of utmost importance to the firm's reputation in the industry. 
+
+Your specific objective is to design a 100-bit binary adder, which will effectively take two 100-bit binary numbers as inputs, along with an additional carry-in bit, and will subsequently generate a sum that is also 100-bits wide, along with an output carry bit. Given the complexity and size of the operation, simply instantiating a vast number of individual full adder components may not be practical. Therefore, you are encouraged to explore the use of behavioral coding techniques to streamline this process.
+
+The module you will be constructing, titled 'top_module,' requires specific input and output parameters. Your inputs must include two 100-bit wide binary numbers, 'a' and 'b,' as well as a carry-in input represented as 'cin.' The outputs of your module should consist of a carry-out signal labeled 'cout' and a 100-bit wide output signal for the sum, named 'sum.'
+
+The challenge lies in implementing this design efficiently, taking into consideration the need for precision and reliability in your output while adhering to the behavioral coding approach rather than directly instantiating numerous full adders. 
+
+What strategies and considerations should you keep in mind as you integrate these requirements into your Verilog module to ensure not only functionality but also adherence to industry standards and practices?

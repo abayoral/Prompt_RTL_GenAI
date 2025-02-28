@@ -1,0 +1,55 @@
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output [511:0] q
+);
+
+    reg [511:0] state;
+    integer i;
+    // Rule 110 lookup table encoded in a byte where
+    // index corresponds to {left, center, right} as a 3-bit number.
+    // Bit positions (from LSB to MSB):
+    //  0: 000 -> 0
+    //  1: 001 -> 1
+    //  2: 010 -> 1
+    //  3: 011 -> 1
+    //  4: 100 -> 0
+    //  5: 101 -> 1
+    //  6: 110 -> 1
+    //  7: 111 -> 0
+    reg [7:0] rule = 8'b01101110; // rule[pattern] gives next state for that pattern
+
+    always @(posedge clk) begin
+        if (load) begin
+            state <= data;
+        end else begin
+            // Create next state based on Rule 110.
+            // Boundary cells use a fixed off (0) neighbor.
+            for (i = 0; i < 512; i = i + 1) begin
+                // Determine left, center, right for cell i.
+                // For boundary conditions: if i==0, left neighbor = 0, if i==511, right neighbor = 0.
+                // Construct 3-bit pattern as {left, center, right} where:
+                //   left = state[i-1] (or 0 if i==0)
+                //   center = state[i]
+                //   right = state[i+1] (or 0 if i==511)
+                // Use these bits as an index into the rule lookup table.
+                reg left;
+                reg center;
+                reg right;
+                reg [2:0] pattern;
+                
+                center = state[i];
+                left = (i == 0) ? 1'b0 : state[i-1];
+                right = (i == 511) ? 1'b0 : state[i+1];
+
+                pattern = {left, center, right};
+                // Assign next state for cell i based on rule lookup
+                state[i] <= rule[pattern];
+            end
+        end
+    end
+
+    assign q = state;
+
+endmodule

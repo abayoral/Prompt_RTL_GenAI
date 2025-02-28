@@ -1,0 +1,211 @@
+module float_multi(
+    input         clk,
+    input         rst,
+    input  [31:0] a,
+    input  [31:0] b,
+    output reg [31:0] z
+);
+
+  // Cycle counter to sequence operations (0 to 6)
+  reg [2:0] counter;
+
+  // Component extraction registers
+  reg [23:0] a_mantissa, b_mantissa, z_mantissa; // 24-bit with implicit bit if normalized
+  reg [9:0]  a_exponent, b_exponent, z_exponent;   // 10-bit to allow extra bits in arithmetic
+  reg        a_sign, b_sign, z_sign;
+
+  // For effective exponent computation (handling denormals as having exponent 1)
+  reg [7:0] exp_a_eff, exp_b_eff;
+
+  // Intermediate calculation registers
+  reg [49:0] product;  // 50-bit register to hold full precision product
+  reg        guard_bit, round_bit, sticky;
+
+  // Special-case handling
+  reg        special_case;
+  reg [31:0] special_result;
+
+  // A temporary rounding sum
+  reg [23:0] rounded_mantissa;
+  reg        carry_round;
+
+  // Combinational function for sticky OR of many bits
+  function automatic sticky_or;
+    input [19:0] bits;
+    integer i;
+    begin
+      sticky_or = 1'b0;
+      for (i = 0; i < 20; i = i + 1)
+        if (bits[i])
+          sticky_or = 1'b1;
+    end
+  endfunction
+
+  // Main sequential process
+  always @(posedge clk) begin
+    if(rst) begin
+      // Initialization Phase: clear registers and counter
+      counter      <= 3'd0;
+      a_mantissa   <= 24'd0;
+      b_mantissa   <= 24'd0;
+      z_mantissa   <= 24'd0;
+      a_exponent   <= 10'd0;
+      b_exponent   <= 10'd0;
+      z_exponent   <= 10'd0;
+      a_sign       <= 1'b0;
+      b_sign       <= 1'b0;
+      z_sign       <= 1'b0;
+      product      <= 50'd0;
+      guard_bit    <= 1'b0;
+      round_bit    <= 1'b0;
+      sticky       <= 1'b0;
+      special_case <= 1'b0;
+      special_result <= 32'd0;
+      z <= 32'd0;
+    end else begin
+      case(counter)
+        3'd0: begin
+          // Cycle 1: Input Processing Phase: extract components from a and b.
+
+          // Extract sign bits
+          a_sign <= a[31];
+          b_sign <= b[31];
+
+          // Extract exponent bits.
+          // For an IEEE 754 float, exponent is in bits [30:23].
+          // For denormal numbers (exponent == 0), effective exponent is taken as 1.
+          if(a[30:23] == 8'd0) begin
+            a_exponent <= {2'b00, 8'd0};  // Save raw exponent as 0
+            exp_a_eff  <= 8'd1;
+          end else begin
+            a_exponent <= {2'b00, a[30:23]};  // expand to 10 bits
+            exp_a_eff  <= a[30:23];
+          end
+
+          if(b[30:23] == 8'd0) begin
+            b_exponent <= {2'b00, 8'd0};
+            exp_b_eff  <= 8'd1;
+          end else begin
+            b_exponent <= {2'b00, b[30:23]};
+            exp_b_eff  <= b[30:23];
+          end
+
+          // Extract mantissas.
+          // For normalized numbers, add the implicit 1.
+          // For denormals (exponent==0), no implicit 1.
+          if(a[30:23] == 8'd0)
+            a_mantissa <= {1'b0, a[22:0]};
+          else
+            a_mantissa <= {1'b1, a[22:0]};
+
+          if(b[30:23] == 8'd0)
+            b_mantissa <= {1'b0, b[22:0]};
+          else
+            b_mantissa <= {1'b1, b[22:0]};
+
+          counter <= counter + 1;
+        end
+
+        3'd1: begin
+          // Cycle 2: Special Case Handling Phase.
+          // Detect if either operand is NaN or Infinity. 
+          // For IEEE 754, exponent field of 255 (8'hFF) indicates such cases.
+          if ((a[30:23] == 8'hFF) || (b[30:23] == 8'hFF)) begin
+            special_case <= 1'b1;
+            // If either input is NaN or if multiplying zero by infinity, then result is NaN.
+            // Here we assign a canonical quiet NaN value.
+            special_result <= 32'h7FC00000;
+          end else begin
+            special_case <= 1'b0;
+          end
+
+          counter <= counter + 1;
+        end
+
+        3'd2: begin
+          // Cycle 3: Normalization Phase (for the operands' exponents).
+          // Compute the preliminary exponent result.
+          // For multiplication, the effective exponent is: exp_a_eff + exp_b_eff - bias (127).
+          z_exponent <= {2'b00, (exp_a_eff + exp_b_eff)} - 10'd127;
+          counter <= counter + 1;
+        end
+
+        3'd3: begin
+          // Cycle 4: Multiplication Phase.
+          // Multiply the 24-bit mantissas.
+          // The product of two 24-bit numbers is up to 48 bits. We store it in a 50-bit register.
+          product <= a_mantissa * b_mantissa;
+          // Compute sign of the product.
+          z_sign <= a_sign ^ b_sign;
+          counter <= counter + 1;
+        end
+
+        3'd4: begin
+          // Cycle 5: Rounding and Adjustment Phase.
+          // IEEE multiplication of two normalized numbers gives a product in [2,4) if both inputs were normalized.
+          // We need to normalize the product so that the leading bit (implicit bit) is 1.
+          if(product[47] == 1'b1) begin
+            // If most significant bit is 1, then we have an extra bit (value >=2).
+            // For the final 24-bit mantissa, we take bits [46:23].
+            z_mantissa <= product[46:23];
+            // Set rounding control bits.
+            guard_bit <= product[22];
+            round_bit <= product[21];
+            sticky    <= |(product[20:0]);
+          end else begin
+            // Otherwise, shift left by one to normalize.
+            z_mantissa <= product[45:22]; // shifted left by 1 bit
+            guard_bit <= product[21];
+            round_bit <= product[20];
+            sticky    <= |(product[19:0]);
+            // Adjust the exponent since we shifted left.
+            z_exponent <= z_exponent - 10'd1;
+          end
+
+          // Rounding: perform round-to-nearest-even.
+          if (guard_bit && (round_bit || sticky || z_mantissa[0])) begin
+            rounded_mantissa = z_mantissa + 24'd1;
+            // Handle carry from rounding that might increase the bitwidth.
+            if(rounded_mantissa[23] == 1'b1) begin
+              // If rounding overflows into the implicit bit, shift right and increment exponent.
+              z_mantissa <= rounded_mantissa >> 1;
+              z_exponent <= z_exponent + 10'd1;
+            end else begin
+              z_mantissa <= rounded_mantissa;
+            end
+          end
+          counter <= counter + 1;
+        end
+
+        3'd5: begin
+          // Cycle 6: Output Generation Phase.
+          if(special_case) begin
+            // If a special case was detected, output the special result.
+            z <= special_result;
+          end else begin
+            // Check for exponent overflow and underflow.
+            // For IEEE single-precision, the maximum biased exponent (not counting reserved infinity)
+            // is 254 (8'hFE) and underflow results in 0.
+            if(z_exponent[9:2] > 8'd254) begin
+              // Overflow: set result to infinity.
+              z <= {z_sign, 8'hFF, 23'd0};
+            end else if(z_exponent[9:2] < 8'd1) begin
+              // Underflow: result too small, output zero.
+              z <= {z_sign, 8'd0, 23'd0};
+            end else begin
+              // Normal case: drop the implicit bit in the mantissa.
+              z <= {z_sign, z_exponent[7:0], z_mantissa[22:0]};
+            end
+          end
+          counter <= counter + 1;
+        end
+
+        default: begin
+          // After finishing output generation, reset counter to restart for next operation.
+          counter <= 3'd0;
+        end
+      endcase
+    end
+  end
+
+endmodule

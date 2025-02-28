@@ -1,0 +1,52 @@
+module fixed_point_subtractor #(parameter Q = 8, parameter N = 16) (
+    input  [N-1:0] a,
+    input  [N-1:0] b,
+    output [N-1:0] c
+);
+
+    // Internal register to hold the result.
+    reg [N-1:0] res;
+    
+    // Extract the sign bits; assume MSB is the sign.
+    wire a_sign = a[N-1];
+    wire b_sign = b[N-1];
+    
+    // Compute the absolute values of a and b.
+    wire [N-1:0] abs_a = a_sign ? (~a + 1'b1) : a;
+    wire [N-1:0] abs_b = b_sign ? (~b + 1'b1) : b;
+    
+    // Use an extended signed register to perform intermediate arithmetic.
+    // One extra bit is used to capture any overflow of addition/subtraction.
+    reg signed [N:0] result_ext;
+    
+    always @(*) begin
+        // Case 1: Both inputs have the same sign.
+        // In this case, we subtract directly. Two's complement subtraction correctly
+        // computes negative results when, for example, a < b even though both are positive.
+        if (a_sign == b_sign) begin
+            result_ext = $signed(a) - $signed(b);
+        end 
+        else begin
+            // Case 2: The inputs have different signs.
+            // For a positive and b negative, subtraction becomes an addition of magnitudes.
+            // For a negative and b positive, the magnitudes are added and the result is negative.
+            if (!a_sign && b_sign) begin
+                // a is positive, b is negative: a - b = a + |b|.
+                result_ext = $signed(a) + $signed(abs_b);
+            end 
+            else begin
+                // a is negative and b is positive: a - b = -(|a| + b).
+                result_ext = -($signed(abs_a) + $signed(b));
+            end
+        end
+        
+        // If the computed result is exactly zero, explicitly force the sign bit to zero.
+        if (result_ext == 0)
+            res = {N{1'b0}};
+        else
+            res = result_ext[N-1:0];
+    end
+
+    assign c = res;
+
+endmodule

@@ -1,0 +1,30 @@
+You are assigned the role of a proficient Verilog designer with a clear objective: to create and implement a digital module known as the "Triangle Wave Signal Generator." The purpose of this module is to generate a waveform that exhibits a periodic oscillatory behavior in which the signal's value increases from a defined minimum to a maximum peak, then decreases back to the starting value in a cyclic process. In this particular design, you will work with a signal named "wave," which is constrained to a width of 5 bits. The expected behavior is as follows: the "wave" signal should count upwards from 0 until it reaches 31, then it should count downwards back to 0, and continue this cycle repeatedly.
+
+Below are the expanded design requirements and details you need to consider:
+
+1. Module Details:
+   - Name the module "signal_generator."
+
+2. Inputs:
+   - clk: This clock input is critical for synchronizing the operations within the module. All changes, updates, or transitions in the waveform will occur on the rising edge of this clock.
+   - rst_n: This input is an active-low reset signal. When rst_n is at a low logic level (0), it should force the module into a reset state, which clears and initializes internal registers. When rst_n is high (logic 1), the module should operate normally.
+
+3. Output:
+   - wave: The main output signal is "wave," which is a 5-bit digital signal. This signal displays the current magnitude of the triangle waveform based on the design's operational logic.
+
+4. Implementation Strategy:
+   - Use two key registers within the module:
+     a. A register labeled "state" that will manage the current mode of operation for the waveform—specifically, whether the waveform is in an "incrementing" mode or a "decrementing" mode.
+     b. A register "wave", which holds the current numerical value of the waveform.
+   - The module's behavior should be governed by an always block. This block is sensitive to both the rising edge of the clock (posedge clk) and the falling edge of the active-low reset signal (negedge rst_n).
+   - Reset Functionality: When a low reset condition is detected (i.e., when ~rst_n is true), both the "state" and "wave" registers must be initialized to 0, ensuring a consistent starting point.
+
+5. Waveform Generation and State Transition Logic:
+   - During normal operation, the "state" and "wave" registers should update as follows:
+     a. When the "state" register is 0 (indicating an incrementing mode), the "wave" register should increase by 1 at every clock cycle.
+     b. Once the "wave" register reaches its maximum value of 31, the module should change the "state" from 0 to 1, switching the operation to decrement mode.
+     c. When the "state" is 1 (decrementing mode), the "wave" register should decrease by 1 at every clock cycle.
+     d. If the "wave" register value drops to 0, the "state" should revert back to 0, indicating readiness to resume the incrementing mode.
+   - This logic should ensure that the module continuously produces the triangle waveform by oscillating the "wave" value between 0 and 31 in an ongoing loop.
+
+With all the above specifications and clarifications in mind, your task is to construct a complete Verilog code implementation for the "signal_generator" module that adheres precisely to these requirements. Remember, do not include any solution or code as part of your response; focus solely on understanding and elaborating on the problem statement.

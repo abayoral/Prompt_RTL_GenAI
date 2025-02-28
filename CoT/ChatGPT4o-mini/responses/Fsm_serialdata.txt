@@ -1,0 +1,89 @@
+```
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg [7:0] out_byte,
+    output reg done
+); 
+
+    // State encoding
+    typedef enum reg [2:0] {
+        IDLE,
+        START_BIT,
+        DATA_BITS,
+        STOP_BIT,
+        WAIT_FOR_STOP
+    } state_t;
+
+    state_t current_state, next_state;
+    reg [3:0] bit_count; // 4 bits to count up to 8 data bits
+    reg [7:0] shift_reg; // Register to hold received bits
+
+    // State transition logic
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+            bit_count <= 0;
+            shift_reg <= 0;
+            done <= 0;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+
+    // Next state logic
+    always @(*) begin
+        case (current_state)
+            IDLE: begin
+                if (in == 0) // Start bit detected
+                    next_state = START_BIT;
+                else
+                    next_state = IDLE;
+            end
+            START_BIT: begin
+                next_state = DATA_BITS; // Move to data bits
+            end
+            DATA_BITS: begin
+                if (bit_count < 8)
+                    next_state = DATA_BITS;
+                else
+                    next_state = STOP_BIT; // Move to stop bit after 8 data bits
+            end
+            STOP_BIT: begin
+                if (in == 1) begin
+                    out_byte = shift_reg; // Output the received byte
+                    done = 1;  // Indicate done
+                    next_state = IDLE; // Return to idle
+                end else begin
+                    next_state = WAIT_FOR_STOP; // Wait for valid stop bit
+                end
+            end
+            WAIT_FOR_STOP: begin
+                if (in == 1) begin
+                    out_byte = shift_reg; // Output the received byte
+                    done = 1;  // Indicate done
+                    next_state = IDLE; // Return to idle
+                end else begin
+                    next_state = WAIT_FOR_STOP; // Stay in wait for stop
+                end
+            end
+            default: next_state = IDLE;
+        endcase
+    end
+
+    // Data shifting
+    always @(posedge clk) begin
+        if (current_state == DATA_BITS) begin
+            shift_reg <= {in, shift_reg[7:1]}; // Shift in new bit
+            bit_count <= bit_count + 1;
+        end else if (current_state == START_BIT) begin
+            bit_count <= 0; // Reset bit count after start bit
+        end else if (current_state == STOP_BIT || current_state == WAIT_FOR_STOP) begin
+            bit_count <= 0; // Reset bit count
+            done <= 0; // Reset done signal
+        end
+    end
+
+endmodule
+```

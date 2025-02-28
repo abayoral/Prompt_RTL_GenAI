@@ -1,0 +1,166 @@
+module radix2_div(
+    input         clk,
+    input         rst,
+    input         sign,         // 1: signed division, 0: unsigned
+    input  [7:0]  dividend,     // dividend operand
+    input  [7:0]  divisor,      // divisor operand
+    input         opn_valid,    // new operation valid
+    output reg    res_valid,    // result valid flag
+    output reg [15:0] result    // {remainder[7:0], quotient[7:0]}
+);
+
+  // state encoding
+  localparam IDLE = 2'd0,
+             RUN  = 2'd1,
+             DONE = 2'd2;
+             
+  reg [1:0] state;
+  reg [3:0] cnt;  // counts from 0 to 8 iterations (using 4 bits)
+
+  // Internal registers for division algorithm.
+  // Q holds the quotient in progress.
+  reg [7:0] Q;
+  // A is the accumulator (remainder) plus one extra sign bit.
+  reg signed [8:0] A;  
+
+  // To support signed division, store the absolute values
+  reg [7:0] dividend_abs;
+  reg [7:0] divisor_abs;
+  // Remember the signs of the original operands.
+  reg        dividend_sign;
+  reg        divisor_sign;
+  // Latch the 'sign' control so it persists through the operation.
+  reg        sign_reg;
+
+  // Temporary variables used in the iterative step.
+  reg signed [8:0] shifted_A;
+  reg        [7:0] shifted_Q;
+  reg signed [8:0] sub;
+  reg        [7:0] new_Q;
+  reg signed [8:0] new_A;
+
+  // Temporary variables for final sign correction.
+  reg [7:0] final_quotient;
+  reg [7:0] final_remainder;
+
+  // Main sequential process.
+  always @(posedge clk) begin
+    if (rst) begin
+      state       <= IDLE;
+      res_valid   <= 1'b0;
+      cnt         <= 4'd0;
+      Q           <= 8'd0;
+      A           <= 9'd0;
+      dividend_abs<= 8'd0;
+      divisor_abs <= 8'd0;
+      dividend_sign <= 1'b0;
+      divisor_sign  <= 1'b0;
+      sign_reg    <= 1'b0;
+      result      <= 16'd0;
+    end
+    else begin
+      case (state)
+        IDLE: begin
+          res_valid <= 1'b0;
+          if (opn_valid) begin
+            // Latch the sign mode.
+            sign_reg <= sign;
+            // For a signed division, compute absolute value.
+            if (sign && dividend[7]) begin
+              dividend_abs <= ~dividend + 1;
+              dividend_sign <= 1'b1;
+            end
+            else begin
+              dividend_abs <= dividend;
+              dividend_sign <= 1'b0;
+            end
+
+            if (sign && divisor[7]) begin
+              divisor_abs <= ~divisor + 1;
+              divisor_sign <= 1'b1;
+            end
+            else begin
+              divisor_abs <= divisor;
+              divisor_sign <= 1'b0;
+            end
+
+            // Initialize quotient (Q) with absolute value of dividend.
+            Q <= (sign && dividend[7]) ? (~dividend + 1) : dividend;
+            // Clear accumulator A.
+            A <= 9'd0;
+            cnt <= 4'd0;
+            state <= RUN;
+          end
+        end
+
+        RUN: begin
+          // Perform one iteration of the restoring division algorithm.
+          // Step 1. Shift left the {A, Q} pair by 1 bit.
+          shifted_A = {A[7:0], Q[7]};  // Left-shift A and bring in MSB of Q.
+          shifted_Q = Q << 1;           // Q is shifted left (the LSB becomes 0).
+          
+          // Step 2. Subtract the divisor from the shifted accumulator.
+          // Extend divisor_abs to 9 bits.
+          sub = shifted_A - {1'b0, divisor_abs};
+
+          // Step 3. Decide whether the subtraction result is nonnegative.
+          if (sub[8] == 1'b1) begin
+            // Negative result, so restore A and set quotient bit to 0.
+            new_A = shifted_A; // Restoration: do not accept subtraction
+            new_Q = shifted_Q; // LSB remains 0.
+          end
+          else begin
+            // Subtraction succeeded: update A and set new quotient bit to 1.
+            new_A = sub;
+            // Set the LSB to 1.
+            new_Q = shifted_Q | 8'b0000_0001;
+          end
+
+          // Update A and Q.
+          A <= new_A;
+          Q <= new_Q;
+          cnt <= cnt + 1;
+
+          // If eight iterations are complete, move to DONE.
+          if (cnt == 4'd7) begin
+            state <= DONE;
+          end
+          else begin
+            state <= RUN;
+          end
+        end
+
+        DONE: begin
+          // Compute final result with sign correction if needed.
+          if (sign_reg) begin
+            // For quotient, if the signs of dividend and divisor differ, negate Q.
+            if (dividend_sign ^ divisor_sign)
+              final_quotient = ~Q + 1;
+            else
+              final_quotient = Q;
+
+            // For remainder, the sign follows the dividend.
+            if (dividend_sign)
+              final_remainder = ~A[7:0] + 1;
+            else
+              final_remainder = A[7:0];
+          end
+          else begin
+            final_quotient = Q;
+            final_remainder = A[7:0];
+          end
+
+          result <= {final_remainder, final_quotient};
+          res_valid <= 1'b1;
+
+          // Wait here until opn_valid is deasserted so that the result can be consumed.
+          if (!opn_valid)
+            state <= IDLE;
+        end
+
+        default: state <= IDLE;
+      endcase
+    end
+  end
+
+endmodule

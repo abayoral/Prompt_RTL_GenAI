@@ -1,0 +1,92 @@
+```verilog
+module traffic_light (
+    input wire rst_n,
+    input wire clk,
+    input wire pass_request,
+    output reg [7:0] clock,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+    // State Encoding
+    parameter idle = 2'b00, s1_red = 2'b01, s2_yellow = 2'b10, s3_green = 2'b11;
+    reg [1:0] state, next_state;
+    reg [7:0] cnt;
+    
+    // State transition logic
+    always @ (posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= idle;
+            cnt <= 8'b0;
+        end else begin
+            state <= next_state;
+            if (cnt > 0) cnt <= cnt - 1;
+        end
+    end
+
+    // Counter and state update logic
+    always @ (*) begin
+        next_state = state;
+        case(state)
+            idle: begin
+                cnt = 0; // Reset the counter
+                if (state == s1_red) begin
+                    next_state = s3_green; // Move to green
+                    cnt = 60; // Set up green duration
+                end
+            end
+            s1_red: begin
+                red = 1;
+                yellow = 0;
+                green = 0;
+                cnt = 10; // Red for 10 cycles
+                if (pass_request) begin
+                    // After 50 cycles of green left
+                    if (cnt > 10) begin
+                        cnt = 10; // Reduce remaining green light to 10
+                    end
+                end
+                if (cnt == 0) next_state = s2_yellow;
+            end
+            s2_yellow: begin
+                red = 0;
+                yellow = 1;
+                green = 0;
+                cnt = 5; // Yellow for 5 cycles
+                if (cnt == 0) next_state = s1_red; // Back to red
+            end
+            s3_green: begin
+                red = 0;
+                yellow = 0;
+                green = 1;
+                // Handle pedestrian request in green state
+                if (pass_request && cnt > 10) begin
+                    cnt = 10; // Reduce to 10 cycles if conditions met
+                end
+                if (cnt == 0) next_state = s1_red; // Switch back to red
+            end
+        endcase
+    end
+
+    // Output Logic
+    always @ (*) begin
+        clock = cnt; // Update output clock
+        // Default light outputs as off until chosen in state logic
+        red = 0;
+        yellow = 0;
+        green = 0;
+        case(state)
+            s1_red: begin
+                red = 1;
+            end
+            s2_yellow: begin
+                yellow = 1;
+            end
+            s3_green: begin
+                green = 1;
+            end
+        endcase
+    end
+endmodule
+```

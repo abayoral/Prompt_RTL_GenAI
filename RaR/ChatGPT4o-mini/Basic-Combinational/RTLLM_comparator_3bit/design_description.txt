@@ -1,0 +1,21 @@
+As a professional Verilog designer, you are required to create a specialized module that serves the function of a 3-bit comparator. This module needs to be able to compare two 3-bit binary inputs and provide clear output signals reflecting their relational status. 
+
+### Module Designation:
+You should name the module `comparator_3bit`, as this will clearly indicate its functionality and make it easily identifiable within your project.
+
+### Input Parameters:
+The module must accept two input operands, both of which are 3-bit binary vectors:
+- The first operand will be referred to as 'A', represented by the notation `A[2:0]`. This input is to be treated as the first binary number in the comparison operation.
+- The second operand will be named 'B', designated as `B[2:0]`. This input is to be treated as the second binary number for comparison purposes.
+
+### Output Parameters:
+Upon processing the input values, the module should produce three distinct output signals, each one being a single bit:
+- The output labeled `A_greater` should yield a high signal (logic level 1) if the binary value of 'A' exceeds that of 'B'.
+- The output labeled `A_equal` should produce a high signal (logic level 1) only in the event that the binary values of 'A' and 'B' are equal.
+- The output labeled `A_less` should result in a high signal (logic level 1) under the condition that the binary value of 'A' is less than that of 'B'.
+
+### Functional Logic:
+Within the module, you are required to implement combinational logic that effectively facilitates the comparison between the two inputs, 'A' and 'B'. This logic will evaluate the two binary numbers to determine whether 'A' is greater than, equal to, or less than 'B'. Importantly, the outputs must be designed to be mutually exclusive; at any point in time, precisely one of the outputs (`A_greater`, `A_equal`, `A_less`) should be active (set to high), accurately reflecting the relational status derived from the comparison of 'A' and 'B'.
+
+### Objective:
+Your task is to construct a comprehensive Verilog code implementation that encapsulates the above specifications for the `comparator_3bit` module. As you proceed, make certain to adhere to best practices in Verilog coding, ensuring clarity and precision in defining the module, its input and output ports, and the operational logic necessary to carry out the required comparisons between the two 3-bit binary numbers.

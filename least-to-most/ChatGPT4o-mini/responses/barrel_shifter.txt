@@ -1,0 +1,31 @@
+```
+module barrel_shifter (
+    input  [7:0] in,
+    input  [2:0] ctrl,
+    output [7:0] out
+);
+
+    wire [7:0] shift1, shift2, shift4;
+
+    // Shift by 1 position
+    assign shift1 = {in[0], in[7:1]};  // Rotate left by 1
+
+    // Shift by 2 positions
+    assign shift2 = {in[1:0], in[7:2]}; // Rotate left by 2
+
+    // Shift by 4 positions
+    assign shift4 = {in[3:0], in[7:4]}; // Rotate left by 4
+
+    // MUX for 4-bit shift control
+    wire [7:0] mux4_out;
+    assign mux4_out = ctrl[2] ? shift4 : in;
+
+    // MUX for 2-bit shift control
+    wire [7:0] mux2_out;
+    assign mux2_out = ctrl[1] ? shift2 : mux4_out;
+
+    // MUX for 1-bit shift control
+    assign out = ctrl[0] ? shift1 : mux2_out;
+
+endmodule
+```

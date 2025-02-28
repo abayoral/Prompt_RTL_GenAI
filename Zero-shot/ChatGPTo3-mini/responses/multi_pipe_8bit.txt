@@ -1,0 +1,70 @@
+module multi_pipe_8bit(
+    input         clk,
+    input         rst_n,
+    input         mul_en_in,
+    input  [7:0]  mul_a,
+    input  [7:0]  mul_b,
+    output        mul_en_out,
+    output [15:0] mul_out
+);
+
+  // Pipeline register for inputs and enable signal (Stage 1)
+  reg [7:0]  mul_a_reg;
+  reg [7:0]  mul_b_reg;
+  reg        mul_en_reg1;
+  
+  // Pipeline register for final multiplication result and enable (Stage 3)
+  reg [15:0] mul_out_reg;
+  reg        mul_en_reg2;
+
+  // Stage 1: Capture inputs when multiplication enable is high.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      mul_a_reg   <= 8'b0;
+      mul_b_reg   <= 8'b0;
+      mul_en_reg1 <= 1'b0;
+    end else begin
+      // Only capture new inputs when enable is high.
+      if (mul_en_in) begin
+        mul_a_reg   <= mul_a;
+        mul_b_reg   <= mul_b;
+        mul_en_reg1 <= mul_en_in;
+      end else begin
+        // Deassert the enable if there is no new request.
+        mul_en_reg1 <= 1'b0;
+      end
+    end
+  end
+
+  // Stage 2: Generate partial products and compute the partial sum
+  // Each bit of the multiplier selects a shifted version of the multiplicand.
+  // When the corresponding bit of the multiplier is 0, the partial product is 0.
+  wire [15:0] temp0 = (mul_b_reg[0]) ? {8'b0, mul_a_reg}            : 16'b0;
+  wire [15:0] temp1 = (mul_b_reg[1]) ? {{7{1'b0}}, mul_a_reg, 1'b0}    : 16'b0;
+  wire [15:0] temp2 = (mul_b_reg[2]) ? {{6{1'b0}}, mul_a_reg, 2'b0}     : 16'b0;
+  wire [15:0] temp3 = (mul_b_reg[3]) ? {{5{1'b0}}, mul_a_reg, 3'b0}     : 16'b0;
+  wire [15:0] temp4 = (mul_b_reg[4]) ? {{4{1'b0}}, mul_a_reg, 4'b0}     : 16'b0;
+  wire [15:0] temp5 = (mul_b_reg[5]) ? {{3{1'b0}}, mul_a_reg, 5'b0}     : 16'b0;
+  wire [15:0] temp6 = (mul_b_reg[6]) ? {{2{1'b0}}, mul_a_reg, 6'b0}     : 16'b0;
+  wire [15:0] temp7 = (mul_b_reg[7]) ? {1'b0, mul_a_reg, 7'b0}          : 16'b0;
+
+  // Sum all partial products together.
+  wire [15:0] sum_partial = temp0 + temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7;
+
+  // Stage 3: Latch the final product and pipeline the enable signal.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      mul_out_reg  <= 16'b0;
+      mul_en_reg2  <= 1'b0;
+    end else begin
+      mul_out_reg <= sum_partial;
+      mul_en_reg2 <= mul_en_reg1;
+    end
+  end
+
+  // Output assignment: Drive outputs based on the pipelined enable signal.
+  // If the enable is active, output the computed product; otherwise, output 0.
+  assign mul_out    = (mul_en_reg2) ? mul_out_reg : 16'b0;
+  assign mul_en_out = mul_en_reg2;
+
+endmodule

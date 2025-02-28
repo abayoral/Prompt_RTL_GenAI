@@ -1,0 +1,17 @@
+```verilog
+module constant_high_output (
+    output reg out
+);
+
+// Initialize the output to logic high
+initial begin
+    out = 1'b1;  // Set the output to 1 (high state)
+end
+
+// Continuously drive the output high
+always begin
+    #0; // No delay to keep the output at a constant high
+end
+
+endmodule
+```

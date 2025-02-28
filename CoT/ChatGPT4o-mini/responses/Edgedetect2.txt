@@ -1,0 +1,16 @@
+```
+module top_module (
+    input clk,
+    input [7:0] in,
+    output reg [7:0] anyedge
+);
+
+    reg [7:0] in_d; // Delayed input
+
+    always @(posedge clk) begin
+        anyedge <= (in & ~in_d); // Detect rising edge by comparing current and previous state
+        in_d <= in; // Update delayed input to current input
+    end
+
+endmodule
+```

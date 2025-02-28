@@ -1,0 +1,25 @@
+```verilog
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out  
+); 
+
+    wire ab, ab_not, cd, cd_not, a_not, b_not, c_not, d_not;
+
+    assign a_not = ~a;
+    assign b_not = ~b;
+    assign c_not = ~c;
+    assign d_not = ~d;
+
+    assign ab = a & b;
+    assign ab_not = a_not & b_not;
+    assign cd = c & d;
+    assign cd_not = c_not & d_not;
+
+    assign out = (cd | (ab & c_not)) | (ab_not & d) | (b & c);
+
+endmodule
+```

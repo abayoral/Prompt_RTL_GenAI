@@ -1,0 +1,48 @@
+module top_module ( 
+    input clk, 
+    input [7:0] d, 
+    input [1:0] sel, 
+    output reg [7:0] q 
+);
+
+    // Internal wires connecting the stages of the shift register.
+    wire [7:0] q1;
+    wire [7:0] q2;
+    wire [7:0] q3;
+
+    // Instantiate three 8-bit D flip-flop arrays (my_dff8).
+    my_dff8 stage0 (
+        .clk(clk),
+        .d(d),
+        .q(q1)
+    );
+    
+    my_dff8 stage1 (
+        .clk(clk),
+        .d(q1),
+        .q(q2)
+    );
+    
+    my_dff8 stage2 (
+        .clk(clk),
+        .d(q2),
+        .q(q3)
+    );
+
+    // 4-to-1 multiplexer implemented with a combinational always block.
+    // The multiplexer selects the value:
+    // sel==0 : output d (no delay)
+    // sel==1 : output after one cycle (q1)
+    // sel==2 : output after two cycles (q2)
+    // sel==3 : output after three cycles (q3)
+    always @(*) begin
+        case (sel)
+            2'b00: q = d;
+            2'b01: q = q1;
+            2'b10: q = q2;
+            2'b11: q = q3;
+            default: q = 8'b0;
+        endcase
+    end
+
+endmodule

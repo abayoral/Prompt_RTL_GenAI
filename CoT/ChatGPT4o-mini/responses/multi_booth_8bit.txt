@@ -1,0 +1,60 @@
+```
+module multi_booth_8bit (
+    input wire clk,
+    input wire reset,
+    input wire [7:0] a,
+    input wire [7:0] b,
+    output reg [15:0] p,
+    output reg rdy
+);
+    reg [15:0] multiplicand;
+    reg [15:0] multiplier;
+    reg [4:0] ctr;
+    reg [1:0] state; // 00: Idle, 01: Multiply, 10: Done
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            p <= 16'b0;
+            rdy <= 0;
+            ctr <= 0;
+            state <= 0;
+            multiplier <= {{8{a[7]}}, a}; // Sign-extend a
+            multiplicand <= {{8{b[7]}}, b}; // Sign-extend b
+        end else begin
+            case (state)
+                0: begin // Idle
+                    if (ctr == 0) begin
+                        multiplier <= {{8{a[7]}}, a}; // Sign-extend a
+                        multiplicand <= {{8{b[7]}}, b}; // Sign-extend b
+                        p <= 16'b0;
+                        rdy <= 0;
+                        ctr <= 0;
+                        state <= 1; // Move to Multiply state
+                    end
+                end
+                
+                1: begin // Multiply
+                    if (ctr < 16) begin
+                        // Booth's algorithm checking last bit of multiplier
+                        case (multiplier[1:0])
+                            2'b01: p <= p + multiplicand; // Add multiplicand to product
+                            2'b10: p <= p - multiplicand; // Subtract multiplicand from product
+                        endcase
+                        // Shift
+                        multiplicand <= multiplicand << 1;
+                        multiplier <= {multiplier[14:0], 1'b0}; // Shift multiplier to the right
+                        ctr <= ctr + 1; // Increment counter
+                    end else begin
+                        state <= 2; // Transition to Done state
+                    end
+                end
+                
+                2: begin // Done
+                    rdy <= 1; // Indicate multiplying is done
+                    state <= 0; // Go back to idle
+                end
+            endcase
+        end
+    end
+endmodule
+```

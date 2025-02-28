@@ -1,0 +1,25 @@
+Consider the following detailed design challenge:
+
+You are required to develop a digital logic module using Verilog, a widely adopted hardware description language for modeling and synthesizing electronic systems. The module you create must operate as a 64-bit subtractor capable of detecting overflow conditions during the arithmetic operation. Your module will be named "sub_64bit" and must handle the following tasks:
+
+1. Inputs and Outputs:
+   - The module should accept two 64-bit input data lines, designated as "A" and "B". Each input represents a signed integer value encoded in 64 bits.
+   - The primary operation is to subtract input B from input A, effectively computing the expression A - B.
+   - The module should produce two outputs:
+     a. A "result" port, which is a 64-bit wide output that holds the subtraction result.
+     b. An "overflow" flag, which is a 1-bit output signaling whether an arithmetic overflow has occurred during the subtraction.
+
+2. Overflow Detection:
+   - Your design must include logic to detect overflow based on the sign bits of the inputs and the computed result.
+   - Specifically, the overflow condition occurs in the following scenarios:
+     a. When a positive (non-negative) number is subtracted by a negative number but the resulting output is negative, this indicates a positive overflow.
+     b. Conversely, when a negative number subtracted by a positive number produces a positive result, this indicates a negative overflow.
+   - If either of these conditions is detected during execution, the overflow output must be set to 1. Otherwise, if the subtraction result fits within the signed 64-bit range without any sign inconsistency, the overflow flag should remain at 0.
+
+3. Implementation Guidance:
+   - In your Verilog module, structure the code to clearly implement both the arithmetic subtraction and the corresponding overflow check.
+   - Document and outline within your code how the subtraction operation is performed and how each overflow condition is explicitly detected based on the sign analysis.
+
+Your task is to write a complete Verilog module that embodies this functionality. Explain the architecture and logic flow of your design in a way that leaves no ambiguity concerning how the subtraction and overflow detection are achieved. Remember, the focus is solely on designing the module according to these specifications, with proper delineation for both the arithmetic operation and the overflow checking mechanism.
+
+Do not provide any code solutions or answers—only ensure that the problem statement is clear and comprehensive.

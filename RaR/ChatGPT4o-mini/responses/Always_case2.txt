@@ -1,0 +1,18 @@
+```verilog
+module priority_encoder (
+    input wire [3:0] in,
+    output reg [1:0] out
+);
+    
+    always @* begin
+        casez (in)
+            4'b1???: out = 2'b11;  // Input 3 high
+            4'b01??: out = 2'b10;  // Input 2 high
+            4'b001?: out = 2'b01;  // Input 1 high
+            4'b0001: out = 2'b00;  // Input 0 high
+            default: out = 2'b00;   // All inputs low
+        endcase
+    end
+
+endmodule
+```

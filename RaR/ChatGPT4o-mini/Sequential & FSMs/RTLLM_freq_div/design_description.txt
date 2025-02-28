@@ -1,0 +1,28 @@
+As a proficient designer working with Verilog, you are required to conceptualize and implement a frequency divider module that systematically generates several output clock signals derived from a given input clock. Specifically, this input clock operates at a frequency of 100MHz and the module must produce three distinct output clock frequencies: 50MHz, 10MHz, and 1MHz. 
+
+To guide you in your design, here are the comprehensive requirements and specifications for the module:
+
+**Module Identification:**
+- The module should be designated as `freq_div`.
+
+**Input Ports:**
+- The module must feature an input port named `CLK_in`, which serves as the primary clock signal with a frequency of 100MHz.
+- It should also include a reset input port, `RST`, whose role is to initialize all output clock signals and any counters when it is asserted (active).
+
+**Output Ports:**
+- The outputs must consist of three distinct clock signals:
+  - `CLK_50`: This output must yield a clock signal that represents half the frequency of the input clock, specifically at 50MHz.
+  - `CLK_10`: This output is expected to deliver a clock signal at one-tenth the frequency of the input clock, equating to 10MHz.
+  - `CLK_1`: Lastly, this output should generate a clock signal at one-hundredth the frequency of the input, resulting in a frequency of 1MHz.
+
+**Implementation Details:**
+1. **Generation of CLK_50:**
+   - You'll need to devise a mechanism that toggles the `CLK_50` output every other positive edge of the `CLK_in` signal, effectively achieving a frequency division by two. Importantly, if the `RST` signal is asserted, `CLK_50` should immediately reset to a value of 0.
+
+2. **Generation of CLK_10:**
+   - For the `CLK_10` signal, a counter designated as `cnt_10` must be implemented. This counter will tally the clock cycles of the `CLK_in` signal. When this counter accumulates a value of four, you should toggle the `CLK_10` output and reset the counter to zero. Similar to the previous output, an asserted `RST` signal should reset both `CLK_10` and `cnt_10` to zero.
+
+3. **Generation of CLK_1:**
+   - This output will be derived from another counter, `cnt_100`, which will increment with each cycle of the input clock `CLK_in`. Upon reaching a count of 49, you should toggle the `CLK_1` signal and subsequently reset this counter. Again, when the `RST` signal is active, both `CLK_1` and `cnt_100` should reset to zero.
+
+Given these comprehensive design requirements and operational specifications, please provide the complete Verilog code encapsulating this logic. Make sure that the code adheres to established best practices in digital design, as well as employs efficient coding techniques for counters and flip-flops within the context of hardware description language.

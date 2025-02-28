@@ -1,0 +1,7 @@
+./simv -l run.log
+Starting ROM Testbench...
+=========== Test Summary ===========
+Total Tests Run:           4
+Total Failures:           0
+=========== Your Design Passed ===========
+testbench.v:65: $finish called at 40 (1s)

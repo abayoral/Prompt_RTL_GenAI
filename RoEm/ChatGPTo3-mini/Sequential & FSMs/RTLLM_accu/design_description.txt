@@ -1,0 +1,23 @@
+You are being asked to create a Verilog module that is designed to accumulate data received in a serial manner. This involves handling input and output data in a structured and synchronized sequence, as specified in the requirements listed below.
+
+Module Objective:
+- The goal is to design a Verilog module named `accu` that accepts serial input data and outputs the sum of every four consecutive 8-bit input values. The key challenge is to manage the accumulation process effectively, considering synchronization and valid signaling.
+
+Input Ports:
+1. `clk`: This is the clock input, which is essential for timing and synchronization of the module operations. Each operation should be aligned with the rising or falling edge of the clock, as customary in digital design.
+2. `rst_n`: This is an active-low reset signal. When driven low, it resets the internal state of the module. The implementation should ensure the module can return to a known initial state when this line is asserted.
+3. `data_in[7:0]`: An 8-bit wide input bus through which data is fed into the module. You will accumulate these values over time, so the design needs to correctly handle the transition from one value to the next.
+4. `valid_in`: This signal indicates whether the incoming data at `data_in` is valid. It must be checked before processing any input to avoid capturing erroneous data.
+
+Output Ports:
+1. `valid_out`: This output indicates when the module has successfully accumulated four input values and the resultant sum is ready at `data_out`. It should be asserted (set to high) for exactly one clock cycle to signal the validity of `data_out`.
+2. `data_out[9:0]`: A 10-bit wide output that provides the accumulated sum of four consecutive input values. The width of this bus is larger than the input to accommodate the maximum possible sum of four 8-bit numbers.
+
+Functional Requirements:
+- Initiate accumulation when `valid_in` is high, ensuring that only valid data contributes to the running total.
+- Maintain a counter or similar mechanism to track the number of valid inputs processed. 
+- Once four valid inputs are accumulated, compute the result and present it on `data_out` while simultaneously asserting `valid_out` for exactly one clock cycle.
+- If `valid_in` is not asserted, disregard any data on `data_in` and ensure internal accumulators or counters are not erroneously updated.
+- Handle reset (`rst_n`) by clearing any stored values or counters, making sure the module is ready to start accumulating anew once normal operation resumes.
+
+Ensure the implementation respects typical digital design practices, maintaining efficiency and reliability, while also addressing corner cases such as incomplete input groups due to reset or signal interruptions.

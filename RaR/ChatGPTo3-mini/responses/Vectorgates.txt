@@ -1,0 +1,21 @@
+module top_module( 
+    input  [2:0] a,
+    input  [2:0] b,
+    output [2:0] out_or_bitwise,
+    output       out_or_logical,
+    output [5:0] out_not
+);
+    // Compute bitwise OR of the two 3-bit input vectors
+    assign out_or_bitwise = a | b;
+    
+    // Compute logical OR of the two input vectors
+    // This outputs 1 if either 'a' or 'b' is non-zero, otherwise 0
+    assign out_or_logical = (a || b);
+    
+    // Compute the bitwise inversion of each input vector and assign to out_not
+    // Lower 3 bits (bits 2 downto 0) hold the inversion of 'a'
+    assign out_not[2:0] = ~a;
+    // Upper 3 bits (bits 5 downto 3) hold the inversion of 'b'
+    assign out_not[5:3] = ~b;
+    
+endmodule

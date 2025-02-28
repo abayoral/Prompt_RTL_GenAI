@@ -1,0 +1,46 @@
+module instr_reg(
+    input clk,
+    input rst,             // active low reset
+    input [1:0] fetch,     // instruction source control: 2'b01 for register; 2'b10 for RAM/ROM
+    input [7:0] data,      // new instruction data input
+    output [2:0] ins,      // high-order 3 bits of current instruction (from ins_p1)
+    output [4:0] ad1,      // lower 5 bits of current instruction (from ins_p1)
+    output [7:0] ad2       // complete data from second source (from ins_p2)
+);
+
+  // Two registers to capture instructions from different sources.
+  reg [7:0] ins_p1;
+  reg [7:0] ins_p2;
+  
+  // Synchronous block for capturing instructions and reset logic.
+  always @(posedge clk) begin
+    if (!rst) begin
+      // Active low reset: Initialize registers to zero.
+      ins_p1 <= 8'b0;
+      ins_p2 <= 8'b0;
+    end
+    else begin
+      // Depending on the fetch control signal, capture the instruction.
+      if (fetch == 2'b01) begin
+        // If fetching from register.
+        ins_p1 <= data;
+      end
+      else if (fetch == 2'b10) begin
+        // If fetching from RAM/ROM.
+        ins_p2 <= data;
+      end
+      // If fetch is neither 2'b01 nor 2'b10, retain the current values.
+    end
+  end
+  
+  // Outputs derived from the stored instructions.
+  // 'ins' represents the opcode taken as the high 3 bits of ins_p1.
+  assign ins = ins_p1[7:5];
+  
+  // 'ad1' represents the lower 5 bits of ins_p1 (e.g., register address).
+  assign ad1 = ins_p1[4:0];
+  
+  // 'ad2' reflects the complete 8-bit data from the second source (ins_p2).
+  assign ad2 = ins_p2;
+
+endmodule

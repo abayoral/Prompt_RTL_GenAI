@@ -1,0 +1,91 @@
+```
+module traffic_light (
+    input wire rst_n,
+    input wire clk,
+    input wire pass_request,
+    output reg [7:0] clock,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+    // Parameters for traffic light states
+    parameter idle = 2'b00, s1_red = 2'b01, s2_yellow = 2'b10, s3_green = 2'b11;
+    reg [1:0] state;
+    reg [7:0] cnt;
+    reg [7:0] cnt_green;
+    reg p_green, p_yellow, p_red;
+
+    // State and counter management
+    always @(posedge clk or negedge rst_n) begin
+        if (~rst_n) begin
+            state <= idle;
+            cnt <= 0;
+            red <= 0;
+            yellow <= 0;
+            green <= 0;
+            clock <= 0;
+            cnt_green <= 0;
+        end else begin
+            case (state)
+                idle: begin
+                    // Reset values
+                    red <= 1;
+                    yellow <= 0;
+                    green <= 0;
+                    cnt <= 0; // Wait for the red state to finish
+                    if (cnt >= 10) begin // stay in red for 10 cycles
+                        state <= s3_green;
+                        cnt <= 0; // Reset counter for green state
+                    end
+                end
+
+                s1_red: begin
+                    red <= 1;
+                    yellow <= 0;
+                    green <= 0;
+                    cnt <= cnt + 1;
+                    if (cnt >= 10) begin
+                        state <= s2_yellow;
+                        cnt <= 0; // Reset counter for yellow state
+                    end
+                end
+
+                s2_yellow: begin
+                    red <= 0;
+                    yellow <= 1;
+                    green <= 0;
+                    cnt <= cnt + 1;
+                    if (cnt >= 5) begin
+                        state <= s3_green;
+                        cnt <= 0; // Reset counter for green state
+                    end
+                end
+
+                s3_green: begin
+                    red <= 0;
+                    yellow <= 0;
+                    green <= 1;
+                    if (pass_request && cnt < (60 - 10)) begin
+                        cnt_green <= 10; // Reduce to 10 cycles
+                    end else if (cnt < 60) begin
+                        cnt_green <= cnt + 1;
+                    end
+                    if (cnt_green >= 60) begin
+                        state <= s1_red;
+                        cnt_green <= 0; // Reset for red state
+                    end
+                end
+
+                default: state <= idle; // safety fallback
+            endcase
+        end
+    end
+
+    // Update clock output continuously
+    always @(posedge clk) begin
+        clock <= cnt;
+    end
+
+endmodule
+```

@@ -1,0 +1,29 @@
+As an expert in Verilog design, could you assist in creating a Triangle Wave signal generator module for a digital system? This module's goal is to produce a triangular waveform by managing a 5-bit output signal, labelled "wave." The signal needs to oscillate between the values 0 and 31, modifying by increments or decrements of 1 as it does so. 
+
+The module you are tasked with designing is named `signal_generator` and it contains specific input and output ports:
+
+1. **Input Ports:**
+   - `clk`: It serves as the clock signal, governing the synchronous functionality of the module.
+   - `rst_n`: This is an active-low reset signal. When this input is at 0, the module should reset; when at 1, the reset condition is inactive.
+
+2. **Output Ports:**
+   - `wave`: This is a 5-bit output signal which displays the generated triangular waveform.
+
+For implementing this module, consider the following aspects:
+
+- **State and Waveform Generation:**
+  - Two main registers should be defined: `state`, which tracks the current phase of waveform generation, and `wave`, a 5-bit wide register representing the waveform value.
+  - Update these registers within an `always` block that triggers on the clock's positive edge (`posedge clk`) or when the reset signal is asserted (`negedge rst_n`).
+
+- **Reset Condition:**
+  - When a reset is detected (`~rst_n`), the `state` and `wave` should both initialize to 0.
+
+- **Waveform Logic:**
+  - Utilize a `case` statement to manage the waveform generation based on the `state`:
+    - **State 0**: Increment the `wave` by 1. Transition to state 1 if `wave` reaches 31.
+    - **State 1**: Decrement the `wave` by 1. Switch back to state 0 when `wave` returns to 0.
+  
+- **Continuous Cycle:**
+  - The waveform production must continuously alternate between 0 and 31, dictated by the state transitions.
+
+This module requires a complete Verilog code implementation to achieve its functionality. Could you draft this code based on the specifications outlined above?

@@ -1,0 +1,21 @@
+```verilog
+module decade_counter (
+    input wire clk,          // Clock input
+    input wire reset,        // Synchronous reset input
+    output reg [3:0] count   // 4-bit output to hold the count
+);
+
+    always @(posedge clk) begin
+        if (reset) begin
+            count <= 4'b0000; // Reset count to 0
+        end else begin
+            if (count == 4'b1001) begin
+                count <= 4'b0000; // Reset count to 0 after reaching 9
+            end else begin
+                count <= count + 1; // Increment count
+            end
+        end
+    end
+
+endmodule
+```

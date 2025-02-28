@@ -1,0 +1,75 @@
+module fixed_point_adder #(
+    parameter integer Q = 8,   // Number of fractional bits
+    parameter integer N = 16   // Total number of bits (integer + fractional)
+)(
+    input  [N-1:0] a,         // First fixed‐point operand
+    input  [N-1:0] b,         // Second fixed‐point operand
+    output reg [N-1:0] c      // Result of the fixed‐point addition/subtraction
+);
+
+    // Internal register to hold result
+    reg [N-1:0] res;
+    
+    // Local signals for sign and absolute values
+    reg a_sign, b_sign;
+    reg [N-1:0] a_abs, b_abs;
+    
+    // Intermediate signals for operations
+    reg [N:0] sum_full;   // one extra bit for carry-out in absolute addition
+    reg [N-1:0] diff;     // to hold subtraction result (magnitude)
+    reg result_sign;      // to indicate the sign of the subtraction result
+    
+    // Combinational logic
+    always @(*) begin
+        // Determine the sign bits
+        a_sign = a[N-1];
+        b_sign = b[N-1];
+        
+        // Compute absolute values using two's complement conversion if negative
+        a_abs = a_sign ? (~a + 1) : a;
+        b_abs = b_sign ? (~b + 1) : b;
+        
+        // Case 1: Both operands have the same sign, so perform absolute addition.
+        if (a_sign == b_sign) begin
+            sum_full = a_abs + b_abs;
+            // Check for overflow by verifying the carry out of the MSB of the magnitude.
+            if (sum_full[N] == 1'b1) begin
+                // Overflow has occurred.
+                if (a_sign == 1'b0) begin
+                    // For positive numbers, saturate to maximum positive value.
+                    res = {1'b0, {(N-1){1'b1}}};  // 0 followed by all ones
+                end else begin
+                    // For negative numbers, saturate to most negative value.
+                    res = {1'b1, {(N-1){1'b0}}};  // 1 followed by all zeros
+                end
+            end else begin
+                // No overflow: reapply the common sign.
+                if (a_sign == 1'b0) begin
+                    res = sum_full[N-1:0];       // Positive result is the sum directly.
+                end else begin
+                    // For negative, convert the magnitude back to two's complement.
+                    res = ~sum_full[N-1:0] + 1;
+                end
+            end
+        end
+        
+        // Case 2: Operands have different signs, so perform subtraction of absolute values.
+        else begin
+            // Determine which absolute value is larger.
+            if (a_abs >= b_abs) begin
+                diff = a_abs - b_abs;
+                result_sign = a_sign;  // Result sign determined by operand with larger magnitude.
+            end else begin
+                diff = b_abs - a_abs;
+                result_sign = b_sign;
+            end
+            
+            // Convert the result back to signed fixed-point representation.
+            res = (result_sign == 1'b0) ? diff : (~diff + 1);
+        end
+        
+        // Assign the computed result to the output port.
+        c = res;
+    end
+
+endmodule

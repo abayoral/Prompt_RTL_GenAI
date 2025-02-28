@@ -1,0 +1,33 @@
+module freq_diveven #
+(
+    parameter NUM_DIV = 10  // Must be an even number
+)
+(
+    input  wire clk,    // Input clock signal to be divided
+    input  wire rst_n,  // Active low reset
+    output reg  clk_div // Divided clock output
+);
+
+// Calculate half the division constant. Each toggle of clk_div will occur every HALF_NUM_DIV input clock cycles.
+localparam HALF_NUM_DIV = NUM_DIV / 2;
+
+// 4-bit counter to track the number of input clock cycles
+reg [3:0] cnt;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        cnt     <= 4'b0;
+        clk_div <= 1'b0;
+    end else begin
+        // Increment counter until it reaches HALF_NUM_DIV - 1.
+        // When the counter reaches this value, reset it and toggle the divided clock.
+        if (cnt < (HALF_NUM_DIV - 1))
+            cnt <= cnt + 1'b1;
+        else begin
+            cnt     <= 4'b0;
+            clk_div <= ~clk_div;
+        end
+    end
+end
+
+endmodule

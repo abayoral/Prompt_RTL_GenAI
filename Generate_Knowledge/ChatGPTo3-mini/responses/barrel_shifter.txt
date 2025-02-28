@@ -1,0 +1,67 @@
+module mux2X1(
+    input  a,
+    input  b,
+    input  sel,
+    output y
+);
+    assign y = sel ? b : a;
+endmodule
+
+module barrel_shifter(
+    input  [7:0] in,
+    input  [2:0] ctrl,
+    output [7:0] out
+);
+
+    wire [7:0] stage0;
+    wire [7:0] stage1;
+    wire [7:0] stage2;
+
+    genvar i;
+
+    // Stage 0: Rotate left by 1 if ctrl[0] is asserted.
+    // For each bit, choose between no shift and shifted by 1.
+    generate
+        for(i = 0; i < 8; i = i + 1) begin: stage0_gen
+            // Calculate index for the shifted version (rotate left by 1)
+            // If i==7, then (i+1)%8 = 0, otherwise in[i+1]
+            mux2X1 mux_stage0 (
+                .a(in[i]),
+                .b( (i == 7) ? in[0] : in[i+1] ),
+                .sel(ctrl[0]),
+                .y(stage0[i])
+            );
+        end
+    endgenerate
+
+    // Stage 1: Rotate left by 2 if ctrl[1] is asserted.
+    generate
+        for(i = 0; i < 8; i = i + 1) begin: stage1_gen
+            // Calculate index for the shifted version (rotate left by 2)
+            // When (i+2) >= 8, wrap around by subtracting 8.
+            mux2X1 mux_stage1 (
+                .a(stage0[i]),
+                .b( ((i+2) >= 8) ? stage0[i+2-8] : stage0[i+2] ),
+                .sel(ctrl[1]),
+                .y(stage1[i])
+            );
+        end
+    endgenerate
+
+    // Stage 2: Rotate left by 4 if ctrl[2] is asserted.
+    generate
+        for(i = 0; i < 8; i = i + 1) begin: stage2_gen
+            // Calculate index for the shifted version (rotate left by 4)
+            // When (i+4) >= 8, wrap around by subtracting 8.
+            mux2X1 mux_stage2 (
+                .a(stage1[i]),
+                .b( ((i+4) >= 8) ? stage1[i+4-8] : stage1[i+4] ),
+                .sel(ctrl[2]),
+                .y(stage2[i])
+            );
+        end
+    endgenerate
+
+    assign out = stage2;
+
+endmodule

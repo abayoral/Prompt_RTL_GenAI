@@ -1,0 +1,11 @@
+As a senior Digital Design Engineer at a prominent hardware design firm, your current responsibility involves the creation of a crucial Verilog module that is instrumental for a new product. The success of this module is vital for sustaining the esteemed reputation of your company within the competitive industry of computer hardware.
+
+Imagine you are developing a circuit that controls a cellphone's ringer and vibration motor. The functionality of your circuit is dictated by specific conditions: whenever an incoming call is detected (indicated by the input signal `ring`), your design must decide whether to activate the ringer (which is represented by the output `ringer` set to 1) or the vibration motor (represented by the output `motor` set to 1), ensuring that only one output is activated at any given time.
+
+Moreover, in situations where the cellphone is set to vibrate mode (indicated by the input signal `vibrate_mode` being equal to 1), your circuit should prioritize activating the vibration motor over the ringer. Conversely, if the vibrate mode is not active (meaning `vibrate_mode` is 0), the ringer should be activated instead.
+
+In the context of hardware design, it's essential to translate this situation into effective logic gate configurations using only Verilog assign statements. This exercise challenges you to approach the problem from the perspective of the outputs first, thereby conceptualizing the circuit's behavior based on the required outputs while working backwards toward the input conditions. 
+
+To illustrate, rather than adopting a sequential programming mindset that typically begins with the evaluation of inputs to determine outputs ("If (inputs are ___ ) then (output should be ___ )"), you should instead think in terms of the outputs: "The (output should be ___ ) when (inputs are ___ )." Specifically, for this task, you will need to clearly articulate the conditions under which the motor should be on, rather than directly linking the vibrate mode to the motor's activation.
+
+Therefore, with this understanding, how would you proceed to formulate the Verilog module that corresponds to the described functionality, ensuring that the outputs are correctly activated based on the defined inputs and conditions?

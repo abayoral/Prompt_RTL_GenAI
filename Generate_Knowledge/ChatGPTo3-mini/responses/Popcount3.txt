@@ -1,0 +1,10 @@
+module top_module( 
+    input [2:0] in,
+    output [1:0] out 
+);
+
+    // The output is the sum of the 3 input bits (each bit can be 0 or 1)
+    // Since the maximum sum is 3 (11 in binary), a 2-bit output is sufficient.
+    assign out = in[0] + in[1] + in[2];
+
+endmodule

@@ -1,0 +1,103 @@
+module fixed_point_adder #(
+    parameter integer Q = 8,  // number of fractional bits
+    parameter integer N = 16  // total bits (including sign bit)
+)(
+    input  [N-1:0] a,
+    input  [N-1:0] b,
+    output reg [N-1:0] c
+);
+
+  // Internal register to hold the intermediate result.
+  reg [N-1:0] res;
+
+  // Intermediate signals for magnitude arithmetic
+  reg [N-1:0] a_abs, b_abs;
+  reg a_neg, b_neg;
+  
+  // Use one extra bit for capturing potential overflow on magnitude operations.
+  reg [N:0] mag_sum;
+  reg [N:0] mag_diff;
+  
+  // Saturation limits:
+  // For positive numbers, maximum is  2^(N-1)-1 (e.g. 0 followed by N-1 ones)
+  wire [N-1:0] POS_MAX = {1'b0, {(N-1){1'b1}}};
+  // For negative numbers, minimum is -2^(N-1).  In magnitude, that is exactly 2^(N-1).
+  wire [N:0] NEG_LIMIT = (1 << (N-1)); // as magnitude
+
+  always @(*) begin
+    // Determine sign bits
+    a_neg = a[N-1];
+    b_neg = b[N-1];
+    
+    // Compute absolute values.
+    // Two's complement absolute value: if negative, take (~x + 1), else x.
+    if (a_neg)
+      a_abs = ~a + 1;
+    else
+      a_abs = a;
+      
+    if (b_neg)
+      b_abs = ~b + 1;
+    else
+      b_abs = b;
+      
+    // Check if the two operands have the same sign.
+    if (a_neg == b_neg) begin
+      // Both operands have the same sign:
+      // Perform addition of the magnitudes.
+      mag_sum = a_abs + b_abs;
+      
+      // Determine result sign: same as inputs.
+      if (!a_neg) begin
+        // Both operands are positive.
+        // Saturate if the magnitude sum exceeds the positive limit.
+        if (mag_sum > {1'b0, POS_MAX[N-2:0]})
+          res = POS_MAX;
+        else
+          res = mag_sum[N-1:0];
+      end
+      else begin
+        // Both operands are negative.
+        // For negative results, the valid magnitude is up to NEG_LIMIT.
+        // Note: If the magnitude equals NEG_LIMIT, then the result is exactly -2^(N-1)
+        if (mag_sum > NEG_LIMIT)
+          // Saturate to the most negative number
+          res = {1'b1, {(N-1){1'b0}}};
+        else
+          // Compute two's complement of the magnitude sum to restore negativity.
+          res = ~mag_sum[N-1:0] + 1;
+      end
+    end
+    else begin
+      // The operands have opposite signs.
+      // The operation reduces to a subtraction between the magnitudes.
+      // Determine which magnitude is larger.
+      if (a_abs >= b_abs) begin
+        mag_diff = a_abs - b_abs;
+        // The sign of the result is that of operand a.
+        if (!a_neg) begin
+          // a was positive so the result remains positive.
+          res = mag_diff[N-1:0];
+        end
+        else begin
+          // a was negative so result is negative.
+          res = ~mag_diff[N-1:0] + 1;
+        end
+      end
+      else begin
+        mag_diff = b_abs - a_abs;
+        // The sign of the result is that of operand b.
+        if (!b_neg) begin
+          res = mag_diff[N-1:0];
+        end
+        else begin
+          res = ~mag_diff[N-1:0] + 1;
+        end
+      end
+    end
+    
+    // Assign the calculated result to the output.
+    c = res;
+  end
+
+endmodule

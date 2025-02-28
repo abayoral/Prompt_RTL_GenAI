@@ -1,0 +1,98 @@
+```verilog
+module asyn_fifo #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16
+) (
+    input wire wclk,
+    input wire rclk,
+    input wire wrstn,
+    input wire rrstn,
+    input wire winc,
+    input wire rinc,
+    input wire [WIDTH-1:0] wdata,
+    output reg wfull,
+    output reg rempty,
+    output reg [WIDTH-1:0] rdata
+);
+    localparam ADDR_WIDTH = $clog2(DEPTH);
+    
+    // Dual-Port RAM
+    reg [WIDTH-1:0] ram [0:DEPTH-1];
+    
+    // Write Pointer and Read Pointer in Gray Code
+    reg [ADDR_WIDTH-1:0] wptr_gray, rptr_gray;
+    reg [ADDR_WIDTH-1:0] wptr_bin, rptr_bin;
+    
+    // Synchronize Read Pointer with Write Clock
+    reg [ADDR_WIDTH-1:0] wptr_sync;
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn)
+            wptr_sync <= 0;
+        else
+            wptr_sync <= wptr_gray;
+    end
+    
+    // Synchronize Write Pointer with Read Clock
+    reg [ADDR_WIDTH-1:0] rptr_sync;
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn)
+            rptr_sync <= 0;
+        else
+            rptr_sync <= rptr_gray;
+    end
+    
+    // Pointer Logic
+    reg [ADDR_WIDTH-1:0] wptr, rptr;
+    
+    // Gray Code Generation
+    function [ADDR_WIDTH-1:0] to_gray(input [ADDR_WIDTH-1:0] binary);
+        to_gray = binary ^ (binary >> 1);
+    endfunction
+
+    function [ADDR_WIDTH-1:0] from_gray(input [ADDR_WIDTH-1:0] gray);
+        reg [ADDR_WIDTH-1:0] binary;
+        integer i;
+        begin
+            binary[ADDR_WIDTH-1] = gray[ADDR_WIDTH-1];
+            for (i = ADDR_WIDTH-2; i >= 0; i = i - 1) begin
+                binary[i] = binary[i + 1] ^ gray[i];
+            end
+            from_gray = binary;
+        end
+    endfunction
+    
+    // Write Logic
+    always @(posedge wclk or negedge wrstn) begin
+        if (!wrstn) begin
+            wptr <= 0;
+            wptr_gray <= 0;
+            wfull <= 0;
+        end else if (winc && !wfull) begin
+            ram[wptr] <= wdata;
+            wptr <= wptr + 1;
+            wptr_gray <= to_gray(wptr);
+        end
+    end
+
+    // Read Logic
+    always @(posedge rclk or negedge rrstn) begin
+        if (!rrstn) begin
+            rptr <= 0;
+            rptr_gray <= 0;
+            rempty <= 1;
+            rdata <= 0;
+        end else if (rinc && !rempty) begin
+            rdata <= ram[rptr];
+            rptr <= rptr + 1;
+            rptr_gray <= to_gray(rptr);
+        end
+    end
+
+    // FIFO Full/Empty Logic
+    always @* begin
+        rempty = (wptr_gray == rptr_gray);
+        wfull = ((wptr_gray[ADDR_WIDTH-1] ^ rptr_gray[ADDR_WIDTH-1]) && (wptr_gray[ADDR_WIDTH-2:0] == rptr_gray[ADDR_WIDTH-2:0]));
+    end
+    
+endmodule
+```

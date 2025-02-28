@@ -1,0 +1,31 @@
+module top_module (
+    input clk,
+    input reset,
+    input [31:0] in,
+    output reg [31:0] out
+);
+
+    // Register to hold the previous cycle's input
+    reg [31:0] prev;
+    // Register to hold the falling-edge detection event (set pending) computed in the previous cycle
+    reg [31:0] set_pending;
+
+    always @(posedge clk) begin
+        if (reset) begin
+            out         <= 32'b0;
+            prev        <= in;
+            set_pending <= 32'b0;
+        end else begin
+            // The output bit remains set if it was set before (latch behavior) 
+            // or if a falling edge was detected in the previous cycle.
+            out <= out | set_pending;
+            
+            // Compute a falling edge: detect if a bit was 1 in previous cycle and now 0.
+            set_pending <= (prev & ~in);
+            
+            // Update prev for the next cycle.
+            prev <= in;
+        end
+    end
+
+endmodule

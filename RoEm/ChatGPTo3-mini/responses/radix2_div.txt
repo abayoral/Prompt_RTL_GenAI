@@ -1,0 +1,157 @@
+module radix2_div (
+    input         clk,
+    input         rst,
+    input         sign,       // 1: signed, 0: unsigned
+    input  [7:0]  dividend,
+    input  [7:0]  divisor,
+    input         opn_valid,
+    output reg    res_valid,
+    output reg [15:0] result  // [15:8]: remainder, [7:0]: quotient
+);
+
+  // State encoding for the finite state machine:
+  localparam IDLE = 2'b00;
+  localparam RUN  = 2'b01;
+  localparam DONE = 2'b10;
+
+  reg [1:0] state;   // current state
+  reg [3:0] cnt;     // iteration counter (0 to 8)
+
+  // Internal registers for holding the absolute (non‐negative) operands.
+  // For unsigned operations these are simply the input values.
+  reg [7:0] abs_dividend, abs_divisor;
+  reg       dividend_neg, divisor_neg; // indicate if original operands were negative
+
+  // Shift register used to perform the iterative radix-2 division.
+  // It is 9 bits wide. The upper 8 bits (bits [8:1]) hold the current remainder
+  // candidate, while bit 0 will be used to accumulate quotient bits.
+  reg [8:0] sr;
+
+  // ----------------------------------------------------------------------------
+  // The division procedure is implemented as a three‐state FSM:
+  //
+  //  1. IDLE:
+  //       When opn_valid is high, capture the operands.  For a signed
+  //       operation, compute their absolute values and record the sign bits.
+  //       Then initialize the shift register “sr” with the absolute dividend
+  //       shifted left by one bit, set the iteration counter to 0, and move to RUN.
+  //
+  //  2. RUN:
+  //       For eight clock cycles, perform one iteration of radix–2 division.
+  //       At each iteration, subtract the divisor (if possible) from the upper
+  //       8 bits of the shift register. This subtraction is implemented using
+  //       a “negated divisor” computed as: NEG_DIVISOR = ~abs_divisor + 1.
+  //       Use a multiplexer to decide between keeping the remainder unchanged
+  //       (if subtraction would be negative) or using the subtraction result.
+  //       Then, perform a left shift of the shift register and embed the quotient
+  //       bit (1 if subtraction succeeded, 0 otherwise) into the LSB.
+  //
+  //  3. DONE:
+  //       When eight iterations are complete, the quotient is stored in sr[7:0]
+  //       and the remainder in sr[8:1]. If a signed operation is required, the
+  //       quotient is made negative (if dividend and divisor had opposite signs)
+  //       and the remainder is adjusted to have the same sign as the dividend.
+  //       The 16-bit “result” is then formed by concatenating the 8-bit remainder
+  //       (upper) and the 8-bit quotient (lower). The res_valid output is asserted
+  //       to indicate that the result is ready. The FSM then waits for opn_valid
+  //       to de-assert before returning to IDLE.
+  // ----------------------------------------------------------------------------
+
+  always @(posedge clk) begin
+    if (rst) begin
+      state      <= IDLE;
+      res_valid  <= 1'b0;
+      result     <= 16'b0;
+      cnt        <= 4'b0;
+      sr         <= 9'b0;
+    end
+    else begin
+      case (state)
+        IDLE: begin
+          // Clear result-valid flag
+          res_valid <= 1'b0;
+          if (opn_valid) begin
+            // Latch the input operands.
+            // For signed division, obtain the absolute values and record sign.
+            if(sign && dividend[7]) begin
+              abs_dividend <= ~dividend + 8'd1;
+              dividend_neg <= 1'b1;
+            end
+            else begin
+              abs_dividend <= dividend;
+              dividend_neg <= 1'b0;
+            end
+
+            if(sign && divisor[7]) begin
+              abs_divisor <= ~divisor + 8'd1;
+              divisor_neg <= 1'b1;
+            end
+            else begin
+              abs_divisor <= divisor;
+              divisor_neg <= 1'b0;
+            end
+
+            // Initialize the shift register with the absolute dividend shifted left by one.
+            // This provides a 9-bit register: [8:1] will hold the remainder candidate, LSB
+            // reserved for accumulating the quotient bits.
+            sr  <= {abs_dividend, 1'b0};
+            cnt <= 4'd0;
+            state <= RUN;
+          end
+        end
+
+        RUN: begin
+          // Perform one iterative step as long as we have not completed 8 iterations.
+          if(cnt < 8) begin
+            // Compare the upper 8 bits of sr with the divisor.
+            // If sr[8:1] >= abs_divisor, we subtract; otherwise we do not.
+            if (sr[8:1] >= abs_divisor) begin
+              // Subtraction is effectively done by adding the two's complement of abs_divisor.
+              // The subtraction result becomes the new remainder candidate.
+              sr <= { (sr[8:1] - abs_divisor), 1'b1 }; // set quotient bit = 1 in LSB
+            end
+            else begin
+              sr <= { sr[8:1], 1'b0 }; // No subtraction; quotient bit = 0.
+            end
+            cnt <= cnt + 4'd1;
+          end
+          else begin
+            // 8 iterations complete; move to DONE state.
+            state <= DONE;
+          end
+        end
+
+        DONE: begin
+          // Extract quotient and remainder from the shift register:
+          // Quotient is in the lower 8 bits and remainder is in the upper 8 bits (bits [8:1]).
+          // For signed operations, adjust the sign of the outputs.
+          //
+          // Note: Temporary registers are declared in this block to hold the computed values.
+          reg [7:0] quo, rem;
+          quo = sr[7:0];
+          rem = sr[8:1];
+
+          if (sign) begin
+            // If the dividend and divisor have opposite signs, the quotient is negative.
+            if (dividend_neg ^ divisor_neg)
+              quo = ~quo + 8'd1;
+            // The remainder should have the same sign as the dividend.
+            if (dividend_neg)
+              rem = ~rem + 8'd1;
+          end
+
+          // Form the 16-bit result with remainder in the upper 8 bits and quotient in the lower 8 bits.
+          result    <= { rem, quo };
+          res_valid <= 1'b1;
+
+          // Wait here until opn_valid is deasserted before returning to IDLE.
+          if (!opn_valid)
+            state <= IDLE;
+        end
+
+        default: state <= IDLE;
+      endcase
+    end
+  end
+
+endmodule

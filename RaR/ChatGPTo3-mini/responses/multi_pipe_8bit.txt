@@ -1,0 +1,105 @@
+module multi_pipe_8bit(
+    input clk,
+    input rst_n,
+    input mul_en_in,
+    input [7:0] mul_a,
+    input [7:0] mul_b,
+    output reg mul_en_out,
+    output reg [15:0] mul_out
+);
+
+    // Stage 1: Register the input data and enable signal
+    reg [7:0] mul_a_reg, mul_b_reg;
+    reg        en_stage1;
+
+    // Stage 2: Generate partial products (each is 16‐bit after shifting)
+    reg [15:0] pp0_reg, pp1_reg, pp2_reg, pp3_reg, pp4_reg, pp5_reg, pp6_reg, pp7_reg;
+    reg        en_stage2;
+
+    // Stage 3: Add partial products in pairs
+    reg [15:0] sum0_reg, sum1_reg, sum2_reg, sum3_reg;
+    reg        en_stage3;
+
+    // Stage 4: Add the pair sums to get two intermediate sums
+    reg [15:0] sum_a_reg, sum_b_reg;
+    reg        en_stage4;
+
+    // Stage 5: Final addition to get the multiplication result
+    reg [15:0] final_result_reg;
+    reg        en_stage5;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset all pipeline registers and outputs
+            mul_a_reg       <= 8'd0;
+            mul_b_reg       <= 8'd0;
+            en_stage1       <= 1'b0;
+            
+            pp0_reg         <= 16'd0; pp1_reg <= 16'd0; pp2_reg <= 16'd0; pp3_reg <= 16'd0;
+            pp4_reg         <= 16'd0; pp5_reg <= 16'd0; pp6_reg <= 16'd0; pp7_reg <= 16'd0;
+            en_stage2       <= 1'b0;
+            
+            sum0_reg        <= 16'd0; sum1_reg <= 16'd0; sum2_reg <= 16'd0; sum3_reg <= 16'd0;
+            en_stage3       <= 1'b0;
+            
+            sum_a_reg       <= 16'd0; sum_b_reg <= 16'd0;
+            en_stage4       <= 1'b0;
+            
+            final_result_reg<= 16'd0;
+            en_stage5       <= 1'b0;
+            
+            mul_out         <= 16'd0;
+            mul_en_out      <= 1'b0;
+        end else begin
+            // Stage 1: Capture the inputs and multiplication enable signal
+            // Only capture valid inputs when mul_en_in is active.
+            if (mul_en_in) begin
+                mul_a_reg <= mul_a;
+                mul_b_reg <= mul_b;
+            end else begin
+                // When not active, clear the registers to avoid spurious processing.
+                mul_a_reg <= 8'd0;
+                mul_b_reg <= 8'd0;
+            end
+            en_stage1 <= mul_en_in;
+            
+            // Stage 2: Generate partial products
+            // Each partial product is formed by conditionally shifting the multiplicand by the bit index
+            // if the corresponding bit of the multiplier is 1.
+            pp0_reg <= (mul_b_reg[0]) ? ({8'd0, mul_a_reg} << 0) : 16'd0;
+            pp1_reg <= (mul_b_reg[1]) ? ({8'd0, mul_a_reg} << 1) : 16'd0;
+            pp2_reg <= (mul_b_reg[2]) ? ({8'd0, mul_a_reg} << 2) : 16'd0;
+            pp3_reg <= (mul_b_reg[3]) ? ({8'd0, mul_a_reg} << 3) : 16'd0;
+            pp4_reg <= (mul_b_reg[4]) ? ({8'd0, mul_a_reg} << 4) : 16'd0;
+            pp5_reg <= (mul_b_reg[5]) ? ({8'd0, mul_a_reg} << 5) : 16'd0;
+            pp6_reg <= (mul_b_reg[6]) ? ({8'd0, mul_a_reg} << 6) : 16'd0;
+            pp7_reg <= (mul_b_reg[7]) ? ({8'd0, mul_a_reg} << 7) : 16'd0;
+            
+            en_stage2 <= en_stage1;
+            
+            // Stage 3: Add the partial products in pairs
+            sum0_reg <= pp0_reg + pp1_reg;
+            sum1_reg <= pp2_reg + pp3_reg;
+            sum2_reg <= pp4_reg + pp5_reg;
+            sum3_reg <= pp6_reg + pp7_reg;
+            
+            en_stage3 <= en_stage2;
+            
+            // Stage 4: Further add the intermediate sums
+            sum_a_reg <= sum0_reg + sum1_reg;
+            sum_b_reg <= sum2_reg + sum3_reg;
+            
+            en_stage4 <= en_stage3;
+            
+            // Stage 5: Final addition to obtain the 16-bit multiplication result
+            final_result_reg <= sum_a_reg + sum_b_reg;
+            
+            en_stage5 <= en_stage4;
+            
+            // Output assignment: only output the result when the pipeline enable is active.
+            mul_out    <= (en_stage5) ? final_result_reg : 16'd0;
+            mul_en_out <= en_stage5;
+        end
+    end
+
+endmodule

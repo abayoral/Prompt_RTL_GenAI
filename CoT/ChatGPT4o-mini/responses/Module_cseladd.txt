@@ -1,0 +1,48 @@
+```
+module add16 (
+    input [15:0] a,
+    input [15:0] b,
+    input cin,
+    output [15:0] sum,
+    output cout
+);
+
+// Internal carry signal declaration
+wire c1, c2;
+
+// First 16-bit adder
+add16 adder0 (
+    .a(a[15:0]),
+    .b(b[15:0]),
+    .cin(1'b0),
+    .sum(sum[15:0]),
+    .cout(c1)
+);
+
+// Second 16-bit adder
+add16 adder1 (
+    .a(a[31:16]),
+    .b(b[31:16]),
+    .cin(c1),
+    .sum(sum[31:16]),
+    .cout(c2)
+);
+
+// Third 16-bit adder for case selection
+add16 adder2 (
+    .a(a[31:16]),
+    .b(b[31:16]),
+    .cin(1'b1), // for the carry when selected
+    .sum(temp_sum[31:16]), // output of the second adder when cin=1
+    .cout(cout)
+);
+
+// 2-to-1 MUX for carry select
+wire [15:0] temp_sum[31:16];
+assign sum[31:16] = (c1 ? temp_sum[31:16] : sum[31:16]);
+
+// Assign cout
+assign cout = (c1 ? c2 : 0);
+
+endmodule
+```

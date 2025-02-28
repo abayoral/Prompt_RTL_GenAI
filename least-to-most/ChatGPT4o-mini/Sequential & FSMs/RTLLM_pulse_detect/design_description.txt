@@ -1,0 +1,26 @@
+As a professional Verilog designer, you're tasked with creating a logic module called `pulse_detect` that identifies specific patterns in a one-bit continuous signal, `data_in`, using the clock `clk` as a timing reference. Here are the requirements:
+
+1. **Module Purpose**: The module is designed to detect a sequence, where the input signal `data_in` transitions from 0 to 1 and back to 0 over three clock cycles. This sequence is termed as a "pulse."
+
+2. **Signal Definitions**: 
+   - **`clk`**: This is the clock signal that drives the timing of the entire module. It ensures that all operations occur synchronously with this clock's positive edges.
+   - **`rst_n`**: This is an active-low reset signal. When this signal is low, the module should reset its internal state and output.
+   - **`data_in`**: The input signal, which is a one-bit continuous stream that the module needs to monitor for pulses.
+   - **`data_out`**: The output signal, which should indicate the detection of a pulse by being high (`1`) at the third cycle (or end cycle) of the pulse, and low (`0`) otherwise.
+
+3. **Detection Process**:
+   - Create an internal register, `state`, to maintain the current state of the pulse detection cycle. This state helps in recognizing and confirming when a pulse has occurred.
+   - Within an always block, which is sensitive to the positive edge of `clk` or the negative edge of `rst_n`, implement the pulse logic.
+
+4. **Reset Logic**: When `rst_n` is low, the module should reset any ongoing detection process:
+   - Set the `state` register to its starting value, preparing the module for fresh detections when the reset condition is lifted.
+   - Ensure that the output `data_out` is set to 0, since a pulse cannot be detected during reset.
+
+5. **State Transitions**: As the clock progresses, evaluate `data_in` to determine transitions:
+   - **Initial State**: When there's no pulse yet, wait for the sequence `0 -> 1`.
+   - **Intermediate State**: After detecting `0 -> 1`, wait for the `1 -> 0` transition.
+   - **Final State**: Upon completing the transition `0 -> 1 -> 0`, conclude that a pulse has been detected. Set `data_out` to 1 for one cycle, indicating the successful detection of a pulse.
+
+6. **Output Logic**: After detecting a pulse (i.e., reaching the final state), `data_out` should briefly be set to 1 and then revert to 0 until a new pulse is detected.
+
+Your task is to write Verilog code that encapsulates this behavior in the `pulse_detect` module, considering precise handling of edge cases and ensuring that the transitions between states are managed properly.

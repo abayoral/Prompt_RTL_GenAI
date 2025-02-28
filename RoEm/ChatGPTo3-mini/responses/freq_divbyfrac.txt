@@ -1,0 +1,35 @@
+module freq_divbyfrac(
+  input  clk,
+  input  rst_n,
+  output reg clk_div
+);
+
+  // This implementation uses a phase‐accumulator technique
+  // to realize a fractional divider by 3.5.
+  // Every clock cycle, we add a fixed increment (STEP = 4)
+  // to an accumulator. Whenever the accumulator meets or exceeds
+  // the threshold (TH = 7) we subtract 7 and toggle clk_div.
+  // This produces toggle events separated in time by either 3 or 4 input
+  // clock cycles, yielding an average half‐period of 3.5 clk cycles.
+  // Consequently, the overall output period is 7 input clock cycles
+  // and its average duty cycle is 50%.
+
+  reg [3:0] accum;  // 4-bit accumulator is enough (range needed up to 10)
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      accum   <= 4'd0;
+      clk_div <= 1'b0;
+    end else begin
+      // Calculate next accumulator value if we add the step
+      if (accum + 4'd4 >= 4'd7) begin
+        accum   <= (accum + 4'd4) - 4'd7;
+        clk_div <= ~clk_div;  // Toggle output when threshold is reached
+      end else begin
+        accum   <= accum + 4'd4;
+        clk_div <= clk_div;
+      end
+    end
+  end
+
+endmodule

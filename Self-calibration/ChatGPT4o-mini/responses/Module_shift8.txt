@@ -1,0 +1,50 @@
+The provided Verilog code has a few points that need improvement or correction to adhere to best practices and ensure proper synthesis behavior:
+
+1. **The Use of Non-Blocking Assignments**: Inside the sequential logic defined in `my_dff8`, it is good practice to use non-blocking assignments (`<=`) when writing to flip-flops, which is indeed being followed here. However, in the `top_module`, the output `q` is being assigned using blocking assignments (`=`) inside a combinational process. This may lead to unpredictable behavior.
+
+2. **Sensitivity List**: Although the `always @(*)` block automatically generates a sensitivity list, it's essential to confirm that the logic behaves as expected. Since `q` should be directly updated based on the clock edge, it must be inside a proper clock-triggered always block.
+
+3. **Default Case Handling**: The default case may not be necessary in your design as `sel` is a 2-bit signal, and all cases are already covered. However, it is safe to leave it in place for robustness.
+
+Here's the corrected version of the original Verilog code:
+
+```verilog
+module my_dff8 ( 
+    input clk, 
+    input [7:0] d, 
+    output reg [7:0] q 
+);
+    always @(posedge clk) begin
+        q <= d; // Non-blocking assignment is correct for flip-flop behavior
+    end
+endmodule
+
+module top_module ( 
+    input clk, 
+    input [7:0] d, 
+    input [1:0] sel, 
+    output reg [7:0] q 
+);
+    wire [7:0] q1, q2, q3;
+
+    my_dff8 dff1 (.clk(clk), .d(d), .q(q1));
+    my_dff8 dff2 (.clk(clk), .d(q1), .q(q2));
+    my_dff8 dff3 (.clk(clk), .d(q2), .q(q3));
+
+    always @(posedge clk) begin // Change to clock-triggered always block
+        case(sel)
+            2'b00: q <= d;     // No delay
+            2'b01: q <= q1;    // 1 clock delay
+            2'b10: q <= q2;    // 2 clock delay
+            2'b11: q <= q3;    // 3 clock delay
+            default: q <= d;   // Default case (redundant but safe)
+        endcase
+    end
+endmodule
+```
+
+### Summary of Changes:
+- Changed `always @(*)` to `always @(posedge clk)` in `top_module`. This ensures that `q` is updated synchronously with the clock, matching the behavior typically expected in digital circuits that involve flip-flops.
+- Replaced blocking assignments with non-blocking assignments (`<=`) for the output `q` inside the clocked process to ensure correct synthesis and simulation behavior. 
+
+These changes adhere to the best practices of coding in Verilog, especially in synchronous design.

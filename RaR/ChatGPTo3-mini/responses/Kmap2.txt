@@ -1,0 +1,42 @@
+module top_module(
+    input  a,
+    input  b,
+    input  c,
+    input  d,
+    output out
+);
+    // The following Karnaugh map was given:
+    //              a'b'    a'b    ab    ab'
+    //         c'd' |   1      1    0     1
+    //         c'd  |   1      0    0     1
+    //         cd   |   0      1    1     1
+    //         cd'  |   1      1    0     0
+    //
+    // One correct procedure is to first “read out” the minterms corresponding
+    // to a 1 in the map (remember that the rows and columns are arranged in Gray-code order):
+    //
+    //   Row c'd' (c=0,d=0):  a'b', a'b,      , ab'
+    //   Row c'd  (c=0,d=1):  a'b',      ,      , ab'
+    //   Row cd   (c=1,d=1):        a'b, ab, ab'
+    //   Row cd'  (c=1,d=0):  a'b', a'b,      ,
+    //
+    // One may then simplify the function by grouping adjacent 1’s. One minimal sum‐of‐products
+    // expression found by such a grouping is:
+    //
+    //   F = a'b'(c' + d') + a b'(c' + d) + a'b(c + d') + a c d
+    //
+    // Notice that some groups have been combined to give common factors. For example,
+    // the two terms from the a’b columns (one covering a cell with c = 0 and the other c = 1)
+    // can sometimes be combined if they share another literal.
+    //
+    // (An equivalent minimal sum‐of‐products is also acceptable.)
+    //
+    // Translating the simplified Boolean expression into Verilog, we get:
+    
+    assign out = ( (~a & ~b & ( ~c | ~d )) |    // covers group from a'b' that is true when either c or d is 0
+                   (  a & ~b & ( ~c |  d )) |    // covers group in the ab' column
+                   ( ~a &  b & (  c | ~d )) |    // covers the remaining a'b group (combining cells where c=1 or d=0)
+                   (  a &  c &  d )             // covers the isolated group where a, c, d are all 1
+                 );
+    
+endmodule

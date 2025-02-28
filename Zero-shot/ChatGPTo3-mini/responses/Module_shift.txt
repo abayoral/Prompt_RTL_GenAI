@@ -1,0 +1,16 @@
+module my_dff ( input clk, input d, output q );
+
+endmodule
+
+module top_module ( input clk, input d, output q );
+  wire q0, q1;
+
+  // First D flip-flop receives external data
+  my_dff dff0 (.clk(clk), .d(d), .q(q0));
+  
+  // Second D flip-flop receives the output of the first
+  my_dff dff1 (.clk(clk), .d(q0), .q(q1));
+  
+  // Third D flip-flop receives the output of the second and produces final output
+  my_dff dff2 (.clk(clk), .d(q1), .q(q));
+endmodule

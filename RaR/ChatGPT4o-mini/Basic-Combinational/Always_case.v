@@ -1,0 +1,9 @@
+As a senior Digital Design Engineer at a prominent hardware design company, you find yourself responsible for the development of an essential Verilog module that plays a critical role in a next-generation product. The successful implementation of this module is crucial not only for the functionality of the product itself but also for maintaining your company's esteemed reputation within the highly competitive hardware industry.
+
+In this context, your task involves designing a 6-to-1 multiplexer (MUX). The multiplexer should be capable of selecting one of six 4-bit wide data inputs based on a 3-bit selection signal, `sel`. Specifically, if the value of `sel` falls within the range of 0 to 5, the corresponding 4-bit data input should be directed to the output. However, if `sel` takes on a value outside this range, the multiplexer should default the output to 0. 
+
+One crucial consideration during the design process is to avoid inadvertently inferring latches, which can lead to unintended behavior, especially in combinational circuits. You are required to implement this functionality using a case statement, as case statements tend to be more efficient and clearer to read when dealing with multiple cases, compared to using multiple if statements. 
+
+In the provided Verilog module skeleton, there is an indication of creating a combinational circuit through the `always @(*)` block. Your objective now is to fill in the appropriate code for the case statement, ensuring that all specified requirements are adhered to, including correct handling of output values based on the input selection signal.
+
+Please clarify any specific questions regarding the design requirements, implementation details, or any potential challenges you might face while working on this multiplexer module, so that your approach can be well-defined and effective.

@@ -1,0 +1,60 @@
+module top_module(
+    input clk,
+    input reset,
+    input ena,
+    output reg pm,
+    output reg [7:0] hh,
+    output reg [7:0] mm,
+    output reg [7:0] ss
+); 
+
+    reg [25:0] counter; // Counter to divide clk for 1 second pulse
+    wire tick; // To hold the 1 second pulse
+    
+    // Generate a 1 second pulse
+    always @(posedge clk) begin
+        if (reset) begin
+            counter <= 0;
+        end else begin
+            counter <= counter + 1;
+        end
+    end
+    
+    assign tick = (counter == 26'd50_000_000); // Assuming 50MHz clk; adjust to your clk frequency
+    
+    // Clock logic
+    always @(posedge tick or posedge reset) begin
+        if (reset) begin
+            hh <= 8'd0; // Set to 12:00 AM
+            mm <= 8'd0;
+            ss <= 8'd0;
+            pm <= 1'b0; // AM
+        end else if (ena) begin
+            if (ss == 59) begin
+                ss <= 0;
+                if (mm == 59) begin
+                    mm <= 0;
+                    if (hh == 8'd11) begin
+                        hh <= 8'd0; // Go to 12
+                        pm <= ~pm; // Toggle AM/PM
+                    end else if (hh == 8'd0) begin
+                        hh <= 8'd1; // After 12:59:59 PM, go to 01:00:00 PM
+                    end else begin
+                        hh <= hh + 1;
+                    end
+                end else begin
+                    mm <= mm + 1;
+                end
+            end else begin
+                ss <= ss + 1;
+            end
+        end
+    end
+    
+    // Convert to BCD
+    always @(hh or mm or ss) begin
+        hh <= {4'b0000, (hh % 12 == 0) ? 8'd12 : hh % 12}; // BCD Conversion for HH
+        mm <= {4'b0000, mm}; // BCD Conversion for MM
+        ss <= {4'b0000, ss}; // BCD Conversion for SS
+    end
+endmodule

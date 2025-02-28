@@ -1,0 +1,80 @@
+```verilog
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output reg [23:0] out_bytes,
+    output reg done);
+
+    // State encoding
+    typedef enum reg [1:0] {
+        IDLE = 2'b00,
+        RECEIVING = 2'b01,
+        COMPLETE = 2'b10
+    } state_t;
+
+    state_t current_state, next_state;
+
+    // Byte counter to keep track of received bytes
+    reg [1:0] byte_count;
+
+    // FSM process
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+            byte_count <= 0;
+            out_bytes <= 0;
+            done <= 0;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+
+    // Next state logic
+    always @* begin
+        next_state = current_state;
+        done = 0;
+
+        case (current_state)
+            IDLE: begin
+                if (in[3] == 1) begin
+                    out_bytes[23:16] = in; // First byte
+                    byte_count = 1;
+                    next_state = RECEIVING;
+                end
+            end
+
+            RECEIVING: begin
+                if (byte_count < 2) begin
+                    if (in[3] == 1) begin
+                        // If we encounter a new header byte, restart
+                        out_bytes[23:16] = in; // First byte (overwrite)
+                        byte_count = 1;        // Reset byte count
+                    end else begin
+                        // Capture next byte
+                        if (byte_count == 1) 
+                            out_bytes[15:8] = in; // Second byte
+                        else if (byte_count == 2)
+                            out_bytes[7:0] = in; // Third byte
+
+                        byte_count = byte_count + 1;
+                        if (byte_count == 2) begin
+                            next_state = COMPLETE;
+                        end
+                    end
+                end
+            end
+
+            COMPLETE: begin
+                done = 1; // Indicate message is complete
+                // Return to IDLE automatically after signaling done
+                next_state = IDLE;
+                byte_count = 0; // Reset byte count for next packet
+            end
+
+            default: next_state = IDLE; // Safety state
+        endcase
+    end
+
+endmodule
+```

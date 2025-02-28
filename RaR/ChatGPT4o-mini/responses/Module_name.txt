@@ -1,0 +1,39 @@
+```verilog
+module mod_a (
+    output reg out1,
+    output reg out2,
+    input wire in1,
+    input wire in2,
+    input wire in3,
+    input wire in4
+);
+
+// Internal logic for mod_a
+always @(*) begin
+    // Example logic for outputs based on inputs
+    out1 = in1 & in2;  // Example operation
+    out2 = in3 | in4;  // Example operation
+end
+
+endmodule
+
+module top_module (
+    output wire out1,
+    output wire out2,
+    input wire a,
+    input wire b,
+    input wire c,
+    input wire d
+);
+
+mod_a instance_mod_a (
+    .out1(out1),  // Connecting mod_a out1 to top_module out1
+    .out2(out2),  // Connecting mod_a out2 to top_module out2
+    .in1(a),      // Connecting top_module a to mod_a in1
+    .in2(b),      // Connecting top_module b to mod_a in2
+    .in3(c),      // Connecting top_module c to mod_a in3
+    .in4(d)       // Connecting top_module d to mod_a in4
+);
+
+endmodule
+```

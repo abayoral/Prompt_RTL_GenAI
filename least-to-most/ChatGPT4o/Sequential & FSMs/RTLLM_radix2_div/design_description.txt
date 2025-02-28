@@ -1,0 +1,28 @@
+As a professional Verilog designer, your task is to create a Verilog module named `radix2_div` that effectively implements a simplified radix-2 division mechanism operating on 8-bit signed or unsigned integers. This module functions by taking two 8-bit operands as input: the dividend and the divisor. The goal of this design is to output a 16-bit result consisting of both the quotient and the remainder from the division operation. Here's a breakdown of the module requirements and operations:
+
+**Module Name:**
+- `radix2_div`
+
+**Input Ports:**
+- `clk`: This is a clock signal, essential for the synchronous operation of the module, ensuring that changes in the state occur at the correct time intervals.
+- `rst`: A reset signal needed to initialize or reset the module's internal states, preparing it for a new operation or clearing any prior data.
+- `sign`: A 1-bit indicator that determines the nature of the division operation; a value of '1' signifies a signed operation, whereas '0' indicates an unsigned one.
+- `dividend`: An 8-bit input that represents the dividend for the division operation.
+- `divisor`: An 8-bit input representing the divisor for the division operation.
+- `opn_valid`: A 1-bit signal used to denote the presence of a valid operation request, prompting the module to commence the division process.
+
+**Output Ports:**
+- `res_valid`: A 1-bit output signal that indicates when the division result is ready and valid for use.
+- `result`: A 16-bit output composed of the division results, where the upper 8 bits represent the remainder of the division, and the lower 8 bits capture the quotient.
+
+**Implementation Details:**
+
+- **Operation Start:** When the `opn_valid` signal is asserted high and `res_valid` is low, the module should capture and save the input values for dividend and divisor. Subsequently, the process involves initializing a shift register (`SR`) with the absolute value of the dividend, which is shifted left by one bit. The negative absolute value of the divisor, stored as `NEG_DIVISOR`, is also calculated at this stage. The counters `cnt` and `start_cnt` are initialized to '1' to kick off the division proceedings.
+
+- **Division Process:** With `start_cnt` asserted, the module enters the division phase characterized by:
+  - Checking if the counter `cnt` reaches '8', which corresponds to completing 8 iterations or shifts, marking the conclusion of the division process. At this point, both `cnt` and `start_cnt` are reset, and the shift register `SR` is updated to reflect the final remainder and quotient values.
+  - In any other case, the counter `cnt` is incremented, and the shift register `SR` undergoes updates based on the subtraction outcome involving `NEG_DIVISOR`. A multiplexer is utilized to choose the appropriate result using the carry-out flag. Consequently, `SR` is updated by shifting to the left, with the carry-out value being added.
+
+- **Result Validity Management:** The `res_valid` signal is controlled considering the reset signal, the status of the counter, and whether the result has been consumed by external logic or systems.
+
+The provided module description requires a comprehensive implementation in Verilog to fully adhere to these specifications, including handling signed and unsigned operations, performing arithmetic shifts, and managing state transitions based on the clock cycle. The challenge lies in orchestrating these operations effectively within the synchronous logic framework, with focus on precise bit manipulation and timely output generation.

@@ -1,0 +1,19 @@
+```verilog
+module signal_router (
+    input wire a,
+    input wire b,
+    input wire c,
+    output wire w,
+    output wire x,
+    output wire y,
+    output wire z
+);
+
+// Directly connect inputs to outputs as specified
+assign w = a; // Input 'a' to output 'w'
+assign x = b; // Input 'b' to output 'x'
+assign y = b; // Input 'b' to output 'y'
+assign z = c; // Input 'c' to output 'z'
+
+endmodule
+```

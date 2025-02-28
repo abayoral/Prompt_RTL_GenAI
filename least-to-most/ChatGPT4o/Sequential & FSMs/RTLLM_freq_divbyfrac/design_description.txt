@@ -1,0 +1,17 @@
+I would like you to assist with designing a Verilog module named `freq_divbyfrac` that functions as a frequency divider capable of dividing an input clock signal frequency by a fractional value. Specifically, I am interested in achieving a 3.5x frequency division. The design should employ the double-edge clocking technique to handle half-integer division, taking into account any duty cycle imbalances that might occur.
+
+For this design, consider the process of dividing the clock cycles unevenly, and implementing phase-shifting to produce a smoothly outputted fractional clock signal. This method involves creating an intermediate clock signal that undergoes specific division and phase adjustment.
+
+Here are the input and output ports for the module:
+- **Input Port:**
+  - `clk`: This is the main clock signal input that is to be divided.
+  - `rst_n`: This is an active low reset signal used to initialize the state of the module.
+  
+- **Output Port:**
+  - `clk_div`: This is the output port providing the clock signal after it has been divided by the specified fractional frequency.
+
+For the implementation, the frequency division should be achieved through a process of counting clock cycles. For a division factor of 3.5x, the counter will cycle through 7 clock periods, which is effectively the multiplied basis for the division (denoted as MUL2_DIV_CLK = 7). During these cycles, two distinct clock periods will need to be generated: one consisting of 4 source clock cycles and the other of 3 source clock cycles.
+
+Subsequently, a phase shift operation will create two phase-adjusted versions of the divided clock. One of these will be delayed by half a clock period, and the other will be advanced by half a clock period. These phase-shifted clocks are then combined through a logical OR operation to form the final output, thus ensuring the resulting fractional divided clock has a consistently uniform period.
+
+Could you provide a complete Verilog code implementation for this frequency division task, paying attention to all the described requirements and specifications?

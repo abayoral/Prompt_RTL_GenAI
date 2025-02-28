@@ -1,0 +1,28 @@
+```
+module decade_counter (
+    input wire clk,
+    input wire reset,
+    output reg [3:0] q
+);
+
+    // Initialize counter to 1
+    initial begin
+        q = 4'b0001;
+    end
+
+    // Synchronous process for counting
+    always @(posedge clk) begin
+        if (reset) begin
+            // Reset the counter to 1
+            q <= 4'b0001;
+        end else begin
+            if (q < 4'b1010) begin
+                // Increment the counter if it's less than 10
+                q <= q + 1;
+            end
+            // once it reaches 10, it will hold the value of 10
+        end
+    end
+
+endmodule
+```

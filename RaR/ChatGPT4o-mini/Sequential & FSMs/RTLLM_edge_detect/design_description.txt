@@ -1,0 +1,20 @@
+As a qualified designer with expertise in Verilog, we are seeking your assistance in developing a Verilog module called "edge_detect." The primary function of this module is to reliably identify both rising and falling edges within a 1-bit input signal labeled 'a'. We aim to ensure that the module can accurately indicate the nature of the transitions taking place, specifically by generating output signals designated as 'rise' for detecting rising edges and 'down' for falling edges.
+
+To clarify the requirements, let us delve deeper into the specifics of the input and output ports as well as the operational behavior of the module:
+
+**Input Ports:**
+1. **clk**: This clock input serves as the synchronization source for the module. All edge detection processes should be aligned with the positive edge of this clock signal, ensuring that the detection logic operates in a time-coherent manner corresponding to the clock cycles.
+2. **rst_n**: This active-low reset signal enables the clearing of states and output signals within the module. When 'rst_n' is asserted (i.e., held low), the module should revert to a defined initial state, effectively resetting the edge detection mechanisms.
+3. **a**: The 1-bit input signal being monitored is critical for edge detection. The module must continuously observe any changes on this signal to identify whether a rising or falling edge is present.
+
+**Output Ports:**
+1. **rise**: This output signal serves as an indicator of a rising edge detected on the input signal 'a'. When a transition occurs from a low (0) to a high (1) state, the 'rise' signal should momentarily assert high (1) for the duration of the subsequent clock cycle before reverting to low (0) until the next rising edge is encountered.
+2. **down**: Similar to ‘rise’, this output signal signals a falling edge on the input signal 'a'. It should trigger high (1) when there is a transition from high (1) to low (0) on the input and remain high for the following clock cycle before returning to low (0) until a further falling edge is detected.
+
+**Implementation Considerations:**
+- The core requirement for the module is to achieve accurate edge detection, which necessitates observing changes in the input signal 'a' in conjunction with the positive edge of the clock signal 'clk'. 
+- It may be essential to utilize registers within the module to maintain the last state of the input signal 'a'. This will facilitate the comparison between the current and previous states to recognize when transitions occur.
+- The implementation must ensure that the reset functionality is robust and allows the module to return to a predetermined state whenever 'rst_n' is asserted.
+- It is vital that the output signals ('rise' and 'down') are designed to indicate a detected edge accurately, remaining high temporarily to signify the event, and then automatically transitioning to low (0) to prepare for subsequent detections.
+
+In light of these detailed specifications and considerations, we invite you to outline how you would approach the design and implementation of the "edge_detect" Verilog module to meet these requirements effectively. Your insights and methodologies for achieving this will be invaluable.

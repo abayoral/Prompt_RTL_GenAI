@@ -1,0 +1,29 @@
+```verilog
+// you're a senior Digital Design Engineer at a leading hardware design company tasked with developing a critical Verilog module for a next-generation product. The success of this module is pivotal for maintaining my computer hardware company's reputation in the industry.
+
+// Build a priority encoder for 8-bit inputs. Given an 8-bit vector, 
+// the output should report the first (least significant) bit in the vector that is 1. 
+// Report zero if the input vector has no bits that are high. 
+// For example, the input 8'b10010000 should output 3'd4, because bit[4] is first bit that is high.
+
+// synthesis verilog_input_version verilog_2001
+module top_module (
+    input [7:0] in,
+    output reg [2:0] pos );
+
+    always @(*) begin
+        casez(in)
+            8'b1??????? : pos = 3'd7;
+            8'b01?????? : pos = 3'd6;
+            8'b001????? : pos = 3'd5;
+            8'b0001???? : pos = 3'd4;
+            8'b00001??? : pos = 3'd3;
+            8'b000001?? : pos = 3'd2;
+            8'b0000001? : pos = 3'd1;
+            8'b00000001 : pos = 3'd0;
+            default     : pos = 3'd0; // No bits are high
+        endcase
+    end
+
+endmodule
+```

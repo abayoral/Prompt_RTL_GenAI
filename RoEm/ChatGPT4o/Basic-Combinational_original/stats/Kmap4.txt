@@ -1,0 +1,5 @@
+CoT/modules/Kmap4.v:9: syntax error
+CoT/modules/Kmap4.v:9: error: Syntax error in continuous assignment
+Module file path: CoT/modules/Kmap4.v
+Testbench file path: hdlbits_testbenches/Kmap4_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/Kmap4_sim', 'CoT/modules/Kmap4.v', 'hdlbits_testbenches/Kmap4_0_tb.v']' returned non-zero exit status 2.

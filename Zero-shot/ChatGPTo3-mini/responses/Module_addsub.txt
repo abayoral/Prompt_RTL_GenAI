@@ -1,0 +1,35 @@
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    input sub,
+    output [31:0] sum
+);
+
+    wire [15:0] b_low, b_high;
+    wire carry;
+
+    // Invert b conditionally using XOR: When sub == 1, each bit of b is inverted.
+    assign b_low  = b[15:0]  ^ {16{sub}};
+    assign b_high = b[31:16] ^ {16{sub}};
+
+    // Instantiate first 16-bit adder for the lower half.
+    // Connect sub to the carry-in for adder-subtraction.
+    add16 lower_adder (
+        .a(a[15:0]),
+        .b(b_low),
+        .cin(sub),
+        .sum(sum[15:0]),
+        .cout(carry)
+    );
+
+    // Instantiate second 16-bit adder for the upper half.
+    // Use the carry-out from the lower half as the carry-in.
+    add16 upper_adder (
+        .a(a[31:16]),
+        .b(b_high),
+        .cin(carry),
+        .sum(sum[31:16]),
+        .cout()
+    );
+
+endmodule

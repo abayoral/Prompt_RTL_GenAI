@@ -1,0 +1,15 @@
+```verilog
+module bit_reverser (
+    input [99:0] in_vector,
+    output reg [99:0] out_vector
+);
+
+    always @* begin
+        integer i;
+        for (i = 0; i < 100; i = i + 1) begin
+            out_vector[i] = in_vector[99 - i];
+        end
+    end
+
+endmodule
+```

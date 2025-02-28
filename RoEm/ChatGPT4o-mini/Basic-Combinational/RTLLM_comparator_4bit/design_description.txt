@@ -1,0 +1,27 @@
+As an experienced Verilog designer, your task is to create a Verilog module that acts as a 4-bit comparator, which utilizes multiple bit-level comparators in combinational logic. The purpose of this module is to compare two 4-bit binary numbers, A and B, and provide specific outputs based on their comparison. 
+
+To achieve this, you are provided with the following specifications:
+
+**Module Name:**
+- The module should be named `comparator_4bit`.
+
+**Input Ports:**
+- `A [3:0]`: This is the first 4-bit input operand, represented as a binary number, that will be compared against the second operand, B.
+- `B [3:0]`: This is the second 4-bit input operand, also represented as a binary number, to be compared with A.
+
+**Output Ports:**
+- `A_greater`: This is a 1-bit output that should be set to high (1) if and only if the binary number A is determined to be greater than the binary number B.
+- `A_equal`: This is a 1-bit output that should be high (1) when both A and B are equal.
+- `A_less`: This is a 1-bit output that should be high (1) if the binary number A is less than the binary number B.
+
+**Implementation Details:**
+- **Comparison Logic**: The comparison between the two operands A and B should be realized through a combinational logic circuit that effectively emulates binary subtraction, A minus B. This operation provides a basis for determining the relationship between A and B.
+  
+- **Carry Generation and Interpretation**: During the emulation of binary subtraction:
+  - If there is a borrow generated, it can be interpreted as an indication that A is less than B, thereby setting the output `A_less` to high.
+  - If no borrow occurs during the operation and the result is non-zero, it can be concluded that A is greater than B, which should assert `A_greater` to high.
+  - If the subtraction yields a zero result, then A and B are equal, necessitating that `A_equal` is set to high.
+
+- **Output Encoding**: It is crucial that the outputs `A_greater`, `A_equal`, and `A_less` are mutually exclusive, which implies that only one of these outputs should be asserted (set to high) at any given time, thus representing the distinct comparison states of the input operands.
+
+Your task is to code the full Verilog implementation for this 4-bit comparator module, applying the given specifications and logic for accurate comparison results.

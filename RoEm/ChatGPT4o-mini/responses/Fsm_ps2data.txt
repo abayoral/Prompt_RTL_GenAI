@@ -1,0 +1,87 @@
+```verilog
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output reg [23:0] out_bytes,
+    output reg done
+);
+    // State encoding
+    typedef enum reg [1:0] {
+        IDLE = 2'b00,
+        BYTE1 = 2'b01,
+        BYTE2 = 2'b10,
+        BYTE3 = 2'b11
+    } state_t;
+
+    state_t current_state, next_state;
+
+    // Shift register to hold incoming bytes
+    reg [7:0] byte_buffer [0:2];
+    reg [2:0] byte_count;
+
+    // State transition
+    always @(posedge clk) begin
+        if (reset) begin
+            current_state <= IDLE;
+            byte_count <= 0;
+            out_bytes <= 24'b0;
+            done <= 1'b0;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+
+    // Next state logic
+    always @(*) begin
+        case (current_state)
+            IDLE: begin
+                if (in[3]) begin
+                    next_state = BYTE1;
+                end else begin
+                    next_state = IDLE;
+                end
+            end
+            BYTE1: begin
+                next_state = BYTE2;
+            end
+            BYTE2: begin
+                next_state = BYTE3;
+            end
+            BYTE3: begin
+                next_state = IDLE;
+            end
+            default: next_state = IDLE;
+        endcase
+    end
+
+    // Output logic and byte capture
+    always @(posedge clk) begin
+        if (reset) begin
+            out_bytes <= 24'b0;
+            done <= 1'b0;
+            byte_count <= 0;
+        end else begin
+            case (current_state)
+                IDLE: begin
+                    done <= 1'b0;
+                    byte_count <= 0;
+                end
+                BYTE1: begin
+                    byte_buffer[0] <= in;
+                    byte_count <= byte_count + 1;
+                end
+                BYTE2: begin
+                    byte_buffer[1] <= in;
+                    byte_count <= byte_count + 1;
+                end
+                BYTE3: begin
+                    byte_buffer[2] <= in;
+                    out_bytes <= {byte_buffer[0], byte_buffer[1], in}; // Capture the 3-byte message
+                    done <= 1'b1;
+                end
+            endcase
+        end
+    end
+endmodule
+```

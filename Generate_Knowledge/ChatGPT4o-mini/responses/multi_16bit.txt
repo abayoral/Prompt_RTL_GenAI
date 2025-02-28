@@ -1,0 +1,62 @@
+```verilog
+module multi_16bit (
+    input wire clk,
+    input wire rst_n,
+    input wire start,
+    input wire [15:0] ain,
+    input wire [15:0] bin,
+    output reg [31:0] yout,
+    output reg done
+);
+
+reg [15:0] areg, breg; // Registers for multiplicand and multiplier
+reg [31:0] yout_r; // Product register
+reg [4:0] i; // Shift count register
+reg done_r; // Completion flag
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        i <= 0;
+        done_r <= 0;
+        areg <= 0;
+        breg <= 0;
+        yout_r <= 0;
+    end else begin
+        if (start) begin
+            if (i < 17) begin
+                if (i == 0) begin
+                    areg <= ain;
+                    breg <= bin;
+                    yout_r <= 0;
+                end else if (i <= 16) begin
+                    if (areg[i - 1]) begin
+                        yout_r = yout_r + (breg << (i - 1));
+                    end
+                end
+                i <= i + 1;
+            end
+            if (i == 16) begin
+                done_r <= 1;
+            end
+            if (i == 17) begin
+                done_r <= 0;
+                yout_r <= 0;
+                i <= 0; // Reset shift count for next multiplication
+            end
+        end else begin
+            i <= 0; // Reset shift count if start is low
+        end
+    end
+end
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        done <= 0;
+    end else begin
+        done <= done_r;
+        yout <= yout_r; // Assign product output
+    end
+end
+
+endmodule
+```

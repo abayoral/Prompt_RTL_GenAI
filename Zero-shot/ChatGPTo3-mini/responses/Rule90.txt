@@ -1,0 +1,35 @@
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output [511:0] q );
+
+    // Internal state holds the current generation of cells
+    reg [511:0] state;
+    reg [511:0] next_state;
+    integer i;
+
+    // Combinational logic to compute the next generation based on Rule 90:
+    // For boundaries, we assume cells outside are 0.
+    // For cell 0: next = 0 XOR state[1] = state[1]
+    // For cell i (1 <= i <= 510): next = state[i-1] XOR state[i+1]
+    // For cell 511: next = state[510] XOR 0 = state[510]
+    always @(*) begin
+        next_state[0] = state[1];
+        for (i = 1; i < 511; i = i + 1)
+            next_state[i] = state[i-1] ^ state[i+1];
+        next_state[511] = state[510];
+    end
+
+    // Synchronous update: Load or evolve the state on each rising clock edge.
+    always @(posedge clk) begin
+        if (load)
+            state <= data;
+        else
+            state <= next_state;
+    end
+
+    // Output the current state.
+    assign q = state;
+
+endmodule

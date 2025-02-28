@@ -1,0 +1,30 @@
+Consider the following scenario:
+
+You are an experienced Verilog designer, and your assignment is to develop a data width conversion module. Your goal is to create a converter that transforms incoming 8-bit data into a properly formatted 16-bit data output. Additionally, your design must provide a mechanism to indicate when the output data is valid by asserting a dedicated valid signal.
+
+The module, which will be designated as width_8to16, must meet the specific criteria outlined below:
+
+Overview:
+• The primary function of this module is to accept 8-bit data inputs sequentially and produce a 16-bit output, where the first 8-bit input is destined to occupy the higher-order bits (the most significant bits) of the output. The second valid 8-bit input, when it becomes available, will be concatenated with the first to complete the 16-bit data word.
+• The module should only assert the valid signal for the output (valid_out) in the cycle immediately following the reception of a pair of 8-bit valid inputs, ensuring that the timing below supports correct data concatenation and signaling.
+
+Input Details:
+• clk: A clock signal that will drive the sequential logic. All data capture and processing should occur synchronously with the rising edge of this clock.
+• rst_n: An active-low reset signal which, when driven low, forces a reset of the internal state of the module. This reset condition must clear any registers or stored values, including the previously received 8-bit data.
+• valid_in: A control signal indicating that the current data present on data_in is valid and should be processed by the module.
+• data_in: An 8-bit data line carrying the input data that needs to be re-formatted from an 8-bit stream into a 16-bit word.
+
+Output Requirements:
+• valid_out: A signal that is used to indicate that the 16-bit output is valid. This signal should be synchronized so that it becomes active only once the module has successfully combined two valid 8-bit inputs.
+• data_out: This is the 16-bit output that results from the width conversion process. It should consist of the stored first 8-bit data occupying the upper 8 bits and the subsequent 8-bit data filling the lower 8 bits.
+
+Operational Specifications:
+• The design must be synchronized with the clock, meaning all operations that involve data capture, register updates, and valid signal generation occur on the rising edge of the clock or immediately after a reset event.
+• When the reset signal (rst_n) is activated (i.e., when it goes low), the output register (data_out) should be cleared to zero, ensuring the module returns to a clean initial state.
+• Upon the assertion of valid_in, the module should capture the incoming 8-bit value. The first captured data needs to be stored temporarily, as it will be merged later with a second valid input.
+• Only after a second valid data input has been received should the circuit then combine the two inputs to form a complete 16-bit output, where the first input is placed in the MSBs, and the second completes the concatenation.
+• Consequently, the valid_out signal should be activated only in the cycle immediately following the reception of the second valid input to indicate that the output data is now complete and valid for further processing.
+
+Your task is to develop a comprehensive Verilog implementation that fulfills the above criteria, accurately capturing the sequential dynamics of storing, concatenating, and signaling, all synchronized with the module clock. Please ensure the design is efficient and reliable in handling both data conversion and valid output signaling.
+
+Note: Do not include any solution or answer code here. Focus entirely on understanding and restating the problem details and requirements needed for the implementation.

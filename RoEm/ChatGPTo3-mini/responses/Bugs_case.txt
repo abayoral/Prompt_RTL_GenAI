@@ -1,0 +1,28 @@
+module top_module (
+    input  [7:0] code,
+    output reg [3:0] out,
+    output reg valid
+);
+
+    always @(*) begin
+        // Default assignments for recognized codes
+        valid = 1;
+        case (code)
+            8'h45: out = 0;  // key 0
+            8'h16: out = 1;  // key 1
+            8'h1e: out = 2;  // key 2
+            8'h1a: out = 3;  // key 3 (8'd26 is 8'h1A)
+            8'h25: out = 4;  // key 4
+            8'h2e: out = 5;  // key 5
+            8'h36: out = 6;  // key 6
+            8'h3d: out = 7;  // key 7
+            8'h3e: out = 8;  // key 8
+            8'h46: out = 9;  // key 9 (changed from 6'h46 to 8'h46 for consistency)
+            default: begin
+                valid = 0;
+                out   = 4'b0; // Default out value when code not recognized
+            end
+        endcase
+    end
+
+endmodule

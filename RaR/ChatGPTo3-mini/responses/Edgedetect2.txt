@@ -1,0 +1,21 @@
+module rising_edge_detector(
+    input        clk,
+    input  [7:0] in,
+    output reg [7:0] anyedge
+);
+
+  // Register to store the previous state of input bits
+  reg [7:0] prev;
+
+  // On every rising edge of the clock, compare current input with the previous state.
+  // If a bit transitions from 0 to 1 (rising edge) then set the corresponding
+  // bit of 'anyedge' on the next clock cycle.
+  always @(posedge clk) begin
+    // Compute rising edge detection with one cycle delay:
+    anyedge <= in & ~prev;
+    
+    // Update previous state for the next comparison
+    prev <= in;
+  end
+
+endmodule

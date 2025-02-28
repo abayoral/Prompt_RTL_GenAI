@@ -1,0 +1,85 @@
+```verilog
+module control_logic (
+    input wire clk,
+    input wire reset,
+    input wire overheated,
+    input wire arrived_at_destination,
+    input wire low_fuel,
+    output reg shutdown,
+    output reg drive
+);
+
+    // State definitions
+    typedef enum reg [1:0] {
+        IDLE = 2'b00,
+        DRIVING = 2'b01,
+        SHUTDOWN = 2'b10
+    } state_t;
+
+    state_t current_state, next_state;
+
+    // Sequential logic for state transitions
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+
+    // Combinatorial logic for next state determination
+    always @(*) begin
+        // Default state
+        next_state = current_state;
+
+        // Drive logic
+        case (current_state)
+            IDLE: begin
+                if (!low_fuel) begin
+                    next_state = DRIVING;
+                end
+            end
+
+            DRIVING: begin
+                if (arrived_at_destination) begin
+                    next_state = IDLE;
+                end else if (overheated) begin
+                    next_state = SHUTDOWN;
+                end else if (low_fuel) begin
+                    next_state = IDLE; // Stop driving if fuel is low
+                end
+            end
+
+            SHUTDOWN: begin
+                shutdown = 1'b1; // Indicate shutdown
+                // Once in shutdown, stay in this state until reset
+            end
+
+            default: begin
+                next_state = IDLE;
+            end
+        endcase
+    end
+
+    // Output logic based on state
+    always @(*) begin
+        case (current_state)
+            IDLE: begin
+                shutdown = 1'b0;
+                drive = 1'b0;
+            end
+
+            DRIVING: begin
+                shutdown = 1'b0;
+                drive = 1'b1;
+            end
+
+            SHUTDOWN: begin
+                shutdown = 1'b1;
+                drive = 1'b0;
+            end
+        endcase
+    end
+
+endmodule
+```

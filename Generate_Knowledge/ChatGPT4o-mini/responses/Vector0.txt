@@ -1,0 +1,16 @@
+```
+module top_module ( 
+    input wire [2:0] vec,
+    output wire [2:0] outv,
+    output wire o2,
+    output wire o1,
+    output wire o0  
+); 
+
+    assign outv = vec; // Assigning the 3-bit input to the output vector
+    assign o2 = vec[2]; // Assigning position 2 of vec to output o2
+    assign o1 = vec[1]; // Assigning position 1 of vec to output o1
+    assign o0 = vec[0]; // Assigning position 0 of vec to output o0
+
+endmodule
+```

@@ -1,0 +1,50 @@
+module dual_port_ram (
+    input             clk,
+    input             rst_n,       // Active low reset
+    input             write_en,    // Write enable signal
+    input  [2:0]      write_addr,  // Write address (3 bits for DEPTH=8)
+    input  [5:0]      write_data,  // Data to be written (WIDTH=6)
+    input             read_en,     // Read enable signal
+    input  [2:0]      read_addr,   // Read address (3 bits for DEPTH=8)
+    output reg [5:0]  read_data    // Data read out (WIDTH=6)
+);
+
+  // Parameters for flexibility
+  parameter WIDTH = 6;
+  parameter DEPTH = 8;
+  
+  // Internal memory array
+  reg [WIDTH-1:0] ram [DEPTH-1:0];
+
+  integer i;
+  
+  // Write operation and memory initialization
+  // Using asynchronous reset to clear the memory contents
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      // Initialize all memory locations to zero asynchronously
+      for (i = 0; i < DEPTH; i = i + 1) begin
+        ram[i] <= {WIDTH{1'b0}};
+      end
+    end
+    else begin
+      if (write_en) begin
+        ram[write_addr] <= write_data;
+      end
+    end
+  end
+  
+  // Read operation
+  // Synchronous read with asynchronous reset for the output register
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      read_data <= {WIDTH{1'b0}};
+    end
+    else begin
+      if (read_en) begin
+        read_data <= ram[read_addr];
+      end
+    end
+  end
+
+endmodule

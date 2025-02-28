@@ -1,0 +1,73 @@
+```
+module multi_booth_8bit(
+    input wire clk,
+    input wire reset,
+    input wire [7:0] a, // 8-bit input
+    input wire [7:0] b, // 8-bit input
+    output reg [15:0] p, // 16-bit output product
+    output reg rdy // Ready signal
+);
+
+// Internal signals
+reg [15:0] multiplicand; // 16-bit multiplicand
+reg [15:0] multiplier; // 16-bit multiplier
+reg [15:0] product; // Accumulated product
+reg [4:0] ctr; // 5-bit counter
+
+// State Variables
+reg [1:0] state;
+parameter IDLE = 2'b00, EXECUTE = 2'b01, COMPLETE = 2'b10;
+
+always @(posedge clk or posedge reset) begin
+    if (reset) begin
+        // Reset all registers and signals
+        p <= 16'b0;
+        product <= 16'b0;
+        multiplicand <= {8'b0, a}; // sign-extended
+        multiplier <= {8'b0, b}; // sign-extended
+        ctr <= 5'b0;
+        rdy <= 1'b0;
+        state <= IDLE;
+    end else begin
+        case (state)
+            IDLE: begin
+                if (ctr < 5'd16) begin
+                    state <= EXECUTE;
+                end else begin
+                    state <= COMPLETE;
+                end
+            end
+
+            EXECUTE: begin
+                // Booth's Algorithm Logic
+                case ({multiplier[1:0]})
+                    2'b01: product <= product + multiplicand; // add multiplicand
+                    2'b10: product <= product - multiplicand; // subtract multiplicand
+                    2'b00: product <= product; // do nothing
+                    2'b11: product <= product; // do nothing
+                endcase
+                
+                // Left shift product and multiplier
+                product <= {product[14:0], 1'b0}; // Shift product left
+                multiplier <= {multiplier[15], multiplier[15:2]}; // Shift multiplier right
+                
+                // Increment counter
+                ctr <= ctr + 1'b1;
+
+                // Check for completion
+                if (ctr == 5'd15) begin
+                    state <= COMPLETE;
+                end
+            end
+
+            COMPLETE: begin
+                p <= product; // assign product to output
+                rdy <= 1'b1; // set ready signal
+                state <= IDLE; // return to idle for next operation
+            end
+        endcase
+    end
+end
+
+endmodule
+```

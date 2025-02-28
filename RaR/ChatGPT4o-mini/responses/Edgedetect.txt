@@ -1,0 +1,19 @@
+```verilog
+module edge_detector (
+    input wire clk,
+    input wire [7:0] data_in,
+    output reg [7:0] data_out
+);
+
+    reg [7:0] data_prev;
+
+    always @(posedge clk) begin
+        // Store the current data_in in data_prev for comparison in the next clock cycle
+        data_prev <= data_in;
+
+        // Detect positive edges and assign to data_out
+        data_out <= data_in & ~data_prev;
+    end
+
+endmodule
+```

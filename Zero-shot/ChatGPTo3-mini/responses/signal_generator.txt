@@ -1,0 +1,43 @@
+module signal_generator(
+    input clk,
+    input rst_n,
+    output reg [4:0] wave
+);
+
+    // 1-bit register used to control the waveform direction:
+    // 0 for increment mode and 1 for decrement mode.
+    reg state;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset condition: initialize wave and state to zero.
+            wave <= 5'd0;
+            state <= 1'b0;
+        end
+        else begin
+            // Increment mode
+            if (state == 1'b0) begin
+                if (wave == 5'd31) begin
+                    // Reached the maximum peak; switch to decrement mode.
+                    state <= 1'b1;
+                end
+                else begin
+                    // Continue incrementing.
+                    wave <= wave + 5'd1;
+                end
+            end
+            // Decrement mode
+            else begin
+                if (wave == 5'd0) begin
+                    // Reached the valley; switch to increment mode.
+                    state <= 1'b0;
+                end
+                else begin
+                    // Continue decrementing.
+                    wave <= wave - 5'd1;
+                end
+            end
+        end
+    end
+
+endmodule

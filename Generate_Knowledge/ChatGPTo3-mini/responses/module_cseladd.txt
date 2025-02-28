@@ -1,0 +1,47 @@
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+
+    wire [15:0] lower_sum;
+    wire lower_cout;
+    wire [15:0] upper_sum0, upper_sum1;
+    wire [15:0] selected_upper;
+
+    // Lower adder: add lower 16 bits with cin = 0.
+    add16 lower_add (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(lower_sum),
+        .cout(lower_cout)
+    );
+    
+    // Upper adder 0: add upper 16 bits with carry-in = 0.
+    add16 upper_add0 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b0),
+        .sum(upper_sum0),
+        .cout()  // unused
+    );
+    
+    // Upper adder 1: add upper 16 bits with carry-in = 1.
+    add16 upper_add1 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b1),
+        .sum(upper_sum1),
+        .cout()  // unused
+    );
+
+    // 16-bit 2-to-1 multiplexer:
+    // If lower adder produces a carry-out, select upper_add1 result;
+    // otherwise, select upper_add0 result.
+    assign selected_upper = lower_cout ? upper_sum1 : upper_sum0;
+    
+    // Concatenate the upper and lower sums to form the final 32-bit sum.
+    assign sum = {selected_upper, lower_sum};
+
+endmodule

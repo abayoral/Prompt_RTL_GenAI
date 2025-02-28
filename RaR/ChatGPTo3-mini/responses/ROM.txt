@@ -1,0 +1,23 @@
+module ROM(
+    input  [7:0] addr,
+    output reg [15:0] dout
+);
+
+    reg [15:0] mem [0:255];
+
+    // Memory initialization
+    initial begin
+        mem[0] = 16'hA0A0;
+        mem[1] = 16'hB1B1;
+        mem[2] = 16'hC2C2;
+        mem[3] = 16'hD3D3;
+        // Optionally, initialize remaining memory locations if desired.
+        // For simplicity, the rest are left uninitialized.
+    end
+
+    // Combinational logic to output data corresponding to the input address
+    always @(*) begin
+        dout = mem[addr];
+    end
+
+endmodule

@@ -1,0 +1,49 @@
+```verilog
+module synchronizer (
+    input  wire         clk_a,    // Clock for the incoming data and enable
+    input  wire         clk_b,    // Clock for synchronization output
+    input  wire         arstn,    // Active low reset for clk_a domain
+    input  wire         brstn,    // Active low reset for clk_b domain
+    input  wire [3:0]   data_in,  // 4-bit input data
+    input  wire         data_en,   // Enable signal for data synchronization
+    output reg [3:0]    dataout    // 4-bit synchronized output data
+);
+
+    // Registers for clk_a domain
+    reg [3:0] data_reg;
+    reg       en_data_reg;
+
+    // Registers for clk_b domain
+    reg       en_clap_one;
+    reg       en_clap_two;
+
+    // clk_a domain process
+    always @(posedge clk_a or negedge arstn) begin
+        if (!arstn) begin
+            data_reg <= 4'b0;
+            en_data_reg <= 1'b0;
+        end else begin
+            if (data_en) begin
+                data_reg <= data_in;
+                en_data_reg <= data_en;
+            end
+        end
+    end
+
+    // clk_b domain process
+    always @(posedge clk_b or negedge brstn) begin
+        if (!brstn) begin
+            dataout <= 4'b0;
+            en_clap_one <= 1'b0;
+            en_clap_two <= 1'b0;
+        end else begin
+            en_clap_one <= en_data_reg;
+            en_clap_two <= en_clap_one;
+            if (en_clap_two) begin
+                dataout <= data_reg;
+            end // dataout retains previous state otherwise
+        end
+    end
+
+endmodule
+```

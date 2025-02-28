@@ -1,0 +1,40 @@
+```
+module accu (
+    input clk,
+    input rst_n,
+    input [7:0] data_in,
+    input valid_in,
+    output reg valid_out,
+    output reg [9:0] data_out
+);
+
+    reg [9:0] sum;       // Accumulator for the sum of data
+    reg [1:0] count;     // Counter to track the number of valid data received
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            sum <= 10'b0;       // Reset sum to 0
+            count <= 2'b0;      // Reset count to 0
+            valid_out <= 1'b0;  // Reset valid_out to 0
+            data_out <= 10'b0;   // Reset output data to 0
+        end else begin
+            if (valid_in) begin
+                sum <= sum + data_in; // Accumulate data
+                count <= count + 1;    // Increment count
+
+                if (count == 2'b11) begin // Check if we have received 4 valid inputs
+                    data_out <= sum;     // Output the accumulated sum
+                    valid_out <= 1'b1;   // Assert valid output
+                    sum <= 10'b0;         // Reset sum for next accumulation
+                    count <= 2'b0;        // Reset count for next cycle
+                end else begin
+                    valid_out <= 1'b0;    // Deassert valid output until we reach 4
+                end
+            end else begin
+                valid_out <= 1'b0;        // Deassert valid output if valid_in is not asserted
+            end
+        end
+    end
+
+endmodule
+```

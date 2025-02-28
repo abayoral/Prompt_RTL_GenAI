@@ -1,0 +1,52 @@
+You are assigned a project as a seasoned Verilog engineer where your objective is to design and implement a module called "calendar." This module will serve as a perpetual time-keeping mechanism and must correctly track seconds, minutes, and hours. The starting point for the system is defined by having an initial value of 0 for all three counters: seconds (Secs), minutes (Mins), and hours (Hours).
+
+The design specifications are as follows:
+
+• The Seconds Counter (Secs):  
+  - This counter should function cyclically, counting from 0 up to 59.  
+  - With each clock pulse, Secs increments. When it reaches 59, rather than rolling over to 60, it resets back to 0 on the next cycle.  
+  - An important detail is that when Secs completes its cycle (i.e., when it transitions from 59 to 0), this event is used as a trigger to increment the Minutes counter (Mins).
+
+• The Minutes Counter (Mins):  
+  - Mins should similarly count in a loop from 0 to 59.  
+  - Every time the Secs counter completes its cycle (when Secs equals 59), Mins should increment by 1.  
+  - If Mins is already at 59 and it receives the increment trigger from Secs completing its cycle, it indicates that an hour has passed. In this case, Mins should reset to 0 in the next cycle, and the Hours counter should be incremented.
+
+• The Hours Counter (Hours):  
+  - This counter must precisely track the hours by cycling through values from 0 to 23.  
+  - A full hour is defined by the accumulation of 59 seconds and 59 minutes, so when both Secs and Mins have reached the value of 59, the Hours counter should increment by 1.  
+  - Upon reaching 23, if an additional increment is triggered by the completion of a full cycle (i.e., both Secs and Mins at 59), Hours should then cycle back to 0.
+
+In terms of interfacing, your module will have specific input and output ports:
+
+Inputs:  
+  - CLK: A clock input that drives the timing of the module's operations, dictating when the counters should update.  
+  - RST: An active-high reset signal that, when asserted, immediately resets Secs, Mins, and Hours back to zero regardless of their current state.
+
+Outputs:  
+  - Secs: A 6-bit output port that displays the current seconds count.  
+  - Mins: A 6-bit output port that shows the current minutes count.  
+  - Hours: A 6-bit output port that reflects the current hours count.
+
+The module’s functionality is to be implemented using three separate always blocks, each managing one of the time units:
+
+1. Seconds Handling Block:  
+   - This block should activate on the positive edge of either the CLK or RST signals.  
+   - Its primary role is to update Secs; if RST is high, Secs should be immediately set to 0.  
+   - Otherwise, it should verify if Secs has reached 59. If so, it will reset Secs to 0 on the next cycle; if not, Secs simply increments.
+
+2. Minutes Handling Block:  
+   - Similarly sensitive to the positive edges of CLK and RST, this block updates Mins.  
+   - It must prioritize reset functionality (setting Mins to 0 when RST is active).  
+   - When Secs completes its count (i.e., reaches 59), this serves as the condition to increment Mins.  
+   - Notably, if at that moment Mins is at 59, it implies that a full hour has elapsed, necessitating a reset of Mins to 0 on the subsequent update.
+
+3. Hours Handling Block:  
+   - This always block governs the Hours counter and also triggers on the positive edge of either CLK or RST.  
+   - An active RST should instantly clear Hours to 0.  
+   - Hours should increment only when both Mins and Secs have reached 59 (signifying that a complete minute has just been finished and it marks the transition between hours).  
+   - When the value of Hours exceeds 23 due to such an increment, it must roll over and reset to 0.
+
+The task is to develop a Verilog model that encapsulates this behavior. Carefully structure your code to ensure that each counter responds correctly to its respective timing and reset conditions. Be mindful that the incrementing of one counter depends on the full cycle completion of the preceding counter (Secs triggering Mins, and Mins triggering Hours), and that proper resets occur via the RST signal.
+
+This expanded explanation should provide a detailed understanding of the expected functionality and help guide your implementation process.

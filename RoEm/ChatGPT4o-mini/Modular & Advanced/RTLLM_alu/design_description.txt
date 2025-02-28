@@ -1,0 +1,23 @@
+You have indicated that you are operating as a professional Verilog designer and tasked with implementing an Arithmetic Logic Unit (ALU) specifically designed for a 32-bit MIPS Instruction Set Architecture (ISA) CPU. This ALU is required to perform various operations based upon a variety of opcodes, where each opcode corresponds to a specific arithmetic or logic operation. The operations, which the ALU should support, are associated with unique 6-bit binary control signals (aluc). These operations include addition, subtraction, logical operations such as AND and OR, as well as various shift and set instructions.
+
+Inputs and Outputs:
+- The ALU accepts two 32-bit operands, namely 'a' and 'b', which are involved in the computation.
+- A 6-bit input signal 'aluc' is used to dictate the specific operation that the ALU should execute.
+- The primary output, 'r', delivers the 32-bit result of the operation.
+- A series of flags are also output, these include:
+  - 'zero': This is a 1-bit flag indicating if the result of the operation is zero.
+  - 'carry': This flag checks if there was a carry bit during arithmetic operations.
+  - 'negative': This flag signals if the result of the operation is negative.
+  - 'overflow': This flag detects overflow conditions when the arithmetic result surpasses the representable range.
+  - 'flag': Specifically used for SLT (set less than) and SLTU operations to reflect their outcome.
+
+The task involves assigning and computing these outputs within the logic of your Verilog module. The architecture of the module must account for all specified operations, leveraging a combination of arithmetic, logical, and shift operations based on the opcodes provided.
+
+Implementation Details:
+- Define the opcodes as parameters with their respective 6-bit binary values.
+- Establish the logic to handle each opcode, executing the correct operations and setting the flags as necessary.
+- An 'always' block is utilized with a 'case' statement to discern the operation based on the 'aluc' signal.
+- Some nuances, such as determining shift amounts or managing concatenations for the LUI operation, must be handled appropriately within the logic.
+- In situations where no matching opcode is found for 'aluc', the ALU should output 'z' to indicate high-impedance, reflecting an undefined operation in the design.
+
+With these specifications in mind, your role would be to develop the complete Verilog code that fulfills these requirements.

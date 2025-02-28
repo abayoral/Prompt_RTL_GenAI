@@ -1,0 +1,41 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // Using the Karnaugh map we derived the simplified sum‐of‐products:
+    // out = (b' c') + (a' d') + (a b' d) + (a c d) + (b c d)
+    //
+    // Explanation:
+    // The original K-map was arranged as follows (rows: c'd', c'd, cd, cd'; columns: a'b', a'b, ab, ab'):
+    // 
+    //      a'b'  a'b   ab   ab'
+    // c'd'   1     1    0     1
+    // c'd    1     0    0     1
+    // cd     0     1    1     1
+    // cd'    1     1    0     0
+    //
+    // By grouping adjacent 1’s we obtained the following groups:
+    //  1. A 2x2 block in the leftmost two columns (cells at (c'd', a'b'), (c'd', a'b), (cd', a'b'), (cd', a'b))
+    //     Common: a=0 (i.e. a') and d=0 (i.e. d') → implicant: a' d'.
+    //  2. A vertical 2-group at column ab' using rows c'd' and c'd
+    //     Common: at col ab' a=1, b=0; and rows c'd' and c'd share c'=1 → implicant: a b' c'.
+    //  3. A vertical 2-group at column ab' using rows c'd and cd
+    //     Common: a=1, b=0; and rows share d=1 → implicant: a b' d.
+    //  4. A horizontal 2-group on row cd covering columns ab and ab'
+    //     Common: row cd (c=1,d=1) and between ab and ab' gives a=1 → implicant: a c d.
+    //  5. A horizontal pair covering (cd, a'b) and (cd, ab) gives common: b=1 in one pair and row cd (c=1,d=1) → implicant: b c d.
+    //  6. A vertical pair covering (c'd', a'b') and (c'd, a'b') yields: a=0, b=0, c'=1 → implicant: a' b' c'.
+    //
+    // Note that the implicants from groups (2) and (6) can be merged because:
+    //    a b' c' + a' b' c' = b' c'(a + a') = b' c'
+    // 
+    // Thus the final simplified expression becomes:
+    //     out = a' d' + b' c' + a b' d + a c d + b c d.
+    
+    assign out = (~a & ~d) | (~b & ~c) | (a & ~b & d) | (a & c & d) | (b & c & d);
+
+endmodule

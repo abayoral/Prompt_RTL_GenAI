@@ -1,0 +1,20 @@
+```verilog
+module thermostat (
+    input wire mode,        // 1 for heating, 0 for cooling
+    input wire too_cold,   // Input signal to activate heater
+    input wire too_hot,     // Input signal to activate air conditioner
+    input wire fan_on,      // Manual request to turn on fan
+    output wire heater,     // Output to activate heater
+    output wire air_cond,   // Output to activate air conditioner
+    output wire blower       // Output to activate blower fan
+);
+
+// Logic for heater and air conditioner activation
+assign heater = (mode == 1) & too_cold; // Heater ON if heating mode and too cold
+assign air_cond = (mode == 0) & too_hot; // Air conditioner ON if cooling mode and too hot
+
+// Blower logic - ON if heater or air conditioner is ON or fan is manually requested
+assign blower = heater | air_cond | fan_on;
+
+endmodule
+```

@@ -1,0 +1,22 @@
+You are tasked with designing a Verilog module named "accu," which is intended to function as a data accumulator for serially incoming input signals. The primary role of this module is to process an 8-bit input data stream, sequentially accumulate the values, and produce a valid output once a predetermined condition—specifically the accumulation of data from four distinct input signals—is met. Below, I will elaborate on the requirements and specifications for developing this module, which is essential to ensuring that all operational aspects are thoroughly considered by you as a professional Verilog designer.
+
+1. **Module Identification**: The module will be uniquely identified by its name "accu," clearly indicating its purpose related to data accumulation within your project framework.
+
+2. **Input Port Specifications**:
+   - **clk**: This signal functions as the clock input to the module, providing the necessary timing reference for all synchronous operations. It is crucial for coordinating the module's activities.
+   - **rst_n**: This is an active-low reset signal. When asserted low, it initializes the module's internal state and prepares it for operation, ensuring that all internal registers are set to a defined starting condition. The underscore in the name emphasizes its active-low nature.
+   - **data_in[7:0]**: This represents an 8-bit wide bus that serves as the source of input data for accumulation. Each incoming data value on this bus is treated as an unsigned integer, meant to be summed in subsequent operations.
+   - **valid_in**: This control signal indicates that the current data presented on `data_in` is both valid and ready for the module to process. The module should recognize this signal at the positive edge of the clock, leading to data capture.
+
+3. **Output Port Specifications**:
+   - **valid_out**: This output signal is activated (goes high) when the accumulation condition is satisfied—that is, when the module has successfully summed four data entries. This signal remains high for just one clock cycle to indicate readiness for output before returning to a low state.
+   - **data_out[9:0]**: A 10-bit output bus that carries the accumulated sum of the last four consecutive 8-bit data inputs once `valid_out` is asserted. The 10-bit width is essential to accommodate the maximum possible accumulation result (which is four times the highest 8-bit value).
+
+4. **Key Implementation Guidelines**:
+   - **Synchronous Operation**: It's important to ensure all operations related to data reception and output generation are synchronized with the `clk` signal. Accumulation and the toggling of the valid output signal must occur in alignment with the clock cycles.
+   - **Reset Functionality**: When the `rst_n` signal is activated (i.e., when it is low), all stored values within the accumulation module should be cleared and reset. This includes resetting the `valid_out` signal to ensure that no old data influences later operations.
+   - **Data Accumulation Process**: The module must capture the value on `data_in` when `valid_in` is asserted and add it to an internal register designated for summation. This should continue for a total of four valid entries.
+   - **Output Condition**: The module will only present a valid output after it has received and processed four valid input signals. The `data_out` will then reflect this total, and `valid_out` will pulse high for one clock cycle to signal this condition.
+   - **State Management**: It is critical to ensure that there is no output generated—neither in terms of data nor control signals—until the condition of having four valid input data instances is fully met. This is necessary to maintain the integrity of signal control and data consistency.
+
+Given these comprehensive requirements, you are now tasked with writing the complete Verilog code for this module. This implementation must adhere strictly to the outlined specifications and be designed to operate efficiently within these defined constraints. Your attention to these details will be pivotal in achieving functional fidelity in the Verilog module you create.

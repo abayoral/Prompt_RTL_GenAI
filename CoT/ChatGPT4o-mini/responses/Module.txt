@@ -1,0 +1,14 @@
+```
+module top_module ( input a, input b, output out );
+
+    wire in1, in2;
+
+    // Instantiate mod_a and connect its ports to the top-level module's ports
+    mod_a instance_name (
+        .in1(a),
+        .in2(b),
+        .out(out)
+    );
+
+endmodule
+```

@@ -1,0 +1,26 @@
+```verilog
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output [99:0] cout,
+    output [99:0] sum );
+
+    wire [99:0] carry; // Internal carry signals
+
+    // Instantiate full adders
+    genvar i;
+    generate
+        for (i = 0; i < 100; i = i + 1) begin : full_adder
+            if (i == 0) begin
+                // For the first full adder, use cin
+                {carry[i], sum[i]} = a[i] + b[i] + cin; 
+            end else begin
+                // For subsequent adders, use the carry from the previous stage
+                {carry[i], sum[i]} = a[i] + b[i] + carry[i-1];
+            end
+            assign cout[i] = carry[i]; // Output carry for each full adder
+        end
+    endgenerate
+
+endmodule
+```

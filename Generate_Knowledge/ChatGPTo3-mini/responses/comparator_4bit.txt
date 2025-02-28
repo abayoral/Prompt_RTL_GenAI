@@ -1,0 +1,23 @@
+module comparator_4bit(
+    input  [3:0] A,
+    input  [3:0] B,
+    output       A_greater,
+    output       A_equal,
+    output       A_less
+);
+
+    // Perform 5-bit subtraction to capture potential borrow
+    wire [4:0] diff;
+    // The MSB (bit 4) will be '1' if a borrow occurred (i.e. A < B)
+    assign diff = {1'b0, A} - {1'b0, B};
+
+    // If the subtraction required a borrow, A is less than B
+    assign A_less = diff[4];
+    
+    // If no borrow and the difference is zero, then A equals B
+    assign A_equal = ~diff[4] & (diff[3:0] == 4'b0000);
+    
+    // If no borrow and the difference is non-zero, then A is greater than B
+    assign A_greater = ~diff[4] & (diff[3:0] != 4'b0000);
+    
+endmodule

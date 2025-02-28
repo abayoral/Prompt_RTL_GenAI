@@ -1,0 +1,23 @@
+```verilog
+module sub_64bit (
+    input  signed [63:0] A,
+    input  signed [63:0] B,
+    output signed [63:0] result,
+    output overflow
+);
+    wire signed [63:0] temp_result;
+    wire A_sign, B_sign, result_sign;
+
+    assign temp_result = A - B;
+    assign result = temp_result;
+
+    // Determine the signs of A, B, and the result
+    assign A_sign = A[63];
+    assign B_sign = B[63];
+    assign result_sign = result[63];
+
+    // Check for overflow conditions
+    assign overflow = (A_sign != B_sign) && (A_sign != result_sign);
+    
+endmodule
+```

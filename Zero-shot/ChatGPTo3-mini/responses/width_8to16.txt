@@ -1,0 +1,66 @@
+module width_8to16(
+    input clk,
+    input rst_n,
+    input valid_in,
+    input [7:0] data_in,
+    output reg valid_out,
+    output reg [15:0] data_out
+);
+
+  // Define a simple FSM with three states.
+  // WAIT_FIRST: Waiting for the first valid data.
+  // WAIT_SECOND: First valid data stored; waiting for the second valid data.
+  // OUTPUT_STATE: A paired result has been formed; output in this cycle.
+  localparam WAIT_FIRST   = 2'b00;
+  localparam WAIT_SECOND  = 2'b01;
+  localparam OUTPUT_STATE = 2'b10;
+
+  reg [1:0] state;
+  reg [7:0] data_high;  // Temporary storage for first 8-bit data.
+
+  // Synchronous process with asynchronous active-low reset.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      state      <= WAIT_FIRST;
+      valid_out  <= 1'b0;
+      data_out   <= 16'b0;
+      data_high  <= 8'b0;
+    end else begin
+      case (state)
+        WAIT_FIRST: begin
+          valid_out <= 1'b0;  // No valid 16-bit data output yet.
+          // Check if current 8-bit input is valid.
+          if (valid_in) begin
+            data_high <= data_in;  // Store first 8-bit data.
+            state <= WAIT_SECOND;
+          end
+        end
+
+        WAIT_SECOND: begin
+          valid_out <= 1'b0;  // Still not outputting 16-bit data.
+          // Waiting for the second valid 8-bit input.
+          if (valid_in) begin
+            // Combine previously stored data (data_high) with the new data_in.
+            data_out <= {data_high, data_in};
+            state <= OUTPUT_STATE;
+          end
+        end
+
+        OUTPUT_STATE: begin
+          // In the cycle following the arrival of paired inputs,
+          // output the valid 16-bit data.
+          valid_out <= 1'b1;
+          // Reset the state to wait for the next pair of inputs.
+          state <= WAIT_FIRST;
+        end
+
+        default: begin
+          state <= WAIT_FIRST;
+          valid_out <= 1'b0;
+          data_out <= 16'b0;
+        end
+      endcase
+    end
+  end
+
+endmodule

@@ -1,0 +1,26 @@
+module dual_edge_ff(
+    input clk,
+    input d,
+    output q
+);
+
+  // Two separate registers capture 'd' on opposite clock edges.
+  reg q_pos;
+  reg q_neg;
+
+  // Capture data on the rising edge of the clock.
+  always @(posedge clk) begin
+    q_pos <= d;
+  end
+  
+  // Capture data on the falling edge of the clock.
+  always @(negedge clk) begin
+    q_neg <= d;
+  end
+
+  // The final output q is selected based on the clock level.
+  // When clk is high, q_pos (updated on posedge) is used.
+  // When clk is low, q_neg (updated on negedge) is used.
+  assign q = clk ? q_pos : q_neg;
+
+endmodule

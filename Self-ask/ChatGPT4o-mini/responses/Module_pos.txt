@@ -1,0 +1,25 @@
+```verilog
+module mod_a (output out1, output out2, input a, input b, input c, input d);
+    // Logic for processing inputs a, b, c, d to generate outputs out1 and out2
+    assign out1 = a & b; // Example logic for out1
+    assign out2 = c | d; // Example logic for out2
+endmodule
+
+module top_module ( 
+    input a, 
+    input b, 
+    input c,
+    input d,
+    output out1,
+    output out2
+);
+    mod_a my_mod_a (
+        .out1(out1),
+        .out2(out2),
+        .a(a),
+        .b(b),
+        .c(c),
+        .d(d)
+    );
+endmodule
+```

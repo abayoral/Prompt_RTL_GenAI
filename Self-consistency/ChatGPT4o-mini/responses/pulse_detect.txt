@@ -1,0 +1,57 @@
+module pulse_detect (
+    input wire clk,
+    input wire rst_n,
+    input wire data_in,
+    output reg data_out
+);
+
+    typedef enum reg [1:0] {
+        IDLE = 2'b00,
+        DETECTING = 2'b01,
+        PULSE_CONFIRMED = 2'b10
+    } state_t;
+
+    state_t state, next_state;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= IDLE;
+            data_out <= 0;
+        end else begin
+            state <= next_state;
+        end
+    end
+
+    always @(*) begin
+        case (state)
+            IDLE: begin
+                if (data_in == 1) begin
+                    next_state = DETECTING;
+                end else begin
+                    next_state = IDLE;
+                end
+                data_out = 0;
+            end
+
+            DETECTING: begin
+                if (data_in == 0) begin
+                    next_state = PULSE_CONFIRMED;
+                end else begin
+                    next_state = DETECTING;
+                end
+                data_out = 0;
+            end
+
+            PULSE_CONFIRMED: begin
+                next_state = IDLE;
+                data_out = 1;
+            end
+
+            default: begin
+                next_state = IDLE;
+                data_out = 0;
+            end
+        endcase
+    end
+
+endmodule

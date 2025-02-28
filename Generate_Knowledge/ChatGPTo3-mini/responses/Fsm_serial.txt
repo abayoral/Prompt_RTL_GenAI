@@ -1,0 +1,81 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg done
+);
+
+    // state encoding
+    parameter IDLE      = 3'd0;
+    parameter START     = 3'd1;
+    parameter DATA      = 3'd2;
+    parameter STOP      = 3'd3;
+    parameter WAIT_STOP = 3'd4;
+    
+    reg [2:0] state, next_state;
+    reg [2:0] bit_count;  // To count the 8 data bits (0-7)
+    
+    // FSM sequential block: state, counter, and done signal update
+    always @(posedge clk) begin
+        if (reset) begin
+            state     <= IDLE;
+            bit_count <= 3'd0;
+            done      <= 1'b0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    done <= 1'b0;
+                    // The line is idle at 1. Detect a falling edge for the start bit.
+                    if (in == 1'b0)
+                        state <= START;
+                    else
+                        state <= IDLE;
+                end
+                
+                START: begin
+                    // Verify the start bit stays low for one cycle.
+                    if (in == 1'b0) begin
+                        state     <= DATA;
+                        bit_count <= 3'd0;
+                    end else begin
+                        // If the signal becomes high, it’s not a valid start.
+                        state <= IDLE;
+                    end
+                end
+                
+                DATA: begin
+                    // In DATA state we wait for 8 bits.
+                    if (bit_count == 3'd7)
+                        state <= STOP;
+                    else begin
+                        bit_count <= bit_count + 3'd1;
+                        state <= DATA;
+                    end
+                end
+                
+                STOP: begin
+                    // Expect the stop bit to be 1.
+                    if (in == 1'b1) begin
+                        done  <= 1'b1;  // Valid byte received.
+                        state <= IDLE;
+                    end else begin
+                        // Error: the stop bit is not present.
+                        done  <= 1'b0;
+                        state <= WAIT_STOP;
+                    end
+                end
+                
+                WAIT_STOP: begin
+                    // Wait until a stop bit (logic high) is seen.
+                    if (in == 1'b1)
+                        state <= IDLE;
+                    else
+                        state <= WAIT_STOP;
+                end
+                
+                default: state <= IDLE;
+            endcase
+        end
+    end
+
+endmodule

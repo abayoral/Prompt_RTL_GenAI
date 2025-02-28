@@ -1,0 +1,53 @@
+```verilog
+module ripple_carry_adder_100bit (
+    input [99:0] a,          // First 100-bit input
+    input [99:0] b,          // Second 100-bit input
+    input cin,               // Carry-in bit
+    output [99:0] sum,       // 100-bit sum output
+    output cout              // Carry-out bit
+);
+
+    wire [99:0] carry;       // Internal carry wires
+
+    // Generate instances of the full adder
+    genvar i;
+    generate
+        for (i = 0; i < 100; i = i + 1) begin : full_adder_inst
+            if (i == 0) begin
+                // First full adder with carry-in
+                full_adder fa (
+                    .a(a[i]),
+                    .b(b[i]),
+                    .cin(cin),
+                    .sum(sum[i]),
+                    .cout(carry[i])
+                );
+            end else begin
+                // Subsequent full adders
+                full_adder fa (
+                    .a(a[i]),
+                    .b(b[i]),
+                    .cin(carry[i-1]),
+                    .sum(sum[i]),
+                    .cout(carry[i])
+                );
+            end
+        end
+    endgenerate
+
+    // The last full adder's carry out is the overall carry out
+    assign cout = carry[99];
+
+endmodule
+
+module full_adder (
+    input a,                // Input bit a
+    input b,                // Input bit b
+    input cin,              // Carry-in bit
+    output sum,             // Sum output
+    output cout             // Carry-out output
+);
+    assign sum = a ^ b ^ cin;            // Sum is the XOR of a, b and cin
+    assign cout = (a & b) | (cin & (a ^ b)); // Carry-out logic
+endmodule
+```

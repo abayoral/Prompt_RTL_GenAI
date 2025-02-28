@@ -1,0 +1,18 @@
+As a professional with expertise in Verilog design, you are tasked with the development of a specific Verilog module called `pe`, which is intended to function as a Multiplying Accumulator (MAC). This module should handle operations involving 32-bit integers and must be designed to effectively facilitate the multiplication of two 32-bit input operands—referred to as `a` and `b`—on every clock cycle. The resultant product of these multiplications will then be accumulated into a designated output stored in a register named `c`.
+
+To provide a more detailed understanding of the requirements and constraints associated with this MAC implementation, the following points outline what is expected from the module:
+
+**Inputs:**
+- **`clk`**: The clock signal is integral to the synchronous operation of the module. It serves as the timing signal that regulates when the internal states and values of the registers can change.
+- **`rst`**: The reset signal functions as a control mechanism that, when activated (i.e., set to high), will initialize or clear the state of the accumulator register `c`. This signal's state dictates whether the module is in a reset condition, requiring it to revert to an initial state, or whether it can proceed with its normal operational functionality.
+- **`a` & `b`**: These are the two input operands that are both 32 bits in width. On each operational cycle, the module will process these inputs by computing their product.
+
+**Outputs:**
+- **`c`**: This output port is also 32 bits wide and is responsible for holding the accumulated result of the multiplication operations. The value of `c` is influenced by the state of the `rst` signal: when `rst` is asserted, the value of `c` will be reset to zero; if `rst` is not asserted, the output `c` will be updated to reflect the sum of its current value and the latest product derived from the multiplication of `a` and `b`.
+
+**Implementation Details:**
+- The primary logic for the MAC’s functionality will be contained within an always block, which must respond to the positive edges of the `clk` and `rst` signals. This ensures that both the resetting of the accumulator and the accumulation of multiplication results occur in a synchronized and controlled manner.
+- When a positive edge of the `rst` signal is detected, the module shall reset the accumulator register `c` to zero, thereby discarding any previously stored results and ensuring a clean operational slate.
+- Conversely, when the `rst` signal is low, each time a positive edge on the `clk` is detected, the module must calculate the product of the current values of `a` and `b`, then add this product to the current value of `c`, and subsequently update `c` with this new cumulative total. This characteristic of ongoing accumulation is essential to the MAC's functionality and purpose.
+
+With these outlined requirements and functionality, the design of the `pe` module aims to provide a robust and efficient solution for performing multiplication and accumulation tasks specifically for 32-bit integers, underlying the importance of correctly managing clock and reset signals for consistent operation.

@@ -1,0 +1,25 @@
+As a skilled Verilog designer, your task is to architect and code a frequency divider module that effectively generates specific clock signals from an input clock. The frequency divider is meant to take an input clock signal with a frequency of 100MHz and produce three different output clock signals with frequencies of 50MHz, 10MHz, and 1MHz, respectively. Here’s a detailed breakdown of the design requirements and specifications for this module:
+
+Module Designation:
+- Name the module `freq_div`.
+
+Input Ports:
+- `CLK_in`: This is the primary clock signal with an operational frequency of 100MHz.
+- `RST`: This is a reset signal that initializes the output clocks and counters when asserted.
+
+Output Ports:
+- `CLK_50`: This output should deliver a clock signal at half the input frequency, specifically 50MHz.
+- `CLK_10`: This output is expected to provide a clock signal at one-tenth the input frequency, specifically 10MHz.
+- `CLK_1`: This output should furnish a signal at one-hundredth the input frequency, specifically 1MHz.
+
+Implementation Details:
+1. CLK_50 Generation:
+   - This involves creating a mechanism to toggle the `CLK_50` signal with every alternative positive edge of the `CLK_in`, effectively dividing the frequency by two. If the `RST` signal is active (asserted), `CLK_50` should be reset to 0 immediately.
+
+2. CLK_10 Generation:
+   - Utilize a counter (`cnt_10`) that counts clock cycles of `CLK_in`. If the counter reaches a value of four, toggle `CLK_10` and reset the counter to zero. An active `RST` should reset both `CLK_10` and `cnt_10` to zero.
+
+3. CLK_1 Generation:
+   - This involves using another counter (`cnt_100`) that increments with each cycle of `CLK_in`. Once it reaches 49, toggle the `CLK_1` signal and reset the counter. Again, activation of `RST` should reset both `CLK_1` and `cnt_100` back to zero.
+
+Ask for the complete Verilog code to implement this logic, ensuring it adheres to best practices in digital design and utilizes efficient coding techniques for counters and flip-flops within the hardware description.

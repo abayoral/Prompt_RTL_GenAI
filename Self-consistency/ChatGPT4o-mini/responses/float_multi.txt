@@ -1,0 +1,98 @@
+module float_multi(
+    input clk,
+    input rst,
+    input [31:0] a,
+    input [31:0] b,
+    output reg [31:0] z
+);
+
+reg [2:0] counter;
+reg [23:0] a_mantissa, b_mantissa, z_mantissa;
+reg [9:0] a_exponent, b_exponent, z_exponent;
+reg a_sign, b_sign, z_sign;
+reg [49:0] product;
+reg guard_bit, round_bit, sticky;
+
+// State Definitions
+localparam IDLE = 3'b000;
+localparam EXTRACT = 3'b001;
+localparam SPECIAL_CASE = 3'b010;
+localparam MULTIPLY = 3'b011;
+localparam ROUND = 3'b100;
+localparam OUTPUT = 3'b101;
+
+always @(posedge clk or posedge rst) begin
+    if (rst) begin
+        counter <= 3'b000;
+        z <= 32'b0;
+        z_sign <= 1'b0;
+        z_exponent <= 10'b0;
+        z_mantissa <= 24'b0;
+    end else begin
+        case (counter)
+            IDLE: begin
+                counter <= EXTRACT;
+            end
+            
+            EXTRACT: begin
+                a_sign <= a[31];
+                b_sign <= b[31];
+                a_exponent <= a[30:23];
+                b_exponent <= b[30:23];
+                a_mantissa <= {1'b1, a[22:0]}; // Implicit leading 1
+                b_mantissa <= {1'b1, b[22:0]}; // Implicit leading 1
+                counter <= SPECIAL_CASE;
+            end
+            
+            SPECIAL_CASE: begin
+                if (a_exponent == 255 || b_exponent == 255) begin // Check for NaN or Infinity
+                    z <= 32'b01111111110000000000000000000000; // Return NaN
+                end else if (a_exponent == 0 || b_exponent == 0) begin // Check for zero
+                    z <= 32'b0; // Result is zero
+                end else begin
+                    counter <= MULTIPLY;
+                end
+            end
+            
+            MULTIPLY: begin
+                product = a_mantissa * b_mantissa;
+                z_sign <= a_sign ^ b_sign; // Sign of the result
+                z_exponent <= (a_exponent + b_exponent - 127); // Adjust exponent
+                counter <= ROUND;
+            end
+            
+            ROUND: begin
+                // Normalize the product if necessary
+                if (product[49]) begin
+                    z_mantissa <= product[48:25]; // Shift right
+                    z_exponent <= z_exponent + 1; // Increment exponent
+                end else begin
+                    z_mantissa <= product[47:24]; // Keep same
+                end
+                
+                // Rounding logic
+                guard_bit <= product[24];
+                round_bit <= product[23];
+                sticky <= |product[22:0]; // Any bits below to check for sticky
+                
+                if (guard_bit && (round_bit || sticky || z_mantissa[0])) begin
+                    z_mantissa <= z_mantissa + 1; // Round up
+                    if (z_mantissa == 24'hffffff) begin
+                        z_exponent <= z_exponent + 1; // Adjust exponent if mantissa overflow
+                    end
+                end
+                
+                counter <= OUTPUT;
+            end
+            
+            OUTPUT: begin
+                z <= {z_sign, z_exponent[7:0], z_mantissa[22:0]}; // Assemble final result
+                counter <= IDLE; // Reset to idle state
+            end
+            
+            default: counter <= IDLE; // In case of illegal state
+        endcase
+    end
+end
+
+endmodule

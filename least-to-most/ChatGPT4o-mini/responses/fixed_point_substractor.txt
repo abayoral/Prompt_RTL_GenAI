@@ -1,0 +1,36 @@
+```
+module fixed_point_subtractor #(parameter Q = 16, parameter N = 32) (
+    input  [N-1:0] a,
+    input  [N-1:0] b,
+    output reg [N-1:0] c
+);
+    reg [N-1:0] res;
+
+    always @(*) begin
+        if (a[N-1] == b[N-1]) begin // Same sign case
+            res = a - b;
+            if (res == 0) begin
+                c = {1'b0, {N-1{1'b0}}}; // Set sign bit to 0 on zero result
+            end else begin
+                c = res;
+            end
+        end else begin // Different sign case
+            if (a[N-1] == 1'b0 && b[N-1] == 1'b1) begin // a positive, b negative
+                res = a + (~b + 1'b1); // a + abs(b)
+                if (res[N-1]) begin // result is negative
+                    c = res;
+                end else begin // result is positive
+                    c = res;
+                end
+            end else if (a[N-1] == 1'b1 && b[N-1] == 1'b0) begin // a negative, b positive
+                res = (~a + 1'b1) + b; // abs(a) + b
+                if (res[N-1]) begin // result is negative
+                    c = res;
+                end else begin // result is positive
+                    c = res;
+                end
+            end
+        end
+    end
+endmodule
+```

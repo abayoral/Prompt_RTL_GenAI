@@ -1,0 +1,18 @@
+```verilog
+module top_module (
+    input wire clk,
+    input wire reset,
+    input wire [7:0] d,
+    output reg [7:0] q
+);
+
+    always @(posedge clk) begin
+        if (reset) begin
+            q <= 8'b0;  // Reset all flip-flops to 0
+        end else begin
+            q <= d;  // Capture input data on the positive edge of the clock
+        end
+    end
+    
+endmodule
+```

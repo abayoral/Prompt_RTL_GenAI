@@ -1,0 +1,19 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // One acceptable answer is to use the following simplified
+    // Sum‐of‐Products form, which is equivalent to the K‐map:
+    //
+    // out = c'*(a'd' + b') + c*(a'b + a d)
+    //
+    // In Verilog, using bitwise NOT for complements, this becomes:
+    //   ~c * ((~a & ~d) | (~b))  OR  c * ((~a & b) | (a & d))
+    
+    assign out = (~c & ((~a & ~d) | (~b))) | (c & ((~a & b) | (a & d)));
+
+endmodule

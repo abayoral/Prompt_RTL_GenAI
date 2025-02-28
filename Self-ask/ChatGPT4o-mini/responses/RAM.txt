@@ -1,0 +1,45 @@
+```verilog
+module dual_port_ram
+#(
+    parameter WIDTH = 6,  // Data width
+    parameter DEPTH = 8   // Memory depth
+)
+(
+    input wire clk,                   // Clock signal
+    input wire rst_n,                 // Active-low reset
+    input wire write_en,              // Write enable signal
+    input wire [2:0] write_addr,      // Write address (3 bits for 8 locations)
+    input wire [WIDTH-1:0] write_data, // Data to write
+    input wire read_en,               // Read enable signal
+    input wire [2:0] read_addr,       // Read address (3 bits for 8 locations)
+    output reg [WIDTH-1:0] read_data  // Data output
+);
+
+    // Memory array
+    reg [WIDTH-1:0] ram [0:DEPTH-1];
+
+    // Asynchronous read always block
+    always @(*) begin
+        if (read_en) begin
+            read_data = ram[read_addr];
+        end else begin
+            read_data = {WIDTH{1'b0}}; // Default to zero if not reading
+        end
+    end
+
+    // Synchronous write always block
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset all memory values to zero
+            integer i;
+            for (i = 0; i < DEPTH; i = i + 1) begin
+                ram[i] <= {WIDTH{1'b0}};
+            end
+        end else if (write_en) begin
+            // Write data to the specified address
+            ram[write_addr] <= write_data;
+        end
+    end
+
+endmodule
+```

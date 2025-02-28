@@ -1,0 +1,9 @@
+Imagine you are a senior digital design engineer working at a top-tier hardware design company, and you have been assigned the task of creating a critical Verilog module for a groundbreaking next-generation product. Your company’s reputation in the computer hardware market depends on the success of this module.
+
+You are provided with an already available one-digit BCD (binary-coded decimal) adder module named bcd_fadd. This module takes in two 4-bit inputs representing a single BCD digit along with a carry-in bit, performs addition in base-10, and produces an output consisting of a 4-bit sum and a carry-out bit.
+
+Your challenge is to instantiate four copies of this bcd_fadd module to build a 4-digit BCD ripple-carry adder. In this context, you will be adding two 4-digit BCD numbers that are each represented as a 16-bit vector, along with an input carry. The resulting module should output a 4-digit BCD sum (packed into a 16-bit vector) and a final carry-out representing any overflow beyond the 4-digit range.
+
+Keep in mind that while the structure of your design resembles that of a typical binary ripple-carry adder, the addition operations here are performed in base-10. Also, note the provided hint regarding representations: the BCD encoding for the 5-digit decimal number 12345 is given as 20’h12345. This is distinct from a binary representation like 14’d12345, which would be represented as 14’h3039.
+
+Your task is to write the Verilog code inside the top_module with the specified inputs and outputs, making sure that the top_module instantiates and interconnects four bcd_fadd modules to achieve the desired 4-digit BCD addition. Do not include any solved code or implementation details, but focus on understanding how to structure and define the overall module.

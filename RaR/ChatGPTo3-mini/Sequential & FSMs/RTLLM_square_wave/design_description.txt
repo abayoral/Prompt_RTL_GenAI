@@ -1,0 +1,26 @@
+Imagine you are a seasoned Verilog engineer assigned to create a module specifically engineered to produce square wave signals with frequency control features. In this task, your primary objective is to design and implement a module named "square_wave" that accurately generates a square wave based on an adjustable frequency input.
+
+The module comprises the following critical elements:
+
+1. Module Identification:
+   • The module is identified by the name "square_wave". This label signifies its fundamental purpose: to output a square wave signal.
+
+2. Input Port Specifications:
+   • clk: This input serves as the clock signal. It is the main timing source that drives the internal logic within the module, ensuring that all time-dependent operations are properly synchronized.
+   • freq: Represented as an 8-bit vector ([7:0]), this input dictates the frequency characteristics of the square wave. Essentially, the value provided to "freq" determines how rapidly the square wave toggles. A lower numerical value on "freq" will lead to a higher toggling rate (resulting in a higher output frequency), whereas a higher numerical value will cause the square wave to toggle more slowly (yielding a lower output frequency).
+
+3. Output Port Specifications:
+   • wave_out: This output port is the point from which the generated square wave signal is emitted. The behavior of "wave_out"—specifically, its toggling pattern—is controlled by both the "freq" input and the internal logic governing the module's operations.
+
+4. Internal Implementation Details:
+   • Internal Register (count):
+     - The design incorporates an 8-bit register named "count" ([7:0]). The purpose of this register is to maintain a record of clock cycles, which in turn determines when the square wave signal should toggle.
+     - With each rising edge of the clk signal, the "count" register increments, continuously tracking the elapsed number of cycles.
+     - When "count" reaches a value equal to "freq - 1", it signals that the requisite number of clock cycles for the current state of the square wave has been completed. At that point, the "wave_out" signal should toggle (i.e., switch from high to low or low to high), and "count" is then reset to 0 to commence a new cycle.
+     - If the "count" register has not yet reached the threshold dictated by "freq", it simply continues incrementing on successive clock cycles.
+
+5. Overall Functionality:
+   • The essential function of your design is to generate a square wave where the frequency of the toggling signal is directly controlled by the freq input. A high frequency is achieved when the count reaches the threshold quicker (i.e., when freq is a lower value), leading to more rapid toggling of "wave_out". Conversely, if freq is set to a larger value, toggling occurs less frequently, resulting in a lower output frequency.
+   • Your final code should comprehensively incorporate the module's hierarchical structure, clearly define all input and output ports, appropriately set up the internal registers, and implement the described logic to meet these operational requirements.
+
+In summary, your task is to encapsulate the described behavior in a well-structured Verilog module. You will need to ensure that the module adheres to the outlined specifications and reliably produces a square wave signal whose frequency can be adjusted via the provided freq input. Your design will serve as a critical component in applications that demand precise and adaptable square wave generation.

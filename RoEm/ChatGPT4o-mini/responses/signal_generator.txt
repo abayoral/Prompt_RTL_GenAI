@@ -1,0 +1,39 @@
+```
+module signal_generator(
+    input clk,
+    input rst_n,
+    output reg [4:0] wave
+);
+
+reg state; // State register to control the waveform generation
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        state <= 0;  // Reset state
+        wave <= 0;   // Reset wave
+    end else begin
+        case (state)
+            0: begin
+                if (wave < 31) begin
+                    wave <= wave + 1; // Increment wave
+                end else begin
+                    state <= 1; // Switch to decrementing state
+                end
+            end
+            1: begin
+                if (wave > 0) begin
+                    wave <= wave - 1; // Decrement wave
+                end else begin
+                    state <= 0; // Switch to incrementing state
+                end
+            end
+            default: begin
+                state <= 0; // Default case, should not occur
+                wave <= 0;  // Reset wave
+            end
+        endcase
+    end
+end
+
+endmodule
+```

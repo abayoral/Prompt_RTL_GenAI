@@ -1,0 +1,79 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg done
+);
+
+    // Define FSM states
+    localparam IDLE = 2'd0;  // Waiting for idle and start bit (logic 0)
+    localparam DATA = 2'd1;  // Receiving 8 data bits
+    localparam STOP = 2'd2;  // Verifying stop bit (should be logic 1)
+    localparam WAIT = 2'd3;  // Bad stop bit: wait until a stop bit is received
+
+    reg [1:0] state, next_state;
+    reg [3:0] bit_count; // Enough to count 8 bits (0 to 7)
+
+    // Sequential block: state register, bit counter, and done output
+    always @(posedge clk) begin
+        if (reset) begin
+            state     <= IDLE;
+            bit_count <= 4'd0;
+            done      <= 1'b0;
+        end else begin
+            state <= next_state;
+            
+            // Increment bit_count in DATA state; otherwise, reset it.
+            if (state == DATA)
+                bit_count <= bit_count + 1;
+            else
+                bit_count <= 4'd0;
+                
+            // When in the STOP state, check if the stop bit is valid.
+            if (state == STOP && in == 1'b1)
+                done <= 1'b1;  // Correctly received byte
+            else
+                done <= 1'b0;
+        end
+    end
+
+    // Combinational block: Determine the next state
+    always @(*) begin
+        // Default: remain in the current state
+        next_state = state;
+        case (state)
+            IDLE: begin
+                // in is high when idle. Detect a falling edge (logic 0) to
+                // signal the start bit.
+                if (in == 1'b0)
+                    next_state = DATA;
+                else 
+                    next_state = IDLE;
+            end
+            DATA: begin
+                // Stay in DATA until 8 bits are received.
+                // bit_count counts from 0 to 7.
+                if (bit_count == 4'd7)
+                    next_state = STOP;
+                else
+                    next_state = DATA;
+            end
+            STOP: begin
+                // Expect stop bit to be 1.
+                if (in == 1'b1)
+                    next_state = IDLE; // Correct stop bit; go back to idle.
+                else
+                    next_state = WAIT; // Wait for a valid stop bit.
+            end
+            WAIT: begin
+                // In error recovery state, wait until a stop bit (logic 1) is seen.
+                if (in == 1'b1)
+                    next_state = IDLE;
+                else
+                    next_state = WAIT;
+            end
+            default: next_state = IDLE;
+        endcase
+    end
+
+endmodule

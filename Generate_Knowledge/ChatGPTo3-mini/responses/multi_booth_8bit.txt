@@ -1,0 +1,57 @@
+module multi_booth_8bit(
+    input        clk,
+    input        reset,
+    input  [7:0] a,
+    input  [7:0] b,
+    output reg [15:0] p,
+    output reg       rdy
+);
+  // Internal registers:
+  // – multiplier: sign‐extended version of input "a"
+  // – multiplicand: sign‐extended version of input "b"; it will be shifted left
+  // – ctr: 5‐bit cycle counter (counts from 0 to 15)
+  reg [15:0] multiplier;
+  reg [15:0] multiplicand;
+  reg [4:0]  ctr;
+
+  // 
+  // DESIGN STRATEGY:
+  // On reset, extend both operands to 16 bits by replicating the sign bit.
+  // Then, over 16 clock cycles, examine one bit of the multiplier in each cycle.
+  // When the examined bit equals 1 the current value of the (shifted) multiplicand is added into the product.
+  // After each cycle the multiplicand is shifted left by one, effectively aligning it for the next higher bit.
+  // The counter "ctr" is used to step through the 16 bits of the multiplier.
+  // When ctr reaches 16 (in practise, when the last bit is processed) the "rdy" signal is asserted.
+  //
+  // Although the multiplier is called "Booth" in the specification, the present design uses
+  // the spirit of Booth’s idea (of sign extension and using shifted multiplicand values) combined with a bit‐serial
+  // accumulation. (A full radix‐4 Booth recoding would process two bits per cycle and involve additions or subtractions,
+  // but here we combine the sign‐extended arithmetic with one decision per cycle as specified.)
+  //
+  // Synchronous process using positive edge of clk and positive edge of reset
+  always @(posedge clk or posedge reset) begin
+    if (reset) begin
+      // On reset, sign-extend both inputs to 16 bits.
+      multiplier   <= {{8{a[7]}}, a};
+      multiplicand <= {{8{b[7]}}, b};
+      p            <= 16'b0;
+      ctr          <= 5'b0;
+      rdy          <= 1'b0;
+    end
+    else if (!rdy) begin
+      // Check the current bit of the multiplier indexed by ctr.
+      // If it is '1' then add the current (shifted) multiplicand to the product.
+      if (multiplier[ctr] == 1'b1)
+        p <= p + multiplicand;
+      // Shift the multiplicand left by one position to properly weight it
+      // for the next bit (simulating the Booth‐algorithm alignment step).
+      multiplicand <= multiplicand << 1;
+      // Increment the counter.
+      ctr <= ctr + 1;
+      // When all 16 bits have been processed, assert ready.
+      if (ctr == 5'd15)
+        rdy <= 1'b1;
+    end
+  end
+
+endmodule

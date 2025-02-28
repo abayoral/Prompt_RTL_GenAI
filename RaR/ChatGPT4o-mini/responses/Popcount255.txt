@@ -1,0 +1,17 @@
+```
+module population_count (
+    input [254:0] vector,  // 255-bit input vector
+    output reg [8:0] count  // 9-bit output to hold the count (0-255)
+);
+
+    integer i;
+
+    always @(*) begin
+        count = 0;  // Initialize count to zero
+        for (i = 0; i < 255; i = i + 1) begin
+            count = count + vector[i];  // Increment count for each '1' bit
+        end
+    end
+
+endmodule
+```

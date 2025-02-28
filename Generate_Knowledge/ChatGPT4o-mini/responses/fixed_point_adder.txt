@@ -1,0 +1,41 @@
+```
+module fixed_point_adder #(parameter Q = 8, parameter N = 16) (
+    input  [N-1:0] a,
+    input  [N-1:0] b,
+    output reg [N-1:0] c
+);
+
+reg [N-1:0] res;
+
+always @* begin
+    if (a[N-1] == b[N-1]) begin // Both numbers have the same sign
+        res = a + b; // Absolute value addition
+        if (res[N-1] != a[N-1]) // Check for overflow
+            c = {a[N-1], {N-1{1'b1}}}; // Set result to max negative if overflow
+        else
+            c = res; // No overflow
+    end else begin // a and b have different signs
+        if (a[N-1] == 1'b0) begin // a is positive
+            // Subtract b from a
+            if (a > {1'b0, b[N-2:0]}) // a's absolute value is greater
+                res = a - b;
+            else // b's absolute value is greater or they are equal
+                res = b - a;
+        end else begin // b is positive, thus a is negative
+            // Subtract a from b
+            if (b > {1'b0, a[N-2:0]}) // b's absolute value is greater
+                res = b - a;
+            else // a's absolute value is greater or they are equal
+                res = a - b;
+        end
+
+        // Determine sign based on which was greater
+        if ({1'b0, a[N-2:0]} > {1'b0, b[N-2:0]})
+            c = res; // a was greater, result is positive
+        else
+            c = {1'b1, res[N-2:0]}; // b was greater or they were equal, result is negative
+    end
+end
+
+endmodule
+```

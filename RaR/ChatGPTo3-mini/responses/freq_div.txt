@@ -1,0 +1,48 @@
+module freq_div(
+    input CLK_in,
+    input RST,
+    output reg CLK_50,
+    output reg CLK_10,
+    output reg CLK_1
+);
+
+    // Counter for generating 10MHz clock (half period count: 5 cycles -> period 10 cycles)
+    reg [2:0] cnt_10;
+    
+    // Counter for generating 1MHz clock (half period count: 50 cycles -> period 100 cycles)
+    reg [5:0] cnt_100;
+    
+    always @(posedge CLK_in) begin
+        if (RST) begin
+            // Synchronous reset: all outputs and counters are zero
+            CLK_50  <= 1'b0;
+            CLK_10  <= 1'b0;
+            CLK_1   <= 1'b0;
+            cnt_10  <= 3'd0;
+            cnt_100 <= 6'd0;
+        end 
+        else begin
+            // Toggle 50MHz clock every CLK_in cycle (100MHz/2 = 50MHz)
+            CLK_50 <= ~CLK_50;
+            
+            // Counter for 10MHz clock generation
+            if (cnt_10 == 3'd4) begin
+                cnt_10 <= 3'd0;
+                CLK_10 <= ~CLK_10; // Toggle CLK_10 when count reaches 4 (5 cycles per half period)
+            end
+            else begin
+                cnt_10 <= cnt_10 + 3'd1;
+            end
+
+            // Counter for 1MHz clock generation
+            if (cnt_100 == 6'd49) begin
+                cnt_100 <= 6'd0;
+                CLK_1 <= ~CLK_1; // Toggle CLK_1 when count reaches 49 (50 cycles per half period)
+            end
+            else begin
+                cnt_100 <= cnt_100 + 6'd1;
+            end
+        end
+    end
+
+endmodule

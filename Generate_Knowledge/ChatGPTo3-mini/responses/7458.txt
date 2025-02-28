@@ -1,0 +1,35 @@
+module top_module ( 
+    input p1a, p1b, p1c, p1d, p1e, p1f,
+    output p1y,
+    input p2a, p2b, p2c, p2d,
+    output p2y 
+);
+
+    // Approach 1: Using intermediate wires (four AND gates and two OR gates)
+
+    // For p1y we'll use two AND gates:
+    //    Gate 1: p1a AND p1b AND p1c
+    //    Gate 2: p1d AND p1e AND p1f
+    wire p1_and1, p1_and2;
+    assign p1_and1 = p1a & p1b & p1c;
+    assign p1_and2 = p1d & p1e & p1f;
+    assign p1y = p1_and1 | p1_and2;
+    
+    // For p2y we'll use two AND gates:
+    //    Gate 3: p2a AND p2b
+    //    Gate 4: p2c AND p2d
+    wire p2_and1, p2_and2;
+    assign p2_and1 = p2a & p2b;
+    assign p2_and2 = p2c & p2d;
+    assign p2y = p2_and1 | p2_and2;
+    
+    //-------------------------------------------------------------------------
+    // Alternative approach: Direct assign statements without intermediate wires
+    //
+    // Uncomment the lines below and comment out the above method to use the one-liners.
+    //
+    // assign p1y = (p1a & p1b & p1c) | (p1d & p1e & p1f);
+    // assign p2y = (p2a & p2b) | (p2c & p2d);
+    //-------------------------------------------------------------------------
+    
+endmodule

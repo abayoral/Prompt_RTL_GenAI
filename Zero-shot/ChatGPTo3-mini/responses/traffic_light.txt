@@ -1,0 +1,121 @@
+module traffic_light(
+    input         clk,
+    input         rst_n,
+    input         pass_request,
+    output [7:0]  clock,  // current value of the internal counter
+    output reg    red,    // vehicle red light
+    output reg    yellow, // vehicle yellow light
+    output reg    green   // vehicle green light
+);
+  
+  // State encoding: Use a 2-bit state machine.
+  // IDLE:        initial state (will immediately transition to red)
+  // S1_RED:      vehicular red light (pedestrian walk)
+  // S3_GREEN:    vehicular green light (pedestrians wait)
+  // S2_YELLOW:   vehicular yellow light (pedestrians wait)
+  parameter IDLE     = 2'b00;
+  parameter S1_RED   = 2'b01; // red duration: 10 clock cycles
+  parameter S2_YELLOW= 2'b10; // yellow duration: 5 clock cycles
+  parameter S3_GREEN = 2'b11; // green duration: normally 60 clock cycles
+  
+  // Internal registers
+  reg [1:0] state;
+  reg [7:0] cnt;       // internal countdown timer
+  // The "previous" light registers used for determining next output values.
+  reg       p_red;
+  reg       p_yellow;
+  reg       p_green;
+  
+  // Drive the output "clock" with the current counter value.
+  assign clock = cnt;
+  
+  // State and counter update logic: This always block controls the state machine and
+  // the internal counter. On reset, the FSM starts in the IDLE state. Immediately, it
+  // transitions to the S1_RED state (vehicular red/pedestrian green) with a timer of 10 cycles.
+  // In the S3_GREEN state the pass_request input can shorten the cycle if more than 10 cycles remain.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      state <= IDLE;
+      cnt   <= 8'd0;
+    end else begin
+      // In the IDLE state, initialize to S1_RED.
+      if (state == IDLE) begin
+        state <= S1_RED;
+        cnt   <= 8'd10;  // red light lasts 10 cycles
+      end
+      // When the counter has reached zero, transition to the next state.
+      else if (cnt == 8'd0) begin
+        case (state)
+          S1_RED: begin     // After red, move to green
+            state <= S3_GREEN;
+            cnt   <= 8'd60; // set full 60-cycle green duration
+          end
+          S3_GREEN: begin   // After green, move to yellow
+            state <= S2_YELLOW;
+            cnt   <= 8'd5;  // yellow lasts 5 cycles
+          end
+          S2_YELLOW: begin  // After yellow, return to red
+            state <= S1_RED;
+            cnt   <= 8'd10; // red lasts 10 cycles
+          end
+          default: begin
+            state <= S1_RED;
+            cnt   <= 8'd10;
+          end
+        endcase
+      end
+      else begin
+        // In the S3_GREEN (green light) state, check for a pedestrian request.
+        // If the pass_request is active and more than 10 clock cycles remain, cut the remaining
+        // green period short by setting the counter to 10.
+        if ((state == S3_GREEN) && pass_request && (cnt > 8'd10))
+          cnt <= 8'd10;
+        else
+          cnt <= cnt - 8'd1;
+      end
+    end
+  end
+  
+  // Determine output signal values based on the current state.
+  // When in S1_RED, the vehicular red light is on (meaning pedestrians may walk).
+  // For S3_GREEN, only the vehicular green light is on.
+  // In S2_YELLOW, only the vehicular yellow light is on.
+  always @(*) begin
+    case (state)
+      S1_RED: begin
+        p_red    = 1'b1;
+        p_yellow = 1'b0;
+        p_green  = 1'b0;
+      end
+      S3_GREEN: begin
+        p_red    = 1'b0;
+        p_yellow = 1'b0;
+        p_green  = 1'b1;
+      end
+      S2_YELLOW: begin
+        p_red    = 1'b0;
+        p_yellow = 1'b1;
+        p_green  = 1'b0;
+      end
+      default: begin
+        p_red    = 1'b0;
+        p_yellow = 1'b0;
+        p_green  = 1'b0;
+      end
+    endcase
+  end
+  
+  // Synchronize output assignments to the clock so that red, yellow, and green are updated reliably.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      red    <= 1'b0;
+      yellow <= 1'b0;
+      green  <= 1'b0;
+    end else begin
+      red    <= p_red;
+      yellow <= p_yellow;
+      green  <= p_green;
+    end
+  end
+  
+endmodule

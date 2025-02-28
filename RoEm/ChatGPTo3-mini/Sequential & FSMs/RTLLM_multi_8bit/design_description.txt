@@ -1,0 +1,27 @@
+As an adept Verilog designer, you're tasked with constructing a digital module termed `multi_8bit`. The primary function of this module is to compute the product of two 8-bit numbers using a hardware-oriented approach known as the shift-and-add method. The task involves creating a Verilog module that not only meets the functional requirements but also adheres to design best practices for hardware implementation.
+
+### Objective:
+Design and implement a Verilog module named `multi_8bit` that performs multiplication of two 8-bit binary numbers. The multiplication operation must be conducted through an iterative process where bits of the number designated as the multiplier dictate arithmetic shifts and additions of the multiplicand.
+
+### Ports Definition:
+- **Input Ports:**
+  - `A [7:0]`: This input port acts as the first operand, referred to as the multiplicand. It consists of 8 bits, indicating that it can represent values ranging from 0 to 255 in unsigned form.
+  - `B [7:0]`: This is the second input operand, known as the multiplier. Like `A`, it is also 8 bits wide, representing values from 0 to 255 in unsigned binary form.
+
+- **Output Ports:**
+  - `product [15:0]`: This port represents the final result of the multiplication operation, combining 16 bits to reflect the largest possible product value when two 8-bit numbers are multiplied. The output is designed to accommodate values up to 65,535.
+
+### Implementation Details:
+- **Multiplication Algorithm:** 
+  - The design follows the shift-and-add algorithm, a methodical approach to binary multiplication.
+  - During each iteration, the algorithm inspects each bit of the multiplier, `B`, sequentially from least significant bit to most significant bit.
+  - Whenever a bit is found to be '1', the 8-bit value of `A` is added to a running total stored in a temporary register or variable, shifted according to the current bit position of `B`.
+- **Bit Shifting:** 
+  - After processing each bit of the multiplier, the multiplicand undergoes a logical left shift. This shift reflects a multiplication by 2 for each subsequent higher-order bit within the traditional multiplication framework.
+  
+- **End Condition and Output Storage:**
+  - The loop continues iterating until all bits of `B` have been evaluated.
+  - At the conclusion of the loop, the complete binary product of the numbers is assigned to the `product` output port, ensuring that the full 16-bit result is available for external interfacing.
+
+### Task Details:
+Ensure your implementation precisely reflects this procedure, considering both efficiency and correctness. Particular attention should be paid to maintaining appropriate signal widths throughout the calculation to avoid any overflow or under-utilization of register space. The final Verilog code should encapsulate these operations succinctly, maintaining clarity and organization typical of professional code practices in digital design environments.

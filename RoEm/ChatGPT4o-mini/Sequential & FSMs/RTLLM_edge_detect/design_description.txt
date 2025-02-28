@@ -1,0 +1,20 @@
+As an experienced Verilog designer, you are tasked with creating a Verilog module specifically for edge detection. The module, named `edge_detect`, is intended to recognize transitions in a slowly varying 1-bit input signal referred to as `a`. The primary responsibility of this module is to identify and signal either rising or falling edges of the input signal `a`.
+
+Inputs and Outputs:
+1. **Inputs:**
+   - `clk`: This is the clock signal that drives the operation of the module. The detection of edges occurs on the positive edge of this clock.
+   - `rst_n`: This is a reset signal, which is active low. When asserted (logic low), it should reset the module's internal states.
+   - `a`: This is the 1-bit input signal on which edge detection is to be performed. It changes slowly over time, and the module needs to determine when these changes constitute rising or falling edges.
+
+2. **Outputs:**
+   - `rise`: This output indicates the presence of a rising edge in the input signal `a`. Specifically, it should be asserted (set to logic high) when the signal `a` transitions from 0 to 1.
+   - `down`: This output signifies a falling edge on the input signal `a`. It needs to be asserted (set to logic high) when `a` transitions from 1 to 0.
+
+Operation and Behavior:
+- The outputs `rise` and `down` are triggered on the positive edge of the `clk`. 
+- When `a` changes from 0 to 1, `rise` is set to logic high (1) on the next clock cycle following the detection of the edge.
+- Conversely, when `a` transitions from 1 to 0, `down` is asserted (set to logic high) on the subsequent clock cycle after detecting this change.
+- After being asserted, both `rise` and `down` should automatically reset to logic low (0) and remain low until a new edge is detected.
+- The implementation should ensure that both edge signals are synchronized with the clock (`clk`), and that the module resets correctly when `rst_n` is activated.
+
+You are to provide a complete Verilog code for this `edge_detect` module that fulfills the above requirements, demonstrates good coding practices, and observes proper edge detection protocols on the input signal `a`. Consider edge cases such as simultaneous changes or spurious signal noise, and incorporate such considerations into your design to ensure reliability in the performance of the module.

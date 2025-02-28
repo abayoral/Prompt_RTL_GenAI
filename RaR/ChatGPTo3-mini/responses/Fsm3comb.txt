@@ -1,0 +1,41 @@
+module top_module(
+    input in,
+    input [1:0] state,
+    output reg [1:0] next_state,
+    output reg out
+);
+
+    parameter A = 2'b00, B = 2'b01, C = 2'b10, D = 2'b11;
+
+    // Combinational logic for the state transition and output of the Moore machine
+    always @(*) begin
+        case (state)
+            A: begin
+                out = 1'b0;
+                // For state A: next state is A when in==0, B when in==1
+                next_state = in ? B : A;
+            end
+            B: begin
+                out = 1'b0;
+                // For state B: next state is C when in==0, remains B when in==1
+                next_state = in ? B : C;
+            end
+            C: begin
+                out = 1'b0;
+                // For state C: next state is A when in==0, D when in==1
+                next_state = in ? D : A;
+            end
+            D: begin
+                out = 1'b1;  // Only state where the output is 1
+                // For state D: next state is C when in==0, B when in==1
+                next_state = in ? B : C;
+            end
+            default: begin
+                // Default safe assignments
+                out = 1'b0;
+                next_state = A;
+            end
+        endcase
+    end
+
+endmodule

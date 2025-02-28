@@ -1,0 +1,31 @@
+```verilog
+module fixed_point_subtractor #(parameter Q = 16, N = 32) (
+    input  [N-1:0] a,
+    input  [N-1:0] b,
+    output reg [N-1:0] c
+);
+
+    wire [N-1:0] b_neg = ~b + 1'b1; // Two's complement to negate b
+    reg [N-1:0] res;
+
+    always @* begin
+        if (a[N-1] == b[N-1]) begin // Same sign case
+            res = a - b; // Direct subtraction
+        end else begin // Different signs case
+            if (a[N-1] == 0 && b[N-1] == 1) begin // a positive, b negative
+                res = a + b_neg; // Add absolute values
+            end else if (a[N-1] == 1 && b[N-1] == 0) begin // a negative, b positive
+                res = b_neg + a; // Add absolute values
+            end
+        end
+        
+        // Handle result sign and zero
+        if (res == 0) begin
+            c = {1'b0, {N-1{1'b0}}}; // Explicitly set to zero
+        end else begin
+            c = res; // Assign result
+        end
+    end
+
+endmodule
+```

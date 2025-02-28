@@ -1,0 +1,86 @@
+module synchronizer (
+    input         clk_a,    // Clock domain for input data and enable signal
+    input         clk_b,    // Clock domain for synchronized output and enable delay
+    input         arstn,    // Asynchronous reset for clk_a domain (active low)
+    input         brstn,    // Asynchronous reset for clk_b domain (active low)
+    input  [3:0]  data_in,  // 4-bit input data
+    input         data_en,  // Enable signal for data input (active high)
+    output reg [3:0] dataout // 4-bit synchronized output data
+);
+
+  // In clk_a domain, we capture data and the enable signal.
+  // When data_en is high, data_in is latched. Bit‐accurate register.
+  reg [3:0] data_reg;       // Data captured in clk_a domain
+  reg       en_data_reg;    // Enable signal captured in clk_a domain
+
+  // In clk_b domain, we use a two-stage synchronizer (D flip‐flops) to transfer
+  // the enable signal (and hence the knowledge of stable data) safely. The
+  // enable signals en_clap_one and en_clap_two provide a two cycle delay.
+  reg en_clap_one;
+  reg en_clap_two;
+
+  // A register to capture data_reg across clock domains. Although data_reg is
+  // generated in clk_a domain, the protocol guarantees that data_in remains steady
+  // when data_en is high for at least three clk_b cycles, making it safe to latch.
+  reg [3:0] sync_data;
+  
+  //===========================================================================
+  // clk_a Domain: Capture data_in and data_en into domain-specific registers.
+  // Asynchronous reset (arstn active low) clears the registers.
+  //===========================================================================
+  always @(posedge clk_a or negedge arstn) begin
+    if (!arstn) begin
+      data_reg    <= 4'b0;
+      en_data_reg <= 1'b0;
+    end else begin
+      // Only update when data_en is high, ensuring the data remains constant
+      // for a sufficient period.
+      if (data_en) begin
+        data_reg    <= data_in;
+        en_data_reg <= 1'b1;
+      end else begin
+        en_data_reg <= 1'b0;
+      end
+    end
+  end
+  
+  //===========================================================================
+  // clk_b Domain: Synchronize the enable signal using two D flip-flops,
+  // creating a two-cycle delay (en_clap_one then en_clap_two).
+  // Additionally, when the delayed enable is active, capture the data registered
+  // in the clk_a domain into a local register (sync_data) for safe sampling.
+  // Asynchronous reset (brstn active low) clears these registers.
+  //===========================================================================
+  always @(posedge clk_b or negedge brstn) begin
+    if (!brstn) begin
+      en_clap_one <= 1'b0;
+      en_clap_two <= 1'b0;
+      sync_data   <= 4'b0;
+    end else begin
+      en_clap_one <= en_data_reg;
+      en_clap_two <= en_clap_one;
+      
+      // When en_clap_two is high, the data from clk_a domain is stable and can be
+      // captured in clk_b domain.
+      if (en_clap_two)
+        sync_data <= data_reg;
+    end
+  end
+  
+  //===========================================================================
+  // clk_b Domain: Update the output data register (dataout) based on the
+  // synchronized enable (en_clap_two). If en_clap_two is active, update dataout
+  // with sync_data; otherwise, hold the previous state.
+  //===========================================================================
+  always @(posedge clk_b or negedge brstn) begin
+    if (!brstn) begin
+      dataout <= 4'b0;
+    end else begin
+      if (en_clap_two)
+        dataout <= sync_data;
+      else
+        dataout <= dataout;  // Hold the previous state when en_clap_two is inactive.
+    end
+  end
+
+endmodule

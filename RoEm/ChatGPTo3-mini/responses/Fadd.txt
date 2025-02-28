@@ -1,0 +1,12 @@
+module top_module( 
+    input a, b, cin,
+    output cout, sum 
+);
+    
+    // Sum is computed as a XOR b XOR cin
+    assign sum = a ^ b ^ cin;
+    
+    // Carry-out is computed as (a & b) | (b & cin) | (a & cin)
+    assign cout = (a & b) | (b & cin) | (a & cin);
+
+endmodule

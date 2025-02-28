@@ -1,0 +1,85 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg [7:0] out_byte,
+    output reg done
+);
+
+    // FSM encoding
+    localparam WAIT_FOR_START = 2'b00,
+               RECEIVE        = 2'b01,
+               CHECK_STOP     = 2'b10,
+               WAIT_STOP      = 2'b11;
+
+    reg [1:0] state;
+    reg [3:0] bit_count; // To count 0-7 for the eight data bits
+    reg [7:0] data_reg;  // Datapath for storing the received byte
+
+    // The FSM with datapath:
+    // - In WAIT_FOR_START, we wait for the start bit (logic 0).
+    // - In RECEIVE, we capture 8 data bits (LSB first) into data_reg.
+    //   The first bit received is stored at bit position 0.
+    // - In CHECK_STOP, we verify the stop bit (should be logic 1).
+    //   If correct, we output out_byte and assert done for one cycle.
+    //   If not, we go to WAIT_STOP, waiting until a stop bit is detected.
+    always @(posedge clk) begin
+        if (reset) begin
+            state     <= WAIT_FOR_START;
+            bit_count <= 0;
+            data_reg  <= 8'b0;
+            out_byte  <= 8'b0;
+            done      <= 1'b0;
+        end else begin
+            // Default: done is low unless set in this clock cycle.
+            done <= 1'b0;
+            case(state)
+                WAIT_FOR_START: begin
+                    bit_count <= 0;
+                    // Wait for the start bit which is a 0.
+                    if (in == 1'b0)
+                        state <= RECEIVE;
+                    else
+                        state <= WAIT_FOR_START;
+                end
+                
+                RECEIVE: begin
+                    // Capture the current data bit into the correct bit position.
+                    // Since the protocol sends LSB first, the very first data bit ends up in bit 0.
+                    data_reg[bit_count] <= in;
+                    if (bit_count == 7) begin
+                        // All 8 data bits have been received; proceed to check the stop bit.
+                        state <= CHECK_STOP;
+                    end else begin
+                        bit_count <= bit_count + 1;
+                        state <= RECEIVE;
+                    end
+                end
+                
+                CHECK_STOP: begin
+                    // In this state the current bit should be the stop bit (logic 1).
+                    if (in == 1'b1) begin
+                        // Valid stop bit: output the received byte and assert done.
+                        out_byte <= data_reg;
+                        done <= 1'b1;
+                        state <= WAIT_FOR_START;
+                    end else begin
+                        // Invalid stop bit: wait until a stop bit appears before restarting.
+                        state <= WAIT_STOP;
+                    end
+                end
+                
+                WAIT_STOP: begin
+                    // Wait here until a stop bit (logic 1) is detected.
+                    if (in == 1'b1)
+                        state <= WAIT_FOR_START;
+                    else
+                        state <= WAIT_STOP;
+                end
+                
+                default: state <= WAIT_FOR_START;
+            endcase
+        end
+    end
+
+endmodule

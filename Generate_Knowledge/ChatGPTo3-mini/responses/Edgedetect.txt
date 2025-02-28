@@ -1,0 +1,24 @@
+module top_module (
+    input clk,
+    input [7:0] in,
+    output [7:0] pedge
+);
+
+    // The design detects a 0-to-1 transition for each bit.
+    // However, the output "pedge" is set one clock cycle after the transition.
+    // We implement this by computing the transition (~prev_in & in)
+    // and storing it in a register (temp) so that the output is delayed by one cycle.
+    
+    reg [7:0] prev_in;
+    reg [7:0] temp;
+    
+    always @(posedge clk) begin
+        // Compute the positive edge detection based on previous input sample.
+        // This result is stored in temp, so the output is asserted one cycle later.
+        temp   <= (~prev_in) & in;
+        prev_in <= in;
+    end
+    
+    assign pedge = temp;
+
+endmodule

@@ -1,0 +1,12 @@
+```
+module top_module(
+    input a,
+    input b,
+    input c,
+    output out  
+); 
+
+    assign out = 1'b1; // The output is always 1 based on the given K-map outputs
+
+endmodule
+```

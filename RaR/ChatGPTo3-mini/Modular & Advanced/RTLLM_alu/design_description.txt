@@ -1,0 +1,41 @@
+The objective is to design a Verilog module that functions as an Arithmetic Logic Unit (ALU) for a 32-bit MIPS ISA CPU. This ALU must support a variety of arithmetic and logical operations, each determined by a 6-bit opcode conveyed via the input signal named "aluc." The module should handle two primary 32-bit input operands, "a" and "b," and produce several outputs that reflect the outcome of the chosen operation.
+
+The outputs that the module must generate include the following:
+
+1. "r": A 32-bit signal that contains the result of the executed operation.
+2. "zero": A 1-bit indicator that shows whether the result "r" equals zero.
+3. "carry": A 1-bit flag intended to indicate if a carry occurs from the most significant bit during the arithmetic calculations.
+4. "negative": A 1-bit signal that establishes whether the computed result "r" is negative.
+5. "overflow": A 1-bit flag that signals if an arithmetic overflow has taken place during the processing of the operation.
+6. "flag": A 1-bit output specifically dedicated to representing the outcome of the "Set on Less Than" (SLT) and "Set on Less Than Unsigned" (SLTU) instructions.
+
+Each possible operation is associated with a unique 6-bit opcode. The required opcodes for each operation are as follows:
+
+- ADD: 6'b100000
+- ADDU: 6'b100001
+- SUB: 6'b100010
+- SUBU: 6'b100011
+- AND: 6'b100100
+- OR: 6'b100101
+- XOR: 6'b100110
+- NOR: 6'b100111
+- SLT: 6'b101010
+- SLTU: 6'b101011
+- SLL (shift logical left): 6'b000000
+- SRL (shift logical right): 6'b000010
+- SRA (shift arithmetic right): 6'b000011
+- SLLV (variable shift logical left): 6'b000100
+- SRLV (variable shift logical right): 6'b000110
+- SRAV (variable shift arithmetic right): 6'b000111
+- LUI (load upper immediate): 6'b001111
+
+When developing the module, implement the following details:
+
+• Use a case statement that examines the 'aluc' input to select the correct operation based on the provided opcode.
+• Account for both signed and unsigned arithmetic; for example, differentiate between ADD (which is signed) and ADDU (which is unsigned).
+• Pay special attention to shift operations. When handling variants of shift instructions, ensure that the bit-shift operations properly account for either a fixed shift amount provided as an immediate value or a shift amount derived from specific bits of an operand.
+• For the 'LUI' operation, incorporate logic to shift the upper 16 bits of operand "a" into the appropriate position, while setting the lower 16 bits to zeros.
+• Compute the additional outputs ("zero," "carry," "negative," "overflow," and "flag") based on the result "r." Each output should accurately capture the condition it is intended to represent.
+• For operations that are not explicitly defined by the provided opcode parameters, the output should default to a high-impedance state ('z') to ensure unhandled cases do not result in undefined behavior.
+
+Your task is to write the complete, real-world Verilog code for the ALU module that meets all of these specifications. Remember to focus solely on clarifying the question and not to present any solutions.

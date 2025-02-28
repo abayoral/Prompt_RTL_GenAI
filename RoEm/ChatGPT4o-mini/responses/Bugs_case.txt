@@ -1,0 +1,36 @@
+```
+module top_module (
+    input [7:0] code,
+    output reg [3:0] out,
+    output reg valid = 0
+);
+
+    always @(*)
+    begin
+        valid = 0; // Reset valid at the beginning
+        case (code)
+            8'h45: out = 4'b0000; // Key 0
+            8'h16: out = 4'b0001; // Key 1
+            8'h1e: out = 4'b0010; // Key 2
+            8'd26: out = 4'b0011; // Key 3
+            8'h25: out = 4'b0100; // Key 4
+            8'h2e: out = 4'b0101; // Key 5
+            8'h36: out = 4'b0110; // Key 6
+            8'h3d: out = 4'b0111; // Key 7
+            8'h3e: out = 4'b1000; // Key 8
+            8'h46: out = 4'b1001; // Key 9
+            default: out = 4'bxxxx; // Undefined output
+        endcase
+        
+        // Set valid if a key is detected
+        if (code == 8'h45 || code == 8'h16 || code == 8'h1e || 
+            code == 8'd26 || code == 8'h25 || code == 8'h2e || 
+            code == 8'h36 || code == 8'h3d || code == 8'h3e || 
+            code == 8'h46) 
+        begin
+            valid = 1;
+        end
+    end
+
+endmodule
+```

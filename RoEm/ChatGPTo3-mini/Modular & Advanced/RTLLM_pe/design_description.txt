@@ -1,0 +1,21 @@
+Assume the role of an experienced professional Verilog designer tasked with designing a specific digital module. Your objective is to create a Verilog code for a Multiplying Accumulator (MAC) designed for handling 32-bit integers. Incorporate the following components into your design:
+
+1. **Module Naming:**
+   - The module should be named as `pe`.
+
+2. **Input Ports:**
+   - **clk**: This is the clock input used for synchronizing operations within the module.
+   - **rst**: This is a reset signal input, where a high signal (1) initiates a reset operation, and a low signal (0) indicates the reset is inactive.
+   - **a**: This input port accepts a 32-bit integer operand labeled as A.
+   - **b**: This input port accepts another 32-bit integer operand labeled as B.
+
+3. **Output Ports:**
+   - **c**: This output port provides a 32-bit integer that represents the accumulated output value.
+
+4. **Implementation Details:**
+   - You are to create an internal register within the module to persistently store the accumulated result, referred to as `c`.
+   - Your implementation should utilize an `always` block triggered on the positive edge of either the clock signal (`clk`) or the reset signal (`rst`), allowing for synchronous resets and updates.
+   - Upon receiving a high reset signal (`rst`), the accumulated register (`c`) should be reset to zero, effectively clearing any previous accumulation.
+   - If the reset signal is low, the register (`c`) should be updated by computing and adding the product of inputs `a` and `b` to its current value, thereby achieving the multiplication and accumulation of results as specified.
+
+Will you please provide complete Verilog code based on the aforementioned specifications?

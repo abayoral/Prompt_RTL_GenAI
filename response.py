@@ -85,6 +85,8 @@ def generate_verilog(conv, model_type, model_id=""):
         model = lm.ChatGPT4o()
     elif model_type == "ChatGPT4o-mini":
         model = lm.ChatGPT4omini()
+    elif model_type == "ChatGPTo3-mini":
+        model = lm.ChatGPTo3mini()
     elif model_type == "PaLM":
         model = lm.PaLM()
     elif model_type == "CodeLlama":
@@ -93,6 +95,7 @@ def generate_verilog(conv, model_type, model_id=""):
         sys.exit(2)
 
     return model.generate(conv)
+
 
 def get_most_consistent_response(responses):
     """
@@ -117,7 +120,9 @@ def get_response(design_prompt, module, model_type, outdir="", log=None, prompt_
     conv.add_message("user", design_prompt)
 
     # Generate the directory path
-    dir_path = os.path.join(outdir, prompt_strategy, dirname)
+    model_name = os.environ.get('model_name', 'default_model')
+    dir_path = os.path.join(outdir, prompt_strategy, model_name, dirname)
+
     os.makedirs(dir_path, exist_ok=True)
 
     # Generate the filename within the new directory

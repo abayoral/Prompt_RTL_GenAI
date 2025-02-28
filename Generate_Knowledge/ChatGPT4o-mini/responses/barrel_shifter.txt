@@ -1,0 +1,32 @@
+```
+module barrel_shifter (
+    input [7:0] in,
+    input [2:0] ctrl,
+    output [7:0] out
+);
+
+    wire [7:0] shift_4, shift_2, shift_1;
+
+    // Shift input by 4 bits to the right
+    assign shift_4 = {in[3:0], in[7:4]}; // Rotate bits
+
+    // Shift input by 2 bits to the right
+    assign shift_2 = {in[5:0], in[7:6]}; // Rotate bits
+
+    // Shift input by 1 bit to the right
+    assign shift_1 = {in[6:0], in[7]}; // Rotate bits
+
+    // 2-to-1 MUX for final output selection
+    wire [7:0] mux_2_1_out, mux_2_2_out;
+
+    // First level mux: chooses between shift_4 and original in based on ctrl[2]
+    assign mux_2_1_out = ctrl[2] ? shift_4 : in;
+
+    // Second level mux: chooses between shift_2 and mux_2_1_out based on ctrl[1]
+    assign mux_2_2_out = ctrl[1] ? shift_2 : mux_2_1_out;
+
+    // Final mux: chooses between shift_1 and mux_2_2_out based on ctrl[0]
+    assign out = ctrl[0] ? shift_1 : mux_2_2_out;
+
+endmodule
+```

@@ -1,0 +1,21 @@
+As a professional Verilog designer, your task is to implement a module that simulates a perpetual calendar using Verilog. This module should be named `calendar` and will be responsible for keeping track of time in terms of seconds, minutes, and hours, starting from zero. The module should have specific input and output ports, as well as certain behavioral characteristics.
+
+### Module Name:
+- **calendar**
+
+### Input Ports:
+- **CLK**: This is the clock input for the module. The module should update its time values in sync with the clock cycles.
+- **RST**: This is an active-high reset signal. When activated, the module should reset all time values (Seconds, Minutes, Hours) to zero.
+
+### Output Ports:
+- **Hours**: A 6-bit output that represents the current hour, cycling from 0 to 23.
+- **Mins**: A 6-bit output that represents the current minute, cycling from 0 to 59.
+- **Secs**: A 6-bit output that represents the current second, cycling from 0 to 59.
+
+### Implementation Details:
+- The module should track time with three counters representing seconds, minutes, and hours, and each should be updated using a series of always blocks.
+- The **first always block** should react to the positive edges of both the clock (`CLK`) and the reset signal (`RST`). It will handle the seconds (`Secs`), incrementing by 1 every clock cycle unless it reaches 59, in which case it resets to 0.
+- The **second always block** should also respond to the positive edges of `CLK` and `RST`. It will handle the minutes (`Mins`). When the seconds reach 59, the minutes counter should increment by 1. When both seconds and minutes reach 59, the minutes counter should reset to 0.
+- The **third always block** should follow the same triggering logic and manage the hours (`Hours`). When both the minutes and seconds reach their maximums (59 and 59), the hours counter should increment by 1. When hours reach 23 and both minutes and seconds hit their peaks, hours should reset to 0.
+
+The described behavior should ensure a continuous and seamless representation of time, adequately mimicking a conventional clock structure within a digital design context. Once these tasks are clearly understood, you can proceed with constructing the Verilog code according to these specifications.

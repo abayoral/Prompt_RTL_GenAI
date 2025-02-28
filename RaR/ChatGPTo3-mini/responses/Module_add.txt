@@ -1,0 +1,31 @@
+module top_module(
+    input  [31:0] a,
+    input  [31:0] b,
+    output [31:0] sum
+);
+    wire carry_out;
+    wire [15:0] sum_lower;
+    wire [15:0] sum_upper;
+
+    // First 16-bit adder for lower bits
+    add16 lower_adder (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum_lower),
+        .cout(carry_out)
+    );
+
+    // Second 16-bit adder for upper bits
+    add16 upper_adder (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(carry_out),
+        .sum(sum_upper),
+        .cout()  // final carry-out is not used
+    );
+
+    // Concatenating the upper and lower parts of the sum
+    assign sum = {sum_upper, sum_lower};
+
+endmodule

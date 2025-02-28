@@ -1,0 +1,18 @@
+module top_module (
+    input a, b, c, d, e,
+    output [24:0] out
+);
+
+    // The idea is to create two 25‐bit vectors:
+    // 1. The first vector is 5 copies (one for each comparison) of each input in order:
+    //    {a,a,a,a,a, b,b,b,b,b, c,c,c,c,c, d,d,d,d,d, e,e,e,e,e}
+    // 2. The second vector is the 5-bit input concatenated 5 times:
+    //    {a,b,c,d,e, a,b,c,d,e, a,b,c,d,e, a,b,c,d,e, a,b,c,d,e}
+    //
+    // Then each output bit is computed as: ~(first_bit) ^ (second_bit),
+    // which yields 1 when the two compared bits are equal and 0 otherwise.
+    
+    assign out = ~{ {5{a}}, {5{b}}, {5{c}}, {5{d}}, {5{e}} } ^
+                 {a, b, c, d, e, a, b, c, d, e, a, b, c, d, e, a, b, c, d, e, a, b, c, d, e};
+
+endmodule

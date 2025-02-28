@@ -1,0 +1,10 @@
+module top_module (
+    input [1:0] A,
+    input [1:0] B,
+    output z
+);
+
+    // assign z to be high if A equals B, low otherwise.
+    assign z = (A == B);
+
+endmodule

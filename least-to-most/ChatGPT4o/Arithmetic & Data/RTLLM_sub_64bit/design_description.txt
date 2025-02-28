@@ -1,0 +1,9 @@
+Imagine you are tasked with designing a digital logic module using Verilog, a hardware description language commonly used for modeling electronic systems. Your specific goal involves creating a module that functions as a 64-bit subtractor, with the capability of checking for overflow occurrences. The module, designated with the name `sub_64bit`, will be responsible for accepting two 64-bit wide input data lines, labeled as `A` and `B`. Each of these lines is intended to hold a large signed integer value. The operation you need to perform is to compute the arithmetic subtraction of these two values, specifically `A - B`.
+
+To handle this process within the module, you will layout two primary output ports: `result`, which is a 64-bit wide line that holds the computed difference between the inputs `A` and `B`, and `overflow`, a 1-bit signal indicating whether an overflow condition has occurred during the computation. The overflow condition must be assessed by evaluating the sign bits of both input operands and the resultant output. Here’s how overflow conditions are determined in this context:
+- A positive number subtracted by a negative number resulting in a negative output signals a condition recognized as positive overflow.
+- Conversely, a negative number subtracted by a positive number which results in a positive output signals negative overflow.
+
+The module's purpose is to set the overflow signal to 1 when any of these overflow conditions is detected, confirming that the computation's result cannot be represented correctly within 64 bits. If no overflow is present, the overflow signal should simply be set to 0, allowing other components or systems to interpret the subtraction operation's result as accurate and error-free.
+
+Your task is to implement this functionality using Verilog, fully delineating the procedures for subtraction operation and overflow detection in the complete code representation of the module.

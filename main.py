@@ -14,11 +14,14 @@ if len(sys.argv) != 3:
 framework_name = sys.argv[1]
 prompt_dir = sys.argv[2]
 
+
+model_name = os.environ.get('model_name', 'default_model')
+
 # Set the environment variable
 os.environ['framework_name'] = framework_name
 print(f"framework_name environment variable set to: {os.environ['framework_name']}")
 
-prompts_dir = os.path.join(framework_name, prompt_dir)
+prompts_dir = os.path.join(framework_name, model_name,prompt_dir)
 testbench_dir = 'hdlbits_testbenches'
 
 # Create a directory for logs within the prompt directory
@@ -32,9 +35,10 @@ v_files = glob.glob(os.path.join(prompts_dir, '*.v'))
 # Add directories starting with "RTLLM_"
 rtllm_dirs = [d for d in os.listdir(prompts_dir) if os.path.isdir(os.path.join(prompts_dir, d)) and d.startswith("RTLLM_")]
 
+
 # Define the commands template
 commands_template = [
-    ['./response.py', '--prompt={prompt}', '--name={name}', '--testbench={testbench}', '--model=ChatGPT4o'],
+    ['./response.py', '--prompt={prompt}', '--name={name}', '--testbench={testbench}', '--model={model_name}'],
     ['python', 'regex.py'],
     ['python', 'iverilog.py']
 ]
@@ -58,7 +62,7 @@ for rtllm_dir in rtllm_dirs:
     print(f"module_name environment variable set to: {os.environ['module_name']}")
 
     # Execute response.py for RTLLM_ files
-    response_command = ['./response.py', '--prompt={}'.format(prompt_file), '--name={}'.format(module_name), '--model=ChatGPT4o']
+    response_command = ['./response.py', '--prompt={}'.format(prompt_file), '--name={}'.format(module_name), '--model={}'.format(model_name)]
     try:
         subprocess.run(response_command, check=True)
         print(f"Response command executed successfully for {rtllm_dir}.")
@@ -122,7 +126,7 @@ for v_file in v_files:
 
     # Generate commands for the current .v file
     commands = [
-        [part.format(prompt=v_file, name=base_name, testbench=testbench_file) for part in command]
+        [part.format(prompt=v_file, name=base_name, testbench=testbench_file, model_name=model_name) for part in command]
         for command in commands_template
     ]
     

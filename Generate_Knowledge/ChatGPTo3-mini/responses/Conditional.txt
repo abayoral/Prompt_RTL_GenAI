@@ -1,0 +1,15 @@
+module top_module (
+    input [7:0] a, b, c, d,
+    output [7:0] min
+);
+
+    // First two-way comparison: min between a and b
+    wire [7:0] min_ab = (a < b) ? a : b;
+
+    // Second two-way comparison: min between c and d
+    wire [7:0] min_cd = (c < d) ? c : d;
+
+    // Final two-way comparison: min between the two intermediate results
+    assign min = (min_ab < min_cd) ? min_ab : min_cd;
+
+endmodule

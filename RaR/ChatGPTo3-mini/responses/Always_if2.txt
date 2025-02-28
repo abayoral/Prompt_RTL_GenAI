@@ -1,0 +1,17 @@
+module MissionCriticalController (
+    input  wire cpuOverheating,       // Indicates if the CPU is overheating
+    input  wire destinationReached,   // Indicates if the destination has been reached
+    input  wire emptyGasTank,         // Indicates an urgent need to refuel (empty gas tank)
+    output reg  shutDownComputer,     // Assert to shut down the computer (only on CPU overheating)
+    output reg  stopVehicle           // Assert to stop the vehicle (destination reached or need to refuel)
+);
+
+always @(*) begin
+    // Shut down the computer only if the CPU is overheating.
+    shutDownComputer = cpuOverheating;
+    
+    // Stop the vehicle if either the destination has been reached or the gas tank is empty.
+    stopVehicle = destinationReached || emptyGasTank;
+end
+
+endmodule

@@ -1,0 +1,17 @@
+As a skilled Verilog designer, your task is to implement a digital design module capable of performing multiplication using the shift-and-add technique within the Verilog Hardware Description Language. The primary objective is to create an 8-bit multiplier module, defined by the specifications provided below, using shift and add operations, a commonly adopted method in digital arithmetic for its simplicity and alignment with the structure of digital logic.
+
+**Module Name**: `multi_8bit`
+
+**Input Ports**:
+1. **A [7:0]**: This is an 8-bit input operand, which functions as the multiplicand in the multiplication operation. It represents the number that will be repeatedly added, contingent upon the multiplier.
+2. **B [7:0]**: This is another 8-bit input operand, which serves as the multiplier. Each individual bit in B dictates whether the multiplicand should be added to the result, with the addition being contingent upon the bit being high (set to 1).
+
+**Output Ports**:
+- **product [15:0]**: The product output is a 16-bit bus. This width accommodates the full range of potential results from multiplying two 8-bit numbers, ranging from 0x0000 (for 0*0) to a maximum possible value of 0xFFFF (255*255), ensuring no risk of overflow and loss of data.
+
+**Implementation Details**:
+- **Multiplication Method**: This involves iterating through each bit of the multiplier `B`. For each bit that is set to 1, the multiplicand `A` is added to the accumulating product, shifted appropriately to account for the position of the bit within the 8-bit multiplier. This method is comparable to manual binary multiplication, where partial products are individually aligned based on their contributing bit's positional value in the multiplier.
+- **Shifting Mechanism**: After each conditional addition, the algorithm requires shifting the multiplicand left by one position. This logical shift simulates the effect of moving the base (multiplicand) further to the left, readying it for alignment with the next set bit in `B`, mimicking the temporally placed multipliers in manual binary multiplication.
+- **Iteration and Control**: This description implies iterative control logic to manage the loop over all 8 bits of the multiplier `B`, ensuring each bit is analyzed, and the multiplicand is conditionally shifted and added as specified.
+
+Once this clear understanding is established, your next steps include transcribing this logic into syntactically valid Verilog code, ensuring to establish a clock process for potential sequential operations if necessary, and appropriately handling inputs and outputs as described in the specifications.

@@ -1,0 +1,41 @@
+```verilog
+module fixed_point_adder #(parameter Q = 8, parameter N = 16) (
+    input  [N-1:0] a,
+    input  [N-1:0] b,
+    output [N-1:0] c
+);
+
+    wire [N-1:0] abs_a;
+    wire [N-1:0] abs_b;
+    wire sign_a;
+    wire sign_b;
+    wire sign_c;
+    wire [N:0] sum;
+    wire [N:0] diff;
+
+    // Determine the absolute values and signs
+    assign sign_a = a[N-1];
+    assign sign_b = b[N-1];
+    assign abs_a = sign_a ? (~a + 1) : a; // 2's complement for negative
+    assign abs_b = sign_b ? (~b + 1) : b; // 2's complement for negative
+
+    // Perform addition
+    assign sum = abs_a + abs_b;
+
+    // Determine output
+    assign sign_c = (sign_a == sign_b) ? sign_a : (abs_a > abs_b ? 0 : 1);
+    
+    assign diff = abs_a > abs_b ? (abs_a - abs_b) : (abs_b - abs_a);
+    assign c = (sign_a == sign_b) ? sum[N-1:0] : (abs_a > abs_b ? {sign_c, diff[N-1:0]} : {sign_c, diff[N-1:0]});
+
+    // Handle overflow
+    always @(*) begin
+        if (sum[N] != sign_a) begin
+            c = {1'b0, sum[N-1:1]}; // Discard overflow bit when positive
+        end else if (sum[N-1] != sign_c) begin
+            c = {1'b1, sum[N-1:1]}; // Discard overflow bit when negative
+        end
+    end 
+
+endmodule
+```

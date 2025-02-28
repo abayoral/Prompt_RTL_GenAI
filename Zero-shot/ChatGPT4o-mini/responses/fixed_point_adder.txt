@@ -1,0 +1,40 @@
+```
+module fixed_point_adder #(
+    parameter Q = 16, // Number of fractional bits
+    parameter N = 32  // Total number of bits
+) (
+    input [N-1:0] a,   // First operand
+    input [N-1:0] b,   // Second operand
+    output [N-1:0] c   // Result of the addition
+);
+    
+    reg [N-1:0] res;   // Internal register for result
+
+    always @(*) begin
+        // Check the MSB of both inputs to determine sign
+        if (a[N-1] == b[N-1]) begin
+            // Both inputs have the same sign, perform addition
+            res = a + b;
+            // Check for overflow (result should be truncated to N bits if it exceeds)
+            if (res[N-1] != a[N-1]) begin
+                // Overflow has occurred, assign maximum representable value
+                res = a[N-1] ? {1'b1, {N-1{1'b0}}} : {1'b0, {N-1{1'b1}}}; // Set to -MAX or +MAX
+            end
+        end else begin
+            // Inputs have different signs, perform subtraction
+            if (a[N-1] == 1'b0 && b[N-1] == 1'b1) begin
+                // a is positive, b is negative
+                res = a + (~b + 1'b1); // a - (-b) => a + |b|
+            end else begin
+                // b is positive, a is negative
+                res = b + (~a + 1'b1); // b - (-a) => b + |a|
+            end
+            // The sign of the result is dictated by the greater absolute value
+            // This is implicitly handled by the addition of the adjusted values
+        end
+    end
+
+    assign c = res; // Output the result
+
+endmodule
+```

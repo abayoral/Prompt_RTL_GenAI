@@ -1,0 +1,13 @@
+module top_module (
+    input ring,
+    input vibrate_mode,
+    output ringer,       // Make sound
+    output motor         // Vibrate
+);
+
+    // When there's an incoming ring, if vibrate_mode is high, motor is activated,
+    // otherwise ringer is activated. If ring is deasserted, both outputs remain off.
+    assign ringer = ring & ~vibrate_mode;
+    assign motor  = ring & vibrate_mode;
+
+endmodule

@@ -1,0 +1,1 @@
+To clarify the operation of the multiplexer, can you confirm the expected behavior of the output `out` when `sel` values are at their boundaries (e.g., when `sel` is `00`, `01`, `10`, `11`, and if there's any special behavior needed for undefined states)?

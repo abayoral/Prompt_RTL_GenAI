@@ -1,0 +1,15 @@
+module top_module (
+    input a, b, c, d, e,
+    output [24:0] out
+);
+
+    // Create the left-hand vector by repeating each input 5 times,
+    // so that it forms the row elements: a,a,a,a,a, b,b,b,b,b, c,c,c,c,c, d,d,d,d,d, e,e,e,e,e.
+    // Create the right-hand vector by repeating the 5-bit group {a, b, c, d, e} 5 times,
+    // which naturally forms the column elements for each row.
+    // The bit-wise XNOR is then implemented as ~(left) ^ (right).
+    
+    assign out = ~( { {5{a}}, {5{b}}, {5{c}}, {5{d}}, {5{e}} } ) 
+                 ^ { {a, b, c, d, e}, {a, b, c, d, e}, {a, b, c, d, e}, {a, b, c, d, e}, {a, b, c, d, e} };
+
+endmodule

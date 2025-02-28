@@ -1,0 +1,102 @@
+```verilog
+module top_module (
+    input wire clk,
+    input wire reset,
+    input wire input_signal,
+    output reg [3:0] state,
+    output reg output_signal
+);
+
+    // State encoding
+    parameter A = 4'b0001;
+    parameter B = 4'b0010;
+    parameter C = 4'b0100;
+    parameter D = 4'b1000;
+
+    always @(*) begin
+        // Default assignments
+        output_signal = 0; // Default output
+        case (state)
+            A: begin
+                if (input_signal) begin
+                    state = B;
+                end else begin
+                    state = A;
+                end
+            end
+            
+            B: begin
+                if (input_signal) begin
+                    state = B;
+                end else begin
+                    state = C;
+                end
+            end
+            
+            C: begin
+                if (input_signal) begin
+                    state = D;
+                end else begin
+                    state = A;
+                end
+            end
+            
+            D: begin
+                if (input_signal) begin
+                    state = B;
+                    output_signal = 1; // Output for state D when input is 1
+                end else begin
+                    state = C;
+                end
+            end
+            
+            default: state = A; // Reset or unknown state
+        endcase
+    end
+
+    // State transition logic
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            state <= A; // Reset state
+        end else begin
+            case (state)
+                A: begin
+                    if (input_signal) begin
+                        state <= B;
+                    end else begin
+                        state <= A;
+                    end
+                end
+                
+                B: begin
+                    if (input_signal) begin
+                        state <= B;
+                    end else begin
+                        state <= C;
+                    end
+                end
+                
+                C: begin
+                    if (input_signal) begin
+                        state <= D;
+                    end else begin
+                        state <= A;
+                    end
+                end
+                
+                D: begin
+                    if (input_signal) begin
+                        state <= B;
+                        output_signal <= 1; // Generate output for state D
+                    end else begin
+                        state <= C;
+                    end
+                end
+                
+                default: state <= A; // Reset to state A
+            endcase
+        end
+    end
+
+endmodule
+```

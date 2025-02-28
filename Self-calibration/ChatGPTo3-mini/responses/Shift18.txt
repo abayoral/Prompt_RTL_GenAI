@@ -1,0 +1,36 @@
+Below is the revised module. The original code was mostly correct, but note that the arithmetic right‐shift operators (>>>) require that the operands be signed. In your original code, q (and data) were declared as 64‑bit vectors without the signed qualifier, so the arithmetic shifts might not behave as intended. In the corrected module, q and data are now declared as signed. This change ensures that the arithmetic shift operations (>>>) sign‐extend as expected. Additionally, a default branch in the case statement is redundant for a 2‑bit selector but is kept for clarity.
+
+------------------------------------------------
+module top_module(
+    input  clk,
+    input  load,
+    input  ena,
+    input  [1:0] amount,
+    input  signed [63:0] data,
+    output reg signed [63:0] q
+);
+    
+    always @(posedge clk) begin
+        if (load) begin
+            q <= data;
+        end else if (ena) begin
+            case (amount)
+                2'b00: q <= q << 1;    // Logical shift left by 1 bit
+                2'b01: q <= q << 8;    // Logical shift left by 8 bits
+                2'b10: q <= q >>> 1;   // Arithmetic shift right by 1 bit
+                2'b11: q <= q >>> 8;   // Arithmetic shift right by 8 bits
+                default: q <= q;       // (Redundant) default branch
+            endcase
+        end
+    end
+
+endmodule
+------------------------------------------------
+
+Key corrections and improvements:
+
+1. Declared both data and q as signed so that the arithmetic right-shift (>>>) performs sign extension.
+2. Maintained comments for clarity regarding the intended shift operations.
+3. Preserved the overall structure and functionality while ensuring that the operations behave as intended.
+
+This version should now meet best practices and perform correctly for both logical and arithmetic shift operations.

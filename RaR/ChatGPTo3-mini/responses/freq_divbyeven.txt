@@ -1,0 +1,29 @@
+module freq_diveven #(parameter NUM_DIV = 10) (
+    input wire clk,
+    input wire rst_n,
+    output reg clk_div
+);
+
+    // 4-bit counter to count clock cycles.
+    reg [3:0] cnt;
+
+    // Always block triggered on the rising edge of clk or negative edge of rst_n (asynchronous reset)
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // When reset is asserted, initialize counter and output clock to 0.
+            cnt <= 4'd0;
+            clk_div <= 1'b0;
+        end
+        else begin
+            // Check if counter has reached half the division factor minus one
+            if (cnt == ((NUM_DIV/2) - 1)) begin
+                cnt <= 4'd0;          // Reset the counter
+                clk_div <= ~clk_div;  // Toggle the divided clock output
+            end
+            else begin
+                cnt <= cnt + 1;       // Increment the counter on each clock cycle
+            end
+        end
+    end
+
+endmodule

@@ -1,0 +1,44 @@
+```verilog
+module mux2(
+    input wire [7:0] in0,
+    input wire [7:0] in1,
+    input wire select,
+    output wire [7:0] out
+);
+    assign out = (select) ? in1 : in0;
+endmodule
+
+module top_module(
+    input wire [1:0] sel,
+    input wire [7:0] a, 
+    input wire [7:0] b, 
+    input wire [7:0] c, 
+    input wire [7:0] d, 
+    output wire [7:0] y
+);
+    wire [7:0] y0, y1;
+
+    // First level of multiplexing
+    mux2 mux0 (
+        .in0(a),
+        .in1(b),
+        .select(sel[0]),
+        .out(y0)
+    );
+
+    mux2 mux1 (
+        .in0(c),
+        .in1(d),
+        .select(sel[0]),
+        .out(y1)
+    );
+
+    // Second level of multiplexing
+    mux2 mux2 (
+        .in0(y0),
+        .in1(y1),
+        .select(sel[1]),
+        .out(y)
+    );
+endmodule
+```

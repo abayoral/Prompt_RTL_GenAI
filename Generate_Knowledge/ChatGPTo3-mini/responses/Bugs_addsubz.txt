@@ -1,0 +1,25 @@
+module top_module ( 
+    input do_sub,
+    input [7:0] a,
+    input [7:0] b,
+    output reg [7:0] out,
+    output reg result_is_zero
+);
+
+    always @(*) begin
+        // Compute addition or subtraction based on do_sub.
+        case (do_sub)
+            1'b0: out = a + b;
+            1'b1: out = a - b;
+            // Although do_sub is a one-bit signal, a default case is not strictly necessary.
+            default: out = 8'b0; 
+        endcase
+
+        // Check if the result is zero.
+        if (out == 8'b0)
+            result_is_zero = 1;
+        else
+            result_is_zero = 0;
+    end
+
+endmodule

@@ -1,0 +1,118 @@
+module traffic_light(
+    input  wire       rst_n,        // active low reset
+    input  wire       clk,          // system clock
+    input  wire       pass_request, // pedestrian request button
+    output reg [7:0]  clock,        // internal countdown timer output
+    output reg        red,          // vehicular red light
+    output reg        yellow,       // vehicular yellow light
+    output reg        green         // vehicular green light
+);
+
+  // State encoding:
+  // IDLE: initial state, go to red on next clock edge.
+  // S_RED: vehicular red light active (pedestrians cross).
+  // S_GREEN: vehicular green light active.
+  // S_YELLOW: vehicular yellow light active.
+  parameter IDLE    = 2'b00;
+  parameter S_RED   = 2'b01;  // red duration: 10 clock cycles
+  parameter S_GREEN = 2'b10;  // green duration: normally 60 clock cycles; can be shortened to 10 on ped request
+  parameter S_YELLOW= 2'b11;  // yellow duration: 5 clock cycles
+
+  reg [1:0] state;
+  reg [7:0] cnt;  // 8-bit counter for timing
+
+  // State transition and counter update logic
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      state <= IDLE;
+      cnt   <= 8'd0;
+    end else begin
+      case (state)
+        IDLE: begin
+          // Begin operation by setting vehicular red light active for 10 cycles.
+          state <= S_RED;
+          cnt <= 8'd10;
+        end
+
+        S_RED: begin
+          if (cnt == 8'd0) begin
+            // When red period ends, transition to green.
+            state <= S_GREEN;
+            cnt <= 8'd60;
+          end else begin
+            cnt <= cnt - 8'd1;
+          end
+        end
+
+        S_GREEN: begin
+          // Check pedestrian request: only affect if more than 10 cycles remain.
+          if (pass_request && (cnt > 8'd10)) begin
+            cnt <= 8'd10;
+          end else if (cnt == 8'd0) begin
+            // When green period ends, move on to yellow.
+            state <= S_YELLOW;
+            cnt <= 8'd5;
+          end else begin
+            cnt <= cnt - 8'd1;
+          end
+        end
+
+        S_YELLOW: begin
+          if (cnt == 8'd0) begin
+            // When yellow period ends, cycle back to red.
+            state <= S_RED;
+            cnt <= 8'd10;
+          end else begin
+            cnt <= cnt - 8'd1;
+          end
+        end
+
+        default: begin
+          state <= S_RED;
+          cnt <= 8'd10;
+        end
+      endcase
+    end
+  end
+
+  // Output assignment based on current state.
+  // When vehicular light is green or yellow, pedestrian light is red
+  // When vehicular light is red, pedestrian light is green.
+  // Since we output only the vehicular lights, we map:
+  // S_RED   -> vehicular red active, (pedestrian green implicitly active)
+  // S_GREEN -> vehicular green active
+  // S_YELLOW-> vehicular yellow active
+  always @(*) begin
+    case (state)
+      S_RED: begin
+        red    = 1'b1;
+        yellow = 1'b0;
+        green  = 1'b0;
+      end
+
+      S_GREEN: begin
+        red    = 1'b0;
+        yellow = 1'b0;
+        green  = 1'b1;
+      end
+
+      S_YELLOW: begin
+        red    = 1'b0;
+        yellow = 1'b1;
+        green  = 1'b0;
+      end
+
+      default: begin
+        red    = 1'b0;
+        yellow = 1'b0;
+        green  = 1'b0;
+      end
+    endcase
+  end
+
+  // Drive the external clock output to reflect the counter value.
+  always @(*) begin
+    clock = cnt;
+  end
+
+endmodule

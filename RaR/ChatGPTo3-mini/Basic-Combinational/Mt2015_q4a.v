@@ -1,0 +1,7 @@
+Imagine you are a highly experienced Digital Design Engineer working at a top-tier hardware design company. You have been assigned a crucial task: to develop a Verilog module that will be a key component in a next-generation product. The module, referred to as Module A, needs to implement a specific logical function where the output z is defined by the expression z = (x^y) & x. Here, the operator "^" represents a bitwise operation (typically XOR in Verilog), and the "&" denotes a bitwise AND operation.
+
+This module is not just another component—it plays a significant role in the performance and reliability of the final product. As such, its design and implementation are vital to preserving and enhancing your company's strong reputation within the competitive computer hardware industry.
+
+Your task is to write the Verilog code for this module within the provided module template named top_module, which includes two inputs (x and y) and one output (z). The goal is to correctly implement the specified logical function so that the design aligns with the performance and reliability expectations of a high-quality hardware design.
+
+Please note that no hints or solutions should be provided—this description solely serves to expand and clarify the requirements of the problem you need to tackle.

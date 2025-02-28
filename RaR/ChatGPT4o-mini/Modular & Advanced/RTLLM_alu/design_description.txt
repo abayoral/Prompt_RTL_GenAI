@@ -1,0 +1,38 @@
+As an expert in Verilog design, I would like you to develop a comprehensive Verilog module called "alu," specifically tailored for a 32-bit MIPS ISA (Instruction Set Architecture) CPU. The primary function of this ALU module will be to execute a variety of arithmetic and logical operations that are determined by a 6-bit operational code (opcode) denoted by the input signal 'aluc'. In the design, you will incorporate two main inputs: 'a' and 'b,' each being 32-bit operands.
+
+Your task involves generating outputs that reflect the result of the operations performed, along with several status indicators about the nature of the result. These specific outputs include:
+
+1. 'r': This output should represent the 32-bit result obtained from the operation performed on operands 'a' and 'b.'
+2. 'zero': A 1-bit output that signals whether the result 'r' equals zero.
+3. 'carry': Another 1-bit flag indicating if a carry-out occurred from the most significant bit as a result of the operation.
+4. 'negative': A 1-bit indicator to signal if the result 'r' is negative (based on signed interpretation).
+5. 'overflow': A 1-bit output flag that identifies whether an arithmetic overflow took place during the operation, which can be crucial for correctly interpreting signed arithmetic results.
+6. 'flag': A 1-bit result specifically associated with the outcome of operations such as "Set on Less Than" (SLT) and "Set on Less Than Unsigned" (SLTU).
+
+The operations supported by this ALU module should strictly adhere to the opcode definitions as follows:
+
+- ADD: 6'b100000
+- ADDU: 6'b100001
+- SUB: 6'b100010
+- SUBU: 6'b100011
+- AND: 6'b100100
+- OR: 6'b100101
+- XOR: 6'b100110
+- NOR: 6'b100111
+- SLT: 6'b101010
+- SLTU: 6'b101011
+- SLL: 6'b000000
+- SRL: 6'b000010
+- SRA: 6'b000011
+- SLLV: 6'b000100
+- SRLV: 6'b000110
+- SRAV: 6'b000111
+- LUI: 6'b001111
+
+In your implementation, it is essential to ensure that the correct interpretation of signed versus unsigned arithmetic is maintained, especially in terms of distinct operations such as addition (ADD vs ADDU). As part of the design, you should also utilize a case statement to manage the 'aluc' signal, directing the control flow to the appropriate arithmetic or logical operation.
+
+When dealing with bitwise shift operations (e.g., logical shift left, logical shift right, and arithmetic shift right), careful consideration must be given to how shift amounts are applied, whether they are immediate values or derived from specific bits of the operand. Additionally, implementing the LUI operation will involve manipulating the upper 16 bits of operand 'a' and filling the lower bits with zeros.
+
+Your output signals for zero, carry, negative, overflow, and flag should be derived based on the result of the operation conducted, ensuring accurate representation of the ALU's status post-operation.
+
+Lastly, for operations that are not defined within the given opcode parameters, please set the outputs to a high-impedance state ('z') to adequately handle any undefined cases. I encourage you to present the complete Verilog code that accurately encapsulates this extensive ALU functionality, taking into account all specified operational constraints and requirements.

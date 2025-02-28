@@ -1,0 +1,53 @@
+```verilog
+module bcd_counter (
+    input wire clk,
+    input wire reset,
+    output reg [15:0] q,
+    output reg [2:0] ena
+);
+
+    // BCD counter maximums for each digit
+    parameter MAX_BCD = 4'd9;
+
+    // State update block
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            q <= 16'b0; // Reset the counter to 0
+            ena <= 3'b000; // Disable all enable signals
+        end else begin
+            // Increment the ones digit
+            if (q[3:0] == MAX_BCD) begin
+                q[3:0] <= 4'b0; // Reset ones
+                // Enable tens increment
+                ena[0] <= 1'b1; 
+                // Check tens
+                if (q[7:4] == MAX_BCD) begin
+                    q[7:4] <= 4'b0; // Reset tens
+                    // Enable hundreds increment
+                    ena[1] <= 1'b1;
+                    // Check hundreds
+                    if (q[11:8] == MAX_BCD) begin
+                        q[11:8] <= 4'b0; // Reset hundreds
+                        // Enable thousands increment
+                        ena[2] <= 1'b1;
+                        // Check thousands
+                        if (q[15:12] == MAX_BCD) begin
+                            q[15:12] <= 4'b0; // Reset thousands
+                        end else begin
+                            q[15:12] <= q[15:12] + 1; // Increment thousands
+                        end
+                    end else begin
+                        q[11:8] <= q[11:8] + 1; // Increment hundreds
+                    end
+                end else begin
+                    q[7:4] <= q[7:4] + 1; // Increment tens
+                end
+            end else begin
+                q[3:0] <= q[3:0] + 1; // Increment ones
+                ena <= 3'b000; // Reset enable signals for this cycle
+            end
+        end
+    end
+
+endmodule
+```

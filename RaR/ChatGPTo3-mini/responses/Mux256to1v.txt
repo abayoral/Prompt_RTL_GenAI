@@ -1,0 +1,12 @@
+module mux256_1to4 (
+    input  wire [1023:0] in,   // Concatenated vector of 256 4-bit inputs
+    input  wire [7:0]    sel,  // 8-bit select signal
+    output wire [3:0]    out   // 4-bit output corresponding to selected segment
+);
+
+    // Use Verilog-2001 indexed part-select with a constant width of 4 bits.
+    // The "sel * 4" computes the starting bit index, and "+:4" extracts 4 consecutive bits.
+    // This allows the synthesizer to positively verify the constant width of the slice.
+    assign out = in[sel * 4 +: 4];
+
+endmodule

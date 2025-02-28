@@ -1,0 +1,32 @@
+module sub_64bit(
+    input  [63:0] A,     // 64-bit signed integer input A
+    input  [63:0] B,     // 64-bit signed integer input B
+    output reg [63:0] result,  // 64-bit result of A - B
+    output reg overflow        // 1-bit flag indicating arithmetic overflow
+);
+
+    // The subtraction is performed as A - B. In two's complement arithmetic,
+    // subtraction is equivalent to addition: A + (~B + 1).
+    // The potential overflow in subtraction of two signed numbers occurs when:
+    // (1) A is positive and B is negative but the result is negative, or
+    // (2) A is negative and B is positive but the result is positive.
+    //
+    // This can be derived by noting that overflow occurs when the sign bit of A
+    // and B are different and the sign of the result differs from the sign of A.
+    // Thus, we check if (A[63] != B[63]) and (A[63] != result[63]). If both conditions
+    // are true, we set the overflow flag.
+
+    always @* begin
+        // Perform subtraction
+        result = A - B;
+        
+        // Check for overflow condition:
+        // If the sign bits of A and B differ and the sign bit of result differs from that of A,
+        // an overflow has occurred.
+        if ((A[63] != B[63]) && (result[63] != A[63]))
+            overflow = 1'b1;
+        else
+            overflow = 1'b0;
+    end
+
+endmodule

@@ -1,0 +1,100 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output [7:0] out_byte,
+    output reg done
+);
+
+    // State encoding
+    localparam WAIT_START  = 2'd0,
+               RECEIVE     = 2'd1,
+               STOP_CHECK  = 2'd2,
+               WAIT_STOP   = 2'd3;
+
+    reg [1:0] state, next_state;
+    reg [7:0] shift_reg;
+    reg [3:0] bit_cnt;  // count from 0 to 7
+
+    // Sequential FSM and datapath (datapath: shift register collects bits)
+    always @(posedge clk) begin
+        if (reset) begin
+            state     <= WAIT_START;
+            shift_reg <= 8'b0;
+            bit_cnt   <= 4'd0;
+            done      <= 1'b0;
+        end else begin
+            state <= next_state;
+            // Default: done is only high for one cycle when a valid byte is ready.
+            if (state != STOP_CHECK)
+                done <= 1'b0;
+            
+            case (state)
+                WAIT_START: begin
+                    // Wait for start bit (logic 0)
+                    if (in == 1'b0) begin
+                        // Start bit detected. Initialize the counter.
+                        bit_cnt <= 4'd0;
+                    end
+                end
+                RECEIVE: begin
+                    // Shift in the data bit. LSB first: shift left and place new bit in LSB.
+                    shift_reg <= {shift_reg[6:0], in};
+                    bit_cnt <= bit_cnt + 1'b1;
+                end
+                STOP_CHECK: begin
+                    // Check for valid stop bit (logic 1)
+                    if (in == 1'b1) begin
+                        // Byte successfully received.
+                        done <= 1'b1;
+                    end
+                    // Otherwise, remain in WAIT_STOP until a stop bit is detected.
+                end
+                WAIT_STOP: begin
+                    // Wait until a valid stop bit arrives
+                    // No datapath update required in this state.
+                end
+                default: ;
+            endcase
+        end
+    end
+
+    // Next-state logic (combinational)
+    always @(*) begin
+        next_state = state;  // Default: hold state
+        case (state)
+            WAIT_START: begin
+                // Stay in WAIT_START until a start bit (0) is seen.
+                if (in == 1'b0)
+                    next_state = RECEIVE;
+                else
+                    next_state = WAIT_START;
+            end
+            RECEIVE: begin
+                // After receiving 8 data bits, move to stop bit check.
+                if (bit_cnt == 4'd7)
+                    next_state = STOP_CHECK;
+                else
+                    next_state = RECEIVE;
+            end
+            STOP_CHECK: begin
+                if (in == 1'b1)
+                    next_state = WAIT_START;  // Valid stop bit: complete the byte.
+                else
+                    next_state = WAIT_STOP;   // Invalid stop: wait until a stop bit is found.
+            end
+            WAIT_STOP: begin
+                if (in == 1'b1)
+                    next_state = WAIT_START;
+                else
+                    next_state = WAIT_STOP;
+            end
+            default: next_state = WAIT_START;
+        endcase
+    end
+
+    // Connect the registered shift_reg to out_byte.
+    // The spec states that out_byte is only valid when done==1, and otherwise is don't-care.
+    assign out_byte = shift_reg;
+
+endmodule

@@ -1,0 +1,35 @@
+```verilog
+module dual_edge_triggered_ff (
+    input wire clk,
+    input wire rst,
+    input wire d,
+    output reg q
+);
+    reg d_pos, d_neg;
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            d_pos <= 1'b0;
+        end else begin
+            d_pos <= d;
+        end
+    end
+
+    always @(negedge clk or posedge rst) begin
+        if (rst) begin
+            d_neg <= 1'b0;
+        end else begin
+            d_neg <= d;
+        end
+    end
+
+    always @(posedge clk) begin
+        q <= d_pos; // Output on positive edge
+    end
+
+    always @(negedge clk) begin
+        q <= d_neg; // Output on negative edge
+    end
+
+endmodule
+```

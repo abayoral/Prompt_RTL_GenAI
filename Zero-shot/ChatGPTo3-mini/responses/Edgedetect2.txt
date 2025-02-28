@@ -1,0 +1,28 @@
+module top_module (
+    input clk,
+    input [7:0] in,
+    output [7:0] anyedge
+);
+
+    // Register to hold previous input value
+    reg [7:0] in_d;
+    // Register to capture rising edge events immediately (0->1)
+    reg [7:0] rising;
+    // Register to delay the rising edge event by one clock cycle
+    reg [7:0] anyedge_reg;
+    
+    // Assign the registered output to the module output.
+    assign anyedge = anyedge_reg;
+    
+    always @(posedge clk) begin
+        // Detect rising edges: when previous bit was 0 and current bit is 1.
+        rising <= (~in_d) & in;
+        
+        // Store current input for next cycle comparison.
+        in_d <= in;
+        
+        // Delay the rising edge detection by one clock cycle.
+        anyedge_reg <= rising;
+    end
+
+endmodule

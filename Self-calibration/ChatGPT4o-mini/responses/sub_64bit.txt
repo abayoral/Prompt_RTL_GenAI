@@ -1,0 +1,34 @@
+The provided Verilog code contains a logical error in the overflow detection for a subtraction operation. Specifically, the calculations for detecting overflow when subtracting two signed numbers are not correct. 
+
+The overflow cases for subtraction can be detected by the following logic:
+1. If A is positive (`A[63] == 0`), B is negative (`B[63] == 1`), and the result is negative (`result[63] == 1`), then an overflow has occurred.
+2. If A is negative (`A[63] == 1`), B is positive (`B[63] == 0`), and the result is positive (`result[63] == 0`), then an overflow has occurred.
+
+Here is the corrected version of the module, along with some minor improvements in style:
+
+```verilog
+module sub_64bit (
+    input  [63:0] A,
+    input  [63:0] B,
+    output [63:0] result,
+    output        overflow
+);
+
+    wire [63:0] B_negated;
+    assign B_negated = ~B + 1; // Two's complement to get -B
+    assign result = A + B_negated; // A - B is the same as A + (-B)
+
+    // Corrected overflow detection
+    assign overflow = ((A[63] == 0 && B[63] == 1 && result[63] == 1) ||  // A positive, B negative, result negative
+                       (A[63] == 1 && B[63] == 0 && result[63] == 0) ||  // A negative, B positive, result positive
+                       (A[63] == 1 && B[63] == 1 && result[63] == 0) ||  // A negative, B negative, result positive
+                       (A[63] == 0 && B[63] == 0 && result[63] == 1));    // A positive, B positive, result negative
+
+endmodule
+```
+
+### Changes Made:
+1. **Overflow Detection Fix**: I fixed the overflow logic, ensuring it correctly reflects the signed nature of the operands when performing subtraction via addition of the two's complement.
+2. **Comment Improvements**: Added comments to clarify overflow conditions more explicitly.
+
+This corrected version should accurately detect overflow for 64-bit signed integers when performing subtraction.

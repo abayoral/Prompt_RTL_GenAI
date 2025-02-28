@@ -1,0 +1,103 @@
+module multi_pipe_8bit(
+  input         clk,
+  input         rst_n,      // active-low reset
+  input         mul_en_in,  // input multiplication enable
+  input  [7:0]  mul_a,      // 8-bit multiplicand
+  input  [7:0]  mul_b,      // 8-bit multiplier
+  output reg    mul_en_out, // output enable: high indicates that mul_out is valid
+  output reg [15:0] mul_out // 16-bit multiplication result
+);
+
+  //--------------------------------------------------------------------------
+  // Pipeline Stage 1: Input Capture
+  //--------------------------------------------------------------------------
+  // Registers to latch inputs when mul_en_in is active
+  reg         en_stage1;
+  reg [7:0]   reg_a;
+  reg [7:0]   reg_b;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      en_stage1 <= 1'b0;
+      reg_a     <= 8'd0;
+      reg_b     <= 8'd0;
+    end else begin
+      en_stage1 <= mul_en_in;
+      // Capture the inputs only when mul_en_in is asserted
+      if (mul_en_in) begin
+         reg_a <= mul_a;
+         reg_b <= mul_b;
+      end
+    end
+  end
+
+  //--------------------------------------------------------------------------
+  // Pipeline Stage 2: Partial Product Generation
+  //--------------------------------------------------------------------------
+  // Compute eight partial products by ANDing reg_a with each bit of reg_b.
+  // Each partial product is produced by shifting reg_a accordingly.
+  reg         en_stage2;
+  reg [15:0]  pp0, pp1, pp2, pp3, pp4, pp5, pp6, pp7;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      en_stage2 <= 1'b0;
+      pp0       <= 16'd0;
+      pp1       <= 16'd0;
+      pp2       <= 16'd0;
+      pp3       <= 16'd0;
+      pp4       <= 16'd0;
+      pp5       <= 16'd0;
+      pp6       <= 16'd0;
+      pp7       <= 16'd0;
+    end else begin
+      en_stage2 <= en_stage1;
+      // Extend reg_a to 16 bits and shift left by the bit position if reg_b bit is 1.
+      pp0 <= reg_b[0] ? ({8'd0, reg_a} << 0) : 16'd0;
+      pp1 <= reg_b[1] ? ({8'd0, reg_a} << 1) : 16'd0;
+      pp2 <= reg_b[2] ? ({8'd0, reg_a} << 2) : 16'd0;
+      pp3 <= reg_b[3] ? ({8'd0, reg_a} << 3) : 16'd0;
+      pp4 <= reg_b[4] ? ({8'd0, reg_a} << 4) : 16'd0;
+      pp5 <= reg_b[5] ? ({8'd0, reg_a} << 5) : 16'd0;
+      pp6 <= reg_b[6] ? ({8'd0, reg_a} << 6) : 16'd0;
+      pp7 <= reg_b[7] ? ({8'd0, reg_a} << 7) : 16'd0;
+    end
+  end
+
+  //--------------------------------------------------------------------------
+  // Pipeline Stage 3: Partial Sum Calculation & Final Product Generation
+  //--------------------------------------------------------------------------
+  // Sum all partial products to compute the final 16-bit product.
+  reg        en_stage3;
+  reg [15:0] mul_out_reg;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      en_stage3   <= 1'b0;
+      mul_out_reg <= 16'd0;
+    end else begin
+      en_stage3   <= en_stage2;
+      // Sum all the shifted partial products
+      mul_out_reg <= pp0 + pp1 + pp2 + pp3 + pp4 + pp5 + pp6 + pp7;
+    end
+  end
+
+  //--------------------------------------------------------------------------
+  // Output Assignment
+  //--------------------------------------------------------------------------
+  // The output registers update when the final pipeline stage (en_stage3) is active.
+  // mul_out holds the result and mul_en_out indicates its validity.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      mul_en_out <= 1'b0;
+      mul_out    <= 16'd0;
+    end else begin
+      mul_en_out <= en_stage3;
+      if (en_stage3)
+         mul_out <= mul_out_reg;
+      else
+         mul_out <= mul_out; // Retain previous state if not enabled
+    end
+  end
+
+endmodule

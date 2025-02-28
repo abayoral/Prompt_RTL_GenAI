@@ -1,0 +1,37 @@
+```verilog
+module width_8to16 (
+    input wire clk,
+    input wire rst_n,
+    input wire [7:0] data_in,
+    input wire valid_in,
+    output reg valid_out,
+    output reg [15:0] data_out
+);
+    reg [7:0] temp_data;
+    reg [1:0] input_count;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            valid_out <= 1'b0;
+            data_out <= 16'b0;
+            temp_data <= 8'b0;
+            input_count <= 2'b0;
+        end else begin
+            if (valid_in) begin
+                if (input_count == 2'b00) begin
+                    // First valid input
+                    temp_data <= data_in;
+                    input_count <= 2'b01;
+                end else if (input_count == 2'b01) begin
+                    // Second valid input
+                    data_out <= {temp_data, data_in}; // Concatenate into 16 bits
+                    valid_out <= 1'b1; // Set valid output high
+                    input_count <= 2'b00; // Reset input count
+                end
+            end else begin
+                valid_out <= 1'b0; // Reset valid output if no valid input
+            end
+        end
+    end
+endmodule
+```

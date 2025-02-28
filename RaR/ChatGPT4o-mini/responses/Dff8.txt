@@ -1,0 +1,14 @@
+```
+module dff_array (
+    input wire clk,            // Clock input for flip-flops
+    input wire [7:0] d,       // 8-bit data input
+    output reg [7:0] q        // 8-bit data output representing states of flip-flops
+);
+
+    // D flip-flops with positive edge trigger
+    always @(posedge clk) begin
+        q <= d;                // On the positive edge of clk, update q with d
+    end
+
+endmodule
+```

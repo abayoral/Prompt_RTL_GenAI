@@ -1,0 +1,28 @@
+As an expert in the field of digital design with proficiency in Verilog, your task involves creating a module that performs 16-bit division through combinational logic. This module will take a 16-bit dividend and an 8-bit divisor as inputs and will output both a 16-bit quotient and a 16-bit remainder. Here is a detailed breakdown of what this task entails:
+
+The name of the module you are required to implement is `div_16bit`. 
+
+**Input Ports:**
+1. `A`: This is a vector of 16 bits representing the dividend, the number that is to be divided.
+2. `B`: This vector is 8 bits wide, representing the divisor, the number by which the dividend is to be divided.
+
+**Output Ports:**
+1. `result`: A vector of 16 bits intended to store the quotient of the division operation.
+2. `odd`: Another 16-bit vector representing the remainder of the division.
+
+The implementation involves breaking down the division logic into the following key steps:
+
+1. **Extraction and Comparison**: Initially, extract the higher 8 bits (upper half) of the 16-bit dividend. These extracted bits must match the bit width of the divisor, allowing for direct comparison. Assess whether this extracted portion of the dividend is greater than the divisor. If it is greater, set the quotient bit to 1, otherwise, set it to 0.
+
+2. **Subtraction and Construction of Remainder**: Once the comparison is done, if the dividend segment was larger, calculate the difference between this portion of the dividend and the divisor, which will serve as the partial remainder.
+
+3. **Concatenation and Iteration**: Append the highest bit from the unprocessed part of the dividend (shifting down those remaining) to the current remainder to form a new 8-bit segment. This segment will then be compared again to the divisor in subsequent iterations.
+
+The iterative process described above should continue until all bits of the dividend have been processed, at each step modifying the quotient and updating the remainder as necessary.
+
+**Implementation Guidelines**:
+- Two `always` blocks must be used. Both blocks operate in a combinational context and trigger on any change to the input vectors `A` and `B`.
+  - The first `always` block initializes or updates auxiliary registers (`a_reg` and `b_reg`) to store the values transferred from the inputs `A` and `B`. These registers hold intermediate computations during the division process.
+  - The second `always` block will contain the iterative logic needed to simulate the manual long division process, adjusting quotient and remainder based on aforementioned comparisons and calculations.
+
+By adhering to this framework, you'll develop a fully functional Verilog module, `div_16bit`, capable of performing the desired division operation entirely in a combinational manner. Make sure to follow best practices for coding style and modularity while implementing this solution for maximum efficiency and clarity.

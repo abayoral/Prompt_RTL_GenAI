@@ -1,0 +1,41 @@
+In your role as a professional Verilog designer, you are challenged to create a fully asynchronous FIFO (First-In, First-Out) buffer that supports configurable bit width and depth. Your design should be modular, separating key functions into distinct components that work together seamlessly.
+
+Key aspects of the design include:
+
+• Data Storage: Implement the FIFO’s data storage using a dual-port RAM module. This module must be instantiated as a submodule within your FIFO design. The dual-port RAM will have separate ports for read and write operations. It must accept the following signals as inputs:
+  – Write clock (wclk)
+  – Write enable (wenc)
+  – Write address (waddr)
+  – Write data (wdata)
+  – Read clock (rclk)
+  – Read enable (renc)
+  – Read address (raddr)
+The output of this module will be the registered read data (rdata).
+
+• Write and Read Controllers: Develop two controllers to manage data flow. One controller will handle writing data into the FIFO and the other will handle reading data out of the FIFO.
+
+• Pointer Synchronization: Since the FIFO operates asynchronously with separate clock domains for reading and writing, you must implement pointer synchronizers. Specifically, design one synchronizer to safely bring the read pointer into the write clock domain, and another synchronizer to bring the write pointer into the read clock domain. This ensures that the pointer information is accurately and reliably exchanged between the two domains.
+
+• FIFO Status Detection Using Gray Code: To address potential race conditions in pointer comparison, use Gray code for representing the read and write pointers. For a FIFO with a depth of 8, use 4-bit Gray-coded pointers. Gray coding simplifies the detection of the FIFO states:
+  – The FIFO is considered empty when the read pointer and write pointer are identical.
+  – It is considered full when the read and write pointers differ only in the most significant bit, with all other bits matching.
+You must also implement logic to convert these Gray-coded pointers back to binary so that correct addresses can be generated for accessing the dual-port RAM.
+
+• Module Interfaces and Configurability: For the main FIFO module (named asyn_fifo), you need to define the following:
+  – Inputs:
+    * Write clock signal (wclk)
+    * Read clock signal (rclk)
+    * Write reset signal (wrstn)
+    * Read reset signal (rrstn)
+    * Write increment signal (winc)
+    * Read increment signal (rinc)
+    * Input data (wdata)
+  – Outputs:
+    * Write full status flag (wfull)
+    * Read empty status flag (rempty)
+    * Read data (rdata)
+Additionally, design the module so that its parameters, such as WIDTH (data width) and DEPTH (number of entries), are configurable. The default settings should be 8 bits for data width and 16 entries for depth, but these should be adjustable to suit various application requirements.
+
+The design should integrate the logic for pointer updates, ensure accurate transformation between Gray code and binary representations, and maintain proper synchronization across asynchronous clock domains. Your task is to architect this asynchronous FIFO, ensuring that each component works together to provide reliable data storage and retrieval across independent clock domains.
+
+Please provide only the problem description and design requirements without including any sample solutions or implemented code.

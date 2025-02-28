@@ -1,0 +1,64 @@
+```verilog
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output done
+);
+
+    // State encoding
+    typedef enum logic [1:0] {
+        IDLE    = 2'b00,
+        BYTE1   = 2'b01,
+        BYTE2   = 2'b10,
+        DONE    = 2'b11
+    } state_t;
+
+    state_t current_state, next_state;
+    reg done_reg;
+
+    assign done = done_reg;
+
+    // State transition logic (combinational)
+    always_comb begin
+        next_state = current_state;
+        done_reg = 1'b0;
+
+        case (current_state)
+            IDLE: begin
+                if (in[3] == 1'b1)
+                    next_state = BYTE1;
+            end
+            BYTE1: begin
+                if (in[3] == 1'b1)
+                    next_state = BYTE1; // continue in BYTE1 if the new byte also has bit[3]=1
+                else
+                    next_state = BYTE2;
+            end
+            BYTE2: begin
+                if (in[3] == 1'b1)
+                    next_state = BYTE1; // continue in BYTE1 if the new byte has bit[3]=1
+                else
+                    next_state = DONE;
+            end
+            DONE: begin
+                done_reg = 1'b1; // signal done
+                if (in[3] == 1'b1)
+                    next_state = BYTE1; // transition back to BYTE1 if the new byte has bit[3]=1
+                else
+                    next_state = IDLE;
+            end
+        endcase
+    end
+
+    // State flip-flops (sequential)
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+
+endmodule
+```

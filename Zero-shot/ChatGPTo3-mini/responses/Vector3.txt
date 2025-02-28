@@ -1,0 +1,11 @@
+module top_module (
+    input [4:0] a, b, c, d, e, f,
+    output [7:0] w, x, y, z
+);
+
+    // Concatenate the six 5-bit inputs (30 bits) and two 1 bits (2 bits) to form 32 bits
+    wire [31:0] combined;
+    assign combined = {a, b, c, d, e, f, 2'b11};
+    assign {w, x, y, z} = combined;
+
+endmodule

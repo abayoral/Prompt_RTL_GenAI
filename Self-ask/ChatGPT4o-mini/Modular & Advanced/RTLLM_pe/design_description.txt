@@ -1,0 +1,18 @@
+As a professional specializing in Verilog design, the task at hand involves creating a Verilog module named `pe` that functions as a Multiplying Accumulator (MAC) specifically for 32-bit integers. The MAC module is required to handle the multiplication of two 32-bit input operands, `a` and `b`, on each clock cycle, and accumulate the resultant product into an output stored in a specific register labeled `c`. 
+
+To elaborate, the MAC must include the following elements and adhere to these requirements:
+
+**Inputs:**
+- `clk`: A clock signal that governs synchronous operations within the module. It is crucial for defining the timing of changes to register states.
+- `rst`: A reset signal that, when asserted (i.e., set to high), initializes or clears the state of the accumulator register `c`. When deasserted (i.e., set to low), normal operation proceeds, allowing accumulation to occur.
+- `a` & `b`: These are the two 32-bit input operands whose values are multiplied together during each operation cycle.
+
+**Outputs:**
+- `c`: A 32-bit output port which holds and presents the cumulative result of successive multiplications. `c` is updated based on the value of `rst`: if `rst` is active, `c` is reset to zero; otherwise, it receives the accumulated sum of its current value and the latest product of `a` and `b`.
+
+**Implementation Details:**
+- The core functionality is encapsulated within an always block that reacts to the positive edge of either the `clk` or `rst` signals. This ensures that both reset behavior and regular accumulation updates occur synchronously and predictably.
+- Upon detecting a positive edge of `rst`, the MAC resets the accumulator register `c` to zero, effectively clearing any previously accumulated results.
+- If `rst` remains inactive, each positive edge of `clk` prompts the module to compute the product of `a` and `b`, add this product to the current value stored in `c`, and update `c` accordingly. This iterative accumulation is a key characteristic of the MAC's functionality.
+
+By precisely following these guidelines, the module will effectively perform its role as a multiplying accumulator for 32-bit integers, maintaining correct operation through careful management of synchronous signals and conditions.

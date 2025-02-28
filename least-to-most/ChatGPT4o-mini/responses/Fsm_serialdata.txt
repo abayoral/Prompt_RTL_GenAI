@@ -1,0 +1,73 @@
+```verilog
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg [7:0] out_byte,
+    output reg done
+);
+
+    typedef enum reg [2:0] {
+        IDLE,      // Waiting for start bit
+        READING,   // Receiving data bits
+        STOP_BIT   // Waiting for stop bit
+    } state_t;
+
+    state_t current_state, next_state;
+    reg [3:0] bit_count; // Count of bits received
+    reg [7:0] shift_reg; // Shift register for byte storage
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+            bit_count <= 0;
+            shift_reg <= 0;
+            done <= 0;
+            out_byte <= 0;
+        end else begin
+            current_state <= next_state;
+            if (current_state == READING) begin
+                shift_reg <= {in, shift_reg[7:1]}; // Shift in the new bit
+                bit_count <= bit_count + 1;
+            end else if (current_state == STOP_BIT) begin
+                if (in == 1) begin // Check for correct stop bit
+                    out_byte <= shift_reg; // Output the correctly received byte
+                    done <= 1; // Signal that the byte is valid
+                end
+            end else begin
+                if (current_state == IDLE && in == 0) begin // Start bit detected
+                    bit_count <= 0;
+                end
+                if (done) begin
+                    done <= 0; // Reset done on next clock
+                end
+            end
+        end
+    end
+
+    always @(*) begin
+        case (current_state)
+            IDLE: begin
+                if (in == 0) // Start bit
+                    next_state = READING;
+                else
+                    next_state = IDLE;
+            end
+            READING: begin
+                if (bit_count == 7) // Received 8 bits
+                    next_state = STOP_BIT;
+                else
+                    next_state = READING;
+            end
+            STOP_BIT: begin
+                if (in == 1) // Valid stop bit
+                    next_state = IDLE;
+                else
+                    next_state = STOP_BIT; // Wait for valid stop bit
+            end
+            default: next_state = IDLE;
+        endcase
+    end
+
+endmodule
+```

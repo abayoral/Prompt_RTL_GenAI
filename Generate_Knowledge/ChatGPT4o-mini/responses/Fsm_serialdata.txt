@@ -1,0 +1,82 @@
+```
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg [7:0] out_byte,
+    output reg done
+);
+    
+    typedef enum reg [1:0] {
+        IDLE,
+        START_BIT,
+        DATA_BITS,
+        STOP_BIT,
+        OUTPUT
+    } state_t;
+    
+    state_t state, next_state;
+    reg [3:0] bit_count; // Count how many bits have been received
+    reg [7:0] shift_reg; // To hold the received byte
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            state <= IDLE;
+            bit_count <= 0;
+            shift_reg <= 0;
+            done <= 0;
+        end else begin
+            state <= next_state;
+        end
+    end
+
+    always @(state or in or bit_count) begin
+        case (state)
+            IDLE: begin
+                done = 0;
+                if (in == 0) begin // Start bit detected
+                    next_state = START_BIT;
+                end else begin
+                    next_state = IDLE;
+                end
+            end
+            
+            START_BIT: begin
+                if (bit_count == 4'd0) begin
+                    next_state = DATA_BITS;
+                    bit_count = 4'd0;
+                end else begin
+                    next_state = START_BIT;
+                end
+            end
+            
+            DATA_BITS: begin
+                if (bit_count < 4'd8) begin
+                    shift_reg[bit_count] = in; // Shift in the data
+                    bit_count = bit_count + 1;
+                    next_state = DATA_BITS;
+                end else begin
+                    next_state = STOP_BIT; // Move to stop bit check
+                end
+            end
+            
+            STOP_BIT: begin
+                if (in == 1) begin // Stop bit detected
+                    next_state = OUTPUT;
+                end else begin
+                    next_state = IDLE; // Wait for start bit again
+                end
+            end
+            
+            OUTPUT: begin
+                out_byte = shift_reg; // Latch received byte
+                done = 1; // Indicate byte is valid
+                next_state = IDLE; // Return to IDLE
+            end
+            
+            default: next_state = IDLE; // Fallback state
+        endcase
+    end
+
+endmodule
+```

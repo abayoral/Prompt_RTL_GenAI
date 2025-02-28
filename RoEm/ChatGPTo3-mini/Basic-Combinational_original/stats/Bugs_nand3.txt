@@ -1,0 +1,7 @@
+CoT/modules/Bugs_nand3.v:3: error: Module definition top_module cannot nest into module andgate.
+hdlbits_testbenches/Bugs_nand3_0_tb.v:3: error: Module definition top_module_tb cannot nest into module andgate.
+hdlbits_testbenches/Bugs_nand3_0_tb.v:281: syntax error
+I give up.
+Module file path: CoT/modules/Bugs_nand3.v
+Testbench file path: hdlbits_testbenches/Bugs_nand3_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/Bugs_nand3_sim', 'CoT/modules/Bugs_nand3.v', 'hdlbits_testbenches/Bugs_nand3_0_tb.v']' returned non-zero exit status 4.

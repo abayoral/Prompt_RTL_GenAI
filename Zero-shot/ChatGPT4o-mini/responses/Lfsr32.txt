@@ -1,0 +1,22 @@
+```
+module top_module(
+    input clk,
+    input reset,    // Active-high synchronous reset to 32'h1
+    output [31:0] q
+); 
+
+    reg [31:0] lfsr;
+
+    always @(posedge clk) begin
+        if (reset) begin
+            lfsr <= 32'h1; // Synchronous reset to 1
+        end else begin
+            // LFSR polynomial x^32 + x^22 + x^2 + x^1 + 1
+            lfsr <= {lfsr[30:0], lfsr[31] ^ lfsr[21] ^ lfsr[1] ^ lfsr[0]};
+        end
+    end
+
+    assign q = lfsr;
+
+endmodule
+```

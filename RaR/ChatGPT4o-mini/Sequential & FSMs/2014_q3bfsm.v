@@ -1,0 +1,7 @@
+As a senior Digital Design Engineer working for a prominent hardware design company, you are currently assigned the important task of developing a Verilog module for a product that represents a significant step forward in technology for your organization. The successful completion of this module is not just a requirement for the project at hand; it is also critical for upholding your company's esteemed reputation within the competitive landscape of the computer hardware industry.
+
+With this context in mind, you need to design a finite-state machine (FSM) based on the specified state-assigned table, which provides clarity on the present states, the conditions under which the next states are determined, and the corresponding output for each state and input combination. Specifically, the reset condition should revert the FSM to the initial state, represented as '000'.
+
+Given this background, the question arises: How can you effectively implement the finite-state machine in Verilog, ensuring it adheres strictly to the provided state transition table and handles the synchronous reset feature, all while maintaining optimal performance and reliability in the module's operation? 
+
+Please focus on detailing the steps and considerations necessary to create the FSM, including handling state transitions based on the input signals and managing the output logic as specified by the state table.

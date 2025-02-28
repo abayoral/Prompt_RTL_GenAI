@@ -1,0 +1,9 @@
+```verilog
+module top_module(
+    output wire zero
+);// Module body starts after semicolon
+
+    assign zero = 1'b0; // Continuously assign the output to constant 0
+
+endmodule
+```

@@ -1,0 +1,9 @@
+module even_parity(
+    input  [7:0] in,
+    output       parity
+);
+
+    // Compute even parity by XOR-ing all data bits.
+    assign parity = ^in;
+
+endmodule

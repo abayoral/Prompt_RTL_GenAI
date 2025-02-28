@@ -1,0 +1,9 @@
+CoT/modules/Rule110.v:1: error: Variable declaration in unnamed block requires SystemVerilog.
+CoT/modules/Rule110.v:18: warning: Static variable initialization requires explicit lifetime in this context.
+CoT/modules/Rule110.v:18: error: Variable declaration assignments are only allowed at the module level.
+CoT/modules/Rule110.v:19: warning: Static variable initialization requires explicit lifetime in this context.
+CoT/modules/Rule110.v:19: error: Variable declaration assignments are only allowed at the module level.
+CoT/modules/Rule110.v:1: error: Variable declaration in unnamed block requires SystemVerilog.
+Module file path: CoT/modules/Rule110.v
+Testbench file path: hdlbits_testbenches/Rule110_0_tb.v
+Error during compilation: Command '['iverilog', '-o', 'CoT/simulations/Rule110_sim', 'CoT/modules/Rule110.v', 'hdlbits_testbenches/Rule110_0_tb.v']' returned non-zero exit status 4.

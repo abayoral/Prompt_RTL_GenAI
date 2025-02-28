@@ -1,0 +1,15 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    output out  
+);
+
+    // The Karnaugh map indicates that for all input combinations, out = 1.
+    // Thus, the simplified Boolean expression is simply:
+    //     out = 1
+    // Both the sum-of-products and product-of-sums forms reduce to the constant 1.
+    
+    assign out = 1'b1;
+
+endmodule

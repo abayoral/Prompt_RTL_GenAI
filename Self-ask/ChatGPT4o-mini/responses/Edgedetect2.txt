@@ -1,0 +1,1 @@
+What specific condition should be used to clear the output bits when there are no changes detected in the corresponding input bits?

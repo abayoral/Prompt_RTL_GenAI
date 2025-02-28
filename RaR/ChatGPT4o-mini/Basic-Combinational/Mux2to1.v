@@ -1,0 +1,9 @@
+As a seasoned Digital Design Engineer at a prominent hardware design firm, you have been entrusted with an essential task: to create a pivotal Verilog module that will contribute significantly to a next-generation product. The importance of this module cannot be overstated, as its success is crucial for upholding the prestigious reputation of your computer hardware company within the competitive landscape of the industry.
+
+The specific objective at hand is to design a one-bit wide, 2-to-1 multiplexer. This multiplexer should operate based on a selection signal (denoted as 'sel'), which determines which of the two inputs—labelled 'a' and 'b'—will be forwarded to the output. More specifically, when the selection signal 'sel' is set to 0, the multiplexer should route input 'a' to the output; conversely, when 'sel' is set to 1, it should route input 'b' to the output.
+
+Additionally, there is a recommendation in the form of a hint, suggesting that the ternary operator—structured as (condition ? result_if_true : result_if_false)—may provide a more straightforward and readable approach for implementing the multiplexer functionality within your Verilog code.
+
+In order to fulfill this requirement, you are expected to write the corresponding code under the given module definition. The module is outlined as follows: it takes three inputs—'a', 'b', and 'sel'—and produces a single output, 'out'. Your task is to carefully consider the requirements and constraints of the problem, as well as the hint provided, to effectively complete the implementation of this multiplexer module. 
+
+As you embark on this coding task, reflect on the design principles and engineering best practices that will ensure the reliability and efficiency of the module, as these factors are of paramount importance given the critical nature of this project and the potential implications for your company's standing in the industry.

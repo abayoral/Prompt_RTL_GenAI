@@ -1,0 +1,48 @@
+```verilog
+module fixed_point_subtractor #(
+    parameter Q = 16, // Fractional bits
+    parameter N = 32  // Total bits (must be > Q)
+)(
+    input  [N-1:0] a, // First operand
+    input  [N-1:0] b, // Second operand
+    output reg [N-1:0] c // Result of subtraction
+);
+
+reg [N-1:0] res; // Internal register to hold the result
+
+always @* begin
+    // Reset the result to zero
+    res = 0;
+
+    // Check the signs of the operands
+    if (a[N-1] == b[N-1]) begin // Both have the same sign
+        res = a - b;
+    end else begin // Different signs (a and b)
+        if (a[N-1] == 0 && b[N-1] == 1) begin // a is positive, b is negative
+            res = a + ({1'b0, b[N-2:0]}); // Adding absolute values
+            if (res[N-1] == 1) begin // Check if the result is negative
+                res[N-1] = 1; // Retain negative sign if applicable
+            end else if (res != 0) begin
+                res[N-1] = 0; // If result is positive, set sign bit to 0
+            end
+        end else if (a[N-1] == 1 && b[N-1] == 0) begin // a is negative, b is positive
+            res = ({1'b0, a[N-2:0]}) + b; // Adding absolute values
+            if (res[N-1] == 1) begin // Check if the result is negative
+                res[N-1] = 1; // Retain negative sign if applicable
+            end else if (res != 0) begin
+                res[N-1] = 0; // If result is positive, set sign bit to 0
+            end
+        end
+    end
+
+    // Ensure zero is represented correctly
+    if (res == 0) begin
+        res[N-1] = 0; // Set the sign to zero for zero results
+    end
+    
+    // Assign the result to output
+    c = res;
+end
+
+endmodule
+```

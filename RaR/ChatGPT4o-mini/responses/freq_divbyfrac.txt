@@ -1,0 +1,40 @@
+```verilog
+module freq_divbyfrac(
+    input wire clk,
+    input wire rst_n,
+    output reg clk_div
+);
+    parameter DIVISOR = 7; // Total clock edges for 3.5x division
+    parameter HALF_DIVISOR = DIVISOR / 2; // 3.5 means 7 / 2 for phase
+
+    reg [2:0] counter; // 3 bits to count up to DIVISOR
+    reg clk_buf1, clk_buf2;
+
+    // Counter for clock division and phase adjustment
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            counter <= 0;
+            clk_buf1 <= 0;
+            clk_buf2 <= 0;
+            clk_div <= 0;
+        end else begin
+            if (counter < DIVISOR - 1) begin
+                counter <= counter + 1;
+            end else begin
+                counter <= 0;
+            end
+
+            // Generate two clock buffers based on counter
+            // First buffer toggles every 4 counts (4 clock edges)
+            if (counter < 4) clk_buf1 <= 1; else clk_buf1 <= 0;
+
+            // Second buffer toggles every 3 counts (3 clock edges)
+            if (counter < 3) clk_buf2 <= 1; else clk_buf2 <= 0;
+            
+            // Create the output by combining the two buffered clocks
+            clk_div <= clk_buf1 | clk_buf2;
+        end
+    end
+
+endmodule
+```

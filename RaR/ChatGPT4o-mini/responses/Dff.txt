@@ -1,0 +1,14 @@
+```
+module d_flip_flop (
+    input wire clk,    // Clock input
+    input wire d,      // Data input
+    output reg q       // Data output
+);
+
+    // Always block triggered on the rising edge of the clock
+    always @(posedge clk) begin
+        q <= d;         // Non-blocking assignment to store input data on the clock edge
+    end
+
+endmodule
+```

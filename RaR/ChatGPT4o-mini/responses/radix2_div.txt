@@ -1,0 +1,58 @@
+```
+module radix2_div (
+    input clk,
+    input rst,
+    input sign,
+    input [7:0] dividend,
+    input [7:0] divisor,
+    input opn_valid,
+    output reg res_valid,
+    output reg [15:0] result
+);
+    reg [15:0] SR;
+    reg [7:0] NEG_DIVISOR;
+    reg [3:0] cnt;
+    reg start_cnt;
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            res_valid <= 0;
+            result <= 0;
+            SR <= 0;
+            cnt <= 0;
+            start_cnt <= 0;
+        end else begin
+            if (opn_valid && !res_valid) begin
+                // Initialize the division process
+                SR <= {8'b0, dividend}; // Shift dividend into SR
+                NEG_DIVISOR <= (~divisor + 1'b1); // Compute negative divisor
+                cnt <= 1;
+                start_cnt <= 1;
+                res_valid <= 0; // Not valid until operation is complete
+            end
+            
+            if (start_cnt) begin
+                if (cnt == 8) begin
+                    // Set the result and indicate valid
+                    result <= SR; // SR holds the final result (remainder, quotient)
+                    res_valid <= 1; // Results are valid
+                    cnt <= 0; // Reset counter
+                    start_cnt <= 0; // Stop the division process
+                end else begin
+                    // Perform the division algorithm
+                    // Shift left the SR
+                    SR <= {SR[14:0], 1'b0}; // Shift SR left
+                    if (SR[15:8] + NEG_DIVISOR[7:0] >= 0) begin
+                        // If the condition meets, subtract the divisor
+                        SR[15:8] <= SR[15:8] + NEG_DIVISOR[7:0];
+                        SR[0] <= 1'b1; // Set the quotient bit
+                    end else begin
+                        SR[0] <= 1'b0; // Reset the quotient bit
+                    end
+                    cnt <= cnt + 1; // Increment count
+                end
+            end
+        end
+    end
+endmodule
+```

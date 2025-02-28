@@ -1,0 +1,36 @@
+Imagine you have been tasked with designing a frequency divider circuit in Verilog that takes a single high-frequency clock input and produces several lower-frequency clock outputs. Your assignment is to create a module, named freq_div, which divides a 100MHz input clock (CLK_in) into three separate output clocks with frequencies of 50MHz, 10MHz, and 1MHz. The design must also incorporate a reset mechanism (RST) that reinitializes the state of the circuit.
+
+Below is an expanded explanation of the design specifications and requirements:
+
+• Module Name: 
+  – The module should be named freq_div.
+
+• Input Signals:
+  – CLK_in: This is the primary clock signal operating at 100MHz.
+  – RST: This reset signal should immediately set the output clocks and any counters used in the design back to the initial state (typically zero) whenever it is asserted.
+
+• Output Signals and Their Generation:
+
+  1. For the 50MHz Clock Output (CLK_50):
+     – The output signal CLK_50 is expected to have half the frequency of CLK_in, which means 50MHz.
+     – The mechanism to achieve this is by toggling the status of CLK_50 on every other positive edge of the 100MHz input clock.
+     – In addition, when RST is high, CLK_50 must be immediately reset to zero.
+
+  2. For the 10MHz Clock Output (CLK_10):
+     – The goal is to generate a 10MHz clock output.
+     – To do this, you should implement a counter (for example, named cnt_10) that increments with each cycle of CLK_in.
+     – Once the counter reaches a predetermined value (in this case, 4), you should toggle CLK_10 and then reset the counter to zero.
+     – Ensure that if RST is asserted, both CLK_10 and cnt_10 are reset to zero immediately.
+
+  3. For the 1MHz Clock Output (CLK_1):
+     – This signal is to be generated using another counter (for example, named cnt_100).
+     – The counter will increment with each cycle of CLK_in.
+     – Upon reaching a specific count value (here, 49), toggle the CLK_1 output and reset the counter to its starting value.
+     – Similarly, if RST is active, both CLK_1 and cnt_100 must be reset immediately.
+
+• Implementation Guidelines:
+  – The complete Verilog code should reflect best practices in digital design.
+  – The implementation should use efficient coding techniques, especially in building the counters and handling the toggling of the clock signals.
+  – Proper reset logic must be incorporated to ensure that the circuit returns to a defined state when RST is asserted.
+
+Your task is to provide the full Verilog code for this frequency divider module, ensuring that it adheres to these detailed specifications. Please focus on clarifying and elaborating on how the frequency division is to be implemented without including any solution or answer details beyond the problem description.

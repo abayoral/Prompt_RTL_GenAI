@@ -1,0 +1,33 @@
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    input sub,
+    output [31:0] sum
+);
+
+    // Invert b when sub is 1 by XORing with 32-bit sub replicated.
+    wire [31:0] b_mod;
+    assign b_mod = b ^ {32{sub}};
+
+    // Connect the two 16-bit adders. The sub signal is used as the initial carry-in.
+    wire c0;
+    
+    // Lower 16-bit addition/subtraction
+    add16 lower_adder(
+        .a(a[15:0]),
+        .b(b_mod[15:0]),
+        .cin(sub),
+        .sum(sum[15:0]),
+        .cout(c0)
+    );
+    
+    // Upper 16-bit addition/subtraction (carry out from lower is connected to carry in)
+    add16 upper_adder(
+        .a(a[31:16]),
+        .b(b_mod[31:16]),
+        .cin(c0),
+        .sum(sum[31:16]),
+        .cout()  // Overflow carry not used
+    );
+
+endmodule

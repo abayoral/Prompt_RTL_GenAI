@@ -1,0 +1,151 @@
+module asyn_fifo #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16,
+    // Calculate address width required for DEPTH
+    parameter ADDR_WIDTH = $clog2(DEPTH),
+    // Pointer width is one more than address width for full/empty flag detection
+    parameter PTR_WIDTH = ADDR_WIDTH + 1
+)(
+    input  wire               wclk,
+    input  wire               rclk,
+    input  wire               wrstn,   // write reset (active low)
+    input  wire               rrstn,   // read reset (active low)
+    input  wire               winc,    // write increment signal
+    input  wire               rinc,    // read increment signal
+    input  wire [WIDTH-1:0]   wdata,
+    output wire               wfull,
+    output wire               rempty,
+    output wire [WIDTH-1:0]   rdata
+);
+
+  // Internal pointer registers (binary and gray)
+  reg [PTR_WIDTH-1:0] wbin, wgray;
+  reg [PTR_WIDTH-1:0] rbin, rgray;
+
+  // Next pointer (binary) values
+  wire [PTR_WIDTH-1:0] wbin_next = wbin + 1;
+  wire [PTR_WIDTH-1:0] rbin_next = rbin + 1;
+  
+  // Synchronized pointers: bring read pointer into write domain, and vice versa.
+  reg [PTR_WIDTH-1:0] rgray_sync_wclk1, rgray_sync_wclk2; // read pointer synchronized into write clock domain
+  reg [PTR_WIDTH-1:0] wgray_sync_rclk1, wgray_sync_rclk2; // write pointer synchronized into read clock domain
+
+  // Functions for conversion between binary and Gray code.
+  function [PTR_WIDTH-1:0] bin2gray;
+    input [PTR_WIDTH-1:0] bin;
+    begin
+      bin2gray = (bin >> 1) ^ bin;
+    end
+  endfunction
+
+  // Convert Gray code to binary.
+  function [PTR_WIDTH-1:0] gray2bin;
+    input [PTR_WIDTH-1:0] gray;
+    integer i;
+    reg [PTR_WIDTH-1:0] bin;
+    begin
+      bin[PTR_WIDTH-1] = gray[PTR_WIDTH-1];
+      for (i = PTR_WIDTH-2; i >= 0; i = i - 1)
+        bin[i] = bin[i+1] ^ gray[i];
+      gray2bin = bin;
+    end
+  endfunction
+
+  // Write pointer and synchronizer updates in the write clock domain.
+  always @(posedge wclk or negedge wrstn) begin
+    if (!wrstn) begin
+      wbin <= 0;
+      wgray <= 0;
+      // Synchronizer registers are also reset.
+      rgray_sync_wclk1 <= 0;
+      rgray_sync_wclk2 <= 0;
+    end else begin
+      // Synchronize the read pointer (Gray coded) into the write clock domain.
+      rgray_sync_wclk1 <= rgray;
+      rgray_sync_wclk2 <= rgray_sync_wclk1;
+
+      // Write pointer update if winc is true and FIFO is not full.
+      if (winc && !wfull) begin
+        wbin  <= wbin_next;
+        wgray <= bin2gray(wbin_next);
+      end
+    end
+  end
+
+  // Read pointer and synchronizer updates in the read clock domain.
+  always @(posedge rclk or negedge rrstn) begin
+    if (!rrstn) begin
+      rbin <= 0;
+      rgray <= 0;
+      wgray_sync_rclk1 <= 0;
+      wgray_sync_rclk2 <= 0;
+    end else begin
+      // Synchronize the write pointer (Gray coded) into the read clock domain.
+      wgray_sync_rclk1 <= wgray;
+      wgray_sync_rclk2 <= wgray_sync_rclk1;
+
+      // Read pointer update if rinc is true and FIFO is not empty.
+      if (rinc && !rempty) begin
+        rbin  <= rbin_next;
+        rgray <= bin2gray(rbin_next);
+      end
+    end
+  end
+
+  // FIFO status detection using Gray code.
+  // Full condition: When the next write pointer equals the read pointer with MSB inverted.
+  assign wfull = ( bin2gray(wbin_next) == {~rgray_sync_wclk2[PTR_WIDTH-1], rgray_sync_wclk2[PTR_WIDTH-2:0]} );
+
+  // Empty condition: When the synchronized write pointer equals the read pointer.
+  assign rempty = ( rgray == wgray_sync_rclk2 );
+
+  // Dual Port RAM instance for data storage.
+  // The RAM uses the lower ADDR_WIDTH bits of the binary pointers for addressing.
+  dsp_ram #(
+    .WIDTH(WIDTH),
+    .DEPTH(DEPTH),
+    .ADDR_WIDTH(ADDR_WIDTH)
+  ) u_dsp_ram (
+    .wclk  (wclk),
+    .wenc  (winc && !wfull),          // enable write when not full
+    .waddr (wbin[ADDR_WIDTH-1:0]),
+    .wdata (wdata),
+    .rclk  (rclk),
+    .renc  (rinc && !rempty),         // enable read when not empty
+    .raddr (rbin[ADDR_WIDTH-1:0]),
+    .rdata (rdata)
+  );
+
+endmodule
+
+// Dual-port RAM module implementing asynchronous read and write ports.
+module dsp_ram #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16,
+    parameter ADDR_WIDTH = $clog2(DEPTH)
+)(
+    input  wire               wclk,
+    input  wire               wenc,
+    input  wire [ADDR_WIDTH-1:0] waddr,
+    input  wire [WIDTH-1:0]   wdata,
+    input  wire               rclk,
+    input  wire               renc,
+    input  wire [ADDR_WIDTH-1:0] raddr,
+    output reg  [WIDTH-1:0]   rdata
+);
+  // Memory declaration.
+  reg [WIDTH-1:0] mem [0:DEPTH-1];
+
+  // Write port: synchronous write.
+  always @(posedge wclk) begin
+    if (wenc)
+      mem[waddr] <= wdata;
+  end
+
+  // Read port: synchronous read.
+  // Note: rdata is registered on the rising edge of rclk.
+  always @(posedge rclk) begin
+    if (renc)
+      rdata <= mem[raddr];
+  end
+endmodule

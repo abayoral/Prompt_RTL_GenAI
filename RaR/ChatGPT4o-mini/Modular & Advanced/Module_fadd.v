@@ -1,0 +1,14 @@
+You are currently serving as a senior Digital Design Engineer at a well-respected hardware design company, where your expertise is crucial in the development of innovative products. Your specific task involves creating a highly important Verilog module for a next-generation computing product. The successful execution of this module is essential, as it significantly impacts the reputation of your company in the competitive landscape of the computer hardware industry.
+
+In this project, you are required to work with an existing module known as "add16," which is designed to perform addition on 16-bit binary numbers. To achieve a larger goal, you need to instantiate two such add16 modules in order to construct a 32-bit adder that can combine two 32-bit inputs effectively. In this implementation, one add16 module will handle the addition of the lower 16 bits of the two inputs, while the second add16 module will be responsible for adding the upper 16 bits. It's important to note that for this specific 32-bit adder design, you are not required to manage carry-in or carry-out values; you can assume that the carry-in is always 0, and any carry-out from the addition can be disregarded in your calculations.
+
+To facilitate the addition process within each add16 module, 16 full adder instances (denoted as the module "add1") must be instantiated. These full adders will work together to compute the sum and the carry-out for the addition of the binary numbers. The "add1" module follows a particular declaration pattern as outlined in the requirements, and it computes the sum and the carry-out based on three inputs: two bits to be added and a carry-in bit.
+
+In total, your design will consist of three essential modules:
+1. The "top_module," which serves as the primary module that integrates the two add16 modules.
+2. The provided "add16" module, which performs 16-bit addition.
+3. The "add1" module, which is the crucial component for carrying out 1-bit full addition.
+
+It's imperative to note that if you fail to implement the add1 module, you will encounter an error message indicating that the specific module has not been defined. Therefore, your challenge involves not just establishing the functionality of each module, but also ensuring that they are correctly connected in accordance with the provided guidelines.
+
+Given this context, how would you approach the task of writing the top-level module that connects these two add16 modules together, ensuring the proper workings of the 32-bit adder as specified? What considerations should you keep in mind regarding the arrangement and instantiation of both the add16 and the add1 modules?

@@ -1,0 +1,30 @@
+Consider yourself in the position of a proficient Verilog designer, given the responsibility to create a digital module known as the "Triangle Wave Signal Generator." The primary purpose of this module is to generate a triangular waveform, characterized by its recurring pattern of value fluctuations over time. This means that the waveform operates by rising steadily to a maximum amplitude and then falling back to its minimum, thereby producing a continuous cycle of oscillation.
+
+### Essential Information about the Module Design:
+
+#### Module Identification:
+- You will name this module `signal_generator`, which will encapsulate the functionality of generating the triangle waveform.
+
+#### Input Signals:
+- **clk**: This input represents the clock signal, critical for timing and synchronization of operations within the module. It serves as the conductor, ensuring that the module's actions align with the rising edges of the clock signal.
+- **rst_n**: This input serves as an active-low reset control. In scenarios where this signal is pulled to a low state (logical 0), the module must enter a reset state where all internal registers are cleared, effectively reinitializing the system. Conversely, when the signal is high (logical 1), the system is expected to exit the reset condition and resume normal operational behavior.
+
+#### Output Signal:
+- **wave**: This constitutes the core output of the module, and it represents the current amplitude of the triangle waveform. The signal width is restricted to 5 bits, allowing for values ranging from 0 to 31, inclusive.
+
+#### Implementation Framework:
+- **State Management and Waveform Production**:
+  1. Your design will involve a register termed `state`, which dictates the current operational mode of the waveform generation. This register effectively controls whether the output waveform is in an incrementing or decrementing phase.
+  2. A separate register, also named `wave`, will be utilized to hold the current amplified value of the triangle waveform while adhering to the 5-bit width constraint.
+  3. The updating mechanism for both the `state` and `wave` registers will occur within an always block that triggers on either the rising edge of the clock signal (`posedge clk`) or the falling edge of the reset signal (`negedge rst_n`).
+  4. **Behavior During Reset**: When the reset condition is invoked (i.e., `~rst_n` evaluates to true), both the `state` and `wave` registers should be reset to 0, initializing the system to a known state.
+
+- **Waveform Transitional Dynamics**:
+  1. **Increment Phase**: In the scenario where the `state` is 0, the `wave` output should increase incrementally by one unit for every clock cycle.
+  2. **Transition to Peak**: Upon the `wave` reaching the maximum threshold of 31 (indicated by `wave == 31`), the `state` should switch to 1, marking the transition to the decrementing phase.
+  3. **Decrement Phase**: When the system is in state 1, the `wave` output will decrease by one unit per clock cycle.
+  4. **Transition to Valley**: As the `wave` reaches the minimum value of 0 (denoted by `wave == 0`), the `state` should revert back to 0, signaling the resumption of the incrementing phase.
+
+- **Continuous Signal Generation**: The module should continuously cycle through the process of incrementing and decrementing the `wave` signal between the values of 0 and 31, based on the predefined state changes.
+
+With a clear understanding of the module's requirements and specifications, your objective now is to create a detailed, fully coded implementation of the `signal_generator` module that adheres to these outlined criteria.

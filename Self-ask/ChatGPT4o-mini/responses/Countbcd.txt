@@ -1,0 +1,52 @@
+```verilog
+module top_module (
+    input clk,
+    input reset,   // Synchronous active-high reset
+    output [3:1] ena,
+    output [15:0] q
+);
+    reg [3:0] ones, tens, hundreds, thousands; 
+    reg [3:1] enable;
+
+    assign q = {thousands, hundreds, tens, ones};
+    assign ena = enable;
+
+    always @(posedge clk) begin
+        if (reset) begin
+            ones <= 0;
+            tens <= 0;
+            hundreds <= 0;
+            thousands <= 0;
+            enable <= 0;
+        end else begin
+            if (ones == 9) begin
+                ones <= 0;
+                enable[1] <= 1; // Enable tens increment
+            end else begin
+                ones <= ones + 1;
+                enable[1] <= 0;
+            end
+            
+            if (enable[1] && tens == 9) begin
+                tens <= 0;
+                enable[2] <= 1; // Enable hundreds increment
+            end else if (enable[1]) begin
+                tens <= tens + 1;
+                enable[2] <= 0;
+            end
+            
+            if (enable[2] && hundreds == 9) begin
+                hundreds <= 0;
+                enable[3] <= 1; // Enable thousands increment
+            end else if (enable[2]) begin
+                hundreds <= hundreds + 1;
+                enable[3] <= 0;
+            end
+            
+            if (enable[3]) begin
+                thousands <= (thousands == 9) ? 0 : thousands + 1;
+            end
+        end
+    end
+endmodule
+```

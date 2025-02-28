@@ -1,0 +1,59 @@
+module top_module(
+    input clk,
+    input reset,
+    input ena,
+    output pm,
+    output [7:0] hh,
+    output [7:0] mm,
+    output [7:0] ss
+);
+
+    // Internal registers hold the clock values in binary.
+    // seconds and minutes count from 0 to 59, hours counts from 1 to 12.
+    reg [7:0] sec, min, hr;
+    reg       pm_reg;
+
+    // On reset the clock is set to 12:00:00 AM (pm_reg = 0)
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            sec    <= 8'd0;
+            min    <= 8'd0;
+            hr     <= 8'd12;
+            pm_reg <= 1'b0;
+        end else if (ena) begin
+            // Increment seconds; if seconds roll over from 59 to 00, update minutes.
+            if (sec == 8'd59) begin
+                sec <= 8'd0;
+                // Minutes roll over from 59 to 00, so update hours.
+                if (min == 8'd59) begin
+                    min <= 8'd0;
+                    // Hours update differs depending on the current hour:
+                    // When hour==11, the next hour is 12 and pm toggles.
+                    // When hour==12, the next hour is 1 and pm remains the same.
+                    // Otherwise, simply increment hours.
+                    if (hr == 8'd11) begin
+                        hr     <= 8'd12;
+                        pm_reg <= ~pm_reg;  // Toggle am/pm when finishing an 11-hour cycle.
+                    end else if (hr == 8'd12) begin
+                        hr <= 8'd1;
+                    end else begin
+                        hr <= hr + 8'd1;
+                    end
+                end else begin
+                    min <= min + 8'd1;
+                end
+            end else begin
+                sec <= sec + 8'd1;
+            end
+        end
+    end
+
+    // Outputs are two-digit BCD values.
+    // We convert the internal binary counters to BCD (tens and ones nibble).
+    // Since the ranges are small (0-59 for sec/min and 1-12 for hr), simple division/modulus works.
+    assign ss = {sec / 10, sec % 10};
+    assign mm = {min / 10, min % 10};
+    assign hh = {hr / 10, hr % 10};
+    assign pm = pm_reg;
+
+endmodule

@@ -1,0 +1,21 @@
+As a professional Verilog designer, your task involves the development of a specialized digital module in Verilog, which is intended to serve as a frequency divider for clock signals with an emphasis on odd-number divisors. The specific module you are required to create is named `freq_divbyodd`. This module should accept an input clock signal and produce an output clock signal that reflects a frequency division by a specified odd integer. 
+
+The goal of this module is to allow for a range of odd divisors through a configurable parameter, while it defaults to a divisor value of 5 if no specific parameter is provided. 
+
+To design this module, you will need to clearly articulate the following input and output ports:
+
+**Input Ports:**
+1. `clk`: This port captures the input clock signal, which is essential for the timing operations of the module and will be the basis for the frequency division.
+2. `rst_n`: This is an active-low reset signal, which is crucial for initializing the divider. It ensures that the module is set to a known operational state upon activation of the reset.
+
+**Output Ports:**
+1. `clk_div`: The output of the module, which will deliver the resulting clock signal that has been altered in frequency as per the specified odd divisor parameter.
+
+**Module Specifications:**
+Within the module's implementation, you are expected to facilitate the division of the input clock frequency by an odd integer. This is managed through a parameter referred to as `NUM_DIV`, allowing for flexibility should changes to the divisor be necessary. The fundamental task requires the module to utilize two counters, referred to as `cnt1` and `cnt2`. These counters will serve the function of tracking both the rising and the falling edges of the input clock signal. Each counter will be designed to count up to a predetermined value of `NUM_DIV - 1`.
+
+In the division process, it is critical to generate two auxiliary clock signals, `clk_div1` and `clk_div2`. One will toggle on the positive edges of the input clock, while the other will react to the negative edges, effectively managing the division operations for both phases. The toggling behavior of these signals is contingent upon the respective counter reaching a count equivalent to half of the defined `NUM_DIV` value.
+
+Ultimately, the output signal, `clk_div`, will be produced from the logical OR operation between `clk_div1` and `clk_div2`. This combination ensures comprehensive coverage in terms of clock transitions contributing to the output.
+
+In summary, please reflect on the intricacies involved in implementing this `freq_divbyodd` module. Consideration should encompass not only the functions and parameters governing its operation, but also how best to structure the design to ensure it meets the requirements for odd-number frequency division accurately and efficiently.

@@ -1,0 +1,21 @@
+```
+module top_module (
+    input clk,
+    input d,
+    output reg q
+);
+
+    reg d1, d2;
+
+    always @(posedge clk) begin
+        d1 <= d;         // On the rising edge, sample d
+        q <= d1;         // On the rising edge, set q to the sample
+    end
+
+    always @(negedge clk) begin
+        d2 <= d;         // On the falling edge, sample d
+        q <= d2;         // On the falling edge, set q to the sample
+    end
+
+endmodule
+```

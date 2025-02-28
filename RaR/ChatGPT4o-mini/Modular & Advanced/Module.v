@@ -1,0 +1,7 @@
+As a senior Digital Design Engineer at a prominent hardware design company, you have been assigned the crucial task of developing a Verilog module that plays an essential role in the success of a next-generation product. This module is not only critical for the functionality of the product but is also vital for upholding the reputation of your company in the highly competitive field of computer hardware.
+
+Your immediate objective is to create a single instance of an existing module known as `mod_a`. This module has three designated pins: `in1`, `in2`, and `out`. Additionally, you need to establish the appropriate connections between these pins of `mod_a` and the corresponding three ports in your top-level module, which are represented as wires named `a`, `b`, and `out`.
+
+It is important to note that while you need to focus on successfully instantiating `mod_a` in your code, you do not need to concern yourself with the internal implementation details of `mod_a`. Your task primarily revolves around the proper instantiation and connection of this module's ports to ensure correct functionality within your top-level module. 
+
+Could you clarify how to effectively achieve this instantiation and the correct connections, taking into account the importance of properly aligning the module's ports with the wires in your top-level module? What specific steps and considerations should be addressed in this process to maximize the effectiveness of your design while also ensuring adherence to best practices in Verilog coding?

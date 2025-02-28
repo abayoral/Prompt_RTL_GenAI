@@ -1,0 +1,34 @@
+```verilog
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+
+    wire [15:0] lower_sum;
+    wire [15:0] upper_sum;
+    wire lower_cout;
+
+    // Instantiate the first 16-bit adder for lower bits
+    add16 add_lower (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(lower_sum),
+        .cout(lower_cout)
+    );
+
+    // Instantiate the second 16-bit adder for upper bits
+    add16 add_upper (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(lower_cout),
+        .sum(upper_sum),
+        .cout() // The cout from the upper adder is not connected
+    );
+
+    // Concatenating the results to form the final 32-bit sum
+    assign sum = {upper_sum, lower_sum};
+
+endmodule
+```

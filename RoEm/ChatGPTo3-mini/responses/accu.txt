@@ -1,0 +1,42 @@
+module accu(
+    input        clk,
+    input        rst_n,
+    input  [7:0] data_in,
+    input        valid_in,
+    output reg   valid_out,
+    output reg [9:0] data_out
+);
+
+  // Internal registers for accumulation and counting valid inputs.
+  reg [9:0] accumulator;
+  reg [1:0] count; // Enough to count values 0-3
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      accumulator <= 10'd0;
+      count       <= 2'd0;
+      valid_out   <= 1'b0;
+      data_out    <= 10'd0;
+    end else begin
+      // Default to no valid output unless triggered below.
+      valid_out   <= 1'b0;
+      
+      if (valid_in) begin
+        // If this is the fourth valid input, complete accumulation.
+        if (count == 2'd3) begin
+          data_out    <= accumulator + data_in;
+          valid_out   <= 1'b1; // pulse valid_out for one clock cycle
+          // Reset accumulator and count for the next accumulation cycle.
+          accumulator <= 10'd0;
+          count       <= 2'd0;
+        end else begin
+          // Accumulate the incoming 8-bit value.
+          accumulator <= accumulator + data_in;
+          count       <= count + 1;
+        end
+      end
+      // When valid_in is not asserted, keep the accumulator and count unchanged.
+    end
+  end
+
+endmodule

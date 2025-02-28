@@ -1,0 +1,13 @@
+```
+module andgate (output out, input a, input b, input c, input d, input e);
+    assign out = a & b & c & d & e; // Correctly implement the AND gate functionality
+endmodule
+
+module top_module (input a, input b, input c, output out);
+    wire and_out; // Intermediate wire for AND gate output
+
+    andgate inst1 (and_out, a, b, c, 1'b1, 1'b1); // Use logic levels for unused inputs (d, e)
+
+    assign out = ~(and_out); // NAND gate functionality by inverting AND gate output
+endmodule
+```

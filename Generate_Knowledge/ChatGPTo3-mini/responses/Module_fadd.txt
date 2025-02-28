@@ -1,0 +1,69 @@
+module add1 (
+    input  a,
+    input  b,
+    input  cin,
+    output sum,
+    output cout
+);
+    // Full adder: sum = a XOR b XOR cin, carry-out = majority(a,b,cin)
+    assign sum  = a ^ b ^ cin;
+    assign cout = (a & b) | (b & cin) | (a & cin);
+endmodule
+
+module add16 (
+    input  [15:0] a,
+    input  [15:0] b,
+    input         cin,
+    output [15:0] sum,
+    output        cout
+);
+    wire [15:0] carry;
+    genvar i;
+    generate
+        for (i = 0; i < 16; i = i + 1) begin : full_adder_chain
+            if (i == 0)
+                add1 adder (
+                    .a(a[i]),
+                    .b(b[i]),
+                    .cin(cin),
+                    .sum(sum[i]),
+                    .cout(carry[i])
+                );
+            else
+                add1 adder (
+                    .a(a[i]),
+                    .b(b[i]),
+                    .cin(carry[i-1]),
+                    .sum(sum[i]),
+                    .cout(carry[i])
+                );
+        end
+    endgenerate
+    assign cout = carry[15];
+endmodule
+
+module top_module (
+    input  [31:0] a,
+    input  [31:0] b,
+    output [31:0] sum
+);
+    wire lower_carry;
+    
+    // Lower 16-bit addition: use 0 as carry-in.
+    add16 lower_add (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum[15:0]),
+        .cout(lower_carry)
+    );
+    
+    // Upper 16-bit addition: use the carry from the lower adder.
+    add16 upper_add (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(lower_carry),
+        .sum(sum[31:16]),
+        .cout()  // Carry-out ignored.
+    );
+endmodule

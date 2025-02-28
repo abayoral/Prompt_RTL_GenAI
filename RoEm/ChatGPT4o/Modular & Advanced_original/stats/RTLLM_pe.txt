@@ -1,0 +1,6 @@
+./simv -l run.log
+===========Your Design Passed===========
+=========== Test Summary ===========
+Total Tests Run:           4
+Total Failures:           0
+=========== Your Design Passed ===========

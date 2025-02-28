@@ -1,0 +1,7 @@
+As a senior Digital Design Engineer at a prominent hardware design company, you have been assigned a critical task involving the development of a Verilog module that plays a vital role in a next-generation product. This module's successful implementation is essential not only for the project's success but also for preserving your company’s esteemed reputation in the competitive landscape of the computer hardware industry.
+
+In particular, you are required to work with a predefined module named `my_dff`, which represents a D flip-flop and has a structure that includes two inputs (the clock signal `clk` and the data input `d`) and one output (`q`). The objective is to create a shift register with a total length of three bits by instantiating three separate instances of this `my_dff` module. It’s important to note that these instances need to be connected in such a way that they form a series—specifically, chaining them to allow for the shifting of data between them. 
+
+Additionally, you must ensure that all instances share the same clock signal, which needs to be connected appropriately to the `clk` port of each flip-flop instance. 
+
+Given the details provided, how would you structure your implementation within the `top_module`, and what considerations must you keep in mind regarding the connectivity and behavior of this shift register? Please elaborate on your thought process about how to approach instantiating the modules, connecting them, and ensuring they work together seamlessly within your design constraints.

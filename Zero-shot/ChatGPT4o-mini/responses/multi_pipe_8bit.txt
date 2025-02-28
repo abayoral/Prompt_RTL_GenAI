@@ -1,0 +1,95 @@
+```verilog
+module multi_pipe_8bit (
+    input           clk,
+    input           rst_n,
+    input           mul_en_in,
+    input   [7:0]   mul_a,
+    input   [7:0]   mul_b,
+    output reg      mul_en_out,
+    output reg [15:0] mul_out
+);
+
+    reg [7:0] mul_a_reg;
+    reg [7:0] mul_b_reg;
+    reg [15:0] sum [0:7]; // Array to hold partial sums
+    reg [15:0] mul_out_reg;
+    reg [2:0] stage; // Pipeline stage counter
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            mul_a_reg <= 8'b0;
+            mul_b_reg <= 8'b0;
+            mul_out_reg <= 16'b0;
+            mul_en_out <= 1'b0;
+            stage <= 3'b000;
+            // Initialize the sum register to zero
+            sum[0] <= 16'b0;
+            sum[1] <= 16'b0;
+            sum[2] <= 16'b0;
+            sum[3] <= 16'b0;
+            sum[4] <= 16'b0;
+            sum[5] <= 16'b0;
+            sum[6] <= 16'b0;
+            sum[7] <= 16'b0;
+        end else begin
+            mul_en_out <= mul_en_in;
+
+            if (mul_en_in) begin
+                mul_a_reg <= mul_a;
+                mul_b_reg <= mul_b;
+                stage <= 3'b001; // Start processing
+            end
+            
+            case (stage)
+                3'b001: begin
+                    // Generate partial products and init sum
+                    sum[0] <= mul_a_reg & {8{mul_b_reg[0]}}; // Partial product for bit 0
+                    stage <= 3'b010; // Move to the next stage
+                end
+                3'b010: begin
+                    sum[1] <= (mul_a_reg & {8{mul_b_reg[1]}}) << 1; // Partial product for bit 1
+                    stage <= 3'b011;
+                end
+                3'b011: begin
+                    sum[2] <= (mul_a_reg & {8{mul_b_reg[2]}}) << 2; // Partial product for bit 2
+                    stage <= 3'b100;
+                end
+                3'b100: begin
+                    sum[3] <= (mul_a_reg & {8{mul_b_reg[3]}}) << 3; // Partial product for bit 3
+                    stage <= 3'b101;
+                end
+                3'b101: begin
+                    sum[4] <= (mul_a_reg & {8{mul_b_reg[4]}}) << 4; // Partial product for bit 4
+                    stage <= 3'b110;
+                end
+                3'b110: begin
+                    sum[5] <= (mul_a_reg & {8{mul_b_reg[5]}}) << 5; // Partial product for bit 5
+                    stage <= 3'b111;
+                end
+                3'b111: begin
+                    sum[6] <= (mul_a_reg & {8{mul_b_reg[6]}}) << 6; // Partial product for bit 6
+                    stage <= 3'b1000;
+                end
+                3'b1000: begin
+                    sum[7] <= (mul_a_reg & {8{mul_b_reg[7]}}) << 7; // Partial product for bit 7
+                    stage <= 3'b1001;
+                end
+                3'b1001: begin
+                    // Final accumulation of partial sums
+                    mul_out_reg <= sum[0] + sum[1] + sum[2] + sum[3] + sum[4] + sum[5] + sum[6] + sum[7];
+                    stage <= 3'b000; // Reset to initial stage
+                end
+            endcase
+        end
+    end
+
+    // Assign final output
+    always @(posedge clk) begin
+        if (mul_en_out) begin
+            mul_out <= mul_out_reg;
+        end else begin
+            mul_out <= 16'b0;
+        end
+    end
+endmodule
+```

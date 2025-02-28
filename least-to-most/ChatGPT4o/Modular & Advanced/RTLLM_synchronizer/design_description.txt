@@ -1,0 +1,33 @@
+You are tasked with developing a complete Verilog code implementation for a design module named `synchronizer`. The primary function of this module is to implement a multi-bit multiplexer-based (MUX-based) synchronizer. This synchronizer is intended to handle data input `data_in` that remains constant whenever the enable signal `data_en` is high, noting that `data_en` should remain high for a minimum of three consecutive `clk_b` clock cycles to allow for proper synchronization of the data.
+
+Key Points to Consider:
+
+1. **Clock Domains**: 
+   - There are two distinct clock signals governing the design: `clk_a` and `clk_b`. 
+   - `clk_a` is associated with the incoming data (`data_in`) and the synchronization enable signal (`data_en`).
+   - `clk_b` is involved in controlling the delay of `data_en`, output data synchronization, and also the final data output (`dataout`).
+
+2. **Input Data and Enable Signal**:
+   - The input data signal, `data_in`, is a multi-bit signal (specifically 4 bits).
+   - The enable signal, `data_en`, governs when the data can be actively synchronized across clock domains.
+
+3. **Synchronization Requirement**:
+   - The enable signal `data_en` is subject to a propagation delay of two clock cycles, facilitated by a pair of D flip-flops, with respect to the clock signal `clk_b`.
+
+4. **Reset Signals**:
+   - Two asynchronous reset signals are employed: `arstn` for `clk_a` domain and `brstn` for `clk_b` domain, both active-low, i.e., they initiate reset actions when low.
+
+5. **Module Behavior**:
+   - In the `clk_a` domain, a data register `data_reg` is used for latching `data_in`, and its state is updated based on the enable signal controlled by clock `clk_a`. 
+   - Another register, `en_data_reg`, latches `data_en` under similar conditions.
+   - For the `clk_b` domain, two additional registers, `en_clap_one` and `en_clap_two`, are designed to manage and propagate the enable signal with a delay.
+   - The output `dataout` is determined by these delayed enable signals in the `clk_b` domain.
+
+6. **Design Constraints**:
+   - Ensure that the reset behavior sets all relevant registers to zero when activated.
+   - Upon deactivation of reset (`arstn` high for `clk_a` domain and `brstn` high for `clk_b` domain), data should flow correctly based on the described logic.
+
+7. **Output Handling**:
+   - Assign the `dataout` signal based on when the `en_clap_two` register is active. If the signal is inactive, `dataout` holds its previous state.
+
+Your challenge is to accurately capture all these requirements and constraints within the Verilog code for the `synchronizer` module that fulfills its intended purpose of a multi-bit MUX-based synchronizer.

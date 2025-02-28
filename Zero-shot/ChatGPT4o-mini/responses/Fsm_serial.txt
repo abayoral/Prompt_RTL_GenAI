@@ -1,0 +1,82 @@
+```verilog
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg done
+); 
+
+    typedef enum reg [2:0] {
+        IDLE = 3'b000,
+        START = 3'b001,
+        DATA = 3'b010,
+        STOP = 3'b011,
+        ERROR = 3'b100
+    } state_t;
+
+    state_t current_state, next_state;
+    reg [3:0] bit_count;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+            done <= 0;
+            bit_count <= 0;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+
+    always @(*) begin
+        done = 0;  // Default done output
+        case (current_state)
+            IDLE: begin
+                if (in == 0) begin  // Start bit detected
+                    next_state = START;
+                end else begin
+                    next_state = IDLE;
+                end
+            end
+            START: begin
+                next_state = DATA;  // Move to data state after detecting start bit
+            end
+            DATA: begin
+                if (bit_count < 8) begin
+                    next_state = DATA;  // Stay in DATA until we receive 8 bits
+                end else begin
+                    next_state = STOP;  // Move to STOP after 8 bits
+                end
+            end
+            STOP: begin
+                if (in == 1) begin  // Validate stop bit
+                    done = 1;       // Byte received correctly
+                    next_state = IDLE;  // Go back to IDLE state
+                end else begin
+                    next_state = ERROR;  // Error if stop bit is not received as expected
+                end
+            end
+            ERROR: begin
+                if (in == 1) begin  // Wait for the next start bit after error
+                    next_state = IDLE; 
+                end else begin
+                    next_state = ERROR;  // Stay in ERROR state until stop bit is found
+                end
+            end
+            default: begin
+                next_state = IDLE;  // Default case to prevent latches
+            end
+        endcase
+    end
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            bit_count <= 0;
+        end else if (current_state == DATA) begin
+            bit_count <= bit_count + 1;  // Increment bit count in DATA state
+        end else if (current_state == STOP || current_state == IDLE) begin
+            bit_count <= 0;  // Reset bit count on STOP or IDLE
+        end
+    end
+
+endmodule
+```

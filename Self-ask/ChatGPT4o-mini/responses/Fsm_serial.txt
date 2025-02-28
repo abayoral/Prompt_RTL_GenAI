@@ -1,0 +1,57 @@
+Thank you for the clarification. I will now proceed to generate the Verilog module based on the provided information. 
+
+```
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg done
+); 
+
+    typedef enum reg [2:0] {IDLE, START, DATA, STOP} state_t;
+    state_t current_state, next_state;
+    
+    reg [3:0] bit_count; // to count the received bits
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current_state <= IDLE;
+            bit_count <= 0;
+            done <= 0;
+        end else begin
+            current_state <= next_state;
+        end
+    end
+
+    always @* begin
+        case (current_state)
+            IDLE: begin
+                done = 0;
+                if (in == 0) // Detect start bit
+                    next_state = START;
+                else
+                    next_state = IDLE;
+            end
+            START: begin
+                if (in == 0) // Continue to wait for a start bit
+                    next_state = DATA;
+                else
+                    next_state = IDLE;
+            end
+            DATA: begin
+                bit_count = bit_count + 1;
+                if (bit_count < 8)
+                    next_state = DATA;
+                else
+                    next_state = STOP;
+            end
+            STOP: begin
+                done = (in == 1); // Check if stop bit is 1
+                next_state = IDLE; // Reset to IDLE to wait for the next byte
+            end
+            default: next_state = IDLE;
+        endcase
+    end
+
+endmodule
+```

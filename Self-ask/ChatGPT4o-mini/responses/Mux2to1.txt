@@ -1,0 +1,14 @@
+```verilog
+module top_module( 
+    input a, b, sel,
+    output reg out ); 
+
+    always @* begin
+        out = (sel == 0) ? a : b;
+    end
+
+    // High-impedance handling
+    assign out = (a === 1'bz && b === 1'bz) ? 1'bz : out;
+
+endmodule
+```

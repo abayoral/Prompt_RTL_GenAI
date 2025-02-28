@@ -1,0 +1,29 @@
+```verilog
+module sub_64bit (
+    input  [63:0] A,       // First 64-bit signed input
+    input  [63:0] B,       // Second 64-bit signed input
+    output [63:0] result,   // 64-bit output for the subtraction result
+    output reg overflow      // 1-bit output for overflow detection
+);
+    
+    wire signed [63:0] signed_A; // Define a signed version of A
+    wire signed [63:0] signed_B; // Define a signed version of B
+    wire signed [63:0] signed_result; // Define a signed version of the result
+
+    assign signed_A = A;           // Assign A to signed_A
+    assign signed_B = B;           // Assign B to signed_B
+    assign signed_result = signed_A - signed_B; // Perform signed subtraction
+    assign result = signed_result; // Assign the subtraction result to output
+
+    // Overflow detection logic
+    always @(*) begin
+        overflow = 0; // Default to no overflow
+        if ((signed_A > 0 && signed_B < 0 && signed_result < 0) || // Positive overflow
+            (signed_A < 0 && signed_B > 0 && signed_result > 0))   // Negative overflow
+        begin
+            overflow = 1; // Set overflow if any overflow condition is met
+        end
+    end
+
+endmodule
+```

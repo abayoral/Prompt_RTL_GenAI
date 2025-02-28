@@ -1,0 +1,21 @@
+module top_module (
+    input clk,
+    input [7:0] in,
+    output reg [7:0] anyedge
+);
+
+    // Delay register to hold the previous value of 'in'
+    reg [7:0] prev;
+    // Register to hold the detected rising edge (0->1) event, which will be output in the next cycle
+    reg [7:0] rising_edge;
+
+    always @(posedge clk) begin
+        // Detect a rising edge using the previous value of in
+        rising_edge <= (~prev) & in;
+        // Update the delayed version of the input
+        prev <= in;
+        // The output anyedge is the rising edge detected in the previous cycle
+        anyedge <= rising_edge;
+    end
+
+endmodule

@@ -1,0 +1,12 @@
+```
+module top_module( 
+    input [31:0] in,
+    output [31:0] out );
+
+    assign out[31:24] = in[07:00];
+    assign out[23:16] = in[15:08];
+    assign out[15:08] = in[23:16];
+    assign out[07:00] = in[31:24];
+
+endmodule
+```

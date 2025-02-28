@@ -1,0 +1,68 @@
+module div_16bit(
+    input  [15:0] A,    // Dividend
+    input  [7:0]  B,    // Divisor
+    output reg [15:0] result,  // Quotient output (16-bit, with leading zeros if quotient is less than 16 bits)
+    output reg [15:0] odd      // Remainder output (16-bit, with remainder in lower 8 bits)
+);
+
+  // Auxiliary registers for holding the dividend and divisor values.
+  reg [15:0] a_reg;
+  reg [7:0]  b_reg;
+
+  // Always block to initialize the auxiliary registers with the input values.
+  always @(*) begin
+      a_reg = A;
+      b_reg = B;
+  end
+
+  // Always block to compute the division result using a combinational iterative (long-division) algorithm.
+  // This implementation works in two steps:
+  //  1) Extract the upper 8 bits of the dividend and perform an initial comparison to set the most
+  //     significant quotient bit.
+  //  2) For each of the remaining 8 bits of the dividend, shift the current remainder left by one and
+  //     bring in the next lower dividend bit. Then, compare and subtract the divisor if possible.
+  always @(*) begin
+      integer i;
+      // 'partial' holds the current partial remainder, which is an 8‐bit value.
+      reg [7:0] partial;
+      // 'quotient' is a 9-bit register because (16 – 8 + 1) = 9 iterations produce significant quotient bits.
+      reg [8:0] quotient;
+      
+      // Initialize quotient to zero.
+      quotient = 9'd0;
+      
+      // Step 1: Extract the high 8 bits of A.
+      partial = a_reg[15:8];
+      if (partial >= b_reg) begin
+          quotient[8] = 1'b1;
+          partial = partial - b_reg;
+      end
+      else begin
+          quotient[8] = 1'b0;
+      end
+
+      // Step 2: Iterate for the remaining 8 bits of the dividend.
+      // The loop iterates from bit position 7 downto 0 of the dividend.
+      for (i = 7; i >= 0; i = i - 1) begin
+          // Shift 'partial' left by one and bring in the next unprocessed bit from the dividend.
+          // This forms the new 8-bit segment for comparison.
+          partial = {partial[6:0], a_reg[i]};
+          if (partial >= b_reg) begin
+              quotient[i] = 1'b1;
+              partial = partial - b_reg;
+          end
+          else begin
+              quotient[i] = 1'b0;
+          end
+      end
+
+      // The computed quotient is 9 bits wide. Since the output "result" is 16 bits,
+      // we zero-extend the 9-bit quotient to 16 bits placing the quotient in the lower bits.
+      result = {7'b0, quotient};
+      
+      // Likewise, the final remainder is an 8-bit quantity.
+      // We extend it to 16 bits by padding the upper 8 bits with zeros.
+      odd = {8'b0, partial};
+  end
+
+endmodule

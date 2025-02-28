@@ -1,0 +1,34 @@
+Imagine you are a seasoned Verilog designer tasked with developing a module that functions as a Last-In-First-Out (LIFO) buffer. This module is intended for temporary data storage and retrieval, employing push and pop operations controlled by specified signals. The objective is to create a LIFO buffer with the following characteristics:
+
+1. Data Width and Capacity:
+   - The buffer should handle data entries that are 4 bits wide.
+   - It must be capable of storing up to four such entries concurrently.
+
+2. Module Identification:
+   - The module should be named “LIFObuffer.”
+
+3. Input Ports:
+   - dataIn [3:0]: A 4-bit bus that serves as the data input. This is the input from which data is received when a push operation is executed.
+   - RW: A Read/Write control signal. When RW is set to logic high (‘1’), the module should perform a read (pop) operation. When it is logic low (‘0’), a write (push) operation is initiated.
+   - EN: An Enable signal that activates the buffer's operations. Only when EN is asserted will the buffer perform any push or pop operations.
+   - Rst: An active-high Reset signal. When this signal is high, the entire buffer—including the stack pointer and all stored data—should be reinitialized or cleared.
+   - Clk: A Clock signal used for synchronous operations, ensuring that all control and data processes occur in step with the clock pulses.
+
+4. Output Ports:
+   - EMPTY: A flag output indicating whether the buffer is currently empty, that is, no valid data is stored.
+   - FULL: A flag output reflecting whether the buffer has reached its maximum storage capacity for 4-bit entries.
+   - dataOut [3:0]: A 4-bit output bus that provides the data removed during a pop operation from the top of the stack.
+
+5. Operational Details:
+   - The internal storage is implemented as a stack memory (often referred to as “stack_mem”), where each memory location holds a 4-bit data value.
+   - A stack pointer (SP) is used to track the current top-of-stack position, facilitating the management of push (writing new data) and pop (reading and removing data) operations.
+   - On the rising edge of the Clk signal, provided that the Enable (EN) signal is high, the following conditions should be evaluated:
+     • If the Reset (Rst) signal is active, then immediately reset all components: clear the stack memory to default values (e.g., zeros) and set the stack pointer to indicate an empty stack state (for instance, setting it to the value 4).
+     • If the Reset signal is inactive, determine the current state of the buffer (whether it is full or empty) and then:
+       - For a push operation (indicated by RW being low): If the buffer is not full, store the incoming 4-bit data from dataIn into the top of the stack memory and update the stack pointer accordingly (usually by decrementing it).
+       - For a pop operation (indicated by RW being high): If the buffer is not empty, retrieve the 4-bit data from the top of the stack memory and assign it to dataOut, clear that memory location, and update the stack pointer (typically by incrementing it).
+   - Concurrently, update the EMPTY and FULL indicator flags based on the current status of the stack pointer.
+
+The design assignment requires you to define and implement the internal components and logic that support these operations. Focus on ensuring that the push and pop functionalities work reliably under synchronous operations while correctly managing the status flags. Your implementation should strictly follow LIFO principles by maintaining the order of insertions and removals according to the push/pop methodology. 
+
+Note: Do not provide any actual Verilog code or solutions; the focus here is solely on understanding and outlining the detailed requirements and behavior expected from the LIFObuffer module.

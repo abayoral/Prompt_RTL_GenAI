@@ -1,0 +1,25 @@
+Imagine you are functioning as a professional Verilog designer, and your current assignment is to develop a Read-Only Memory (ROM) module. This module is an essential component often used for the purpose of storing static data that can be accessed in different contexts. The design you're tasked with, specifically named "ROM," is intended to facilitate the retrieval of predefined data based on an 8-bit address input. In essence, the module should be able to provide an output corresponding to the data that resides at a particular memory address.
+
+To provide clarity on the specifications of this module, consider the following details:
+
+1. **Module Name**: The module will be identified as "ROM."
+  
+2. **Input Ports**:
+   - You will have an input port designated as `addr [7:0]`, which is an 8-bit address input. This specific input is key for identifying the memory location from which the desired data should be fetched. The address capability you will implement allows for addressing from 0 to 255, covering the full range of available ROM locations for effective data retrieval.
+
+3. **Output Ports**:
+   - There is an output port named `dout [15:0]`. This port will output a 16-bit wide piece of data that corresponds to the memory location identified by the provided address input. The expectation is that `dout` will accurately reflect the stored value at the address that `addr` points to.
+
+4. **Memory Array**:
+   - Your ROM will be structured with an array of memory slots defined as `reg [15:0] mem [0:255]`. This architecture allows for 256 locations, each capable of storing a 16-bit data piece, making it versatile enough for a wide array of applications where fixed data storage is required.
+
+5. **Initial Block**:
+   - An initial block will play a crucial role in loading the ROM with predefined data at the module's start-up. For instance, you might initialize memory locations 0 through 3 with the values 16'hA0A0, 16'hB1B1, 16'hC2C2, and 16'hD3D3, respectively. You also have the discretion to populate additional addresses with different values as necessary.
+
+6. **Behavior**:
+   - The ROM's functionality will be governed by an `always @(*)` block, ensuring that the output is continuously aligned with the address input. As a result, any data stored at the specified address will be promptly available on the output pin `dout`. It is essential to remember that this module is strictly a Read-Only Memory, meaning it is designed exclusively for reading data and does not allow for writing to or modifying the stored data during its operational phase.
+
+### Task Objective:
+Your mission is to craft an exhaustive Verilog implementation of the specified ROM module, strictly adhering to the outlined design criteria and architectural principles. Be sure that this ROM module effectively outputs data corresponding to the address provided, while also preserving the intended characteristics of initialization and the read-only nature of its operation. 
+
+In what ways can you achieve these requirements in your Verilog code, ensuring proper functionality and optimal performance of the ROM module?

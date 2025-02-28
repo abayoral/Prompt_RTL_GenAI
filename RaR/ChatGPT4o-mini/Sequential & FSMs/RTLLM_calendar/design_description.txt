@@ -1,0 +1,30 @@
+As a professional Verilog designer, your task is to construct a module named `calendar` that operates as a perpetual timekeeping system. This module is required to maintain accurate counts for seconds, minutes, and hours, beginning with initial values set to zero for all three measurements: `Secs`, `Mins`, and `Hours`. To successfully implement this functionality, a clear understanding of the timing and logic behind each component of the module is essential.
+
+To elaborate on the specifics of each counter's functionality: 
+
+1. The `Secs` counter counts from 0 to 59 and is designed to increment with each clock pulse you receive. Once the counter reaches 59, it will reset back to 0. Importantly, when `Secs` increments to 59 and completes its cycle, it should trigger an increase in the `Mins` counter.
+
+2. The `Mins` counter functions similarly by counting from 0 to 59. It should be triggered by the completion of a minute, which is recognized when `Secs` reach 59. At that moment, the `Mins` counter must increment by 1. Furthermore, if `Mins` is already at 59 when this increment occurs, it indicates that a complete hour has transpired, prompting the need to increment the `Hours` counter.
+
+3. The `Hours` counter operates on a cycle from 0 to 23, covering a full 24-hour day. Each hour consists of 59 minutes and 59 seconds; thus, it is crucial that the `Hours` counter only increments after both `Secs` and `Mins` have returned to 59. Once the `Hours` counter surpasses 23, it should reset back to 0.
+
+This module will include several critical input and output ports:
+
+- **Input Ports:**
+  - `CLK`: This represents the clock signal that orchestrates the timing for updates to the counters within the module.
+  - `RST`: An active-high reset signal that allows for the immediate resetting of `Secs`, `Mins`, and `Hours` to zero, regardless of their current states.
+
+- **Output Ports:**
+  - `Secs`: A 6-bit output signal displaying the count of seconds.
+  - `Mins`: A 6-bit output signal representing the count of minutes.
+  - `Hours`: A 6-bit output signal indicating the current count of hours.
+
+The behavior of your module will be governed by three key `always` blocks:
+
+1. **Seconds Handling:** The first `always` block will manage the `Secs` counter, responding to changes on either the positive edge of `CLK` or the `RST` signal. If `RST` is activated (logic high), the `Secs` counter will be promptly reset to 0. If the counter reaches 59, the next cycle should reset it back to 0; otherwise, it should just increment by 1.
+
+2. **Minutes Handling:** The second `always` block will handle the `Mins` counter similarly, checking for the `CLK` and `RST` signals. Upon activation of `RST`, `Mins` must return to 0. Following that, it should check the `Secs` counter; upon it reaching 59, there should be an increment of 1 to `Mins`. If `Secs` and `Mins` both reach 59, it will be necessary to reset `Mins` to 0 in the subsequent cycle.
+
+3. **Hours Handling:** The final `always` block focuses on the `Hours` counter. This block will respond as well to `CLK` and `RST`, ensuring that a high signal on `RST` immediately sets `Hours` to 0. Incrementing of `Hours` should occur only when both `Mins` and `Secs` are at their maximum values, indicating that an hour has completed. When `Hours` hits 23, the design requires it to reset back to 0.
+
+In developing your code, be sure to reflect this logical structure clearly, ensuring that each counter responds accurately to the defined logic of the timekeeping system while properly utilizing the `RST` input for resetting purposes.

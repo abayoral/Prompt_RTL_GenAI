@@ -1,0 +1,184 @@
+module ALU(
+    input  [31:0] a,
+    input  [31:0] b,
+    input  [5:0]  aluc,
+    output reg [31:0] r,
+    output reg zero,
+    output reg carry,
+    output reg negative,
+    output reg overflow,
+    output reg flag
+);
+
+always @(*) begin
+    // Default assignments for outputs
+    r        = 32'd0;
+    carry    = 1'b0;
+    overflow = 1'b0;
+    flag     = 1'b0;
+    
+    // Temporary variable for 33‐bit arithmetic operations
+    reg [32:0] temp;
+    
+    case (aluc)
+        // SIGNED ADD
+        6'b100000: begin // ADD
+            temp = {1'b0, a} + {1'b0, b};
+            r        = temp[31:0];
+            carry    = temp[32];
+            // Overflow if operands have same sign but result sign differs.
+            overflow = ((a[31] == b[31]) && (r[31] != a[31])) ? 1'b1 : 1'b0;
+        end
+
+        // UNSIGNED ADD (no overflow)
+        6'b100001: begin // ADDU
+            temp = {1'b0, a} + {1'b0, b};
+            r        = temp[31:0];
+            carry    = temp[32];
+            overflow = 1'b0;
+        end
+
+        // SIGNED SUBTRACT
+        6'b100010: begin // SUB
+            temp = {1'b0, a} - {1'b0, b};
+            r        = temp[31:0];
+            carry    = temp[32]; // In subtraction, this acts as the inverse of borrow.
+            // Overflow if signs of a and b differ and sign of result differs from sign of a.
+            overflow = ((a[31] != b[31]) && (r[31] != a[31])) ? 1'b1 : 1'b0;
+        end
+
+        // UNSIGNED SUBTRACT (no overflow)
+        6'b100011: begin // SUBU
+            temp = {1'b0, a} - {1'b0, b};
+            r        = temp[31:0];
+            carry    = temp[32];
+            overflow = 1'b0;
+        end
+
+        // BITWISE AND
+        6'b100100: begin // AND
+            r        = a & b;
+            carry    = 1'b0;
+            overflow = 1'b0;
+        end
+
+        // BITWISE OR
+        6'b100101: begin // OR
+            r        = a | b;
+            carry    = 1'b0;
+            overflow = 1'b0;
+        end
+
+        // BITWISE XOR
+        6'b100110: begin // XOR
+            r        = a ^ b;
+            carry    = 1'b0;
+            overflow = 1'b0;
+        end
+
+        // BITWISE NOR
+        6'b100111: begin // NOR
+            r        = ~(a | b);
+            carry    = 1'b0;
+            overflow = 1'b0;
+        end
+
+        // SET ON LESS THAN (SIGNED)
+        6'b101010: begin // SLT
+            if ($signed(a) < $signed(b)) begin
+                r    = 32'd1;
+                flag = 1'b1;
+            end else begin
+                r    = 32'd0;
+                flag = 1'b0;
+            end
+            carry    = 1'b0;
+            overflow = 1'b0;
+        end
+
+        // SET ON LESS THAN (UNSIGNED)
+        6'b101011: begin // SLTU
+            if (a < b) begin
+                r    = 32'd1;
+                flag = 1'b1;
+            end else begin
+                r    = 32'd0;
+                flag = 1'b0;
+            end
+            carry    = 1'b0;
+            overflow = 1'b0;
+        end
+
+        // SHIFT LOGICAL LEFT (Immediate)
+        // In MIPS SLL: rt is shifted by the immediate shift amount.
+        // Here we assume operand b is the value and operand a[4:0] is the immediate shift amount.
+        6'b000000: begin // SLL
+            r        = b << a[4:0];
+            carry    = 1'b0;
+            overflow = 1'b0;
+        end
+
+        // SHIFT LOGICAL RIGHT (Immediate)
+        // Here operand b is shifted right logically by the immediate specified in a[4:0].
+        6'b000010: begin // SRL
+            r        = b >> a[4:0];
+            carry    = 1'b0;
+            overflow = 1'b0;
+        end
+
+        // SHIFT ARITHMETIC RIGHT (Immediate)
+        // Operand b is shifted arithmetic right by the immediate specified in a[4:0].
+        6'b000011: begin // SRA
+            r        = $signed(b) >>> a[4:0];
+            carry    = 1'b0;
+            overflow = 1'b0;
+        end
+
+        // SHIFT LOGICAL LEFT VARIABLE
+        // In MIPS SLLV: rt is shifted by the amount given in the register rs.
+        // Here we take operand a as the value and use the lower 5 bits of operand b as the shift amount.
+        6'b000100: begin // SLLV
+            r        = a << b[4:0];
+            carry    = 1'b0;
+            overflow = 1'b0;
+        end
+
+        // SHIFT LOGICAL RIGHT VARIABLE
+        // Here operand a is shifted right logically by the lower 5 bits of operand b.
+        6'b000110: begin // SRLV
+            r        = a >> b[4:0];
+            carry    = 1'b0;
+            overflow = 1'b0;
+        end
+
+        // SHIFT ARITHMETIC RIGHT VARIABLE
+        // Here operand a is shifted arithmetic right by the lower 5 bits of operand b.
+        6'b000111: begin // SRAV
+            r        = $signed(a) >>> b[4:0];
+            carry    = 1'b0;
+            overflow = 1'b0;
+        end
+
+        // LOAD UPPER IMMEDIATE
+        // Here we shift the upper 16 bits of operand a into the proper position, zeroing the lower 16 bits.
+        6'b001111: begin // LUI
+            r        = {a[15:0], 16'b0};
+            carry    = 1'b0;
+            overflow = 1'b0;
+        end
+
+        // For any unspecified opcodes, set outputs to high-impedance.
+        default: begin
+            r        = 32'hz;
+            carry    = 1'bz;
+            overflow = 1'bz;
+            flag     = 1'bz;
+        end
+    endcase
+
+    // Common flag outputs computed from result r
+    negative = r[31];              // Negative flag if the MSB of r is 1.
+    zero     = (r == 32'd0) ? 1'b1 : 1'b0; // Zero flag if r equals 0.
+end
+
+endmodule

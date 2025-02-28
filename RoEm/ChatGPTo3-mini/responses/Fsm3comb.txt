@@ -1,0 +1,28 @@
+module top_module(
+    input in,
+    input [1:0] state,
+    output reg [1:0] next_state,
+    output reg out);
+
+    parameter A = 2'b00, B = 2'b01, C = 2'b10, D = 2'b11;
+
+    // State transition logic: next_state is determined by current state and input
+    always @(*) begin
+        case (state)
+            A: next_state = in ? B : A; // For state A: in=0 -> A, in=1 -> B
+            B: next_state = in ? B : C; // For state B: in=0 -> C, in=1 -> B
+            C: next_state = in ? D : A; // For state C: in=0 -> A, in=1 -> D
+            D: next_state = in ? B : C; // For state D: in=0 -> C, in=1 -> B
+            default: next_state = A;
+        endcase
+    end
+
+    // Output logic for a Moore state machine: out is determined solely by the current state
+    always @(*) begin
+        case (state)
+            D: out = 1; // For state D, output is 1
+            default: out = 0; // For states A, B, C, output is 0
+        endcase
+    end
+
+endmodule

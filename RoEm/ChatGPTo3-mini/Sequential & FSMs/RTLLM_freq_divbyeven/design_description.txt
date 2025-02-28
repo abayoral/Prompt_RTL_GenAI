@@ -1,0 +1,21 @@
+Imagine you are a proficient Verilog designer tasked with developing a frequency divider module that divides an input clock signal's frequency by even numbers. The purpose of this division is to generate a new clock signal, which results from toggling the output every specific number of input clock cycles defined by an even number.
+
+The module should be named `freq_diveven` and must include the following input and output ports:
+
+1. **Input Ports:**
+   - `clk`: This is the primary input clock signal that your module will divide.
+   - `rst_n`: An active-low reset signal is included to ensure that you can initialize the module's internal states correctly.
+
+2. **Output Ports:**
+   - `clk_div`: This is the output signal that represents the divided clock. It should reflect the frequency division as specified.
+
+For the core implementation, consider the following requirements:
+
+- Your design should incorporate a counter variable (`cnt`) that plays a central role in maintaining the count of clock cycles from the input clock (`clk`). This counter's function is to determine when the output clock (`clk_div`) should toggle its state.
+- The module should allow for a parameter (`NUM_DIV`) to be set to specify the division ratio. Importantly, this parameter must be restricted to even numbers only, ensuring that the output clock frequency is a precise division of the input frequency by this even number.
+- Under the conditions of a low `rst_n` signal, both the counter and the divided clock output (`clk_div`) should be reset to zero, setting the initial conditions.
+- Upon receiving a positive edge of the `clk` signal, if the counter's value is less than half of the adjusted division factor (`NUM_DIV / 2 - 1`), the counter should increment, maintaining the present state of the `clk_div` output. If this condition is met, it is only when the counter reaches the targeted count limit that it resets back to zero, toggling the `clk_div` signal to achieve the desired frequency division effect.
+
+Additionally, consider implementing the counter with a 4-bit register following best practices to efficiently track the required number of clock cycles, catering for a broad range of potential division factors while optimizing memory usage.
+
+With these guidelines in mind, contemplate the complete code to fulfill the module design's specifications effectively.

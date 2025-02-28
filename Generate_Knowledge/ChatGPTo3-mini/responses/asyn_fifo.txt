@@ -1,0 +1,134 @@
+module dual_port_ram #(parameter WIDTH = 8,
+                       parameter DEPTH = 16,
+                       parameter ADDR_WIDTH = $clog2(DEPTH))
+   (
+    input                   wclk,
+    input                   wenc,
+    input  [ADDR_WIDTH-1:0] waddr,
+    input  [WIDTH-1:0]      wdata,
+    input                   rclk,
+    input                   renc,
+    input  [ADDR_WIDTH-1:0] raddr,
+    output reg [WIDTH-1:0]  rdata
+    );
+
+   // Memory array
+   reg [WIDTH-1:0] mem [0:DEPTH-1];
+
+   // Write port (synchronous write)
+   always @(posedge wclk) begin
+      if (wenc)
+         mem[waddr] <= wdata;
+   end
+
+   // Read port (synchronous read with registered output)
+   always @(posedge rclk) begin
+      if (renc)
+         rdata <= mem[raddr];
+   end
+
+endmodule
+
+module asyn_fifo #(parameter WIDTH = 8,
+                   parameter DEPTH = 16)
+   (
+    input                 wclk,    // Write clock domain
+    input                 rclk,    // Read clock domain
+    input                 wrstn,   // Write reset (active low)
+    input                 rrstn,   // Read reset (active low)
+    input                 winc,    // Write increment signal
+    input                 rinc,    // Read increment signal
+    input  [WIDTH-1:0]    wdata,   // Data input
+    output                wfull,   // FIFO full flag
+    output                rempty,  // FIFO empty flag
+    output [WIDTH-1:0]    rdata    // Data output
+    );
+
+   // Calculate the pointer width based on DEPTH
+   localparam ADDR_WIDTH = $clog2(DEPTH);
+
+   // Write and read pointers in the write and read clock domains
+   reg [ADDR_WIDTH-1:0] wptr_bin, rptr_bin;
+   reg [ADDR_WIDTH-1:0] wptr_gray, rptr_gray;
+
+   // Synchronizer registers for crossing clock domains
+   // In write clock domain: synchronize rptr_gray from read domain
+   reg [ADDR_WIDTH-1:0] rptr_gray_wclk1, rptr_gray_wclk;
+   // In read clock domain: synchronize wptr_gray from write domain
+   reg [ADDR_WIDTH-1:0] wptr_gray_rclk1, wptr_gray_rclk;
+
+   // Function to convert binary to Gray code
+   function [ADDR_WIDTH-1:0] bin2gray;
+      input [ADDR_WIDTH-1:0] bin;
+      begin
+         bin2gray = bin ^ (bin >> 1);
+      end
+   endfunction
+
+   // Write pointer update in write clock domain
+   always @(posedge wclk or negedge wrstn) begin
+      if (!wrstn) begin
+         wptr_bin  <= 0;
+         wptr_gray <= 0;
+      end else if (winc && !wfull) begin
+         wptr_bin  <= wptr_bin + 1;
+         wptr_gray <= bin2gray(wptr_bin + 1);
+      end
+   end
+
+   // Read pointer update in read clock domain
+   always @(posedge rclk or negedge rrstn) begin
+      if (!rrstn) begin
+         rptr_bin  <= 0;
+         rptr_gray <= 0;
+      end else if (rinc && !rempty) begin
+         rptr_bin  <= rptr_bin + 1;
+         rptr_gray <= bin2gray(rptr_bin + 1);
+      end
+   end
+
+   // Synchronize the read pointer (Gray code) into the write clock domain
+   always @(posedge wclk or negedge wrstn) begin
+      if (!wrstn) begin
+         rptr_gray_wclk1 <= 0;
+         rptr_gray_wclk  <= 0;
+      end else begin
+         rptr_gray_wclk1 <= rptr_gray;
+         rptr_gray_wclk  <= rptr_gray_wclk1;
+      end
+   end
+
+   // Synchronize the write pointer (Gray code) into the read clock domain
+   always @(posedge rclk or negedge rrstn) begin
+      if (!rrstn) begin
+         wptr_gray_rclk1 <= 0;
+         wptr_gray_rclk  <= 0;
+      end else begin
+         wptr_gray_rclk1 <= wptr_gray;
+         wptr_gray_rclk  <= wptr_gray_rclk1;
+      end
+   end
+
+   // Combinational full flag logic in write clock domain
+   // Compute what the next Gray-coded write pointer would be
+   wire [ADDR_WIDTH-1:0] wptr_gray_next = bin2gray(wptr_bin + 1);
+   // FIFO is full when the next pointer equals the read pointer with the MSB inverted
+   assign wfull = (wptr_gray_next == {~rptr_gray_wclk[ADDR_WIDTH-1], rptr_gray_wclk[ADDR_WIDTH-2:0]});
+
+   // Combinational empty flag logic in read clock domain
+   // FIFO is empty when the read Gray pointer equals the synchronized write Gray pointer
+   assign rempty = (rptr_gray == wptr_gray_rclk);
+
+   // Instantiate the dual-port RAM submodule for data storage
+   dual_port_ram #(WIDTH, DEPTH, ADDR_WIDTH) ram_inst (
+      .wclk  (wclk),
+      .wenc  (winc && !wfull),
+      .waddr (wptr_bin),
+      .wdata (wdata),
+      .rclk  (rclk),
+      .renc  (rinc && !rempty),
+      .raddr (rptr_bin),
+      .rdata (rdata)
+   );
+
+endmodule

@@ -1,0 +1,46 @@
+```
+module my_dff8 ( input clk, input [7:0] d, output [7:0] q );
+    reg [7:0] q_reg;
+    always @(posedge clk) begin
+        q_reg <= d;
+    end
+    assign q = q_reg;
+endmodule
+
+module top_module ( 
+    input clk, 
+    input [7:0] d, 
+    input [1:0] sel, 
+    output [7:0] q 
+);
+    wire [7:0] q1, q2, q3;
+
+    my_dff8 dff1 (
+        .clk(clk),
+        .d(d),
+        .q(q1)
+    );
+
+    my_dff8 dff2 (
+        .clk(clk),
+        .d(q1),
+        .q(q2)
+    );
+
+    my_dff8 dff3 (
+        .clk(clk),
+        .d(q2),
+        .q(q3)
+    );
+
+    always @(*) begin
+        case(sel)
+            2'b00: q = d;       // Output the input d
+            2'b01: q = q1;      // Output after first D flip-flop
+            2'b10: q = q2;      // Output after second D flip-flop
+            2'b11: q = q3;      // Output after third D flip-flop
+            default: q = d;     // Default case (should not occur)
+        endcase
+    end
+endmodule
+```

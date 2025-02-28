@@ -1,0 +1,38 @@
+```verilog
+module ps2_arrow_key_decoder (
+    input  wire [15:0] scancode,
+    output reg  left_arrow,
+    output reg  down_arrow,
+    output reg  right_arrow,
+    output reg  up_arrow
+);
+
+    // Default state for outputs
+    initial begin
+        left_arrow = 1'b0;
+        down_arrow = 1'b0;
+        right_arrow = 1'b0;
+        up_arrow = 1'b0;
+    end
+    
+    always @* begin
+        // Reset outputs
+        left_arrow = 1'b0;
+        down_arrow = 1'b0;
+        right_arrow = 1'b0;
+        up_arrow = 1'b0;
+
+        // Check the scancode and set outputs accordingly
+        case (scancode)
+            16'hE06B: left_arrow = 1'b1;  // Left arrow key
+            16'hE072: down_arrow = 1'b1;  // Down arrow key
+            16'hE074: right_arrow = 1'b1; // Right arrow key
+            16'hE075: up_arrow = 1'b1;     // Up arrow key
+            default: begin
+                // All outputs remain as initialized (0)
+            end
+        endcase
+    end
+
+endmodule
+```

@@ -1,0 +1,22 @@
+Name              | Overall Success | Success Ratio Iteration 1 | Success Ratio Iteration 2 | Success Ratio Iteration 3 | Success Ratio Iteration 4 | Success Ratio Iteration 5 | Total Success | Sum of Ratios | Pass@1       | Pass@2       | Pass@3       | Pass@4       | Pass@5      
+Adder100          | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00 |            0 |            0 |            0 |            0 |            0
+Adder3            | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00 |            0 |            0 |            0 |            0 |            0
+Module_addsub     | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00 |            0 |            0 |            0 |            0 |            0
+Adder100i         | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00 |            0 |            0 |            0 |            0 |            0
+Module_cseladd    | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00 |            0 |            0 |            0 |            0 |            0
+Fadd              | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00 |            0 |            0 |            0 |            0 |            0
+RTLLM_fixed_point_adder | 3/5           |                     1.00 |                     1.00 |                     1.00 |                     0.00 |                     0.00 |                     0.60 |    3.00 |            1 |            1 |            1 |            1 |            1
+Hadd              | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00 |            0 |            0 |            0 |            0 |            0
+RTLLM_div_16bit   | 2/5           |                     1.00 |                     0.00 |                     1.00 |                     0.00 |                     0.00 |                     0.40 |    2.00 |            1 |            1 |            1 |            1 |            1
+RTLLM_sub_64bit   | 5/5           |                     1.00 |                     1.00 |                     1.00 |                     1.00 |                     1.00 |                     1.00 |    5.00 |            1 |            1 |            1 |            1 |            1
+Bugs_addsubz      | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00 |            0 |            0 |            0 |            0 |            0
+Bcdadd4           | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00 |            0 |            0 |            0 |            0 |            0
+Popcount255       | 0/5           |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |                     0.00 |    0.00 |            0 |            0 |            0 |            0 |            0
+RTLLM_fixed_point_substractor | 1/5           |                     0.00 |                     0.00 |                     1.00 |                     0.00 |                     0.00 |                     0.20 |    1.00 |            0 |            0 |            1 |            1 |            1
+
+Average Success Ratio as Percentage: 15.71%
+Pass@1 Average: 0.21
+Pass@2 Average: 0.21
+Pass@3 Average: 0.29
+Pass@4 Average: 0.29
+Pass@5 Average: 0.29

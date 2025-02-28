@@ -1,0 +1,73 @@
+module multi_16bit(
+    input         clk,
+    input         rst_n,
+    input         start,
+    input  [15:0] ain,
+    input  [15:0] bin,
+    output [31:0] yout,
+    output        done
+);
+
+  // Internal registers
+  reg [4:0]  i;       // shift count (needs to count 0 to 17)
+  reg        done_r;  // completion flag
+  reg [15:0] areg;    // register for multiplicand storage
+  reg [15:0] breg;    // register for multiplier storage
+  reg [31:0] yout_r;  // accumulator register for product
+
+  // Data Bit Control: Shift count register update
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      i <= 0;
+    else if (start) begin
+      if (i < 17)
+        i <= i + 1;
+      else
+        i <= i;
+    end
+    else
+      i <= 0;
+  end
+
+  // Multiplication Completion Flag Generation
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      done_r <= 0;
+    else if (i == 16)
+      done_r <= 1;  // when shift count equals 16, mark done
+    else if (i == 17)
+      done_r <= 0;  // reset the flag when count reaches 17
+    else
+      done_r <= 0;
+  end
+
+  // Shift and Accumulate Operation
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      areg    <= 16'b0;
+      breg    <= 16'b0;
+      yout_r  <= 32'b0;
+    end 
+    else if (start) begin
+      if (i == 0) begin
+        // At the beginning of computation, load registers
+        areg   <= ain;
+        breg   <= bin;
+        yout_r <= 32'b0;
+      end 
+      else if (i >= 1 && i <= 16) begin
+        // For each bit of areg (use bit at position [i-1]), add shifted breg if bit is set
+        if (areg[i-1])
+          // Extend breg to 32 bits and shift it left by (i-1) positions then accumulate
+          yout_r <= yout_r + ({16'b0, breg} << (i-1));
+        else
+          yout_r <= yout_r;
+      end
+    end
+  end
+
+  // Output assignments
+  assign yout = yout_r;
+  assign done = done_r;
+
+endmodule

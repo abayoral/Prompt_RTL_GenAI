@@ -1,0 +1,68 @@
+module synchronizer (
+    input         clk_a,    // Clock domain A: drives data_in and data_en registers
+    input         clk_b,    // Clock domain B: drives output and delayed enable registers
+    input         arstn,    // Active‐low asynchronous reset for clock domain A
+    input         brstn,    // Active‐low asynchronous reset for clock domain B
+    input  [3:0]  data_in,  // 4-bit data input, stable for at least 10 clk_b cycles
+    input         data_en,  // Data enable input (remains high for at least 3 clk_b cycles)
+    output reg [3:0] dataout  // 4-bit synchronized output in clk_b domain
+);
+
+    //-------------------------------------------------------------------------
+    // Domain A registers: capture data and enable
+    // These registers are updated synchronously with clk_a and are reset by arstn
+    //-------------------------------------------------------------------------
+    reg [3:0] data_reg;
+    reg       data_en_reg;
+
+    always @(posedge clk_a or negedge arstn) begin
+        if (!arstn) begin
+            data_reg    <= 4'd0;
+            data_en_reg <= 1'b0;
+        end else begin
+            data_reg    <= data_in;
+            data_en_reg <= data_en;
+        end
+    end
+
+    //-------------------------------------------------------------------------
+    // Domain B synchronizers: double-flop synchronizers for the enable signal
+    // and for the multi-bit data.
+    //
+    // The enable synchronizer delays data_en by two clk_b cycles:
+    //   - sync_en1 and sync_en2 are used such that sync_en2 is the delayed version.
+    //
+    // The data path uses a similar two-stage synchronizer (data_sync1, data_sync2),
+    // which, together with a MUX structure, controls the output data update.
+    //-------------------------------------------------------------------------
+    reg       sync_en1, sync_en2;
+    reg [3:0] data_sync1, data_sync2;
+
+    always @(posedge clk_b or negedge brstn) begin
+        if (!brstn) begin
+            // Reset synchronizer registers and output in domain B
+            sync_en1   <= 1'b0;
+            sync_en2   <= 1'b0;
+            data_sync1 <= 4'd0;
+            data_sync2 <= 4'd0;
+            dataout    <= 4'd0;
+        end else begin
+            // Synchronize the enable signal across clock domains (two D flip-flops)
+            sync_en1 <= data_en_reg;
+            sync_en2 <= sync_en1;
+            
+            // Synchronize the multi-bit data from domain A (two-stage synchronizer)
+            data_sync1 <= data_reg;
+            data_sync2 <= data_sync1;
+            
+            // MUX-based selection: When the delayed enable (sync_en2) is high,
+            // update the synchronized data output with the new data.
+            // Otherwise, retain the current output.
+            if (sync_en2)
+                dataout <= data_sync2;
+            else
+                dataout <= dataout;
+        end
+    end
+
+endmodule

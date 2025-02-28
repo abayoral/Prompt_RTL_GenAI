@@ -1,0 +1,30 @@
+As a seasoned Verilog designer, you are tasked with the creation and implementation of a specialized digital logic module utilizing the Verilog hardware description language, specifically focusing on the design of a 16-bit divider module. The module, referred to as `div_16bit`, is intended to execute division operations with precision, employing combinational logic to achieve this objective.
+
+To delve deeper into the project, here are the essential components you need to consider:
+
+1. **Module Definition and Port Specification**:
+   - You must define the Verilog module with the title `div_16bit`, ensuring it incorporates specific input and output ports.
+   - The input ports include:
+     - `A`: A 16-bit input that represents the dividend.
+     - `B`: An 8-bit input that serves as the divisor.
+   - You are also required to establish two output ports:
+     - `result`: A 16-bit output that will convey the quotient produced from the division operation.
+     - `odd`: A 16-bit output that reflects the remainder left after the division has been carried out.
+
+2. **Combinational Logic Dynamics**:
+   - The division operation must be executed using combinational logic, which is vital for ensuring that the output reacts dynamically to any alterations in the input signals. This will involve a stepwise approach where segments of the dividend will be compared and manipulated in relation to the divisor, mirroring the procedures involved in traditional manual binary division.
+
+3. **Stepwise Division Methodology**: 
+   - Your division process will kick off by isolating the higher-order bits from the dividend that correspond to the width of the divisor (which is 8 bits in this scenario).
+   - You will need to engage in comparisons between these bits and the divisor:
+     - If the extracted bits from the dividend hold a value that is greater than or equal to the divisor, you will set the respective bit in the resulting quotient to 1; if not, it will be set to 0.
+   - Calculate the difference between the bits derived from the dividend and the divisor, as this difference will signify the initial portion of the remainder.
+   - This remainder should be concatenated with successive groups of higher-order bits from the dividend, and the comparison and subtraction steps should be reiterated in a loop until all bits of the dividend have been accounted for.
+   - Finally, ensure that the outputs for both the quotient and remainder are adequately computed and provided.
+
+4. **Implementation Framework**:
+   - In your implementation, you will incorporate two distinct always blocks within the `div_16bit` module. 
+   - The first always block will function as a combinational logic segment that activates whenever the values of `A` and `B` change, initializing or modifying internal registers like `a_reg` and `b_reg`.
+   - The second always block will also adhere to the combinational logic paradigm and will handle the iterative nature of the division process. It will be responsible for the continuous comparisons and updates to both the quotient and remainder as it processes each segment of the dividend sequentially.
+
+Your assignment culminates in developing a comprehensive Verilog implementation that successfully represents a 16-bit divider through the usage of pure combinational logic. This component is designed to be integrated into broader digital systems or simulations, allowing adept calculation of both quotient and remainder for a variety of input values under the specified bit-width limits, thereby providing substantial flexibility across diverse digital processing applications.

@@ -1,0 +1,39 @@
+```
+module accu (
+    input wire clk,
+    input wire rst_n,
+    input wire [7:0] data_in,
+    input wire valid_in,
+    output reg valid_out,
+    output reg [9:0] data_out
+);
+    reg [9:0] accum;
+    reg [1:0] count; // Counter to track how many valid inputs have been received
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            accum <= 10'd0; // Clear accumulation on reset
+            count <= 2'd0; // Reset count
+            valid_out <= 1'b0; // Invalid output on reset
+            data_out <= 10'd0; // Clear output data
+        end else begin
+            if (valid_in) begin
+                accum <= accum + data_in; // Accumulate input data
+                count <= count + 2'd1; // Increment count of valid inputs
+
+                if (count == 2'd3) begin
+                    valid_out <= 1'b1; // Signal valid output
+                    data_out <= accum + data_in; // Set output to accumulated value
+                    accum <= 10'd0; // Reset accumulator for next input series
+                    count <= 2'd0; // Reset count for next series
+                end else begin
+                    valid_out <= 1'b0; // Keep valid_out inactive until four inputs are received
+                end
+            end else begin
+                valid_out <= 1'b0; // Maintain valid_out inactive if no valid input
+            end
+        end
+    end
+
+endmodule
+```

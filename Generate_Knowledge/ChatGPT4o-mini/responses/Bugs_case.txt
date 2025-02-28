@@ -1,0 +1,36 @@
+```
+module top_module (
+    input [7:0] code,
+    output reg [3:0] out,
+    output reg valid = 0
+);
+
+    always @(*) begin
+        valid = 0; // Reset valid at the beginning of the always block
+        case (code)
+            8'h45: out = 4'd0;
+            8'h16: out = 4'd1;
+            8'h1e: out = 4'd2;
+            8'h1a: out = 4'd3; // Fixed incorrect code (was 8'd26)
+            8'h25: out = 4'd4;
+            8'h2e: out = 4'd5;
+            8'h36: out = 4'd6;
+            8'h3d: out = 4'd7;
+            8'h3e: out = 4'd8;
+            8'h46: out = 4'd9; // Fixed incorrect code (was 6'h46)
+            default: begin
+                out = 4'b0000; // Set out to a known state on invalid code
+                valid = 0;
+            end
+        endcase
+        
+        if (code == 8'h45 || code == 8'h16 || code == 8'h1e || 
+            code == 8'h1a || code == 8'h25 || code == 8'h2e || 
+            code == 8'h36 || code == 8'h3d || code == 8'h3e || 
+            code == 8'h46) begin
+            valid = 1; // Set valid if a known code is encountered
+        end
+    end
+
+endmodule
+```

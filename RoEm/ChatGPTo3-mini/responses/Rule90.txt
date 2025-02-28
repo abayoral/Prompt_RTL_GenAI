@@ -1,0 +1,26 @@
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output reg [511:0] q
+);
+
+    integer i;  // Loop counter
+    reg [511:0] next_state;
+
+    always @(posedge clk) begin
+        if (load)
+            q <= data;
+        else begin
+            // For the first cell, left boundary is assumed 0.
+            next_state[0] = q[1];  // 0 XOR q[1] = q[1]
+            // For cells 1 to 510, next state is the XOR of left and right neighbors.
+            for (i = 1; i < 511; i = i + 1)
+                next_state[i] = q[i-1] ^ q[i+1];
+            // For the last cell, right boundary is assumed 0.
+            next_state[511] = q[510];  // q[510] XOR 0 = q[510]
+            q <= next_state;
+        end
+    end
+
+endmodule

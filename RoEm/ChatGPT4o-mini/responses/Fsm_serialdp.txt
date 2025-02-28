@@ -1,0 +1,95 @@
+```
+module parity (
+    input clk,
+    input reset,
+    input in,
+    output reg odd
+);
+
+    always @(posedge clk) begin
+        if (reset) 
+            odd <= 0;
+        else if (in) 
+            odd <= ~odd;
+    end
+
+endmodule
+
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg [7:0] out_byte,
+    output reg done
+);
+
+    parameter IDLE = 2'b00, START = 2'b01, DATA = 2'b10, PARITY = 2'b11, STOP = 2'b100;
+    reg [2:0] state, next_state;
+    reg [3:0] bit_count;
+    wire odd_parity;
+    reg parity_reset;
+    
+    parity parity_checker (
+        .clk(clk),
+        .reset(parity_reset),
+        .in(in),
+        .odd(odd_parity)
+    );
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            state <= IDLE;
+            bit_count <= 0;
+            out_byte <= 8'b0;
+            done <= 0;
+        end else begin
+            state <= next_state;
+        end
+    end
+
+    always @(*) begin
+        next_state = state;
+        done = 0; 
+        parity_reset = 1;
+
+        case (state)
+            IDLE: begin
+                if (~in) begin // Start bit detected
+                    next_state = START;
+                    bit_count = 0; 
+                end
+            end
+            START: begin
+                next_state = DATA;
+            end
+            DATA: begin
+                parity_reset = 0; // Disable parity checking
+                if (bit_count < 8) begin
+                    out_byte[bit_count] = in;
+                    bit_count = bit_count + 1;
+                end else begin
+                    next_state = PARITY; // Move to check parity
+                end
+            end
+            PARITY: begin
+                if (bit_count == 8) begin
+                    if (in == odd_parity) begin
+                        next_state = STOP; // Correct parity
+                    end else begin
+                        next_state = IDLE; // Incorrect parity, reset to IDLE
+                    end
+                end
+            end
+            STOP: begin
+                if (in) begin // Stop bit should be high
+                    done = 1; // Signal byte received
+                    next_state = IDLE; // Go back to IDLE
+                end else begin
+                    next_state = IDLE; // Wait for stop bit
+                end
+            end
+        endcase
+    end
+
+endmodule
+```

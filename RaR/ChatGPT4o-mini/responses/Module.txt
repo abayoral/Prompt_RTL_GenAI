@@ -1,0 +1,16 @@
+```verilog
+module top_level (
+    input wire a,
+    input wire b,
+    output wire out
+);
+
+    // Instantiate mod_a and connect its ports to the corresponding wires
+    mod_a u_mod_a (
+        .in1(a),    // Connect input a to in1 of mod_a
+        .in2(b),    // Connect input b to in2 of mod_a
+        .out(out)   // Connect output from mod_a to out
+    );
+
+endmodule
+```

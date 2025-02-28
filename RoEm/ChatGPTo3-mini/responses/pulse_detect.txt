@@ -1,0 +1,63 @@
+module pulse_detect(
+    input  clk,
+    input  rst_n,
+    input  data_in,
+    output reg data_out
+);
+
+    // State encoding
+    localparam STATE_IDLE  = 2'b00,  // Waiting for pulse start (transition from 0 to 1)
+               STATE_WAIT  = 2'b01,  // Saw a 1, waiting for falling edge (transition from 1 to 0)
+               STATE_PULSE = 2'b10;  // Pulse detected
+
+    reg [1:0] state, next_state;
+
+    // State transition (synchronous with asynchronous reset)
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            state <= STATE_IDLE;
+        else
+            state <= next_state;
+    end
+
+    // Next state logic based on current state and data_in
+    always @(*) begin
+        case (state)
+            // In idle state, we stay here until we see a '1' as the pulse start.
+            STATE_IDLE: begin
+                if (data_in)
+                    next_state = STATE_WAIT;
+                else
+                    next_state = STATE_IDLE;
+            end
+
+            // In wait state, we have seen the rising edge.
+            // When data_in transitions back to 0, we complete the pulse.
+            STATE_WAIT: begin
+                if (!data_in)
+                    next_state = STATE_PULSE;
+                else
+                    next_state = STATE_WAIT;
+            end
+
+            // In pulse detected state, we signal the pulse detection for one clock cycle,
+            // then return to idle to detect subsequent pulses.
+            STATE_PULSE: begin
+                next_state = STATE_IDLE;
+            end
+
+            default: next_state = STATE_IDLE;
+        endcase
+    end
+
+    // Output logic: data_out is asserted for one clock cycle when pulse is detected.
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n)
+            data_out <= 1'b0;
+        else if (state == STATE_PULSE)
+            data_out <= 1'b1;
+        else
+            data_out <= 1'b0;
+    end
+
+endmodule

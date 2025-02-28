@@ -1,0 +1,21 @@
+```verilog
+module vector_operations(
+    input  [2:0] a,
+    input  [2:0] b,
+    output [5:0] out_not,
+    output [2:0] out_bitwise_or,
+    output       out_logical_or
+);
+
+    // Compute the bitwise OR operation
+    assign out_bitwise_or = a | b;
+
+    // Compute the logical OR operation
+    assign out_logical_or = |(a | b);
+
+    // Invert the input vectors and assign to out_not
+    assign out_not[2:0] = ~a; // Lower half (bits 2 to 0) for inversion of 'a'
+    assign out_not[5:3] = ~b; // Upper half (bits 5 to 3) for inversion of 'b'
+
+endmodule
+```

@@ -1,0 +1,136 @@
+module asyn_fifo #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16
+)(
+    input                  wclk,      // Write clock
+    input                  wrstn,     // Active-low write reset
+    input                  winc,      // Write increment
+    input                  rclk,      // Read clock
+    input                  rrstn,     // Active-low read reset
+    input                  rinc,      // Read increment
+    input  [WIDTH-1:0]     wdata,     // Data input (write side)
+    output reg             wfull,     // FIFO full indicator (write side)
+    output reg             rempty,    // FIFO empty indicator (read side)
+    output reg [WIDTH-1:0] rdata      // Data output (read side)
+);
+
+  // Calculate pointer width: one extra bit for wrap-around detection.
+  localparam PTR_WIDTH = $clog2(DEPTH);  // actual address bits
+  // Note: Pointers are maintained with PTR_WIDTH+1 bits.
+  
+  // Write pointer: binary and gray code versions.
+  reg [PTR_WIDTH:0] wptr_bin;
+  reg [PTR_WIDTH:0] wptr_gray;
+  
+  // Read pointer: binary and gray code versions.
+  reg [PTR_WIDTH:0] rptr_bin;
+  reg [PTR_WIDTH:0] rptr_gray;
+  
+  // Synchronizers for transferring pointers between clock domains.
+  // In the write clock domain, we need a synchronized version of the read pointer.
+  reg [PTR_WIDTH:0] rptr_gray_sync1, rptr_gray_sync2;
+  // In the read clock domain, we need a synchronized version of the write pointer.
+  reg [PTR_WIDTH:0] wptr_gray_sync1, wptr_gray_sync2;
+  
+  // Dual-port memory (implemented as a simple RAM array)
+  reg [WIDTH-1:0] mem [0:DEPTH-1];
+  
+  // Function: convert binary value to Gray code.
+  function [PTR_WIDTH:0] bin2gray;
+    input [PTR_WIDTH:0] bin;
+    begin
+      bin2gray = bin ^ (bin >> 1);
+    end
+  endfunction
+  
+  //--------------------------------------------------------------------------
+  // Write Domain Logic
+  //--------------------------------------------------------------------------  
+  // Write pointer update and RAM write operations.
+  always @(posedge wclk or negedge wrstn) begin
+    if (!wrstn) begin
+      wptr_bin  <= 0;
+      wptr_gray <= 0;
+      wfull     <= 1'b0;
+    end else begin
+      // Calculate next write pointer candidate (if write is enabled and not full).
+      // Use a temporary variable to hold the next binary pointer.
+      // Note that if the write is not accepted, pointer remains unchanged.
+      reg [PTR_WIDTH:0] wptr_bin_next;
+      reg [PTR_WIDTH:0] wptr_gray_next;
+      
+      if (winc && !wfull) begin
+        // Write data into dual-port RAM at the address indicated by the lower bits.
+        mem[wptr_bin[PTR_WIDTH-1:0]] <= wdata;
+        wptr_bin_next = wptr_bin + 1;
+      end else begin
+        wptr_bin_next = wptr_bin;
+      end
+      // Update pointers.
+      wptr_bin  <= wptr_bin_next;
+      wptr_gray <= bin2gray(wptr_bin_next);
+      
+      // Compute full condition.
+      // The FIFO is full when the next write pointer (in Gray code) equals the read pointer pointer 
+      // with the two MSB bits inverted. This condition works because our pointer is PTR_WIDTH+1 bits.
+      // That is: full = (next_gray == {~rptr_gray_sync2[PTR_WIDTH], ~rptr_gray_sync2[PTR_WIDTH-1], rptr_gray_sync2[PTR_WIDTH-2:0]})
+      wptr_gray_next = bin2gray(wptr_bin_next + ((winc && !wfull) ? 1'b1 : 1'b0));
+      if ((wptr_gray_next[PTR_WIDTH]   != rptr_gray_sync2[PTR_WIDTH]) &&
+          (wptr_gray_next[PTR_WIDTH-1] != rptr_gray_sync2[PTR_WIDTH-1]) &&
+          (wptr_gray_next[PTR_WIDTH-2:0] == rptr_gray_sync2[PTR_WIDTH-2:0]))
+        wfull <= 1'b1;
+      else
+        wfull <= 1'b0;
+    end
+  end
+  
+  // Synchronize the read pointer (in gray code) into the write clock domain.
+  always @(posedge wclk or negedge wrstn) begin
+    if (!wrstn) begin
+      rptr_gray_sync1 <= 0;
+      rptr_gray_sync2 <= 0;
+    end else begin
+      rptr_gray_sync1 <= rptr_gray;
+      rptr_gray_sync2 <= rptr_gray_sync1;
+    end
+  end
+  
+  //--------------------------------------------------------------------------
+  // Read Domain Logic
+  //--------------------------------------------------------------------------  
+  // Read pointer update and RAM read operations.
+  always @(posedge rclk or negedge rrstn) begin
+    if (!rrstn) begin
+      rptr_bin  <= 0;
+      rptr_gray <= 0;
+      rempty    <= 1'b1;
+      rdata     <= {WIDTH{1'b0}};
+    end else begin
+      // Update empty flag based on synchronized write pointer.
+      rempty <= (rptr_gray == wptr_gray_sync2);
+      
+      if (rinc && !rempty) begin
+        // Read data from dual-port RAM using the lower bits of the read pointer.
+        rdata <= mem[rptr_bin[PTR_WIDTH-1:0]];
+        rptr_bin <= rptr_bin + 1;
+        rptr_gray <= bin2gray(rptr_bin + 1);
+      end else begin
+        // If not reading, maintain current pointer and data output.
+        rptr_bin  <= rptr_bin;
+        rptr_gray <= rptr_gray;
+      end
+    end
+  end
+  
+  // Synchronize the write pointer (in gray code) into the read clock domain.
+  always @(posedge rclk or negedge rrstn) begin
+    if (!rrstn) begin
+      wptr_gray_sync1 <= 0;
+      wptr_gray_sync2 <= 0;
+    end else begin
+      wptr_gray_sync1 <= wptr_gray;
+      wptr_gray_sync2 <= wptr_gray_sync1;
+    end
+  end
+
+endmodule

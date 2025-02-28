@@ -1,0 +1,7 @@
+Imagine you are a senior Digital Design Engineer at a top-tier hardware company, and you have been given the task of creating a key Verilog module that is critical for your next-generation product. This module forms a finite-state machine (FSM) that monitors a continuous stream of input bits. The primary objective is to identify the occurrence of the specific binary sequence "1101" within this stream.
+
+When the FSM successfully detects this sequence, it must activate an output signal called start_shifting. Once activated, the signal should remain asserted permanently (i.e., it stays high) until a reset event occurs. It is important to note that remaining in the final state after detection is purposeful—it is meant to simulate a transition into additional states that will be incorporated as part of a larger FSM design in future development steps.
+
+The module should include standard ports: clk for the clock signal, reset for the synchronous reset mechanism, data for the input bit stream, and start_shifting for the output control signal. The reset is synchronous, meaning that it is coordinated with the clock. All implementation details will be encapsulated within this module, and the overarching design can be extended later to integrate more complex functionality.
+
+Your task is to clearly understand this requirement and prepare the necessary Verilog structure without yet providing any solution or code implementation. It is all about framing the problem and clarifying the desired behavior of the FSM at this stage.

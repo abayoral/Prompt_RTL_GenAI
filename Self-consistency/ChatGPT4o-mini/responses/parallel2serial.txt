@@ -1,0 +1,27 @@
+module parallel2serial (
+    input wire clk,
+    input wire rst_n,
+    input wire [3:0] d,
+    output reg valid_out,
+    output reg dout
+);
+    reg [1:0] cnt; // 2-bit counter to keep track of the bits being output
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt <= 2'b00;
+            valid_out <= 1'b0;
+            dout <= 1'b0;
+        end else begin
+            if (cnt < 2'b11) begin
+                dout <= d[3 - cnt]; // Output bits from MSB to LSB
+                valid_out <= 1'b1;
+                cnt <= cnt + 1'b1;
+            end else begin
+                dout <= d[0]; // Last output still d[0]
+                valid_out <= 1'b1; // Valid signal stays high
+                cnt <= 2'b00; // Reset the counter to start the process again
+            end
+        end
+    end
+endmodule

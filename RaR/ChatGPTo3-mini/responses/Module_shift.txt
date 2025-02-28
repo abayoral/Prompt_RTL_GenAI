@@ -1,0 +1,30 @@
+module top_module(
+    input clk,
+    input d,
+    output q
+);
+    // Intermediate signals for the shift register chain
+    wire q1, q2;
+
+    // Instantiate the first D flip-flop: Input d, output q1
+    my_dff dff1 (
+        .clk(clk),
+        .d(d),
+        .q(q1)
+    );
+
+    // Instantiate the second D flip-flop: Input q1, output q2
+    my_dff dff2 (
+        .clk(clk),
+        .d(q1),
+        .q(q2)
+    );
+
+    // Instantiate the third D flip-flop: Input q2, output q
+    my_dff dff3 (
+        .clk(clk),
+        .d(q2),
+        .q(q)
+    );
+
+endmodule

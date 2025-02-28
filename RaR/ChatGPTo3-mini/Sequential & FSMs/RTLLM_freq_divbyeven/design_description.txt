@@ -1,0 +1,22 @@
+Imagine you need to design a Verilog module called freq_diveven that functions as a frequency divider. The goal of this module is to reduce the frequency of an incoming clock signal by dividing it by an even number, determined by a parameter NUM_DIV. In this design, the module must generate a divided clock output by toggling the output signal after a set number of input clock cycles.
+
+Here are the key requirements and specifications for the design:
+
+1. Inputs and Outputs:
+   - There is an input clock signal (clk) that serves as the timing reference for the module.
+   - A reset signal (rst_n) is provided, which is active low. When rst_n is low, both the internal state and the output should be reinitialized.
+   - The output is a divided clock signal (clk_div) that represents a lower frequency clock derived from the division process.
+
+2. Implementation Details:
+   - The design should include a counter (named cnt) implemented as a 4-bit register. This counter is used to keep track of the number of clock cycles that have elapsed.
+   - The division factor is dictated by a parameter called NUM_DIV, and it is assumed that NUM_DIV is an even number.
+   - Upon each rising edge of the clock (clk), the module must inspect the counter:
+       • If rst_n is low, then both the counter (cnt) and the divided clock (clk_div) must be reset to zero.
+       • If rst_n is high, the module should increment cnt until it reaches half the value of NUM_DIV (specifically, less than or equal to half of NUM_DIV minus one). During this period, clk_div remains unchanged.
+   - Once cnt reaches the limit corresponding to the full cycle indicated by NUM_DIV, the module should perform two actions simultaneously: reset the counter to zero and toggle the value of clk_div. This toggling mechanism effectively divides the clock frequency by the even number provided by NUM_DIV.
+
+3. Additional Considerations:
+   - Ensure that the design properly handles the reset condition so that all internal states are correctly initialized.
+   - Since the counter is 4 bits, it must be capable of counting up to the required limit defined by the division factor (NUM_DIV). The design should guarantee that cnt and clk_div behave correctly throughout the operation.
+
+This explanation sets the stage for a detailed Verilog code implementation of the freq_diveven module without revealing any part of the actual code. The problem requires crafting a design that integrates these specifications into a complete and operational Verilog module.
