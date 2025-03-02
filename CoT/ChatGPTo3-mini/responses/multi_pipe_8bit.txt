@@ -1,0 +1,70 @@
+module multi_pipe_8bit(
+    input clk,
+    input rst_n,
+    input mul_en_in,
+    input [7:0] mul_a,
+    input [7:0] mul_b,
+    output reg mul_en_out,
+    output reg [15:0] mul_out
+);
+
+  // Stage 1 registers: capture inputs when multiplication enable is active.
+  reg [7:0] mul_a_reg;
+  reg [7:0] mul_b_reg;
+  reg        en_stage1;
+
+  // Stage 2 register for the computed product.
+  reg [15:0] product_reg;
+
+  // Pipeline Stage 1: Capture and register inputs.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      mul_a_reg <= 8'd0;
+      mul_b_reg <= 8'd0;
+      en_stage1 <= 1'b0;
+    end else begin
+      if (mul_en_in) begin
+        mul_a_reg <= mul_a;
+        mul_b_reg <= mul_b;
+        en_stage1 <= 1'b1;
+      end else begin
+        en_stage1 <= 1'b0;
+      end
+    end
+  end
+
+  // Partial product generation using wires.
+  // For each bit of mul_b_reg, compute a shifted version of mul_a_reg if that bit is 1.
+  wire [15:0] temp0 = mul_b_reg[0] ? (mul_a_reg << 0) : 16'd0;
+  wire [15:0] temp1 = mul_b_reg[1] ? (mul_a_reg << 1) : 16'd0;
+  wire [15:0] temp2 = mul_b_reg[2] ? (mul_a_reg << 2) : 16'd0;
+  wire [15:0] temp3 = mul_b_reg[3] ? (mul_a_reg << 3) : 16'd0;
+  wire [15:0] temp4 = mul_b_reg[4] ? (mul_a_reg << 4) : 16'd0;
+  wire [15:0] temp5 = mul_b_reg[5] ? (mul_a_reg << 5) : 16'd0;
+  wire [15:0] temp6 = mul_b_reg[6] ? (mul_a_reg << 6) : 16'd0;
+  wire [15:0] temp7 = mul_b_reg[7] ? (mul_a_reg << 7) : 16'd0;
+
+  // Sum the partial products to generate the final multiplication product.
+  wire [15:0] product_wire = temp0 + temp1 + temp2 + temp3 + temp4 + temp5 + temp6 + temp7;
+
+  // Pipeline Stage 2: Calculate the final product and update output registers.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      product_reg <= 16'd0;
+      mul_en_out  <= 1'b0;
+      mul_out     <= 16'd0;
+    end else begin
+      // If previous stage was valid, update the pipeline registers.
+      if (en_stage1) begin
+        product_reg <= product_wire;
+        mul_en_out  <= 1'b1;
+        mul_out     <= product_wire;
+      end else begin
+        // If no new enable from Stage 1, output defaults to zero.
+        mul_en_out  <= 1'b0;
+        mul_out     <= 16'd0;
+      end
+    end
+  end
+
+endmodule

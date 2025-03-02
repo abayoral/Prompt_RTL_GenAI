@@ -1,0 +1,66 @@
+module top_module(
+    input clk,
+    input reset,    // Active‐high synchronous reset to 32'h1
+    output [31:0] q
+);
+
+    // This is a 32‐bit Galois LFSR with taps at bit positions 32,22,2, and 1.
+    // We interpret these tap positions using 1‐based numbering,
+    // so bit position 32 is reg index 31, 22 is index 21, 2 is index 1, and 1 is index 0.
+    //
+    // We implement the LFSR as a right‐shifting register.
+    // In a Galois LFSR, only some flip‐flops are updated with a XOR of the feedback.
+    // Here we take the least–significant bit (index 0) as our feedback (fb).
+    // Then for each clock cycle, for indices where a tap is present the shifted value is
+    // XORed with fb. The mapping is as follows:
+    //   • For bit position 1 (i.e. next[0]): next[0] = r[1] XOR fb.
+    //   • For bit position 2 (i.e. next[1]): next[1] = r[2] XOR fb.
+    //   • For bit position 22 (i.e. next[21]): next[21] = r[22] XOR fb.
+    // In addition, the tap at bit position 32 is implemented by forcing the new MSB:
+    //   • next[31] = fb.
+    // All other bits just shift without modification.
+    
+    reg [31:0] r;
+    assign q = r;
+    
+    // The feedback comes from the LSB of the current state.
+    wire fb = r[0];
+    
+    wire [31:0] next;
+    
+    // For index 0 (which corresponds to bit position 1, tapped)
+    assign next[0] = r[1] ^ fb;
+    
+    // For index 1 (bit position 2, tapped)
+    assign next[1] = r[2] ^ fb;
+    
+    // For indices 2 to 20: no tap (they shift normally)
+    genvar i;
+    generate
+        for(i = 2; i < 21; i = i + 1) begin : shift_normal1
+            assign next[i] = r[i+1];
+        end
+    endgenerate
+    
+    // For index 21 (bit position 22, tapped)
+    assign next[21] = r[22] ^ fb;
+    
+    // For indices 22 to 30: normal shift
+    generate
+        for(i = 22; i < 31; i = i + 1) begin : shift_normal2
+            assign next[i] = r[i+1];
+        end
+    endgenerate
+    
+    // For index 31 (bit position 32 is tapped, so we load the feedback)
+    assign next[31] = fb;
+    
+    // Sequential update: On reset, register loads 32'h1; otherwise, it shifts.
+    always @(posedge clk) begin
+        if (reset)
+            r <= 32'h1;
+        else
+            r <= next;
+    end
+
+endmodule

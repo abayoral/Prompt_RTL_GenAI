@@ -1,0 +1,27 @@
+module top_module (
+    input      cpu_overheated,
+    output reg shut_off_computer,
+    input      arrived,
+    input      gas_tank_empty,
+    output reg keep_driving
+);
+
+    // Shutdown the computer only if it is overheated.
+    always @(*) begin
+        if (cpu_overheated)
+            shut_off_computer = 1;
+        else
+            shut_off_computer = 0;
+    end
+
+    // Drive only if we haven't arrived at our destination and the gas tank is not empty.
+    always @(*) begin
+        if (arrived)
+            keep_driving = 0;
+        else if (gas_tank_empty)
+            keep_driving = 0;
+        else
+            keep_driving = 1;
+    end
+
+endmodule

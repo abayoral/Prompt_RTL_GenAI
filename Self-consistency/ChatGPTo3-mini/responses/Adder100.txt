@@ -1,0 +1,11 @@
+module top_module( 
+    input  [99:0] a, b,
+    input         cin,
+    output        cout,
+    output [99:0] sum );
+
+    // Behavioral addition using Verilog arithmetic operators.
+    // The result of the addition is 101 bits wide (carry bit appended to 100-bit sum).
+    assign {cout, sum} = a + b + cin;
+
+endmodule

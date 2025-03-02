@@ -1,0 +1,57 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // The Karnaugh‐map (with rows in the Gray order c’d’, c’d, cd, cd’ and
+    // columns a’b’, a’b, ab, ab’) represents the minterms:
+    //   row c’d’:   a’b’,  a’b,       ,  ab’
+    //   row c’d:    a’b’,        ,       ab’
+    //   row cd:            a’b, ab, ab’
+    //   row cd’:   a’b’, a’b,       ,
+    //
+    // One acceptable minimal sum‐of‐products is found by grouping:
+    //
+    //  • Group 1: The two “1”s in column 0, rows c’d’ and c’d (cells (a=0,b=0) with c=0,d=0 or 1)
+    //     yield: a’b’c’      (since for both rows c=0)
+    //
+    //  • Group 2: The two “1”s in column 0, rows c’d’ and cd’ (cells (a=0,b=0) with d=0, c=0 and 1)
+    //     yield: a’b’d’      (common d=0)
+    //
+    //  • These two groups can be combined (covering all ones in column0) as:
+    //         a’b’(c’ + d’)
+    //
+    //  • Group 3: The two “1”s in column 3, rows c’d’ and c’d (cells (a=1,b=0) with c=0)
+    //     yield: ab’c’
+    //
+    //  • Group 4: The two “1”s in row cd’ (cells in row cd’, columns 0 and 1)
+    //     yield: a’ c d’ 
+    //     (grouping the ones at (a=0,b=0) and (a=0,b=1) in row cd’ where c=1,d=0)
+    //
+    //  • In the lower part of the map, the ones in row cd (c=1,d=1) appear in columns 1,2,3.
+    //     They can be grouped into two overlapping groups:
+    //         Group 5: Pair the ones in columns 2 and 3 of row cd to get:
+    //                   a c d   (since for col2 (a=1,b=1) and col3 (a=1,b=0) the common is a=1, c=1, d=1)
+    //         Group 6: Pair the ones in columns 1 and 2 of row cd to get:
+    //                   b c d   (since col1 (a=0,b=1) and col2 (a=1,b=1) share b=1, c=1, d=1)
+    //
+    //  One acceptable minimal sum‐of‐products is then to take the following (note: some groups overlap):
+    //       f = a’b’(c’ + d’) + ab’c’ + a’b d’ + a c d + b c d
+    //
+    //  We can combine the last two terms:
+    //       a c d + b c d = c d (a + b)
+    //
+    //  So one final, acceptable minimal expression is:
+    //       out = a’b’(c’ + d’) + ab’c’ + a’b d’ + c d (a + b)
+    //
+    // This expression is equivalent to the original map. We now code it in Verilog.
+    
+    assign out = ( (~a & ~b) & (~c | ~d) ) |
+                 ( a & ~b & ~c         ) |
+                 ( ~a &  b & ~d         ) |
+                 ( (a | b) & c & d      );
+
+endmodule

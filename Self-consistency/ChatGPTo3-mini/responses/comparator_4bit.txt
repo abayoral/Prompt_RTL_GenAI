@@ -1,0 +1,24 @@
+module comparator_4bit(
+    input  [3:0] A,
+    input  [3:0] B,
+    output A_greater,
+    output A_equal,
+    output A_less
+);
+
+    // Extend both operands by one bit to capture the borrow information.
+    wire borrow;
+    wire [3:0] diff;
+
+    // The concatenation assignment computes the subtraction.
+    // The MSB "borrow" becomes 1 if A < B.
+    assign {borrow, diff} = {1'b0, A} - {1'b0, B};
+
+    // When A equals B, the subtraction result is 0 and there's no borrow.
+    assign A_equal = (diff == 4'b0000) ? 1'b1 : 1'b0;
+    // If a borrow is generated, it means A is less than B.
+    assign A_less  = borrow ? 1'b1 : 1'b0;
+    // If there is no borrow and the subtraction result is not zero then A must be greater.
+    assign A_greater = (!borrow && (diff != 4'b0000)) ? 1'b1 : 1'b0;
+
+endmodule

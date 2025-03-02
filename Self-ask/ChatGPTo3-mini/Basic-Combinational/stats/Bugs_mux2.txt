@@ -1,0 +1,3 @@
+Module file path: Self-ask/modules/Bugs_mux2.v
+Testbench file path: hdlbits_testbenches/Bugs_mux2_0_tb.v
+Error: Self-ask/modules/Bugs_mux2.v does not exist.

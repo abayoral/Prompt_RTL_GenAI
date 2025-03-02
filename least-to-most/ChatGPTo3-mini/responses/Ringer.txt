@@ -1,0 +1,14 @@
+module top_module (
+    input ring,
+    input vibrate_mode,
+    output ringer,       // Make sound
+    output motor         // Vibrate
+);
+
+    // Motor is activated when there is a ring and vibrate mode is enabled.
+    assign motor = ring & vibrate_mode;
+    
+    // Ringer is activated when there is a ring and vibrate mode is not enabled.
+    assign ringer = ring & ~vibrate_mode;
+
+endmodule

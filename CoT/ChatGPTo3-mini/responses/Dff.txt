@@ -1,0 +1,12 @@
+module top_module (
+    input clk,    // Clocks are used in sequential circuits
+    input d,
+    output reg q
+);
+
+    // Clocked always block: on each rising edge of clk, q is updated with d
+    always @(posedge clk) begin
+        q <= d; // non-blocking assignment for sequential logic
+    end
+
+endmodule

@@ -1,0 +1,57 @@
+module pulse_detect(
+    input  clk,
+    input  rst_n,
+    input  data_in,
+    output reg data_out
+);
+
+    // Define two states for the pulse detection FSM:
+    // IDLE    : Waiting for the rising edge of data_in (0 -> 1)
+    // WAIT_FALL: After detecting a rising edge, waiting for the falling edge (1 -> 0)
+    localparam IDLE      = 1'b0,
+               WAIT_FALL = 1'b1;
+
+    reg state;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Asynchronous reset: Reset state machine and output
+            state    <= IDLE;
+            data_out <= 1'b0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    data_out <= 1'b0;
+                    // Look for transition from 0 to 1
+                    if (data_in) begin
+                        state <= WAIT_FALL;
+                    end else begin
+                        state <= IDLE;
+                    end
+                end
+
+                WAIT_FALL: begin
+                    // In this state, we have already observed a rising edge.
+                    // Now, if a falling edge (data_in goes low) is detected, conclude a full pulse.
+                    if (~data_in) begin
+                        // Pulse detected: Set output high for one clock cycle
+                        data_out <= 1'b1;
+                        // Return to idle state waiting for a new pulse
+                        state <= IDLE;
+                    end else begin
+                        // No falling edge yet; maintain waiting state
+                        data_out <= 1'b0;
+                        state <= WAIT_FALL;
+                    end
+                end
+
+                default: begin
+                    // Safe fallback to the idle state.
+                    state    <= IDLE;
+                    data_out <= 1'b0;
+                end
+            endcase
+        end
+    end
+
+endmodule

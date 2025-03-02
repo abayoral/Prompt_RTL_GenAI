@@ -1,0 +1,142 @@
+module alu(
+    input  [31:0] a,
+    input  [31:0] b,
+    input  [5:0]  aluc,
+    output reg [31:0] r,
+    output reg        zero,
+    output reg        carry,
+    output reg        negative,
+    output reg        overflow,
+    output reg        flag
+);
+
+  // Temporary variable for 33‐bit arithmetic (to capture carry-out)
+  reg [32:0] temp;
+
+  always @(*) begin
+    // Default assignments
+    r        = 32'b0;
+    carry    = 1'b0;
+    overflow = 1'b0;
+    flag     = 1'b0;
+    
+    case(aluc)
+      // ADD: Signed addition with overflow detection
+      6'b100000: begin // ADD
+        temp    = {1'b0, a} + {1'b0, b};
+        r       = temp[31:0];
+        carry   = temp[32];
+        // Overflow when the operands have the same sign but result has a different sign:
+        overflow = ((~(a[31] ^ b[31])) && (r[31] ^ a[31])) ? 1'b1 : 1'b0;
+      end
+
+      // ADDU: Unsigned addition (overflow not flagged)
+      6'b100001: begin // ADDU
+        temp    = {1'b0, a} + {1'b0, b};
+        r       = temp[31:0];
+        carry   = temp[32];
+        overflow = 1'b0;
+      end
+
+      // SUB: Signed subtraction with overflow detection
+      6'b100010: begin // SUB
+        // Compute a - b as a + (~b + 1)
+        temp    = {1'b0, a} + {1'b0, ~b} + 33'd1;
+        r       = temp[31:0];
+        carry   = temp[32]; // In subtraction, carry indicates no borrow (carry=1 if a>=b)
+        // Overflow if a and b have different signs and sign of r differs from a:
+        overflow = ((a[31] ^ b[31]) && (r[31] ^ a[31])) ? 1'b1 : 1'b0;
+      end
+
+      // SUBU: Unsigned subtraction; ignore overflow
+      6'b100011: begin // SUBU
+        temp    = {1'b0, a} + {1'b0, ~b} + 33'd1;
+        r       = temp[31:0];
+        carry   = temp[32];
+        overflow = 1'b0;
+      end
+
+      // AND
+      6'b100100: begin // AND
+        r = a & b;
+      end
+
+      // OR
+      6'b100101: begin // OR
+        r = a | b;
+      end
+
+      // XOR
+      6'b100110: begin // XOR
+        r = a ^ b;
+      end
+
+      // NOR
+      6'b100111: begin // NOR
+        r = ~(a | b);
+      end
+
+      // SLT: Set on Less Than (signed)
+      6'b101010: begin // SLT
+        // flag is 1 if a < b (signed comparison)
+        flag = ($signed(a) < $signed(b)) ? 1'b1 : 1'b0;
+        // For convenience, also place the result in r as a 32‐bit value with only LSB valid.
+        r = {31'b0, flag};
+      end
+
+      // SLTU: Set on Less Than Unsigned
+      6'b101011: begin // SLTU
+        flag = (a < b) ? 1'b1 : 1'b0;
+        r = {31'b0, flag};
+      end
+
+      // SLL: Shift Left Logical (immediate shift amount in a[4:0], shift operand in b)
+      6'b000000: begin // SLL
+        r = b << a[4:0];
+      end
+
+      // SRL: Shift Right Logical (immediate shift amount in a[4:0], shift operand in b)
+      6'b000010: begin // SRL
+        r = b >> a[4:0];
+      end
+
+      // SRA: Shift Right Arithmetic (immediate shift amount in a[4:0], shift operand in b)
+      6'b000011: begin // SRA
+        r = $signed(b) >>> a[4:0];
+      end
+
+      // SLLV: Shift Left Logical Variable (shift amount in b[4:0], shift operand in a)
+      6'b000100: begin // SLLV
+        r = a << b[4:0];
+      end
+
+      // SRLV: Shift Right Logical Variable (shift amount in b[4:0], shift operand in a)
+      6'b000110: begin // SRLV
+        r = a >> b[4:0];
+      end
+
+      // SRAV: Shift Right Arithmetic Variable (shift amount in b[4:0], shift operand in a)
+      6'b000111: begin // SRAV
+        r = $signed(a) >>> b[4:0];
+      end
+
+      // LUI: Load Upper Immediate (shift a left by 16 bits)
+      6'b001111: begin // LUI
+        r = a << 16;
+      end
+
+      // Default: Unhandled opcodes drive outputs to high impedance.
+      default: begin
+        r        = 32'bz;
+        carry    = 1'bz;
+        overflow = 1'bz;
+        flag     = 1'bz;
+      end
+    endcase
+
+    // Common flag assignments based solely on r.
+    zero     = (r == 32'b0) ? 1'b1 : 1'b0;
+    negative = r[31];
+  end
+
+endmodule

@@ -1,0 +1,43 @@
+module dual_port_ram #(parameter WIDTH = 6, parameter DEPTH = 8)(
+    input clk,
+    input rst_n,
+    input write_en,
+    input [2:0] write_addr,
+    input [WIDTH-1:0] write_data,
+    input read_en,
+    input [2:0] read_addr,
+    output reg [WIDTH-1:0] read_data
+);
+
+    // Memory declaration: DEPTH words of WIDTH bits
+    reg [WIDTH-1:0] mem [DEPTH-1:0];
+    integer i;
+
+    // Write process and synchronous initialization
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            // On reset, initialize all memory locations to 0
+            for (i = 0; i < DEPTH; i = i + 1) begin
+                mem[i] <= {WIDTH{1'b0}};
+            end
+        end
+        else begin
+            if (write_en) begin
+                mem[write_addr] <= write_data;
+            end
+        end
+    end
+
+    // Read process
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            read_data <= {WIDTH{1'b0}};
+        end
+        else begin
+            if (read_en) begin
+                read_data <= mem[read_addr];
+            end
+        end
+    end
+
+endmodule

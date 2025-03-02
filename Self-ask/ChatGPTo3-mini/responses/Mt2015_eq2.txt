@@ -1,0 +1,1 @@
+Should the comparison treat the inputs as guaranteed valid binary values (only 0 and 1), or must the design account for potential X or Z values in A or B?

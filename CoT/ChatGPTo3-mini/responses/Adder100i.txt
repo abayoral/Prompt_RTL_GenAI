@@ -1,0 +1,24 @@
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output [99:0] cout,
+    output [99:0] sum );
+
+    // We'll use an internal carry chain of 101 wires.
+    wire [100:0] carry;
+    assign carry[0] = cin;
+
+    genvar i;
+    generate
+        for(i = 0; i < 100; i = i + 1) begin : full_adders
+            // Full adder logic for bit i:
+            // sum[i]   = a[i] ⊕ b[i] ⊕ carry[i]
+            // carry[i+1] = (a[i] & b[i]) | (carry[i] & (a[i] ⊕ b[i]))
+            assign sum[i] = a[i] ^ b[i] ^ carry[i];
+            assign carry[i+1] = (a[i] & b[i]) | (carry[i] & (a[i] ^ b[i]));
+            // Output the carry-out from the full adder as per specification.
+            assign cout[i] = carry[i+1];
+        end
+    endgenerate
+
+endmodule

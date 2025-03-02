@@ -1,0 +1,43 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out  
+);
+
+    // The original Karnaugh map is provided below for reference:
+    // 
+    //           a'b'   a'b   ab   ab'
+    //        ---------------------------
+    // c'd' |    d     0     1     1
+    // c'd  |    0     0     d     d
+    // cd   |    0     1     1     1
+    // cd'  |    0     1     1     1
+    //
+    // The "don't care" values (d) can be chosen conveniently.
+    //
+    // One good choice is to set the don’t care cells in row c'd and the one in 
+    // row c'd', column a'b' (if needed) to 0 so as not to conflict with the surrounding zeros.
+    //
+    // By inspection, one set of minterms where the output must be 1 are:
+    //   - All cases with a=1 (i.e. for columns ab and ab'). Notice that columns 2 
+    //     and 3 in the K-map are ones for every row when a=1 (and we can choose don’t cares
+    //     to be 1 where it is convenient).
+    //   - For a=0 the only ones are in the cells where b=1 and c=1 (that is, in rows with c=1 
+    //     for column a'b, which occur in the lower two rows).
+    //
+    // Thus a sum‐of‐products expression for the circuit is:
+    //     F = a + a' b c
+    //
+    // This expression gives:
+    //    • When a is 1, F is 1 regardless of the other inputs.
+    //    • When a is 0, F becomes b and c ANDed together. Checking against the map:
+    //         * For a=0, b=1, c=1 (in rows cd and cd') F=1.
+    //         * For a=0, b=0, or c=0, F=0 – consistent with the 0 entries.
+    //
+    // Hence, we implement the function as:
+    
+    assign out = a | (~a & b & c);
+
+endmodule

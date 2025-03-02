@@ -1,0 +1,1 @@
+Is it correct that for every recognized scancode case we should explicitly assign valid = 1, and for any unrecognized code we should explicitly assign valid = 0?

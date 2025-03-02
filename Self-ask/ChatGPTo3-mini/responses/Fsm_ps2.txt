@@ -1,0 +1,1 @@
+Is one byte guaranteed to be valid on every clock cycle, or should the FSM account for a separate "data valid" signal for the incoming byte stream?

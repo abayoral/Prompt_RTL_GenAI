@@ -59,10 +59,3 @@ Pass@2 Average: 0.04
 Pass@3 Average: 0.04
 Pass@4 Average: 0.04
 Pass@5 Average: 0.04
-
-Average Success Ratio as Percentage: 4.53%
-Pass@1 Average: 0.04
-Pass@2 Average: 0.04
-Pass@3 Average: 0.04
-Pass@4 Average: 0.04
-Pass@5 Average: 0.04

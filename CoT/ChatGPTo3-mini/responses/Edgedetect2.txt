@@ -1,0 +1,23 @@
+module top_module (
+    input clk,
+    input [7:0] in,
+    output reg [7:0] anyedge
+);
+
+    // We'll calculate a rising edge (0-to-1 transition) detection and
+    // output it in the following clock cycle.
+    reg [7:0] in_last;  // Holds the value of 'in' from the previous cycle.
+    reg [7:0] rising;   // Temporary storage for the rising edge detection.
+
+    always @(posedge clk) begin
+        // Calculate rising edges based on the previous value.
+        rising <= (~in_last) & in;
+        
+        // The output anyedge is set one cycle after a rising edge occurs.
+        anyedge <= rising;
+        
+        // Update the stored previous value.
+        in_last <= in;
+    end
+
+endmodule

@@ -1,0 +1,17 @@
+module top_module (
+    input clk,
+    input reset,            // Synchronous reset
+    input [7:0] d,
+    output reg [7:0] q
+);
+
+    // On the positive edge of clk, update q.
+    // When reset is high, all outputs of the flip-flops are set to 0 synchronously.
+    always @(posedge clk) begin
+        if (reset)
+            q <= 8'b0;
+        else
+            q <= d;
+    end
+
+endmodule

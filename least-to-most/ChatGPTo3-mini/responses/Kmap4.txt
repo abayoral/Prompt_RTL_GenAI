@@ -1,0 +1,31 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // The given Karnaugh map is:
+    // 
+    // |       | a'b' | a'b  | ab  | ab' |
+    // |-------|------|------|-----|-----|
+    // | c'd'  | 0    | 1    | 0   | 1   |
+    // | c'd   | 1    | 0    | 1   | 0   |
+    // | cd    | 0    | 1    | 0   | 1   |
+    // | cd'   | 1    | 0    | 1   | 0   |
+    //
+    // Examining the map, we see that for the rows where c and d are equal (c'd' and cd),
+    // the ones fall in the columns corresponding to a'b and ab'. For the rows where c and d differ
+    // (c'd and cd'), the ones fall in the columns corresponding to a'b' and ab. In other words,
+    // in the cases when the count of ones among (a,b,c,d) is odd, out=1, and when it is even, out=0.
+    // This is exactly the function of a four-input odd-parity generator, which is expressed as:
+    //
+    //       out = a ^ b ^ c ^ d ;
+    //
+    // This is one of the simplest forms (and is equivalent to both a sum-of-products and a product-of-sums
+    // form obtained from the K-map) so we use it in our implementation.
+
+    assign out = a ^ b ^ c ^ d;
+
+endmodule

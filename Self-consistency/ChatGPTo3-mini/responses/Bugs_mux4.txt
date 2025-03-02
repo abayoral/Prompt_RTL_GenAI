@@ -1,0 +1,43 @@
+module mux2 (
+    input sel,
+    input [7:0] a,
+    input [7:0] b,
+    output [7:0] out
+);
+    assign out = sel ? b : a;
+endmodule
+
+module top_module (
+    input [1:0] sel,
+    input [7:0] a,
+    input [7:0] b,
+    input [7:0] c,
+    input [7:0] d,
+    output [7:0] out
+);
+    // First stage: Use lower select bit (sel[0]) for both 2-to-1 muxes.
+    wire [7:0] mux0_out, mux1_out;
+
+    mux2 mux0_inst (
+        .sel(sel[0]),
+        .a(a),
+        .b(b),
+        .out(mux0_out)
+    );
+
+    mux2 mux1_inst (
+        .sel(sel[0]),
+        .a(c),
+        .b(d),
+        .out(mux1_out)
+    );
+
+    // Second stage: Use higher select bit (sel[1]) to choose between mux0_out and mux1_out.
+    mux2 mux2_inst (
+        .sel(sel[1]),
+        .a(mux0_out),
+        .b(mux1_out),
+        .out(out)
+    );
+
+endmodule

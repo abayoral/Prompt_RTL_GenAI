@@ -1,0 +1,4 @@
+module top_module ( input [1:0] A, input [1:0] B, output z );
+    // Compare A and B; assign z = 1 if equal, otherwise 0
+    assign z = (A == B);
+endmodule

@@ -1,0 +1,86 @@
+module multi_pipe_8bit(
+    input         clk,
+    input         rst_n,
+    input         mul_en_in,
+    input  [7:0]  mul_a,
+    input  [7:0]  mul_b,
+    output        mul_en_out,
+    output [15:0] mul_out
+);
+
+  // Stage 1: Input capture registers
+  reg [7:0]  mul_a_reg;
+  reg [7:0]  mul_b_reg;
+  reg        en_stage1;
+  
+  // Stage 2: Partial product addition registers
+  reg [15:0] sum_stage2_0;
+  reg [15:0] sum_stage2_1;
+  reg        en_stage2;
+  
+  // Stage 3: Final product register
+  reg [15:0] mul_out_reg;
+  reg        en_stage3;
+  
+  // Stage 1: Capture inputs when multiplication enable is active.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      mul_a_reg  <= 8'd0;
+      mul_b_reg  <= 8'd0;
+      en_stage1 <= 1'b0;
+    end else begin
+      if (mul_en_in) begin
+        mul_a_reg  <= mul_a;
+        mul_b_reg  <= mul_b;
+        en_stage1 <= 1'b1;
+      end else begin
+        en_stage1 <= 1'b0;
+      end
+    end
+  end
+  
+  // Create an 16-bit extended version of the captured multiplicand.
+  wire [15:0] extended_a = {8'd0, mul_a_reg};
+  
+  // Combinational generation of partial products.
+  wire [15:0] temp0 = (mul_b_reg[0]) ? (extended_a << 0) : 16'd0;
+  wire [15:0] temp1 = (mul_b_reg[1]) ? (extended_a << 1) : 16'd0;
+  wire [15:0] temp2 = (mul_b_reg[2]) ? (extended_a << 2) : 16'd0;
+  wire [15:0] temp3 = (mul_b_reg[3]) ? (extended_a << 3) : 16'd0;
+  wire [15:0] temp4 = (mul_b_reg[4]) ? (extended_a << 4) : 16'd0;
+  wire [15:0] temp5 = (mul_b_reg[5]) ? (extended_a << 5) : 16'd0;
+  wire [15:0] temp6 = (mul_b_reg[6]) ? (extended_a << 6) : 16'd0;
+  wire [15:0] temp7 = (mul_b_reg[7]) ? (extended_a << 7) : 16'd0;
+  
+  // Stage 2: Sum up partial products in two groups.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      sum_stage2_0 <= 16'd0;
+      sum_stage2_1 <= 16'd0;
+      en_stage2    <= 1'b0;
+    end else begin
+      // Group the lower four and upper four partial products separately.
+      sum_stage2_0 <= temp0 + temp1 + temp2 + temp3;
+      sum_stage2_1 <= temp4 + temp5 + temp6 + temp7;
+      en_stage2    <= en_stage1;
+    end
+  end
+  
+  // Stage 3: Final addition to produce the multiplication result.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      mul_out_reg <= 16'd0;
+      en_stage3   <= 1'b0;
+    end else begin
+      mul_out_reg <= sum_stage2_0 + sum_stage2_1;
+      en_stage3   <= en_stage2;
+    end
+  end
+  
+  // Output assignments:
+  // - mul_en_out is the pipelined enable signal propagated to the final stage.
+  // - mul_out outputs the final computed product if enabled; otherwise, zero.
+  assign mul_en_out = en_stage3;
+  assign mul_out    = en_stage3 ? mul_out_reg : 16'd0;
+
+endmodule

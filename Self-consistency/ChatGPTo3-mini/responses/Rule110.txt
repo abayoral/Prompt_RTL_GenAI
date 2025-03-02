@@ -1,0 +1,45 @@
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output reg [511:0] q
+);
+
+    reg [511:0] state;
+    integer i;
+    reg next_bit;
+    
+    always @(posedge clk) begin
+        if (load) begin
+            state <= data;
+        end
+        else begin
+            // Create next state according to Rule 110
+            for (i = 0; i < 512; i = i + 1) begin
+                // Determine neighbors: left and right. Boundaries are considered 0.
+                // state[-1] and state[512] are taken as 0.
+                // For cell i, left neighbor:
+                //   if i==0, left = 0, else left = state[i-1]
+                // For cell i, right neighbor:
+                //   if i==511, right = 0, else right = state[i+1]
+                case ({ (i == 0) ? 1'b0 : state[i-1], state[i], (i == 511) ? 1'b0 : state[i+1] })
+                    3'b111: next_bit = 1'b0;
+                    3'b110: next_bit = 1'b1;
+                    3'b101: next_bit = 1'b1;
+                    3'b100: next_bit = 1'b0;
+                    3'b011: next_bit = 1'b1;
+                    3'b010: next_bit = 1'b1;
+                    3'b001: next_bit = 1'b1;
+                    3'b000: next_bit = 1'b0;
+                    default: next_bit = 1'b0;
+                endcase
+                state[i] <= next_bit;
+            end
+        end
+    end
+
+    always @(*) begin
+        q = state;
+    end
+
+endmodule

@@ -1,0 +1,82 @@
+module multi_16bit(
+    input         clk,
+    input         rst_n,
+    input         start,
+    input  [15:0] ain,
+    input  [15:0] bin,
+    output [31:0] yout,
+    output        done
+);
+
+  // Internal registers
+  reg [4:0]  i;         // shift count register (need to count up to 17)
+  reg        done_r;    // done flag register
+  reg [15:0] areg;      // register holding the multiplicand (ain)
+  reg [15:0] breg;      // register holding the multiplier (bin)
+  reg [31:0] yout_r;    // product accumulation register
+
+  // Assign outputs from internal registers
+  assign yout = yout_r;
+  assign done = done_r;
+
+  // Shift count register update procedure
+  // Updates at each rising clock edge or falling reset edge.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      i <= 5'd0;
+    end else if (start) begin
+      // Increment the shift count by one if below 17; otherwise, hold the value
+      if (i < 5'd17)
+        i <= i + 5'd1;
+      else
+        i <= i;
+    end else begin
+      // When start is not active, reset the shift count to zero.
+      i <= 5'd0;
+    end
+  end
+
+  // Completion flag update procedure
+  // Updates at each rising clock edge or when reset is active (low).
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      done_r <= 1'b0;
+    end else if (i == 5'd16) begin
+      // When shift count equals 16, the multiplication process is complete.
+      done_r <= 1'b1;
+    end else if (i == 5'd17) begin
+      // When shift count reaches 17, clear the done flag.
+      done_r <= 1'b0;
+    end else begin
+      done_r <= done_r;
+    end
+  end
+
+  // Shift and accumulate operation procedure
+  // Updates at each rising clock edge or falling reset edge.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      areg    <= 16'd0;
+      breg    <= 16'd0;
+      yout_r  <= 32'd0;
+    end else if (start) begin
+      if (i == 5'd0) begin
+        // At the initial count, load ain and bin into areg and breg respectively,
+        // and initialize the product accumulator.
+        areg   <= ain;
+        breg   <= bin;
+        yout_r <= 32'd0;
+      end else if (i >= 5'd1 && i <= 5'd16) begin
+        // For shift counts 1 to 16, check the (i-1)th bit of areg.
+        // If it is '1', add a shifted version of breg to yout_r.
+        if (areg[i-1])
+          yout_r <= yout_r + ({16'b0, breg} << (i - 1));
+        else
+          yout_r <= yout_r;
+      end
+      // For i > 16, no further accumulation is performed.
+    end
+    // When start is inactive, registers retain their values until next valid operation.
+  end
+
+endmodule

@@ -1,0 +1,57 @@
+module pulse_detect(
+    input        clk,      // Clock signal for synchronous operations
+    input        rst_n,    // Active low reset signal
+    input        data_in,  // One-bit continuous input signal to monitor
+    output reg   data_out  // Output goes high for one clock cycle when a pulse is detected
+);
+
+    // State definitions for the pulse detection FSM.
+    // IDLE state: Waiting for the rising edge (0 -> 1)
+    // WAIT_FALL state: Rising edge has been seen; now waiting for falling edge (1 -> 0)
+    localparam IDLE      = 1'b0;
+    localparam WAIT_FALL = 1'b1;
+
+    reg state;  // Internal state register
+
+    // Synchronous state machine with asynchronous active-low reset.
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // On reset, initialize the state and output to 0.
+            state    <= IDLE;
+            data_out <= 1'b0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    // In the idle state, ensure output is low.
+                    data_out <= 1'b0;
+                    // Transition to WAIT_FALL when a rising edge is detected.
+                    if (data_in == 1'b1)
+                        state <= WAIT_FALL;
+                    else
+                        state <= IDLE;
+                end
+
+                WAIT_FALL: begin
+                    // Stay in WAIT_FALL until a falling edge is detected.
+                    if (data_in == 1'b0) begin
+                        // Falling edge detected, completing the pulse sequence: 0->1->0.
+                        // Set output high for one clock cycle and return to IDLE.
+                        data_out <= 1'b1;
+                        state    <= IDLE;
+                    end else begin
+                        // If data_in remains high, continue waiting.
+                        data_out <= 1'b0;
+                        state    <= WAIT_FALL;
+                    end
+                end
+
+                // Default case for safety (should not be reached).
+                default: begin
+                    data_out <= 1'b0;
+                    state    <= IDLE;
+                end
+            endcase
+        end
+    end
+
+endmodule

@@ -1,66 +1,67 @@
-Below is an annotated version of your code with a few minor clean‐ups for clarity and best practices. Functionally the original code was correct; however, the revised version makes the following improvements:
+Below is a revised version of your module. Although your original code is largely correct, the following improvements make the design more robust and easier to maintain:
 
-1. It uses default assignments at the beginning of the always block. This style prevents any accidental latch inference and clarifies that every branch assigns a value.
+1. Default assignments are added at the beginning of the combinational block. This helps prevent accidental latch inference if later modifications cause a missing assignment.
 
-2. It renames the input “state” to “current_state” (this is optional but can help readability, as “state” is also used for the FSM’s internal state).
+2. The formatting is slightly cleaned up, and comparisons to a one‐bit signal are simplified. (Using “if (in)” or “if (!in)” makes the code more concise while keeping it clear.)
 
-3. It consolidates the default “out” assignment where possible so that only the branch that changes the output value needs to override it.
-
-Below is a corrected version of the module:
+Here’s the updated code:
 
 ------------------------------------------------------------
 module top_module(
     input        in,
-    input  [1:0] current_state,  // Renamed for clarity
+    input  [1:0] state,
     output reg [1:0] next_state,
-    output reg       out
+    output reg   out
 );
 
-    // Define states
+    // Parameter definitions for states
     parameter A = 2'b00,
               B = 2'b01,
               C = 2'b10,
               D = 2'b11;
 
+    // Combinational block: default assignments prevent latches
     always @(*) begin
-        // Default assignments to prevent latches
-        next_state = current_state;
+        // Default assignment: can be overwritten in each case branch
+        next_state = state;
         out        = 1'b0;
 
-        case(current_state)
+        case (state)
             A: begin
-                if (in == 1'b0)
+                if (!in)
                     next_state = A;
                 else
                     next_state = B;
+                // out remains 0
             end
 
             B: begin
-                if (in == 1'b0)
+                if (!in)
                     next_state = C;
                 else
                     next_state = B;
+                // out remains 0
             end
 
             C: begin
-                if (in == 1'b0)
+                if (!in)
                     next_state = A;
                 else
                     next_state = D;
+                // out remains 0
             end
 
             D: begin
-                // In state D, out is asserted
-                out = 1'b1;
-                if (in == 1'b0)
+                if (!in)
                     next_state = C;
                 else
                     next_state = B;
+                out = 1'b1;
             end
 
             default: begin
-                next_state = A;
-                // out remains 1'b0 by default
+                next_state = A;  // Fallback to A on undefined state.
+                // out remains 0 by default assignment
             end
         endcase
     end
@@ -68,9 +69,10 @@ module top_module(
 endmodule
 ------------------------------------------------------------
 
-Explanation of Key Changes:
-• Default Assignments – By assigning default values for next_state and out at the start of the always block, we ensure that every possible branch of the case statement has defined outputs, eliminating any risk of latch inference.
-• Naming – Renaming the state input to current_state makes the role of that signal clear.
-• Consistency – The control flow remains the same as your original design, but having a default “out” and “next_state” avoids repetitious assignments.
+Key Notes:
 
-This version should be functionally equivalent to your original module while following improved Verilog coding practices.
+• The default assignments (next_state = state; out = 0;) at the start of the always block guarantee that every output is assigned regardless of which branch is taken.
+  
+• Using the simplified if statement (if (!in) for in equal to 0) improves readability.
+
+This version adheres to best practices for combinational logic design in Verilog and ensures that no unintended latches will be inferred.

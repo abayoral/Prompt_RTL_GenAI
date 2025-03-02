@@ -1,0 +1,36 @@
+module top_module ( 
+    input p1a, p1b, p1c, p1d, p1e, p1f,
+    output p1y,
+    input p2a, p2b, p2c, p2d,
+    output p2y );
+
+//---------------------------------------------------------------------------
+// Implementation using intermediate wires (four AND gates feeding into two OR gates):
+// For the p1 side, we form two 3‐input AND operations: one from p1a, p1b, and p1c, 
+// and the other from p1d, p1e, and p1f. Their outputs are then OR’ed to yield p1y.
+// For the p2 side, we form two 2‐input AND operations: one from p2a and p2b,
+// and the other from p2c and p2d. Their outputs are OR’ed to yield p2y.
+//---------------------------------------------------------------------------
+   
+    wire and_p1_1, and_p1_2;
+    wire and_p2_1, and_p2_2;
+
+    assign and_p1_1 = p1a & p1b & p1c;
+    assign and_p1_2 = p1d & p1e & p1f;
+    assign p1y = and_p1_1 | and_p1_2;
+    
+    assign and_p2_1 = p2a & p2b;
+    assign and_p2_2 = p2c & p2d;
+    assign p2y = and_p2_1 | and_p2_2;
+
+//---------------------------------------------------------------------------
+// Alternative Implementation Using Direct Assign Statements:
+// (Uncomment the following lines and comment out the above implementation
+//  if you wish to use a more compact style)
+//---------------------------------------------------------------------------
+//
+//    assign p1y = (p1a & p1b & p1c) | (p1d & p1e & p1f);
+//    assign p2y = (p2a & p2b) | (p2c & p2d);
+//
+    
+endmodule

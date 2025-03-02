@@ -1,0 +1,42 @@
+module instr_reg(
+    input clk,
+    input rst,            // Active low reset
+    input [1:0] fetch,    // 2-bit fetch control signal: 2'b01 for register source, 2'b10 for RAM/ROM
+    input [7:0] data,     // 8-bit instruction data input
+    output [2:0] ins,     // High 3 bits of instruction (opcode), derived from ins_p1
+    output [4:0] ad1,     // Low 5 bits of instruction (register address), derived from ins_p1
+    output [7:0] ad2      // Complete 8-bit instruction fetched from second source (ins_p2)
+);
+
+    // Internal registers to hold fetched instructions from different sources
+    reg [7:0] ins_p1;
+    reg [7:0] ins_p2;
+
+    // Always block triggered on rising edge of clock
+    always @(posedge clk) begin
+        // Check active low reset: when rst is 0, initialize both registers to 0
+        if (!rst) begin
+            ins_p1 <= 8'd0;
+            ins_p2 <= 8'd0;
+        end else begin
+            // Check fetch control signal and capture data accordingly
+            if (fetch == 2'b01) begin
+                // Fetch instruction from register source into ins_p1
+                ins_p1 <= data;
+            end else if (fetch == 2'b10) begin
+                // Fetch instruction from RAM/ROM source into ins_p2
+                ins_p2 <= data;
+            end
+            // If fetch is neither 2'b01 nor 2'b10, retain current values
+        end
+    end
+
+    // Derive outputs from the internal registers
+    // ins: opcode, the high 3 bits from ins_p1
+    assign ins = ins_p1[7:5];
+    // ad1: register address, the low 5 bits from ins_p1
+    assign ad1 = ins_p1[4:0];
+    // ad2: full 8-bit instruction stored in ins_p2
+    assign ad2 = ins_p2;
+
+endmodule

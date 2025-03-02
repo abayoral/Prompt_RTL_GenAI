@@ -1,0 +1,122 @@
+module radix2_div(
+    input         clk,
+    input         rst,
+    input         sign,       // 1 = signed division, 0 = unsigned
+    input  [7:0]  dividend,
+    input  [7:0]  divisor,
+    input         opn_valid,  // start operation when high
+    output reg    res_valid,  // result is valid when high
+    output reg [15:0] result   // {remainder[7:0], quotient[7:0]}
+);
+
+  // Internal registers and signals
+  // We implement an iterative restoring division algorithm using a (9-bit) shift register.
+  // The upper 8 bits of SR hold the current (partial) remainder and the lower bit is used to accumulate the quotient.
+  reg [8:0]  SR;         // Shift register, 9 bits
+  reg [7:0]  abs_dividend; // absolute value of dividend
+  reg [7:0]  abs_divisor;  // absolute value of divisor
+  reg [7:0]  NEG_DIVISOR;  // two's complement (negative) of abs_divisor: ~abs_divisor + 1
+  reg [3:0]  cnt;         // 4-bit counter (we need 8 iterations)
+  reg        busy;        // indicates that a division operation is in progress
+
+  // Temporary final quotient and remainder (before applying sign corrections)
+  reg [7:0]  final_q;
+  reg [7:0]  final_r;
+
+  // These wires are used in the iterative step.
+  // In each cycle we left‐shift SR by one. Let A = SR[8:1] represent the current remainder.
+  // Then, we compute (A – abs_divisor) by adding NEG_DIVISOR.
+  wire [8:0] SR_shift = SR << 1;       // SR shifted left by one bit
+  wire [7:0] A_orig   = SR_shift[8:1];   // candidate remainder after shift (8 bits)
+  wire [7:0] sub      = A_orig + NEG_DIVISOR; // perform subtraction A – abs_divisor
+
+  // The next value for SR is chosen by a multiplexer:
+  // if (sub) is nonnegative (i.e. its MSB = 0) then the subtraction was successful:
+  //   new SR <= {sub, 1'b1}    (the quotient bit is 1)
+  // else (sub is negative) the subtraction is undone (restoring step):
+  //   new SR <= {A_orig, 1'b0}   (the quotient bit is 0)
+  reg [8:0] SR_next;
+
+  // Main sequential block. All operations occur synchronous to clk.
+  always @(posedge clk or posedge rst) begin
+    if (rst) begin
+      busy      <= 1'b0;
+      res_valid <= 1'b0;
+      cnt       <= 4'd0;
+      SR        <= 9'd0;
+      result    <= 16'd0;
+      abs_dividend <= 8'd0;
+      abs_divisor  <= 8'd0;
+      NEG_DIVISOR  <= 8'd0;
+    end
+    else begin
+      // When a new valid operation is requested, and if no result is pending.
+      if (opn_valid && !busy && !res_valid) begin
+        busy <= 1'b1;
+        cnt  <= 4'd0;
+        // Compute the absolute values for dividend and divisor.
+        if (sign) begin
+          abs_dividend <= (dividend[7]) ? (~dividend + 1'b1) : dividend;
+          abs_divisor  <= (divisor[7])  ? (~divisor  + 1'b1) : divisor;
+        end
+        else begin
+          abs_dividend <= dividend;
+          abs_divisor  <= divisor;
+        end
+        // NEG_DIVISOR = two's complement of abs_divisor.
+        NEG_DIVISOR <= ~(( (divisor[7] && sign) ? (~divisor + 1'b1) : divisor )) + 1'b1;
+        // Initialize the shift register with the absolute dividend shifted left by one bit.
+        // This packs the 8-bit dividend (absolute value) into the upper 8 bits of SR; the LSB (quotient bit) is 0.
+        if (sign)
+          SR <= { (dividend[7] ? (~dividend + 1'b1) : dividend), 1'b0 };
+        else
+          SR <= { dividend, 1'b0 };
+      end
+      else if (busy) begin
+        // Compute next state of SR.
+        if (sub[7] == 1'b0)
+          SR_next = { sub, 1'b1 };
+        else
+          SR_next = { A_orig, 1'b0 };
+
+        // Update the shift register with the computed value.
+        SR  <= SR_next;
+        cnt <= cnt + 4'd1;
+
+        // After 8 iterations the division is complete.
+        if (cnt == 4'd7) begin
+          busy <= 1'b0;
+          // In the final SR_next, the lower 8 bits are the quotient and bits [8:1] form the remainder.
+          final_q <= SR_next[7:0];
+          final_r <= SR_next[8:1];
+          // For signed division, adjust the sign of the quotient and remainder appropriately.
+          if (sign) begin
+            // Quotient sign: if dividend and divisor had opposite signs, take two's complement.
+            if (dividend[7] ^ divisor[7])
+              final_q <= ~SR_next[7:0] + 1'b1;
+            else
+              final_q <= SR_next[7:0];
+            // Remainder sign: remainder takes the sign of the dividend.
+            if (dividend[7])
+              final_r <= ~SR_next[8:1] + 1'b1;
+            else
+              final_r <= SR_next[8:1];
+          end
+          else begin
+            final_q <= SR_next[7:0];
+            final_r <= SR_next[8:1];
+          end
+          // Pack remainder (upper 8 bits) and quotient (lower 8 bits) into the 16-bit result.
+          result    <= { final_r, final_q };
+          res_valid <= 1'b1;
+        end
+      end
+      // Once the result has been taken by external logic (indicated by opn_valid deasserting),
+      // clear the res_valid flag.
+      else if (res_valid && !opn_valid) begin
+        res_valid <= 1'b0;
+      end
+    end
+  end
+
+endmodule

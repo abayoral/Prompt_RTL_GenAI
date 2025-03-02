@@ -71,8 +71,8 @@ elif framework_name == "RoEm":
 else:
     script_path = None
 
-#prompt_directories = ["Sequential & FSMs", "Basic-Combinational", "Arithmetic & Data", "Modular & Advanced"]
-prompt_directories = ["Modular & Advanced"]; 
+prompt_directories = ["Sequential & FSMs", "Basic-Combinational", "Arithmetic & Data", "Modular & Advanced"]
+#prompt_directories = ["Modular & Advanced"]; 
 
 for prompt_dir in prompt_directories:
     prompts_dir = os.path.join(framework_directory, prompt_dir)

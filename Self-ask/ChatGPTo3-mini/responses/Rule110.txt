@@ -1,0 +1,1 @@
+Is it correct to assume that on every rising clock edge when load is low, the next state for all 512 cells is computed concurrently using the current q values (with the missing neighbors for q[0] and q[511] treated as zero), so that every cell updates based solely on the previous cycle's state?

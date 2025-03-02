@@ -1,0 +1,70 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg done
+);
+
+    // Define FSM states
+    localparam IDLE      = 2'b00,
+               DATA      = 2'b01,
+               STOP      = 2'b10,
+               WAIT_STOP = 2'b11;
+
+    reg [1:0] state, next_state;
+    reg [3:0] count; // 4-bit counter to count 8 data bits (0-7)
+
+    // State and counter update (synchronous with clock and reset)
+    always @(posedge clk) begin
+        if (reset) begin
+            state <= IDLE;
+            count <= 4'd0;
+            done  <= 1'b0;
+        end else begin
+            state <= next_state;
+            // Update counter only in the DATA state; otherwise, clear it.
+            if(state == DATA)
+                count <= count + 4'd1;
+            else
+                count <= 4'd0;
+            done <= (state == STOP && in == 1'b1) ? 1'b1 : 1'b0;
+        end
+    end
+
+    // Next state logic
+    always @(*) begin
+        case (state)
+            IDLE: begin
+                // In idle state, line is held high when no data is transmitted.
+                // Detect the falling edge representing the start bit (0).
+                if (in == 1'b0)
+                    next_state = DATA;
+                else
+                    next_state = IDLE;
+            end
+            DATA: begin
+                // Wait for 8 data bits. When count reaches 7, we have sampled 8 bits.
+                if (count == 4'd7)
+                    next_state = STOP;
+                else
+                    next_state = DATA;
+            end
+            STOP: begin
+                // Check for correct stop bit (1).
+                if (in == 1'b1)
+                    next_state = IDLE;  // Correct stop, byte is complete.
+                else
+                    next_state = WAIT_STOP; // Invalid stop, wait until a stop bit (1) appears.
+            end
+            WAIT_STOP: begin
+                // Remain in error state until seeing a stop bit.
+                if (in == 1'b1)
+                    next_state = IDLE;
+                else
+                    next_state = WAIT_STOP;
+            end
+            default: next_state = IDLE;
+        endcase
+    end
+
+endmodule

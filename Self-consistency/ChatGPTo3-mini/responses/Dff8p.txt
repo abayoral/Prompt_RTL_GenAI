@@ -1,0 +1,16 @@
+module top_module (
+    input clk,
+    input reset,
+    input [7:0] d,
+    output reg [7:0] q
+);
+
+    // On the negative edge of the clock, use a synchronous reset.
+    always @(negedge clk) begin
+        if (reset)
+            q <= 8'h34; // Reset to 0x34 when reset is active
+        else
+            q <= d;     // Otherwise, load D into the flip-flops
+    end
+
+endmodule

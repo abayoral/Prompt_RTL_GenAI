@@ -1,0 +1,17 @@
+module top_module (
+    input a, b, c, d, e,
+    output [24:0] out );
+
+    // Form a 25-bit vector for the left inputs by replicating each input 5 times.
+    // The ordering is: {5{a}}, then {5{b}}, then {5{c}}, then {5{d}}, then {5{e}}.
+    // Form a 25-bit vector for the right inputs by repeating the sequence {a, b, c, d, e} 5 times.
+    // The output bit is high if the corresponding bits are equal, implemented by doing:
+    //   (~left_bit) XOR right_bit  == XNOR(left_bit, right_bit)
+    assign out = (~{ {5{a}}, {5{b}}, {5{c}}, {5{d}}, {5{e}} })
+                  ^ ({ a, b, c, d, e,
+                       a, b, c, d, e,
+                       a, b, c, d, e,
+                       a, b, c, d, e,
+                       a, b, c, d, e });
+  
+endmodule

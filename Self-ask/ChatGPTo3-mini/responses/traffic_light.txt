@@ -1,0 +1,108 @@
+module traffic_light(
+    input rst_n,
+    input clk,
+    input pass_request,
+    output reg [7:0] clock,
+    output reg red,
+    output reg yellow,
+    output reg green
+);
+
+    // State encoding – we use four states:
+    // IDLE      : Initial state to load starting conditions.
+    // S1_RED    : Vehicular RED light active (pedestrian green).
+    // S3_GREEN  : Vehicular GREEN light active (pedestrian red).
+    // S2_YELLOW : Vehicular YELLOW light active (pedestrian red).
+    parameter IDLE      = 2'b00,
+              S1_RED    = 2'b01,
+              S2_YELLOW = 2'b10,
+              S3_GREEN  = 2'b11;
+              
+    reg [1:0] state, next_state;
+    reg [7:0] cnt, next_cnt;  // 8-bit counter
+
+    // Sequential block for state and counter update.
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state <= IDLE;
+            cnt <= 0;
+        end else begin
+            state <= next_state;
+            cnt <= next_cnt;
+        end
+    end
+
+    // Combinational block to determine next state and counter value.
+    always @(*) begin
+        // Default assignments: hold state and count.
+        next_state = state;
+        next_cnt = cnt;
+        case(state)
+            // In IDLE, immediately load the red phase (S1_RED) with its full duration.
+            IDLE: begin
+                next_state = S1_RED;
+                next_cnt = 10;  // Red phase lasts 10 clock cycles.
+            end
+            // S1_RED: Vehicular red is on for 10 cycles.
+            S1_RED: begin
+                if (cnt == 0) begin
+                    next_state = S3_GREEN;
+                    next_cnt = 60;  // Begin green phase normally with 60 cycles.
+                end else begin
+                    next_state = S1_RED;
+                    next_cnt = cnt - 1;
+                end
+            end
+            // S3_GREEN: Vehicular green is active.
+            // If a pedestrian button press (pass_request) occurs and more than 10 clock cycles remain,
+            // shorten the green phase to only 10 remaining cycles.
+            S3_GREEN: begin
+                if (pass_request && (cnt > 10))
+                    next_cnt = 10;
+                else if (cnt == 0) begin
+                    next_state = S2_YELLOW;
+                    next_cnt = 5;  // Yellow phase lasts 5 clock cycles.
+                end else begin
+                    next_cnt = cnt - 1;
+                end
+            end
+            // S2_YELLOW: Vehicular yellow is active for 5 cycles.
+            S2_YELLOW: begin
+                if (cnt == 0) begin
+                    next_state = S1_RED;
+                    next_cnt = 10;  // Then, return to red phase.
+                end else begin
+                    next_cnt = cnt - 1;
+                end
+            end
+            default: begin
+                next_state = IDLE;
+                next_cnt = 0;
+            end
+        endcase
+    end
+
+    // Combinational logic for output signals.
+    // Note on light pairing:
+    // When vehicular red (S1_RED) is active, pedestrian light would be green.
+    // However, because only vehicular signals are outputs, the pairing is implicit.
+    // When not in S1_RED (i.e. during GREEN or YELLOW phases), pedestrian crossing is not allowed.
+    always @(*) begin
+        // Default: all signals off.
+        red = 0;
+        yellow = 0;
+        green = 0;
+        case(state)
+            S1_RED:    red = 1;
+            S2_YELLOW: yellow = 1;
+            S3_GREEN:  green = 1;
+            default:   red = 1;  // If in IDLE or undefined, default to red.
+        endcase
+    end
+
+    // Drive the 8-bit clock output with the current counter value.
+    always @(*) begin
+        clock = cnt;
+    end
+
+endmodule

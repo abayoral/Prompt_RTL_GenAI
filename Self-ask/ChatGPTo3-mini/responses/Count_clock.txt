@@ -1,0 +1,126 @@
+// Clarifying question: 
+// "Can you specify the minimum guaranteed pulse width and whether the ena signal is asynchronous with respect to the clk domain, so that we know exactly how to design the necessary synchronization and pulse‐stretching logic?"
+
+// Verilog code:
+module top_module(
+    input clk,
+    input reset,
+    input ena,
+    output reg pm,
+    output [7:0] hh,
+    output [7:0] mm,
+    output [7:0] ss
+);
+
+    // Internal time registers:
+    // hr: hour counter (valid values 1 to 12)
+    // mn: minute counter (0 to 59)
+    // sc: second counter (0 to 59)
+    reg [3:0] hr;    // Only need 4 bits for 1-12
+    reg [5:0] mn, sc; // 6 bits for 0-59
+
+    // Synchronization registers for ena (to handle asynchronous or multi-cycle pulses)
+    reg ena_sync0, ena_sync1, ena_sync2;
+    reg ena_pulse; // One-clock-cycle enable pulse after synchronization
+
+    // Synchronize ena and detect rising edge to create a one-cycle pulse.
+    always @(posedge clk) begin
+        // 2-stage synchronization
+        ena_sync0 <= ena;
+        ena_sync1 <= ena_sync0;
+        // Delay for edge detection (3rd stage)
+        ena_sync2 <= ena_sync1;
+        // Detect rising edge of synchronized ena
+        ena_pulse <= ena_sync1 & ~ena_sync2;
+    end
+
+    // Time counter logic
+    always @(posedge clk) begin
+        if (reset) begin
+            // Reset clock to 12:00:00 AM
+            hr <= 4'd12;
+            mn <= 6'd0;
+            sc <= 6'd0;
+            pm <= 1'b0;  // 0 for AM
+        end else if (ena_pulse) begin
+            // Increment seconds
+            if (sc == 6'd59) begin
+                sc <= 6'd0;
+                // Increment minutes
+                if (mn == 6'd59) begin
+                    mn <= 6'd0;
+                    // Increment hours with 12-hour clock logic
+                    if (hr == 4'd11) begin
+                        // 11:59:59 toggles hours to 12 and flips pm.
+                        hr <= 4'd12;
+                        pm <= ~pm;
+                    end else if (hr == 4'd12) begin
+                        // 12:59:59 goes to 1:00:00; pm remains the same.
+                        hr <= 4'd1;
+                    end else begin
+                        hr <= hr + 4'd1;
+                    end
+                end else begin
+                    mn <= mn + 6'd1;
+                end
+            end else begin
+                sc <= sc + 6'd1;
+            end
+        end
+    end
+
+    // BCD conversion for the hour display (hh is two BCD digits)
+    reg [3:0] hh_tens, hh_ones;
+    always @* begin
+        if (hr < 4'd10) begin
+            hh_tens = 4'd0;
+            hh_ones = hr;
+        end else begin
+            hh_tens = 4'd1;
+            hh_ones = hr - 4'd10;
+        end
+    end
+
+    // BCD conversion for minutes (mm) and seconds (ss)
+    reg [3:0] mm_tens, mm_ones;
+    reg [3:0] ss_tens, ss_ones;
+    // Functionality: convert a number in the range 0-59 to two BCD digits.
+    // Use combinational logic.
+    always @* begin
+        // Minutes tens digit determination
+        if (mn >= 6'd50)
+            mm_tens = 4'd5;
+        else if (mn >= 6'd40)
+            mm_tens = 4'd4;
+        else if (mn >= 6'd30)
+            mm_tens = 4'd3;
+        else if (mn >= 6'd20)
+            mm_tens = 4'd2;
+        else if (mn >= 6'd10)
+            mm_tens = 4'd1;
+        else
+            mm_tens = 4'd0;
+        mm_ones = mn - (mm_tens * 4'd10);
+        
+        // Seconds tens digit determination
+        if (sc >= 6'd50)
+            ss_tens = 4'd5;
+        else if (sc >= 6'd40)
+            ss_tens = 4'd4;
+        else if (sc >= 6'd30)
+            ss_tens = 4'd3;
+        else if (sc >= 6'd20)
+            ss_tens = 4'd2;
+        else if (sc >= 6'd10)
+            ss_tens = 4'd1;
+        else
+            ss_tens = 4'd0;
+        ss_ones = sc - (ss_tens * 4'd10);
+    end
+
+    // Concatenate BCD digits into 8-bit outputs
+    assign hh = {hh_tens, hh_ones};
+    assign mm = {mm_tens, mm_ones};
+    assign ss = {ss_tens, ss_ones};
+
+endmodule

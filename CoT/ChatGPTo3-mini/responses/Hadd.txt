@@ -1,0 +1,10 @@
+module top_module( 
+    input a, b,
+    output cout, sum 
+);
+
+    // Half adder logic: sum is a XOR b, and carry out is a AND b.
+    assign sum = a ^ b;
+    assign cout = a & b;
+
+endmodule

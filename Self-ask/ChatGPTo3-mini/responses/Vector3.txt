@@ -1,0 +1,10 @@
+module top_module (
+    input  [4:0] a, b, c, d, e, f,
+    output [7:0] w, x, y, z
+);
+
+    // Concatenate the input vectors in the fixed order and append two 1 bits.
+    // The resulting 32-bit vector is then assigned in sequence to the outputs.
+    assign {w, x, y, z} = {a, b, c, d, e, f, 1'b1, 1'b1};
+
+endmodule

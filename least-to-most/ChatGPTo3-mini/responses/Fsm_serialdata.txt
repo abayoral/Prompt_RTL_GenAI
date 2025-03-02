@@ -1,0 +1,92 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output [7:0] out_byte,
+    output done
+);
+
+    // State encoding
+    localparam IDLE      = 2'd0;
+    localparam DATA      = 2'd1;
+    localparam STOP      = 2'd2;
+    localparam WAIT_STOP = 2'd3;
+
+    reg [1:0] state;
+    reg [2:0] count;      // Counts 0 to 7 for 8 data bits.
+    reg [7:0] data_reg;   // Datapath register for shifting in data bits.
+    reg done_reg;         // One-cycle pulse when a correct byte is received.
+
+    assign out_byte = data_reg;
+    assign done     = done_reg;
+
+    // FSM with datapath for serial byte reception.
+    // Protocol: idle high. When start bit (0) is detected (in IDLE), begin
+    // sampling 8 bits (LSB first) in state DATA via a shift register.
+    // Then check the stop bit in state STOP. If stop bit is high, assert 'done'
+    // and go back to IDLE. Otherwise, remain in WAIT_STOP until a stop bit appears.
+    always @(posedge clk) begin
+        if (reset) begin
+            state    <= IDLE;
+            count    <= 3'd0;
+            data_reg <= 8'd0;
+            done_reg <= 1'b0;
+        end
+        else begin
+            // Default: deassert done pulse.
+            done_reg <= 1'b0;
+            case (state)
+                IDLE: begin
+                    // Wait for start bit (logic 0).
+                    if (in == 1'b0) begin
+                        state <= DATA;
+                        count <= 3'd0;
+                        // Clear data register at the beginning of a frame.
+                        data_reg <= 8'd0;
+                    end
+                end
+
+                DATA: begin
+                    // Shift the incoming bit into data_reg.
+                    // The protocol sends LSB first. Using a right shift (data_reg[7:1])
+                    // with the new bit in MSB will build the byte as {d7,d6,...,d0},
+                    // where d0 is the first bit received and ends as the LSB.
+                    // However, since we are accumulating bits serially in order,
+                    // an equivalent implementation is to shift left:
+                    //    data_reg <= {in, data_reg[7:1]};
+                    // which will, after 8 clocks, form: {d7, d6, ..., d0} correctly.
+                    data_reg <= {in, data_reg[7:1]};
+                    if (count == 3'd7) begin
+                        // All 8 data bits have been shifted in.
+                        state <= STOP;
+                    end
+                    else begin
+                        count <= count + 1;
+                    end
+                end
+
+                STOP: begin
+                    // Verify stop bit: expecting a logic 1.
+                    if (in == 1'b1) begin
+                        done_reg <= 1'b1; // Valid byte received.
+                        state <= IDLE;
+                    end
+                    else begin
+                        // If incorrect stop bit, wait until a valid stop bit (1) is seen.
+                        state <= WAIT_STOP;
+                    end
+                end
+
+                WAIT_STOP: begin
+                    // Stay here until a stop bit (logic 1) is detected.
+                    if (in == 1'b1) begin
+                        state <= IDLE;
+                    end
+                end
+
+                default: state <= IDLE;
+            endcase
+        end
+    end
+
+endmodule

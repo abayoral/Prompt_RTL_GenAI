@@ -1,0 +1,32 @@
+module freq_diveven 
+  #(parameter NUM_DIV = 10)  // NUM_DIV must be an even number
+  (
+    input  wire clk,
+    input  wire rst_n,
+    output reg  clk_div
+  );
+
+  // Calculate half period; clk_div toggles every HALF input cycles.
+  localparam HALF = NUM_DIV / 2;
+
+  // 4-bit counter to track clock cycles up to HALF - 1.
+  reg [3:0] cnt;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      cnt     <= 4'd0;
+      clk_div <= 1'b0;
+    end 
+    else begin
+      // Count until the half-cycle count is reached.
+      if (cnt < (HALF - 1))
+        cnt <= cnt + 1;
+      else begin
+        // Once count reaches (HALF-1), toggle clk_div and reset counter.
+        cnt     <= 4'd0;
+        clk_div <= ~clk_div;
+      end
+    end
+  end
+
+endmodule

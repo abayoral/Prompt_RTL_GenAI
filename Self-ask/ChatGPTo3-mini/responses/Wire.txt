@@ -1,0 +1,8 @@
+module top_module(
+    input in,
+    output out
+);
+    // Continuous assignment connects the input directly to the output with no added logic
+    assign out = in;
+    
+endmodule

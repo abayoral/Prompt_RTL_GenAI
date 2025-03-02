@@ -1,0 +1,31 @@
+module top_module (
+    input      cpu_overheated,
+    output reg shut_off_computer,
+    input      arrived,
+    input      gas_tank_empty,
+    output reg keep_driving
+);
+
+// In a combinational block, you must assign every output on every execution path to avoid latch inference.
+
+// For shutting off the computer, we only shut it off when it's actually overheated.
+always @(*) begin
+    // Default output: computer remains on.
+    shut_off_computer = 0;
+    if (cpu_overheated) begin
+        shut_off_computer = 1;
+    end
+end
+
+// For driving, we want to keep driving only if we haven't arrived and we still have gas.
+// That is, stop driving if you've arrived or the gas tank is empty.
+always @(*) begin
+    // Default output: not driving.
+    keep_driving = 0;
+    
+    if (!arrived && !gas_tank_empty) begin
+        keep_driving = 1;
+    end
+end
+
+endmodule

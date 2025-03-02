@@ -1,0 +1,46 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // The Karnaugh map given was:
+    //              a'b'   a'b   ab    ab'
+    //     c'd'      0     1     0     1 
+    //     c'd       1     0     1     0 
+    //     cd        0     1     0     1 
+    //     cd'       1     0     1     0
+    //
+    // Noticing the pattern, we can list the minterms where the output is 1:
+    //   ~a b ~c ~d,   a ~b ~c ~d,
+    //   ~a ~b ~c d,   a b ~c d,
+    //   ~a b c d,     a ~b c d,
+    //   ~a ~b c ~d,   a b c ~d.
+    //
+    // Grouping the ones according to common factors, we find two groups:
+    //   Group 1 (where a XOR b appears): (a'b + ab') multiplies (~c~d + cd)
+    //   Group 2 (where a XNOR b appears): (a'b' + ab) multiplies (~c d + c~d)
+    //
+    // Since (a'b + ab') is a⊕b and (a'b' + ab) is the complement (a⊕b)¯,
+    // and similarly (~c~d + cd) is c XNOR d and (~c d + c~d) is c⊕d,
+    // the function becomes:
+    //
+    //    F = (a⊕b)(c xnor d) + ((a⊕b)¯)(c⊕d)
+    //
+    // Recognizing the standard form X·Y̅ + X̅·Y = X ⊕ Y, let X = a⊕b and Y = c⊕d.
+    // Thus, the simplified function is:
+    //
+    //    F = (a⊕b) ⊕ (c⊕d)
+    //
+    // Because XOR is associative, this further simplifies to:
+    //
+    //    F = a ⊕ b ⊕ c ⊕ d
+    //
+    // This function outputs 1 when an odd number of the inputs are high.
+    // The following assignment implements the simplified circuit:
+    
+    assign out = a ^ b ^ c ^ d;
+
+endmodule

@@ -1,0 +1,50 @@
+module full_adder(
+    input a,
+    input b,
+    input cin,
+    output sum,
+    output cout
+);
+    // Full-adder logic: sum is the XOR of the three inputs,
+    // and cout is generated when two or more inputs are high.
+    assign sum = a ^ b ^ cin;
+    assign cout = (a & b) | (a & cin) | (b & cin);
+endmodule
+
+module top_module( 
+    input [2:0] a, b,
+    input cin,
+    output [2:0] cout,
+    output [2:0] sum
+);
+    // Instantiate 3 full adders for the 3-bit binary ripple-carry adder.
+    // The carry-out of each full adder is provided on cout.
+    
+    // First full-adder: Least Significant Bit
+    full_adder fa0 (
+        .a(a[0]),
+        .b(b[0]),
+        .cin(cin),
+        .sum(sum[0]),
+        .cout(cout[0])
+    );
+    
+    // Second full-adder: Middle Bit
+    full_adder fa1 (
+        .a(a[1]),
+        .b(b[1]),
+        .cin(cout[0]), // carry propagates from the previous stage
+        .sum(sum[1]),
+        .cout(cout[1])
+    );
+    
+    // Third full-adder: Most Significant Bit
+    full_adder fa2 (
+        .a(a[2]),
+        .b(b[2]),
+        .cin(cout[1]),
+        .sum(sum[2]),
+        .cout(cout[2])  // Final carry-out
+    );
+    
+endmodule

@@ -1,0 +1,1 @@
+Is it correct to assume that a[0] and b[0] are the least significant bits so that the initial carry-in (cin) connects to the full adder for bit 0, and the carry propagates upward to a[99]/b[99]?

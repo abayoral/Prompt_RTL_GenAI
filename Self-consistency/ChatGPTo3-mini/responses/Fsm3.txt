@@ -1,0 +1,63 @@
+module top_module(
+    input clk,
+    input in,
+    input areset,
+    output reg out
+);
+
+    // State encoding
+    localparam A = 2'b00,
+               B = 2'b01,
+               C = 2'b10,
+               D = 2'b11;
+    
+    reg [1:0] state, next_state;
+    
+    // State flip-flops with asynchronous reset
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            state <= A;
+        else
+            state <= next_state;
+    end
+    
+    // Next state logic (Moore FSM)
+    always @* begin
+        case (state)
+            A: begin
+                if (in)
+                    next_state = B; // A -> B when in=1
+                else
+                    next_state = A; // Remain in A when in=0
+            end
+            B: begin
+                if (in)
+                    next_state = B; // Remain in B when in=1
+                else
+                    next_state = C; // B -> C when in=0
+            end
+            C: begin
+                if (in)
+                    next_state = D; // C -> D when in=1
+                else
+                    next_state = A; // C -> A when in=0
+            end
+            D: begin
+                if (in)
+                    next_state = B; // D -> B when in=1
+                else
+                    next_state = C; // D -> C when in=0
+            end
+            default: next_state = A;
+        endcase
+    end
+    
+    // Output logic (Moore machine: output depends only on state)
+    always @* begin
+        case (state)
+            D: out = 1'b1;
+            default: out = 1'b0;
+        endcase
+    end
+
+endmodule

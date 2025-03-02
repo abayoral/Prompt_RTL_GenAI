@@ -1,0 +1,12 @@
+module top_module( 
+    input [99:0] in,
+    output out_and,
+    output out_or,
+    output out_xor 
+);
+    // Perform reduction operations over the 100-bit input
+    assign out_and = &in;  // out_and is high if all bits in in are high.
+    assign out_or  = |in;  // out_or is high if at least one bit in in is high.
+    assign out_xor = ^in;  // out_xor is the XOR reduction of all bits in in.
+    
+endmodule

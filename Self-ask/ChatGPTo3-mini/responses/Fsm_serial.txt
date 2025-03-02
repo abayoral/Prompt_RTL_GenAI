@@ -1,0 +1,1 @@
+Is it required for the module to capture and output the received 8-bit data, or is it solely responsible for generating the one-clock-cycle done pulse indicating a correctly received byte?

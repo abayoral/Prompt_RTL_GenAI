@@ -1,0 +1,31 @@
+module top_module (
+    input clk,
+    input reset,
+    input [31:0] in,
+    output reg [31:0] out
+);
+
+    // Delay registers to detect a falling edge (1 -> 0) and to delay the set event by one clock cycle.
+    reg [31:0] prev;    // Holds previous state of "in"
+    reg [31:0] fall_dly; // Holds falling edge detection delayed one cycle
+
+    always @(posedge clk) begin
+        if (reset) begin
+            out      <= 32'b0;
+            prev     <= in;     // Initialize the previous state with current input
+            fall_dly <= 32'b0;
+        end else begin
+            // Set output bits that were scheduled from the previous falling edge detection.
+            // "out" latches a 1 until reset.
+            out <= out | fall_dly;
+            
+            // Detect falling edge in current cycle using previous cycle's "in"
+            // A falling edge occurs if the previous value was 1 and current value is 0.
+            fall_dly <= prev & ~in;
+            
+            // Update the previous value of input for the next cycle.
+            prev <= in;
+        end
+    end
+
+endmodule

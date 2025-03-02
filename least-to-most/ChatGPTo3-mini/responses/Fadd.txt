@@ -1,0 +1,10 @@
+module top_module( 
+    input a, b, cin,
+    output cout, sum
+);
+
+    // Full adder: sum is XOR of all three bits, and carry is generated when at least two inputs are high.
+    assign sum = a ^ b ^ cin;
+    assign cout = (a & b) | (a & cin) | (b & cin);
+
+endmodule

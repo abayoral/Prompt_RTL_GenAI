@@ -1,0 +1,40 @@
+module accu(
+    input         clk,
+    input         rst_n,
+    input  [7:0]  data_in,
+    input         valid_in,
+    output reg        valid_out,
+    output reg [9:0]  data_out
+);
+
+  reg [9:0] sum;
+  reg [1:0] count;  // Since we only need to count up to 4 inputs
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      sum       <= 10'd0;
+      count     <= 2'd0;
+      valid_out <= 1'b0;
+      data_out  <= 10'd0;
+    end else begin
+      // Default: valid_out is inactive unless set below
+      valid_out <= 1'b0;
+      
+      if (valid_in) begin
+        if (count == 2'd3) begin // This is the fourth valid input.
+          // Compute the sum with this fourth data_in.
+          // Using non-blocking assignments, the right-hand sides read the old sum value.
+          data_out  <= sum + data_in;
+          valid_out <= 1'b1;
+          // Reset the accumulation for the next sequence.
+          sum   <= 10'd0;
+          count <= 2'd0;
+        end else begin
+          sum   <= sum + data_in;
+          count <= count + 1'b1;
+        end
+      end
+    end
+  end
+
+endmodule

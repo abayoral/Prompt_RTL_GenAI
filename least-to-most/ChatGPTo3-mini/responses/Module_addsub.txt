@@ -1,0 +1,35 @@
+module top_module(
+    input  [31:0] a,
+    input  [31:0] b,
+    input         sub,
+    output [31:0] sum
+);
+
+    // Create a 32-bit wire with b inverted based on the sub signal.
+    // If sub is 1, b is inverted; if sub is 0, b remains unchanged.
+    wire [31:0] b_xor;
+    assign b_xor = b ^ {32{sub}};  // replicate 'sub' 32 times and XOR with b
+
+    // Carry wire between the two 16-bit adders.
+    wire c0;
+
+    // Instantiate the lower 16-bit adder.
+    // The sub signal serves as the carry-in, implementing two's complement subtraction.
+    add16 lower_adder (
+        .a   (a[15:0]),
+        .b   (b_xor[15:0]),
+        .cin (sub),
+        .sum (sum[15:0]),
+        .cout(c0)
+    );
+
+    // Instantiate the upper 16-bit adder.
+    add16 upper_adder (
+        .a   (a[31:16]),
+        .b   (b_xor[31:16]),
+        .cin (c0),
+        .sum (sum[31:16]),
+        .cout()  // output carry is not used
+    );
+
+endmodule

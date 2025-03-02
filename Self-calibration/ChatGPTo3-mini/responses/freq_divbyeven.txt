@@ -1,63 +1,72 @@
-Below is an improved version of the module. In the corrected code, we do the following:
+Below is a cleaned‐up version of your module. Although your original code would simulate and even synthesize correctly for NUM_DIV = 10, the following changes have been made for robustness and good coding style:
 
-1. Add a compile‐time check (via an initial block) to ensure that NUM_DIV is an even, nonzero number. This helps catch any mismatches early in simulation.
-2. Compute the required counter width using $clog2 so that the counter will scale correctly with different division factors. (Note that when HALF_DIV is 1, we ensure a minimum width of 1 bit.)
-3. Use meaningful naming (e.g. module name “freq_div_even”) so that the intent is clear.
+1. • A check has been added (in an initial block) to ensure at elaboration time that NUM_DIV is even. (Many tools support a generate-time or elaboration-time error.)
+2. • The width of the counter has been made parameterizable rather than hard‑coded to 4 bits. This makes the design more robust for different choices of NUM_DIV.
+3. • A local function “clog2” is defined so that the counter is allocated only as many bits as are needed for HALF_DIV. (This is a common Verilog idiom when making parameterized counters.)
 
-Here is the revised code:
+Below is the corrected module:
 
------------------------------------------------------------
-module freq_div_even #(parameter NUM_DIV = 4) (
-    input  wire clk,
-    input  wire rst_n,
-    output reg  clk_div
+---------------------------------------------------------------
+module freq_diveven #(parameter NUM_DIV = 10) (
+    input  clk,      // Input clock signal
+    input  rst_n,    // Active-low reset
+    output reg clk_div // Divided clock output (f_in/NUM_DIV)
 );
 
-    // Ensure that NUM_DIV is a nonzero even number.
-    // This compile-time check will stop simulation if NUM_DIV is odd.
+    // Check that NUM_DIV is even. If not, report an error at simulation startup.
     initial begin
-        if (NUM_DIV == 0) begin
-            $error("NUM_DIV must be nonzero.");
-            $finish;
-        end
         if (NUM_DIV % 2 != 0) begin
-            $error("NUM_DIV must be even.");
+            $error("ERROR: NUM_DIV (%0d) must be an even number", NUM_DIV);
             $finish;
         end
     end
 
-    // Calculate half of the division factor.
+    // HALF_DIV is the number of input clock cycles before toggling clk_div.
     localparam HALF_DIV = NUM_DIV / 2;
     
-    // Calculate the minimum width required for the counter.
-    // For HALF_DIV==1, ensure a minimum width of 1.
-    localparam COUNTER_WIDTH = (HALF_DIV > 1) ? $clog2(HALF_DIV) : 1;
+    // Function to calculate the ceiling of the log base-2 of a number.
+    function integer clog2;
+        input integer value;
+        integer i;
+        begin
+            clog2 = 0;
+            for (i = value - 1; i > 0; i = i >> 1)
+                clog2 = clog2 + 1;
+        end
+    endfunction
     
-    // Counter register of appropriate width.
-    reg [COUNTER_WIDTH-1:0] cnt;
+    // Bit-width for the counter; ensures that it is wide enough to count up to HALF_DIV-1.
+    localparam CNT_WIDTH = clog2(HALF_DIV);
     
+    // Parameterized counter.
+    reg [CNT_WIDTH-1:0] cnt;
+    
+    // Update logic for counter and clk_div.
+    // On every rising edge of clk or falling edge of rst_n, reset or update the counter.
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            cnt     <= {COUNTER_WIDTH{1'b0}};
+            cnt     <= {CNT_WIDTH{1'b0}};
             clk_div <= 1'b0;
         end else begin
-            // When the counter reaches HALF_DIV - 1, toggle the output clock
-            // and reset the counter.
+            // When the counter reaches HALF_DIV - 1, reset it and toggle clk_div.
             if (cnt == (HALF_DIV - 1)) begin
-                cnt     <= {COUNTER_WIDTH{1'b0}};
+                cnt     <= {CNT_WIDTH{1'b0}};
                 clk_div <= ~clk_div;
             end else begin
+                // Otherwise, increment the counter.
                 cnt <= cnt + 1'b1;
             end
         end
     end
 
 endmodule
------------------------------------------------------------
+---------------------------------------------------------------
 
-Explanation of changes:
-• The initial block checks for NUM_DIV==0 and for odd NUM_DIV, printing an error and halting simulation if the check fails.
-• The counter width is derived from HALF_DIV using $clog2, ensuring that the counter width scales with the half-period requirement.
-• The reset assignments use a replication operator (i.e. {COUNTER_WIDTH{1'b0}}) to clear the counter regardless of its width.
+Explanation of the changes:
 
-This version follows best practices for parameterized modules and improves overall robustness and readability.
+• The "initial" block checks the evenness of NUM_DIV. If it isn’t even, $error and $finish will stop simulation.
+• A local function "clog2" calculates the minimum number of bits required to count up to (HALF_DIV – 1).
+• The counter is declared with a width defined by CNT_WIDTH instead of a fixed [3:0] width. This is particularly useful if NUM_DIV is changed to a different value.
+• The remainder of the functionality remains the same: the clk_div output toggles every HALF_DIV input clock cycles giving an output frequency of clk/NUM_DIV.
+
+This version adheres to best coding practices and ensures that parameterization is handled in a robust way.

@@ -1,0 +1,45 @@
+module accu(
+    input        clk,
+    input        rst_n,
+    input  [7:0] data_in,
+    input        valid_in,
+    output reg        valid_out,
+    output reg [9:0]  data_out
+);
+
+    // Internal registers to hold the accumulation result and counter for number of valid inputs.
+    reg [9:0] sum;
+    reg [1:0] cnt;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Reset all internal registers and outputs.
+            sum       <= 10'd0;
+            cnt       <= 2'd0;
+            valid_out <= 1'b0;
+            data_out  <= 10'd0;
+        end else begin
+            // Default: valid_out is low unless we complete an accumulation cycle.
+            valid_out <= 1'b0;
+            
+            if (valid_in) begin
+                // When valid_in is high, add the input data to the cumulative sum.
+                // Note: In nonblocking assignments, the old sum is used in the condition.
+                if (cnt == 2'd3) begin
+                    // This is the fourth valid input.
+                    // Calculate the final sum: accumulate the current data_in with the previous sum.
+                    data_out  <= sum + data_in;
+                    valid_out <= 1'b1;   // Output is valid for one clock cycle.
+                    // Reset for the next accumulation cycle.
+                    sum       <= 10'd0;
+                    cnt       <= 2'd0;
+                end else begin
+                    // Otherwise, accumulate and increment the valid data count.
+                    sum <= sum + data_in;
+                    cnt <= cnt + 1;
+                end
+            end
+        end
+    end
+
+endmodule

@@ -1,85 +1,108 @@
-Below is an analysis and a revised solution.
+Below is one corrected version. In our revision we:
 
-──────────────────────────────
-1. Analysis of the Original Code
+• Added an initial “parameter‐check” so that a synthesis/simulation error is flagged if NUM_DIV is even. (Many tools won’t support such a check in synthesizable code, so you may wish to remove it in final production code.)  
+• Kept the original dual–edge design but “synchronized” the OR of the two internal clocks so that the module’s output is registered (reducing glitches caused by combining signals generated on different clock edges).  
+• Included comments to note that using both clock edges is generally discouraged in fully synchronous designs (and a PLL or alternative “one–clock–domain” design is usually preferred), but it is a common trick for odd–dividers.
 
-a) Dual‐edge–triggered logic and OR’ing clocks:
- • The original code uses two always blocks – one on clk’s rising edge and one on clk’s falling edge – each generating an auxiliary clock (clk_div1, clk_div2) and then OR’ing them together.
- • Although this “double‐edge” approach might seem to “average” the toggling to produce a near–50% duty cycle, using both posedge and negedge logic in a design is generally discouraged:
-  – It may not be supported by all synthesis tools or FPGAs.
-  – Combining asynchronously generated signals with a simple OR can lead to glitches and unpredictable timing.
- 
-b) Division logic for odd numbers:
- • Dividing by an odd number is inherently “asymmetric” (one edge period will be one clk cycle longer than the other). A well–tested solution is to use a single–edge design that toggles the output at two different counter values: one at the “half–period” count and one at the end of the period.
- 
-c) Best practice:
- • It is preferable to use a single always block triggered on a single clock edge. One common technique for an odd divider is to maintain a counter (from 0 to NUM_DIV–1) and toggle the output when the counter equals (NUM_DIV–1)/2 and again when the counter reaches NUM_DIV–1. This produces an output clock whose high/low times differ by one clk cycle (which is inevitable for odd division).
- 
-──────────────────────────────
-2. Corrected Version
+────────────────────────────────────────────
+Corrected Code:
 
-Below is the revised module using a single always block with only the rising edge used. This design avoids asynchronous OR’ing of two clocks and is far more robust for synthesis and simulation. Comments explain the operation:
-
-------------------------------------------------------------
-module freq_divbyodd #(
-    parameter NUM_DIV = 5  // Divide-by-odd number; e.g., for NUM_DIV=5 the output clock period = 5 cycles (with duty-cycle ≠ 50%)
-)(
-    input  clk,       // Primary clock
-    input  rst_n,     // Asynchronous active-low reset
-    output reg clk_div // Divided clock output
+//---------------------------------------------------------
+// freq_divbyodd.v
+//---------------------------------------------------------
+module freq_divbyodd #
+(
+  parameter NUM_DIV = 5  // Must be odd; default 5.
+)
+(
+  input       clk,      // Input clock
+  input       rst_n,    // Active low reset
+  output reg  clk_div   // Divided clock output (registered)
 );
 
-    // Calculate counter width – enough to count from 0 to NUM_DIV-1.
-    localparam CNT_WIDTH = $clog2(NUM_DIV);
-
-    // Counter register.
-    reg [CNT_WIDTH-1:0] cnt;
-
-    // Note: For an odd number division the output clock’s high and low phases will be asymmetric.
-    // When NUM_DIV = 5, for example, one phase will be 3 cycles and the other 2 cycles.
-    // We toggle clk_div at both (NUM_DIV-1)/2 and NUM_DIV-1.
-    //
-    // Operation:
-    //   - When the counter reaches (NUM_DIV-1)/2, toggle clk_div.
-    //   - When the counter reaches NUM_DIV-1, toggle clk_div again and reset the counter.
-    // This produces a divided clock with the correct period.
-    
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            cnt     <= 0;
-            clk_div <= 1'b0;
-        end 
-        else begin
-            // If counter reaches the maximum count
-            if (cnt == NUM_DIV - 1) begin
-                cnt     <= 0;
-                clk_div <= ~clk_div;
-            end
-            else begin
-                cnt <= cnt + 1;
-                // Toggle the output at the halfway count.
-                // Using integer division: (NUM_DIV-1)/2 yields the lower half point for odd NUM_DIV.
-                if (cnt == (NUM_DIV - 1) / 2)
-                    clk_div <= ~clk_div;
-            end
-        end
+  //-------------------------------------------------------------------------
+  // Check the parameter at simulation time. (For synthesis, remove or use a 
+  // generate block with proper error messaging if desired.)
+  //-------------------------------------------------------------------------
+  initial begin
+    if (NUM_DIV % 2 == 0) begin
+      $display("Error: NUM_DIV (%0d) must be an odd number.", NUM_DIV);
+      $finish;
     end
+  end
+
+  //-------------------------------------------------------------------------
+  // Internal registers for separate counters and divided clocks tapped on
+  // opposite edges of clk.
+  //-------------------------------------------------------------------------
+  reg [31:0] cnt1, cnt2;
+  reg        clk_div1, clk_div2;
+  wire       clk_div_raw;
+
+  //-------------------------------------------------------------------------
+  // Divided clock generation on rising edge.
+  // cnt1 counts 0 to NUM_DIV-1. When cnt1 equals (NUM_DIV >> 1) (i.e. half the 
+  // division factor using integer division), toggle clk_div1.
+  //-------------------------------------------------------------------------
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      cnt1     <= 0;
+      clk_div1 <= 0;
+    end else begin
+      if (cnt1 == NUM_DIV - 1)
+        cnt1 <= 0;
+      else
+        cnt1 <= cnt1 + 1;
+
+      // Note: using the “old” value of cnt1 (before update) is intentional.
+      if (cnt1 == (NUM_DIV >> 1))
+        clk_div1 <= ~clk_div1;
+    end
+  end
+
+  //-------------------------------------------------------------------------
+  // Divided clock generation on falling edge.
+  // cnt2 counts 0 to NUM_DIV-1. When cnt2 equals (NUM_DIV >> 1), toggle clk_div2.
+  //-------------------------------------------------------------------------
+  always @(negedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      cnt2     <= 0;
+      clk_div2 <= 0;
+    end else begin
+      if (cnt2 == NUM_DIV - 1)
+        cnt2 <= 0;
+      else
+        cnt2 <= cnt2 + 1;
+
+      if (cnt2 == (NUM_DIV >> 1))
+        clk_div2 <= ~clk_div2;
+    end
+  end
+
+  //-------------------------------------------------------------------------
+  // Combine the two divided clocks. Although OR–ing signals generated on different 
+  // edges is not typically recommended, this technique is a common trick to achieve 
+  // nearly 50% duty cycle when the divider factor is odd.
+  //-------------------------------------------------------------------------
+  assign clk_div_raw = clk_div1 | clk_div2;
+
+  //-------------------------------------------------------------------------
+  // Synchronize the combination to the main clock to reduce glitches.
+  //-------------------------------------------------------------------------
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      clk_div <= 0;
+    else
+      clk_div <= clk_div_raw;
+  end
 
 endmodule
+────────────────────────────────────────────
 
-------------------------------------------------------------
+Explanation:
 
-──────────────────────────────
-3. Explanation
+1. The rising–edge always block updates cnt1 and toggles clk_div1 when its count equals (NUM_DIV >> 1).  
+2. The falling–edge always block does the same for cnt2 and clk_div2.  
+3. The two divided clock signals are OR–ed into clk_div_raw; then a positive–edge–triggered always block registers that signal to produce the glitch–free output clk_div.
 
-• We now have one always block triggered on the rising edge of clk.
-• The counter (cnt) counts from 0 up to NUM_DIV–1.
-• When cnt equals (NUM_DIV-1)/2 (the “middle” of the period), we toggle clk_div.
-• When cnt reaches NUM_DIV–1, we toggle clk_div again and reset the counter.
-• This single edge–triggered scheme avoids combining asynchronous signals and is much friendlier for synthesis.
-• The output clock will have a period of NUM_DIV cycles; note that for odd division the duty cycle will not be 50% (which is unavoidable).
-
-──────────────────────────────
-4. Conclusion
-
-The revised module eliminates the potential glitches of dual–edge–triggering and asynchronous OR’ing. It adheres to best practices by using a single always block and produces a correct divided clock for an odd division factor.
+This revised module corrects potential hazards and follows best practices (with a note on dual–edge clocking) for an odd–divider implementation.

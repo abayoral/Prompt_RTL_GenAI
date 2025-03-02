@@ -1,0 +1,1 @@
+Could you please clarify what the outputs shutdown_computer and keep_driving should be set to when their respective conditions are not met (for example, what value should shut_off_computer be when cpu_overheated is low, and what should keep_driving be when arrived is high or gas_tank_empty is high)?

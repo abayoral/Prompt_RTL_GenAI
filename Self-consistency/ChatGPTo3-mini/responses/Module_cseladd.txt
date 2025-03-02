@@ -1,0 +1,59 @@
+module mux16_2to1(
+    input  [15:0] in0,
+    input  [15:0] in1,
+    input         sel,
+    output [15:0] out
+);
+    assign out = sel ? in1 : in0;
+endmodule
+
+module top_module(
+    input  [31:0] a,
+    input  [31:0] b,
+    output [31:0] sum
+);
+    // Internal wires for lower and upper summations and carry signals:
+    wire [15:0] sum_low;
+    wire [15:0] sum_high0, sum_high1, sum_high;
+    wire        c0, c0_hi, c1_hi;
+
+    // Lower 16-bit addition with a carry-in of 0.
+    add16 lower_adder (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum_low),
+        .cout(c0)
+    );
+
+    // Upper 16-bit addition computed assuming an incoming carry of 0.
+    add16 upper_adder0 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b0),
+        .sum(sum_high0),
+        .cout(c0_hi)
+    );
+
+    // Upper 16-bit addition computed assuming an incoming carry of 1.
+    add16 upper_adder1 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b1),
+        .sum(sum_high1),
+        .cout(c1_hi)
+    );
+
+    // Use a 16-bit 2-to-1 multiplexer to choose the correct upper sum
+    // based on the carry-out from the lower 16-bit adder.
+    mux16_2to1 mux_upper (
+        .in0(sum_high0),
+        .in1(sum_high1),
+        .sel(c0),
+        .out(sum_high)
+    );
+
+    // Concatenate the upper and lower sums to form the final 32-bit sum.
+    assign sum = {sum_high, sum_low};
+
+endmodule

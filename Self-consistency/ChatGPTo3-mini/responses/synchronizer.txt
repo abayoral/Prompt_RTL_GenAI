@@ -1,0 +1,61 @@
+module synchronizer (
+    input         clk_a,    // Clock domain for incoming data and enable
+    input         clk_b,    // Clock domain for synchronization and output
+    input         arstn,    // Asynchronous reset for clk_a domain (active-low)
+    input         brstn,    // Asynchronous reset for clk_b domain (active-low)
+    input         data_en,  // Enable signal in clk_a domain (data must be valid for at least 3 clk_b cycles)
+    input  [3:0]  data_in,  // 4-bit input data
+    output reg [3:0] dataout  // 4-bit synchronized output data
+);
+
+// Internal registers in the clk_a domain
+reg [3:0] data_reg;    // Register to latch data_in on clk_a when data_en is active
+reg       en_data_reg; // Latches data_en from clk_a
+
+// Internal registers in the clk_b domain for synchronization of enable signal
+reg       en_clap_one; // First stage synchronizer for the enable signal in clk_b domain
+reg       en_clap_two; // Second stage synchronizer for the enable signal in clk_b domain
+
+// Data capture in clk_a domain
+always @(posedge clk_a or negedge arstn) begin
+    if (!arstn) begin
+        data_reg    <= 4'b0;
+        en_data_reg <= 1'b0;
+    end
+    else begin
+        // Latch data_in only when data_en is asserted
+        if (data_en) begin
+            data_reg    <= data_in;
+            en_data_reg <= 1'b1;
+        end
+        else begin
+            // If enable is not active, clear the enable register.
+            // data_reg holds its value.
+            en_data_reg <= 1'b0;
+        end
+    end
+end
+
+// Synchronization and MUX-based output update in clk_b domain
+always @(posedge clk_b or negedge brstn) begin
+    if (!brstn) begin
+        en_clap_one <= 1'b0;
+        en_clap_two <= 1'b0;
+        dataout     <= 4'b0;
+    end
+    else begin
+        // Propagate the enable signal through two levels of synchronization
+        en_clap_one <= en_data_reg;
+        en_clap_two <= en_clap_one;
+        
+        // If the synchronized enable (after two clk_b cycles) is active,
+        // update dataout with the value from data_reg.
+        // Otherwise, retain the previous value of dataout.
+        if (en_clap_two)
+            dataout <= data_reg;
+        else
+            dataout <= dataout;
+    end
+end
+
+endmodule

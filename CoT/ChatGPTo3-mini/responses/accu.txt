@@ -1,0 +1,42 @@
+module accu(
+  input         clk,
+  input         rst_n,
+  input  [7:0]  data_in,
+  input         valid_in,
+  output reg        valid_out,
+  output reg [9:0]  data_out
+);
+
+  reg [9:0] sum;
+  reg [1:0] count;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      sum       <= 10'd0;
+      count     <= 2'd0;
+      valid_out <= 1'b0;
+      data_out  <= 10'd0;
+    end else begin
+      // Default: valid_out remains low unless explicitly set below
+      valid_out <= 1'b0;
+      
+      if (valid_in) begin
+        // Check if we are processing the fourth valid data
+        if (count == 2'd3) begin
+          // For the fourth input, add data_in to the current sum,
+          // produce the accumulated result and assert valid_out for one cycle.
+          data_out  <= sum + data_in;
+          valid_out <= 1'b1;
+          // Reset sum and counter after outputting the accumulated result.
+          sum   <= 10'd0;
+          count <= 2'd0;
+        end else begin
+          // Otherwise, accumulate the input and increment the counter.
+          sum   <= sum + data_in;
+          count <= count + 1'b1;
+        end
+      end
+    end
+  end
+
+endmodule

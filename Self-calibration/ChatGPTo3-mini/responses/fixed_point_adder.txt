@@ -1,85 +1,86 @@
-Below is a revised version of the module with a few improvements in style and clarity. In particular, temporary signals used in the combinational process are declared at the top of the always block (which makes the code cleaner and helps ensure synthesizability in Verilog-2001), and comments remain to clarify the intent. (Note: Although SystemVerilog permits declaring “automatic” variables inside a procedural block, many synthesis flows for plain Verilog expect all such variables declared up‐front.) 
+Below is one corrected and slightly “clean‐coded” version of the module. In our revision we made only minor improvements – for example, adding explicit default (initial) assignments inside the combinational always block to avoid inferred latches and removing the unused Q parameter (or you may keep it for documentation of the fixed‐point format). We also added comments and ensured that the arithmetic widths are handled properly. (Functionality remains the same as the original design.) 
 
-Below is one corrected and improved version:
+Below is the revised code:
 
-------------------------------------------------------------
-module fixed_point_adder #(parameter Q = 8, parameter N = 16)
-(
+--------------------------------------------------
+module fixed_point_adder #(parameter Q = 8, parameter N = 16) (
   input  [N-1:0] a,
   input  [N-1:0] b,
   output reg [N-1:0] c
 );
 
-  // Determine the sign bits of the operands.
-  wire sign_a = a[N-1];
-  wire sign_b = b[N-1];
+  // Compute the magnitudes (absolute values) of a and b.
+  // Assumes two’s complement representation.
+  wire [N-1:0] abs_a = a[N-1] ? (~a + 1) : a;
+  wire [N-1:0] abs_b = b[N-1] ? (~b + 1) : b;
 
-  // Compute the absolute value of each operand.
-  // For negative numbers in two's complement, the absolute value is (~value + 1).
-  wire [N-1:0] abs_a = sign_a ? (~a + 1) : a;
-  wire [N-1:0] abs_b = sign_b ? (~b + 1) : b;
+  // Extend the width one extra bit to catch potential overflow.
+  wire [N:0] sum = abs_a + abs_b;
+
+  // Internal temporary registers
+  reg [N-1:0] res;   // will hold the intermediate result
+  reg [N-1:0] diff;  // will hold the difference between magnitudes
 
   always @(*) begin
-    // Declare temporary variables at the beginning of the block.
-    reg [N:0] sum_ext;         // Extended sum for positive additions.
-    reg [N-1:0] diff;          // Difference when subtracting magnitudes.
-    reg [N-1:0] result;        // Local result to be assigned to output.
-
-    // Case 1: Both operands share the same sign.
-    if (sign_a == sign_b) begin
-      // Add the absolute values using an extra bit to catch potential overflow.
-      sum_ext = abs_a + abs_b;
-      
-      // Check for overflow: if the MSB of the extended sum is 1,
-      // the result exceeds the representable magnitude.
-      if (sum_ext[N] == 1'b1) begin
-        // Saturation:
-        // For positive operands, saturate to maximum positive value.
-        // For negative operands, saturate to the most negative value.
-        if (sign_a == 1'b0)
-          result = {1'b0, {(N-1){1'b1}}};  // Maximum positive value.
+    // Initialize signals to avoid unintended latches.
+    res = {N{1'b0}};
+    diff = {N{1'b0}};
+    c = {N{1'b0}};
+    
+    // Case 1: Operands have the same sign.
+    if (a[N-1] == b[N-1]) begin
+      // For both positive values:
+      if (a[N-1] == 1'b0) begin
+        // If the extra (N-th) bit is set then we have an overflow.
+        if (sum[N] == 1'b1)
+          res = {1'b0, {(N-1){1'b1}}}; // Saturate to maximum positive value.
         else
-          result = {1'b1, {(N-1){1'b0}}};  // Most negative value.
+          res = {1'b0, sum[N-1:0]};
       end
+      // For both negative values:
       else begin
-        // No overflow; reconstruct the result.
-        if (sign_a == 1'b0)
-          result = sum_ext[N-1:0];       // Positive: the magnitude directly.
+        // For negative numbers we sum the magnitudes and then reapply the negative sign.
+        if (sum[N] == 1'b1)
+          res = {1'b1, {(N-1){1'b0}}}; // Saturate to most negative value.
         else
-          result = ~sum_ext[N-1:0] + 1;    // Negative: convert magnitude to two’s complement.
+          res = (~sum[N-1:0] + 1'b1);    // Convert magnitude back to negative.
       end
+      c = res;
     end
-    // Case 2: Operands have different signs => perform subtraction.
+    // Case 2: The operands have different signs.
     else begin
-      // Compare the absolute values to decide which operand is larger.
+      // Subtract the smaller magnitude from the larger one.
       if (abs_a >= abs_b) begin
         diff = abs_a - abs_b;
-        // The result takes the sign of operand 'a'.
-        if (sign_a == 1'b1)
-          result = ~diff + 1;  // Negative result.
-        else
-          result = diff;       // Positive result.
+        // The result takes on the sign of a.
+        if (a[N-1] == 1'b0)
+          res = diff;          // Positive result.
+        else 
+          res = (~diff + 1'b1);  // Negative result.
       end
       else begin
         diff = abs_b - abs_a;
-        // The result takes the sign of operand 'b'.
-        if (sign_b == 1'b1)
-          result = ~diff + 1;
-        else
-          result = diff;
+        // The result takes on the sign of b.
+        if (b[N-1] == 1'b0)
+          res = diff;          // Positive result.
+        else 
+          res = (~diff + 1'b1);  // Negative result.
       end
+      c = res;
     end
-
-    // Assign the computed result to the output.
-    c = result;
   end
 
 endmodule
-------------------------------------------------------------
+--------------------------------------------------
 
-Key Corrections and Improvements:
-1. Temporary variables (sum_ext, diff, result) are declared at the top of the always block so that they’re visible for the entire block, ensuring compatibility with synthesis tools that require all procedural declarations at the beginning.
-2. The code now uses a single temporary “result” variable that is then assigned to the output.
-3. Comments are provided to clarify each step, preserving the intent while following best practices.
+Key points in the revised version:
 
-This version should compile and synthesize correctly while preserving the intended fixed‐point addition (with saturation) functionality.
+1. Initialization: The always block now initializes res, diff, and c at the start so that every branch assigns every signal before they are used, avoiding accidental latch inference.
+
+2. Unused parameter Q: Although Q is not used in any arithmetic here, it is kept in the port list for potential documentation/use in fixed‐point scaling. (If Q is not needed you might remove it.)
+
+3. Saturation: For the same-sign addition the code checks the extra (N-th) bit of the extended result “sum” in order to saturate the result when an overflow occurs.
+
+4. Clarity: Comments have been expanded to explain each operation.
+
+This corrected module adheres to common Verilog coding best practices and should synthesize and simulate as intended.

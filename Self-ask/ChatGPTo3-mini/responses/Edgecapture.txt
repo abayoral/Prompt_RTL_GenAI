@@ -1,0 +1,31 @@
+module top_module (
+    input clk,
+    input reset,
+    input [31:0] in,
+    output reg [31:0] out
+);
+
+    // Register to hold the previous value of in for falling edge detection.
+    reg [31:0] prev_in;
+    // Register to hold the falling edge detection that will be used to set 'out' in the next cycle.
+    reg [31:0] falling_edge_reg;
+
+    always @(posedge clk) begin
+        // Synchronous reset has precedence.
+        if (reset) begin
+            out <= 32'b0;
+            prev_in <= 32'b0;
+            falling_edge_reg <= 32'b0;
+        end else begin
+            // Set the output in the cycle after a falling edge is detected.
+            out <= out | falling_edge_reg;
+
+            // Compute falling edge for each bit: 1 in the previous cycle and 0 in the current cycle.
+            falling_edge_reg <= prev_in & ~in;
+
+            // Update prev_in for detection in the next cycle.
+            prev_in <= in;
+        end
+    end
+
+endmodule

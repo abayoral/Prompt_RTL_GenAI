@@ -1,0 +1,1 @@
+Is the intended functionality for out_xor to output a logic high when an odd number of the input bits in in[3:0] are high (i.e., functioning as an odd parity generator)?

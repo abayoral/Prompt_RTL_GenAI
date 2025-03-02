@@ -1,0 +1,30 @@
+module freq_diveven #(
+  parameter NUM_DIV = 4  // Must be even. For example, NUM_DIV = 4 divides the clock by 4.
+) (
+  input  wire clk,     // Input clock signal to be divided
+  input  wire rst_n,   // Active-low reset signal
+  output reg  clk_div  // Divided clock output
+);
+
+  // local parameter representing the half period count
+  localparam HALF = NUM_DIV / 2;  
+  // 4-bit counter to count cycles (ensure NUM_DIV is chosen such that HALF <= 16)
+  reg [3:0] cnt;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      cnt     <= 4'd0;
+      clk_div <= 1'b0;
+    end else begin
+      // When the counter is less than HALF - 1, increment it without toggling clk_div.
+      if (cnt < (HALF - 1)) begin
+        cnt <= cnt + 4'd1;
+      end else begin
+        // When count reaches (HALF - 1), reset the counter and toggle the clk_div.
+        cnt     <= 4'd0;
+        clk_div <= ~clk_div;
+      end
+    end
+  end
+
+endmodule

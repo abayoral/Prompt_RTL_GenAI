@@ -1,0 +1,65 @@
+module top_module (
+    input clk,
+    input reset,   // Synchronous active‐high reset
+    output [3:1] ena,
+    output [15:0] q
+);
+
+    // Each digit is a 4‐bit BCD counter.
+    // ones  : q[3:0]     (least-significant digit)
+    // tens  : q[7:4]
+    // hundreds: q[11:8]
+    // thousands: q[15:12]
+    //
+    // For the upper three digits (tens, hundreds, thousands) an enable signal
+    // is provided to indicate when the respective digit should be incremented.
+    
+    reg [3:0] ones;
+    reg [3:0] tens;
+    reg [3:0] hundreds;
+    reg [3:0] thousands;
+    
+    // Ones digit counter: Always counts every clock cycle.
+    always @(posedge clk) begin
+        if (reset)
+            ones <= 4'd0;
+        else
+            ones <= (ones == 4'd9) ? 4'd0 : ones + 4'd1;
+    end
+    
+    // Tens digit counter: Increment only when ones digit rolls over (i.e. was 9).
+    always @(posedge clk) begin
+        if (reset)
+            tens <= 4'd0;
+        else if (ones == 4'd9)
+            tens <= (tens == 4'd9) ? 4'd0 : tens + 4'd1;
+    end
+    
+    // Hundreds digit counter: Increment only when both ones and tens roll over.
+    always @(posedge clk) begin
+        if (reset)
+            hundreds <= 4'd0;
+        else if ((ones == 4'd9) && (tens == 4'd9))
+            hundreds <= (hundreds == 4'd9) ? 4'd0 : hundreds + 4'd1;
+    end
+    
+    // Thousands digit counter: Increment only when ones, tens, and hundreds roll over.
+    always @(posedge clk) begin
+        if (reset)
+            thousands <= 4'd0;
+        else if ((ones == 4'd9) && (tens == 4'd9) && (hundreds == 4'd9))
+            thousands <= (thousands == 4'd9) ? 4'd0 : thousands + 4'd1;
+    end
+    
+    // Combine the digits into the 16‐bit output.
+    assign q = {thousands, hundreds, tens, ones};
+    
+    // Generate enable outputs for the upper three digits.
+    // ena[1] indicates that the tens digit should be incremented,
+    // ena[2] for the hundreds digit,
+    // ena[3] for the thousands digit.
+    assign ena[1] = (ones == 4'd9);
+    assign ena[2] = (tens == 4'd9);
+    assign ena[3] = (hundreds == 4'd9);
+
+endmodule

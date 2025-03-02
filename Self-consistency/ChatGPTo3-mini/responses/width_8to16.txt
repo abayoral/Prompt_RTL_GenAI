@@ -1,0 +1,51 @@
+module width_8to16(
+    input         clk,
+    input         rst_n,
+    input         valid_in,
+    input  [7:0]  data_in,
+    output reg        valid_out,
+    output reg [15:0] data_out
+);
+
+    // Internal registers for storing the first 8-bit data and for pipeline output
+    reg       state;         // 0: waiting for first byte, 1: waiting for second byte
+    reg [7:0] data_temp;     // Store the first 8-bit input
+    reg       valid_pipe;    // Pipeline register for valid output (asserted one cycle later)
+    reg [15:0] data_pipe;    // Pipeline register for 16-bit output data
+
+    // Always block with asynchronous active low reset. 
+    // Data pairing occurs on two consecutive valid_in signals.
+    // The combined 16-bit output appears one clock cycle after the second valid input.
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state       <= 1'b0;
+            data_temp   <= 8'd0;
+            data_pipe   <= 16'd0;
+            valid_pipe  <= 1'b0;
+            data_out    <= 16'd0;
+            valid_out   <= 1'b0;
+        end
+        else begin
+            // Stage the previously computed output data one cycle later
+            data_out   <= data_pipe;
+            valid_out  <= valid_pipe;
+            valid_pipe <= 1'b0;    // Clear the pipeline valid flag by default
+
+            // Process a valid input
+            if (valid_in) begin
+                if (state == 1'b0) begin
+                    // Capture the first 8-bit data and move to next state
+                    data_temp <= data_in;
+                    state     <= 1'b1;
+                end
+                else begin
+                    // On the second valid input, combine with previous data
+                    data_pipe  <= {data_temp, data_in}; // First input becomes the MSB
+                    valid_pipe <= 1'b1;                // Mark the pipeline to output valid data next cycle
+                    state      <= 1'b0;                // Reset state for next conversion
+                end
+            end
+        end
+    end
+
+endmodule

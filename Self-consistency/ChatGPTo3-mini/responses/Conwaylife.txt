@@ -1,0 +1,67 @@
+module top_module(
+    input clk,
+    input load,
+    input [255:0] data,
+    output [255:0] q
+);
+
+    // Internal representation: a 16x16 grid; each row is a 16‐bit vector.
+    reg [15:0] matrix [0:15];
+    
+    // Temporary grid for computing the next state.
+    reg [15:0] next_matrix [0:15];
+    
+    integer r, c;
+    integer r_up, r_down, c_left, c_right;
+    integer neighbors;
+
+    // Update grid state on rising edge of clock.
+    always @(posedge clk) begin
+        if (load) begin
+            // Load initial state from 'data'
+            for (r = 0; r < 16; r = r + 1) begin
+                matrix[r] <= data[r*16 +: 16];
+            end
+        end else begin
+            // Compute the next state for each cell using Game of Life rules on a toroidal grid.
+            // Torus wrapping: use modulo arithmetic to wrap indices around.
+            for (r = 0; r < 16; r = r + 1) begin
+                for (c = 0; c < 16; c = c + 1) begin
+                    r_up   = (r == 0)    ? 15 : r - 1;
+                    r_down = (r == 15)   ? 0  : r + 1;
+                    c_left = (c == 0)    ? 15 : c - 1;
+                    c_right= (c == 15)   ? 0  : c + 1;
+                    
+                    // Sum the 8 neighbours.
+                    neighbors =  matrix[r_up][c_left] + matrix[r_up][c] + matrix[r_up][c_right]
+                               + matrix[r][c_left]                     + matrix[r][c_right]
+                               + matrix[r_down][c_left] + matrix[r_down][c] + matrix[r_down][c_right];
+                    
+                    // Apply the rules:
+                    // 2 neighbours: cell retains its state.
+                    // 3 neighbours: cell becomes alive.
+                    // Otherwise, cell becomes dead.
+                    if (neighbors == 2)
+                        next_matrix[r][c] = matrix[r][c];
+                    else if (neighbors == 3)
+                        next_matrix[r][c] = 1'b1;
+                    else
+                        next_matrix[r][c] = 1'b0;
+                end
+            end
+            
+            // Update the grid with the computed next state.
+            for (r = 0; r < 16; r = r + 1) begin
+                matrix[r] <= next_matrix[r];
+            end
+        end
+    end
+    
+    // Concatenate rows into a 256-bit vector.
+    // q[15:0] corresponds to row 0, q[31:16] to row 1, and so on.
+    assign q = { matrix[15], matrix[14], matrix[13], matrix[12],
+                 matrix[11], matrix[10], matrix[9],  matrix[8],
+                 matrix[7],  matrix[6],  matrix[5],  matrix[4],
+                 matrix[3],  matrix[2],  matrix[1],  matrix[0] };
+
+endmodule

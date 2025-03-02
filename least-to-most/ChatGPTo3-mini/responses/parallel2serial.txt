@@ -1,0 +1,41 @@
+module parallel2serial(
+    input        clk,
+    input        rst_n,
+    input  [3:0] d,
+    output reg   valid_out,
+    output reg   dout
+);
+
+  // Counter to track the current bit position (0 to 3)
+  reg [1:0] cnt;
+
+  // Sequential logic: on each clock cycle output one bit starting from MSB (d[3])
+  // and raise valid_out during the transmission of 4 bits.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      cnt       <= 2'd0; // reset counter to 0
+      dout      <= 1'b0;
+      valid_out <= 1'b0;
+    end 
+    else begin
+      // Set valid output high during the bit transmission sequence
+      valid_out <= 1'b1;
+      
+      // Output the bit corresponding to the current counter value
+      case (cnt)
+        2'd0: dout <= d[3];  // MSB first
+        2'd1: dout <= d[2];
+        2'd2: dout <= d[1];
+        2'd3: dout <= d[0];  // LSB last
+        default: dout <= 1'b0;
+      endcase
+      
+      // Update counter: if it's the last bit, reset it to 0, otherwise increment it
+      if (cnt == 2'd3)
+        cnt <= 2'd0;
+      else
+        cnt <= cnt + 2'd1;
+    end
+  end
+
+endmodule

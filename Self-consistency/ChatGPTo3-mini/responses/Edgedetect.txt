@@ -1,0 +1,27 @@
+module top_module (
+    input clk,
+    input [7:0] in,
+    output [7:0] pedge
+);
+
+    // Register to hold the previous value of 'in'
+    reg [7:0] prev;
+    // Temporary register to capture the edge detection event (0 -> 1 transition)
+    reg [7:0] detect;
+    // Output register; pedge output is one cycle delayed from the detection event
+    reg [7:0] pedge_reg;
+    
+    // On each positive clock edge, update the registers
+    always @(posedge clk) begin
+        // The pedge output is set using the detection value from the previous cycle.
+        pedge_reg <= detect;
+        // For each bit, if the previous value was 0 and the current value is 1, set detect
+        detect <= (~prev) & in;
+        // Update the previous input register for the next cycle
+        prev <= in;
+    end
+    
+    // Connect the internal register to the module output.
+    assign pedge = pedge_reg;
+
+endmodule

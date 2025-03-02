@@ -1,0 +1,32 @@
+module andgate (
+    output out,
+    input  a,
+    input  b,
+    input  c,
+    input  d,
+    input  e
+);
+    assign out = a & b & c & d & e;
+endmodule
+
+module top_module (
+    input  a,
+    input  b,
+    input  c,
+    output out
+);
+    wire and_out;
+    
+    // Instantiate the AND gate with unused inputs tied to logic high.
+    andgate inst1 (
+        .out(and_out),
+        .a(a),
+        .b(b),
+        .c(c),
+        .d(1'b1),
+        .e(1'b1)
+    );
+    
+    // Invert the AND output to implement the required NAND function.
+    assign out = ~and_out;
+endmodule

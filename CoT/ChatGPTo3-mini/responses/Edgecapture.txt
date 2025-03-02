@@ -1,0 +1,44 @@
+module top_module (
+    input clk,
+    input reset,
+    input [31:0] in,
+    output reg [31:0] out
+);
+
+    // in_d holds the previous cycle's input
+    reg [31:0] in_d;
+    // set_pending holds the detected falling edge events (1-to-0 transitions)
+    // from the previous cycle that will cause the output bits to latch high.
+    reg [31:0] set_pending;
+    
+    // Each output bit behaves like an SR flip-flop:
+    // - It is set (to 1) in the cycle following a falling transition
+    //   (i.e. from 1 in one cycle to 0 in the next) of the corresponding input bit.
+    // - It is asynchronously reset (i.e. becomes 0) at the clock edge when reset is high.
+    //
+    // The falling edge is detected by comparing the delayed (stored) input with the
+    // current input value. The set event is pipelined by one clock cycle so that
+    // the output is only updated one clock after the transition.
+    //
+    // Note: If a reset and a set event occur simultaneously the reset takes precedence.
+    
+    always @(posedge clk) begin
+        if (reset) begin
+            // Synchronous reset: clear the outputs and the pending set events.
+            out         <= 32'd0;
+            set_pending <= 32'd0;
+            in_d        <= in; // Update the delayed input to avoid false detection.
+        end else begin
+            // Set bits that had a detected falling transition in the previous cycle.
+            out <= out | set_pending;
+            
+            // Detect falling edge for each bit:
+            // A falling edge on bit i is detected when in_d[i] was 1 and the current in[i] is 0.
+            set_pending <= in_d & ~in;
+            
+            // Update the delayed version of in for the next cycle.
+            in_d <= in;
+        end
+    end
+
+endmodule

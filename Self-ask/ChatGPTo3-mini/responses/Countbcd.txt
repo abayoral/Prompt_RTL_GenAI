@@ -1,0 +1,1 @@
+Does the counter roll over from 9999 back to 0000 continuously, or should it stop counting at 9999 until a reset occurs?

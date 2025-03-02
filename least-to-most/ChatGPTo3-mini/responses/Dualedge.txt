@@ -1,0 +1,27 @@
+module top_module (
+    input clk,
+    input d,
+    output q
+);
+
+    // Two internal registers: one samples d at the positive edge,
+    // the other samples d at the negative edge.
+    reg pos_ff;
+    reg neg_ff;
+    
+    // Positive-edge triggered flip-flop
+    always @(posedge clk) begin
+        pos_ff <= d;
+    end
+    
+    // Negative-edge triggered flip-flop
+    always @(negedge clk) begin
+        neg_ff <= d;
+    end
+    
+    // Combine the two sampled values to mimic a dual-edge triggered flip-flop.
+    // When clk is high, output the value sampled at the positive edge.
+    // When clk is low, output the value sampled at the negative edge.
+    assign q = clk ? pos_ff : neg_ff;
+
+endmodule

@@ -1,84 +1,76 @@
-Below is one acceptable corrected version. Note that the original stage1 “rotate by 4” was correct (since (i–4) mod 8 is equivalent to (i+4) mod 8), but stage2 and stage3 used subtraction (i–2 and i–1) so that when all control signals are high the net rotation is (i–7) mod 8 rather than the intended left‐rotate by 7 (i+7 mod 8). In other words, if you want a left rotate by K bits then, for each stage, the next stage’s bit i should come from stage_in[(i + shift) mod width]. One acceptable fix is to change stage2 and stage3 so that they add the shift amounts. (There are many ways to write a barrel shifter; here we simply fix the “+”/“–” sign.)
+Below is one acceptable corrected version. Note that the original code was actually functionally correct (there were no syntax or logical errors). However, the revised version below shows some best‐practice improvements such as parameterizing the data width, adding a timescale directive, and including some comments. You can use either version as long as your requirements are met.
 
-Below is the revised code:
-
--------------------------------------------------------
+------------------------------------------------------------
 `timescale 1ns/1ps
-// It is good practice to disable implicit nets.
-`default_nettype none
 
-module mux2X1(
-    input  a,
-    input  b,
-    input  sel,
-    output y
+// Parameterized 2-to-1 multiplexer.
+module mux2X1 #(
+    parameter WIDTH = 8
+) (
+    input  [WIDTH-1:0] a,
+    input  [WIDTH-1:0] b,
+    input              sel,
+    output [WIDTH-1:0] y
 );
-  // If sel is high, choose b; otherwise choose a.
-  assign y = sel ? b : a;
+    assign y = sel ? b : a;
 endmodule
 
-
-module barrel_shifter(
-    input  [7:0] in,
-    input  [2:0] ctrl,  // ctrl[2]: shift by 4, ctrl[1]: shift by 2, ctrl[0]: shift by 1
-    output [7:0] out
+// Parameterized barrel shifter that performs a left rotate
+// The rotate amount is specified by a 3-bit control. For an 8-bit wide bus,
+// ctrl[0] rotates by 1, ctrl[1] rotates by 2, and ctrl[2] rotates by 4.
+module barrel_shifter #(
+    parameter WIDTH = 8
+) (
+    input  [WIDTH-1:0] in,
+    input  [2:0]       ctrl,
+    output [WIDTH-1:0] out
 );
-  // The intended operation is a rotate left by:
-  //   4*ctrl[2] + 2*ctrl[1] + 1*ctrl[0] bits.
-  // For a left rotate by K, we want:
-  //    stage_out[i] = stage_in[(i + K) mod 8]
-  //
-  // We implement it in three stages:
-  //  Stage1: Rotate left by 4 (if ctrl[2]==1)
-  //  Stage2: Rotate left by 2 (if ctrl[1]==1)
-  //  Stage3: Rotate left by 1 (if ctrl[0]==1)
-  
-  wire [7:0] stage1;
-  wire [7:0] stage2;
-  wire [7:0] stage3;
-  
-  // Stage1: Rotate left by 4.
-  // For each bit i: if ctrl[2]==1 then stage1[i] = in[(i+4)%8] else stage1[i]= in[i].
-  mux2X1 m0_0(.a(in[0]), .b(in[4]), .sel(ctrl[2]), .y(stage1[0]));
-  mux2X1 m0_1(.a(in[1]), .b(in[5]), .sel(ctrl[2]), .y(stage1[1]));
-  mux2X1 m0_2(.a(in[2]), .b(in[6]), .sel(ctrl[2]), .y(stage1[2]));
-  mux2X1 m0_3(.a(in[3]), .b(in[7]), .sel(ctrl[2]), .y(stage1[3]));
-  mux2X1 m0_4(.a(in[4]), .b(in[0]), .sel(ctrl[2]), .y(stage1[4]));
-  mux2X1 m0_5(.a(in[5]), .b(in[1]), .sel(ctrl[2]), .y(stage1[5]));
-  mux2X1 m0_6(.a(in[6]), .b(in[2]), .sel(ctrl[2]), .y(stage1[6]));
-  mux2X1 m0_7(.a(in[7]), .b(in[3]), .sel(ctrl[2]), .y(stage1[7]));
-  
-  // Stage2: Rotate left by 2.
-  // For each bit i: if ctrl[1]==1 then stage2[i] = stage1[(i+2)%8] else stage2[i] = stage1[i].
-  mux2X1 m1_0(.a(stage1[0]), .b(stage1[2]), .sel(ctrl[1]), .y(stage2[0]));
-  mux2X1 m1_1(.a(stage1[1]), .b(stage1[3]), .sel(ctrl[1]), .y(stage2[1]));
-  mux2X1 m1_2(.a(stage1[2]), .b(stage1[4]), .sel(ctrl[1]), .y(stage2[2]));
-  mux2X1 m1_3(.a(stage1[3]), .b(stage1[5]), .sel(ctrl[1]), .y(stage2[3]));
-  mux2X1 m1_4(.a(stage1[4]), .b(stage1[6]), .sel(ctrl[1]), .y(stage2[4]));
-  mux2X1 m1_5(.a(stage1[5]), .b(stage1[7]), .sel(ctrl[1]), .y(stage2[5]));
-  mux2X1 m1_6(.a(stage1[6]), .b(stage1[0]), .sel(ctrl[1]), .y(stage2[6]));
-  mux2X1 m1_7(.a(stage1[7]), .b(stage1[1]), .sel(ctrl[1]), .y(stage2[7]));
-  
-  // Stage3: Rotate left by 1.
-  // For each bit i: if ctrl[0]==1 then stage3[i] = stage2[(i+1)%8] else stage3[i] = stage2[i].
-  mux2X1 m2_0(.a(stage2[0]), .b(stage2[1]), .sel(ctrl[0]), .y(stage3[0]));
-  mux2X1 m2_1(.a(stage2[1]), .b(stage2[2]), .sel(ctrl[0]), .y(stage3[1]));
-  mux2X1 m2_2(.a(stage2[2]), .b(stage2[3]), .sel(ctrl[0]), .y(stage3[2]));
-  mux2X1 m2_3(.a(stage2[3]), .b(stage2[4]), .sel(ctrl[0]), .y(stage3[3]));
-  mux2X1 m2_4(.a(stage2[4]), .b(stage2[5]), .sel(ctrl[0]), .y(stage3[4]));
-  mux2X1 m2_5(.a(stage2[5]), .b(stage2[6]), .sel(ctrl[0]), .y(stage3[5]));
-  mux2X1 m2_6(.a(stage2[6]), .b(stage2[7]), .sel(ctrl[0]), .y(stage3[6]));
-  mux2X1 m2_7(.a(stage2[7]), .b(stage2[0]), .sel(ctrl[0]), .y(stage3[7]));
-  
-  assign out = stage3;
+
+    // Stage 0: Rotate left by 1 if ctrl[0]==1
+    wire [WIDTH-1:0] shift1;
+    // Concatenate bits: lower WIDTH-1 bits of in and the MSB of in
+    assign shift1 = {in[WIDTH-2:0], in[WIDTH-1]};
+    wire [WIDTH-1:0] stage0;
+    mux2X1 #(.WIDTH(WIDTH)) u_mux0(
+        .a(in),
+        .b(shift1),
+        .sel(ctrl[0]),
+        .y(stage0)
+    );
+
+    // Stage 1: Rotate left by 2 if ctrl[1]==1 applied to stage0 output
+    wire [WIDTH-1:0] shift2;
+    assign shift2 = {stage0[WIDTH-3:0], stage0[WIDTH-1:WIDTH-2]};
+    wire [WIDTH-1:0] stage1;
+    mux2X1 #(.WIDTH(WIDTH)) u_mux1(
+        .a(stage0),
+        .b(shift2),
+        .sel(ctrl[1]),
+        .y(stage1)
+    );
+
+    // Stage 2: Rotate left by 4 if ctrl[2]==1 applied to stage1 output
+    wire [WIDTH-1:0] shift4;
+    assign shift4 = {stage1[WIDTH-5:0], stage1[WIDTH-1:WIDTH-4]};
+    mux2X1 #(.WIDTH(WIDTH)) u_mux2(
+        .a(stage1),
+        .b(shift4),
+        .sel(ctrl[2]),
+        .y(out)
+    );
+
 endmodule
+------------------------------------------------------------
 
-`default_nettype wire
--------------------------------------------------------
+Explanation of the Improvements:
 
-Explanations:
-1. In stage1 we already had the correct mapping for a rotate by 4 (notice that addition or subtraction by 4 are equivalent modulo 8).
-2. In stage2 and stage3 the mux “b” inputs have been changed to use (i+2) and (i+1) respectively, so that when the corresponding control bit is asserted, the data is taken from the bit that is “shifted‐left” by the proper amount.
-3. Finally, using these three stages the net rotation is by 4*ctrl[2] + 2*ctrl[1] + 1*ctrl[0] bits, as specified.
+1. Parameterization:  
+   Both modules now use a parameter WIDTH so that the data width can be easily adjusted if desired.
 
-This version should be syntactically and functionally correct and follows common best–practices.
+2. Timescale Directive:  
+   A timescale directive (`timescale 1ns/1ps`) has been added to specify simulation time units and precision.
+
+3. Comments:  
+   Additional comments clarify the functionality and design choices.
+
+While the original code was correct, these modifications improve readability, maintainability, and reusability.

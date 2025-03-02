@@ -1,0 +1,24 @@
+module top_module (
+    input clk,
+    input d,
+    output q
+);
+
+    reg q_pos, q_neg;
+
+    // Positive edge flip-flop capturing d on rising clock edge
+    always @(posedge clk) begin
+        q_pos <= d;
+    end
+
+    // Negative edge flip-flop capturing d on falling clock edge
+    always @(negedge clk) begin
+        q_neg <= d;
+    end
+
+    // Multiplexer to select the appropriate value based on the current level of clk.
+    // When clk is high, q_pos holds the value sampled on the last positive edge.
+    // When clk is low, q_neg holds the value sampled on the last negative edge.
+    assign q = clk ? q_pos : q_neg;
+
+endmodule

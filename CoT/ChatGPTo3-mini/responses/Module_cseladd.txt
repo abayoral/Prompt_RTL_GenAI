@@ -1,0 +1,58 @@
+module mux16_2(
+    input [15:0] d0,
+    input [15:0] d1,
+    input sel,
+    output [15:0] y
+);
+    // 16-bit 2-to-1 multiplexer: if sel is 1 choose d1, else choose d0
+    assign y = sel ? d1 : d0;
+endmodule
+
+module top_module(
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+
+    wire [15:0] lower_sum, upper_sum0, upper_sum1, upper_sum;
+    wire carry_lower, carry_upper0, carry_upper1;
+
+    // Lower 16-bit addition: add a[15:0] and b[15:0] with carry in 0
+    add16 lower_add (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(lower_sum),
+        .cout(carry_lower)
+    );
+
+    // Upper 16-bit addition assuming carry in = 0
+    add16 upper_add0 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b0),
+        .sum(upper_sum0),
+        .cout(carry_upper0)
+    );
+
+    // Upper 16-bit addition assuming carry in = 1
+    add16 upper_add1 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b1),
+        .sum(upper_sum1),
+        .cout(carry_upper1)
+    );
+
+    // 16-bit multiplexer to select the correct upper sum based on carry_lower from lower 16-bit adder.
+    mux16_2 mux_upper (
+        .d0(upper_sum0),
+        .d1(upper_sum1),
+        .sel(carry_lower),
+        .y(upper_sum)
+    );
+
+    // Final 32-bit sum formed by concatenating the selected upper sum with the lower sum.
+    assign sum = {upper_sum, lower_sum};
+
+endmodule

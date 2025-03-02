@@ -1,10 +1,11 @@
-Below is one acceptable corrected version. Note that your original code was essentially correct. One common best‐practice improvement is to simplify the overflow detection by noting that, for subtraction in two’s complement, overflow occurs when the sign of A differs from the sign of B and the sign of the result differs from the sign of A. That condition can be written more compactly as:
+Below is one corrected version. In fact, the original code is functionally correct, but the overflow‐detection logic can be written in a more conventional and compact way using the well‐known two’s complement overflow condition for subtraction. One common way to detect overflow for A – B is to note that overflow occurs when the sign of A and B differ and the sign of the result differs from A. That is, using the condition
 
   overflow = (A[63] ^ B[63]) & (A[63] ^ result[63]);
 
-Below is the revised module incorporating that improvement along with a few minor stylistic changes for clarity.
+Below is the revised module using that approach (with a few minor stylistic improvements):
 
-------------------------------------------------------------
+------------------------------------------------
+`timescale 1ns / 1ps
 module sub_64bit(
     input  signed [63:0] A,
     input  signed [63:0] B,
@@ -12,19 +13,25 @@ module sub_64bit(
     output              overflow
 );
 
-    // Subtract B from A
-    assign result = A - B;
-    
-    // Overflow detection for two's complement subtraction:
-    // Overflow occurs if the sign of A and B are different, but the sign of A
-    // does not match the sign of the result.
-    assign overflow = (A[63] ^ B[63]) & (A[63] ^ result[63]);
+  // Perform subtraction
+  assign result = A - B;
 
-endmodule
-------------------------------------------------------------
+  // Overflow detection: For two's complement subtraction A - B, overflow 
+  // occurs if A and B have different signs and the sign of result is different from A.
+  assign overflow = (A[63] ^ B[63]) & (A[63] ^ result[63]);
 
-Explanation of changes:
-1. The overflow expression was changed to a more compact form. It is mathematically equivalent to your original formulation.
-2. Comments were updated to clearly explain the overflow condition.
+endmodule`
+------------------------------------------------
 
-Either formulation is correct; this version just follows a common best-practice style.
+Explanations:
+
+1. The original overflow logic was correct if read carefully:
+  - When A is positive (A[63]=0) and B is negative (B[63]=1), overflow occurs if result[63] becomes 1.
+  - When A is negative (A[63]=1) and B is positive (B[63]=0), overflow occurs if result[63] becomes 0.
+  This is equivalent to checking that A[63] ≠ B[63] and result[63] ≠ A[63].
+
+2. The rewritten overflow expression is more standard and easier to understand.
+
+3. A timescale directive was added (it’s optional) for simulation purposes.
+
+This version adheres to best practices and security (no unintended latches, proper use of combinational assignment, clear overflow detection), making the design both clear and robust.

@@ -1,0 +1,70 @@
+module fixed_point_adder #(parameter Q = 8,        // number of fractional bits
+                           parameter N = 16)       // total bit-width
+   (input  [N-1:0] a,       // first fixed‐point operand
+    input  [N-1:0] b,       // second fixed‐point operand
+    output [N-1:0] c);      // fixed‐point result
+
+  // Internal register to hold final result
+  reg [N-1:0] res;
+  
+  // Extract sign bits
+  wire sign_a = a[N-1];
+  wire sign_b = b[N-1];
+
+  // Compute absolute values using two's complement conversion when negative
+  wire [N-1:0] abs_a = sign_a ? (~a + 1) : a;
+  wire [N-1:0] abs_b = sign_b ? (~b + 1) : b;
+
+  // For addition, we use one extra bit to capture potential overflow in magnitude addition.
+  wire [N:0] sum = {1'b0, abs_a} + {1'b0, abs_b};
+
+  // Wires for subtraction case
+  reg [N-1:0] diff;
+  reg sign_out;   // sign of the result in subtraction
+  
+  // Combinational logic for fixed-point addition/subtraction based on sign comparison.
+  always @(*) begin
+    if (sign_a == sign_b) begin
+      // When both operands have the same sign, perform addition on their absolute values.
+      // Check for magnitude overflow by inspecting the extra MSB.
+      if (sum[N]) begin
+        // Overflow condition: saturate result.
+        // For positive numbers, maximum positive value is 0 followed by all 1's 
+        // (i.e. 2^(N-1)-1). For negative numbers, saturate to the most negative value.
+        if (sign_a == 0)
+          res = {1'b0, {(N-1){1'b1}}}; // maximum positive value
+        else
+          res = {1'b1, {(N-1){1'b0}}}; // most negative value in two's complement
+      end else begin
+        // No overflow. If operands are positive, use the sum directly;
+        // if negative, convert the magnitude back to two's complement.
+        if (sign_a == 0)
+          res = sum[N-1:0];
+        else
+          res = (~sum[N-1:0] + 1);
+      end
+    end
+    else begin
+      // When operands have different signs, perform subtraction between the larger
+      // and the smaller absolute value. The sign of the result is the sign of the
+      // operand with the larger magnitude.
+      if (abs_a >= abs_b) begin
+        diff = abs_a - abs_b;
+        sign_out = sign_a;
+      end else begin
+        diff = abs_b - abs_a;
+        sign_out = sign_b;
+      end
+      
+      // Convert the difference to proper two's complement representation.
+      if (sign_out == 0)
+        res = diff;
+      else
+        res = (~diff + 1);
+    end
+  end
+
+  // Output assignment
+  assign c = res;
+
+endmodule

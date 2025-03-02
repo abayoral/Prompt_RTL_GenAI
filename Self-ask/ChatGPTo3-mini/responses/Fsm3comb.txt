@@ -1,0 +1,1 @@
+Would you like to include a default case in the logic to handle any invalid or unexpected state values, and if so, what should the default values for next_state and out be?

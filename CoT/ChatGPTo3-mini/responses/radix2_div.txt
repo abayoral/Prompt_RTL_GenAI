@@ -1,0 +1,133 @@
+module radix2_div(
+    input         clk,
+    input         rst,
+    input         sign,       // 1 -> signed division, 0 -> unsigned
+    input  [7:0]  dividend,
+    input  [7:0]  divisor,
+    input         opn_valid,  // valid operation request
+    output reg    res_valid,  // result valid flag
+    output reg [15:0] result  // [15:8]: remainder, [7:0]: quotient
+);
+
+  // state encoding
+  localparam IDLE = 2'd0,
+             CALC = 2'd1,
+             DONE = 2'd2;
+             
+  reg [1:0] state;
+
+  // internal registers for capturing absolute values and sign flags
+  reg [7:0] abs_dividend, abs_divisor;
+  reg       dividend_neg, divisor_neg;
+
+  // working registers for the iterative (restoring) division algorithm
+  // 'quotient' holds the working quotient (computed on the absolute value)
+  reg [7:0] quotient;
+  // 'rem' holds the working remainder with an extra bit (9 bits) to allow negative values
+  reg signed [8:0] rem;
+  // 4-bit counter to count 8 iterations (0 to 7)
+  reg [3:0] cnt;
+
+  // temporary registers for the combinational step in the CALC state.
+  reg signed [8:0] shifted_rem;
+  reg signed [8:0] trial;
+
+  // The algorithm implements a restoring division:
+  // 1. On a valid operation (opn_valid asserted and no result pending),
+  //    capture the operands. For signed division, compute the absolute values.
+  //    Initialize the working quotient with the absolute dividend and set the
+  //    remainder to zero.
+  // 2. Perform 8 iterations. In each iteration:
+  //    a. Shift left the remainder and bring in the MSB of the quotient.
+  //    b. Subtract the absolute divisor (by adding its 2's complement).
+  //    c. If the result is nonnegative, accept it and record a "1" in the LSB of
+  //       the quotient; otherwise, restore the remainder and record a "0".
+  // 3. In the DONE state, perform sign corrections if a signed operation is requested.
+  //    The final result is concatenated with the upper 8 bits as the remainder and
+  //    the lower 8 bits as the quotient.
+  
+  always @(posedge clk or posedge rst) begin
+    if (rst) begin
+      state         <= IDLE;
+      res_valid     <= 1'b0;
+      result        <= 16'd0;
+      cnt           <= 4'd0;
+      rem           <= 9'd0;
+      quotient      <= 8'd0;
+      abs_dividend  <= 8'd0;
+      abs_divisor   <= 8'd0;
+      dividend_neg  <= 1'b0;
+      divisor_neg   <= 1'b0;
+    end else begin
+      case (state)
+        IDLE: begin
+          res_valid <= 1'b0;
+          cnt <= 4'd0;
+          // When a valid operation is requested and no result is pending,
+          // capture inputs and compute the absolute values needed.
+          if (opn_valid && !res_valid) begin
+            if (sign) begin
+              dividend_neg <= dividend[7];
+              divisor_neg  <= divisor[7];
+              abs_dividend <= (dividend[7]) ? (~dividend + 8'd1) : dividend;
+              abs_divisor  <= (divisor[7])  ? (~divisor + 8'd1)  : divisor;
+            end else begin
+              dividend_neg <= 1'b0;
+              divisor_neg  <= 1'b0;
+              abs_dividend <= dividend;
+              abs_divisor  <= divisor;
+            end
+            // Initialize the working quotient with the absolute dividend.
+            quotient <= (sign && dividend[7]) ? (~dividend + 8'd1) : dividend;
+            // Initial remainder is zero.
+            rem <= 9'd0;
+            state <= CALC;
+          end
+        end
+
+        CALC: begin
+          // For each iteration, shift left the remainder and bring in the MSB of quotient.
+          shifted_rem = {rem[7:0], quotient[7]};
+          // Subtract the divisor by adding its 2's complement.
+          trial = shifted_rem - {1'b0, abs_divisor};
+          if (trial[8] == 1'b0) begin
+            // If the trial result is nonnegative, accept it and record a '1'
+            // into the LSB of the quotient.
+            rem <= trial;
+            quotient <= (quotient << 1) | 1'b1;
+          end else begin
+            // Otherwise, restore the shifted remainder and record a '0'.
+            rem <= shifted_rem;
+            quotient <= (quotient << 1);
+          end
+          cnt <= cnt + 4'd1;
+          // After 8 iterations, the division process is complete.
+          if (cnt == 4'd7)
+            state <= DONE;
+        end
+
+        DONE: begin
+          // For signed operations, perform sign correction.
+          if (sign) begin
+            // The quotient should be negated if the dividend and divisor have opposite signs.
+            if (dividend_neg ^ divisor_neg)
+              quotient <= ~quotient + 8'd1;
+            // The remainder takes the sign of the dividend.
+            if (dividend_neg)
+              rem <= -rem;
+          end
+          // Pack the final result with remainder in upper 8 bits and quotient in lower 8 bits.
+          result <= {rem[7:0], quotient};
+          res_valid <= 1'b1;
+          // Wait for the opn_valid signal to deassert (indicating the result has been consumed)
+          // before returning to IDLE.
+          if (!opn_valid)
+            state <= IDLE;
+        end
+
+        default: state <= IDLE;
+      endcase
+    end
+  end
+
+endmodule

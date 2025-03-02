@@ -1,0 +1,51 @@
+module top_module ( 
+    input clk, 
+    input [7:0] d, 
+    input [1:0] sel, 
+    output reg [7:0] q 
+);
+
+    // Internal wires to connect the stages of the shift register
+    wire [7:0] stage1;
+    wire [7:0] stage2;
+    wire [7:0] stage3;
+
+    // Instantiate three 8-bit D flip-flop modules
+    my_dff8 dff_stage1 (
+        .clk(clk),
+        .d(d),
+        .q(stage1)
+    );
+
+    my_dff8 dff_stage2 (
+        .clk(clk),
+        .d(stage1),
+        .q(stage2)
+    );
+
+    my_dff8 dff_stage3 (
+        .clk(clk),
+        .d(stage2),
+        .q(stage3)
+    );
+
+    // 4-to-1 Multiplexer to select the output based on sel:
+    //  00 : no delay (input d),
+    //  01 : one cycle delay (after stage1),
+    //  10 : two cycle delay (after stage2),
+    //  11 : three cycle delay (after stage3).
+    always @(*) begin
+        case (sel)
+            2'b00: q = d;
+            2'b01: q = stage1;
+            2'b10: q = stage2;
+            2'b11: q = stage3;
+            default: q = d;
+        endcase
+    end
+
+endmodule
+
+// The my_dff8 module is assumed to be provided externally:
+// module my_dff8 ( input clk, input [7:0] d, output [7:0] q );
+// (Its implementation is not shown here.)

@@ -1,0 +1,28 @@
+module edge_detect(
+    input clk,
+    input rst_n,
+    input a,
+    output reg rise,
+    output reg down
+);
+
+    // Register to store the previous state of input 'a'
+    reg a_prev;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // Active low reset: clear the stored value and outputs
+            a_prev <= 1'b0;
+            rise   <= 1'b0;
+            down   <= 1'b0;
+        end else begin
+            // Detect rising edge: previous was 0 and current is 1
+            rise <= (~a_prev & a);
+            // Detect falling edge: previous was 1 and current is 0
+            down <= (a_prev & ~a);
+            // Update the stored value for the next cycle
+            a_prev <= a;
+        end
+    end
+
+endmodule

@@ -1,0 +1,22 @@
+Imagine you are a seasoned Verilog designer tasked with creating a data width conversion circuit. This module is intended to efficiently convert incoming 8-bit data into a 16-bit data output. It's crucial that this circuit not only handles the conversion but also effectively communicates the validity of the output data through a dedicated signal. The module you are designing will be named `width_8to16` and is expected to adhere to specific input and output requirements:
+
+**Objective:**
+Design a Verilog module that takes 8-bit data inputs and outputs the combined result as a 16-bit data signal. You must ensure that the first 8-bit input is stored and aligned correctly within the higher order bits (most significant bits) of the 16-bit output. Additionally, the module must manage the timing of data output such that the `valid_out` signal and the concatenated `data_out` are synchronized to appear in the cycle following the arrival of a pair of valid 8-bit data inputs.
+
+**Inputs Definition:**
+1. **clk**: A clock signal that controls the timing of operations within the module, ensuring synchronous processes.
+2. **rst_n**: An active-low reset signal, where a logic low (0) condition will reset the internal state of the module, clearing registers and allowing it to restart.
+3. **valid_in**: A signal used to indicate whether the current 8-bit data (`data_in`) input is valid and ready for processing.
+4. **data_in**: The 8-bit data input line, providing the data that needs to be converted to the 16-bit format.
+
+**Outputs Specification:**
+1. **valid_out**: This signal indicates when the 16-bit output (`data_out`) is valid and correctly formed from two 8-bit inputs.
+2. **data_out**: This is the 16-bit result of the width conversion and is expected to reflect the concatenated data from two sequential valid 8-bit inputs.
+
+**Core Functional Requirements:**
+- The process begins with the positive edge of the clock signal or when a reset event occurs via the negative edge of `rst_n`.
+- On receiving a reset (!rst_n condition), the `data_out` register must be cleared to zero, effectively resetting the module's output state.
+- If `valid_in` is active signaling valid incoming data, the module should store the first 8-bit input temporarily. This storage is pending until the next valid input is received, which then triggers the formation of a 16-bit output with the preceding data occupying the higher 8 bits.
+- Only after capturing two valid data inputs will the module issue `valid_out` as active, denoting readiness and validity of `data_out`.
+
+Your task is to outline the complete implementation in Verilog, capturing the above dynamics accurately to ensure reliable and efficient data conversion along with appropriate signaling for data validity.

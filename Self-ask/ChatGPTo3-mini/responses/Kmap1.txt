@@ -1,0 +1,13 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    output out
+);
+
+    // The simplified function derived from the Karnaugh map is:
+    // out = a ∨ b ∨ c
+    // This means that only when a, b, and c are all 0 is the output 0; otherwise it is 1.
+    assign out = a | b | c;
+
+endmodule

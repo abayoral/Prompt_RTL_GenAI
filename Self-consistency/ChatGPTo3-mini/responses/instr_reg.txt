@@ -1,0 +1,51 @@
+module instr_reg(
+    input clk,
+    input rst,           // active low reset
+    input [1:0] fetch,
+    input [7:0] data,
+    output [2:0] ins,    // high 3 bits of instruction (opcode)
+    output [4:0] ad1,    // low 5 bits of instruction (register address)
+    output [7:0] ad2     // complete data from fetch source 2
+);
+
+  // Internal 8-bit registers to store fetched instructions from two sources.
+  reg [7:0] ins_p1;
+  reg [7:0] ins_p2;
+  
+  // Sequential logic block for capturing and processing data.
+  // Reset is active low.
+  always @(posedge clk or negedge rst) begin
+    if (!rst) begin
+      // Initialize both registers to zero when reset is asserted.
+      ins_p1 <= 8'b0;
+      ins_p2 <= 8'b0;
+    end
+    else begin
+      // Check the fetch control signal and capture data accordingly.
+      case(fetch)
+        2'b01: begin
+          // Fetch from first source and store instruction in ins_p1.
+          ins_p1 <= data;
+        end
+        2'b10: begin
+          // Fetch from second source and store instruction in ins_p2.
+          ins_p2 <= data;
+        end
+        default: begin
+          // When fetch control is neither 01 nor 10, retain the current values.
+          ins_p1 <= ins_p1;
+          ins_p2 <= ins_p2;
+        end
+      endcase
+    end
+  end
+  
+  // Continuous assignments for outputs.
+  // For instructions fetched from source 1, split ins_p1 into opcode and register address.
+  assign ins = ins_p1[7:5];   // high 3 bits for opcode
+  assign ad1 = ins_p1[4:0];   // low 5 bits for register address
+  
+  // For instructions fetched from source 2, output the complete 8-bit data.
+  assign ad2 = ins_p2;
+  
+endmodule

@@ -1,0 +1,30 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    output out
+);
+
+    // The provided Karnaugh map is:
+    //       a'   a
+    // b'c'  1    1
+    // b'c   1    1
+    // bc    1    1
+    // bc'   1    1
+    //
+    // Every cell in the K-map is 1 which corresponds to a function that is true
+    // regardless of the inputs a, b, and c.
+    //
+    // This can be expressed in both product-of-sums and sum-of-products forms:
+    //
+    // Sum-of-products form:
+    //     F = Σ(0,1,2,3,4,5,6,7) = 1
+    //
+    // Product-of-sums form:
+    //     F = (a+a')(b+b')(c+c') = 1
+    //
+    // Therefore, the complete simplified function is simply '1'.
+
+    assign out = 1'b1;
+
+endmodule

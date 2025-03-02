@@ -1,0 +1,13 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    output out
+);
+
+    // The given K-map has all cells equal to 1.
+    // Both Sum-of-Products and Product-of-Sums simplify to:
+    // out = 1
+    assign out = 1'b1;
+
+endmodule

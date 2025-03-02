@@ -1,0 +1,16 @@
+module top_module (
+    input clk,
+    input [7:0] in,
+    output reg [7:0] anyedge
+);
+
+    reg [7:0] in_d;  // delayed version of in
+
+    always @(posedge clk) begin
+        // For each bit, detect a rising edge by comparing the delayed input to the current input.
+        // The output "anyedge" is set in the cycle after detecting a 0->1 transition.
+        anyedge <= (~in_d) & in;
+        in_d <= in;
+    end
+
+endmodule

@@ -1,0 +1,19 @@
+module top_module (
+    input a, b, c, d, e,
+    output [24:0] out 
+);
+
+    // Create a 25‐bit vector where each group of 5 bits is the same input.
+    // The MSB group corresponds to "a" and the LSB group to "e".
+    wire [24:0] left_vec;
+    assign left_vec = { {5{a}}, {5{b}}, {5{c}}, {5{d}}, {5{e}} };
+
+    // Create a 25‐bit vector that is five repetitions of the 5 bit vector {a,b,c,d,e}.
+    wire [24:0] right_vec;
+    assign right_vec = { 5{ {a, b, c, d, e} } };
+
+    // The XNOR operation can be performed as ~left_vec ^ right_vec.
+    // For each bit, this is equivalent to comparing the corresponding bits for equality.
+    assign out = ~left_vec ^ right_vec;
+
+endmodule

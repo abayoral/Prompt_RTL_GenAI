@@ -1,0 +1,45 @@
+module mux2 (
+    input sel,
+    input [7:0] a,
+    input [7:0] b,
+    output [7:0] out
+);
+    assign out = sel ? b : a;
+endmodule
+
+module top_module (
+    input [1:0] sel,
+    input [7:0] a,
+    input [7:0] b,
+    input [7:0] c,
+    input [7:0] d,
+    output [7:0] out
+);
+    // Declare intermediate signals as 8-bit wide buses
+    wire [7:0] mux0, mux1;
+    
+    // First level: two 2-to-1 multiplexers that select between the corresponding pairs.
+    // For a 4-to-1 mux with inputs {a, b, c, d} and select lines sel[1:0], we select between a and b with sel[0],
+    // and between c and d with sel[0].
+    mux2 mux0_inst (
+        .sel(sel[0]),
+        .a(a),
+        .b(b),
+        .out(mux0)
+    );
+    
+    mux2 mux1_inst (
+        .sel(sel[0]),
+        .a(c),
+        .b(d),
+        .out(mux1)
+    );
+    
+    // Second level: a 2-to-1 multiplexer that selects between the previous outputs based on sel[1].
+    mux2 mux2_inst (
+        .sel(sel[1]),
+        .a(mux0),
+        .b(mux1),
+        .out(out)
+    );
+endmodule

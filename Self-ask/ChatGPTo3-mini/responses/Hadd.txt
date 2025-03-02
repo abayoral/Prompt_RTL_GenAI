@@ -1,0 +1,1 @@
+Is there a specific design style (e.g., behavioral, dataflow, or structural) that the half adder implementation should adhere to?

@@ -1,0 +1,240 @@
+module float_multi(
+    input         clk,
+    input         rst,
+    input  [31:0] a,
+    input  [31:0] b,
+    output reg [31:0] z
+);
+
+  // Cycle counter for pipelined stages
+  reg [2:0] counter;
+
+  // Internal registers for components extraction (24‐bit includes implicit bit for normalized case)
+  reg         a_sign, b_sign;
+  reg [9:0]   a_exponent, b_exponent; // Extended to 10 bits to allow addition and subtraction of bias
+  reg [23:0]  a_mantissa, b_mantissa; // 24 bits: [23] is the implicit 1 for normalized numbers
+
+  // Special flags (zero, infinity, NaN)
+  reg         a_zero, b_zero;
+  reg         a_inf,  b_inf;
+  reg         a_nan,  b_nan;
+
+  // Special case result and flag
+  reg         special;
+  reg [31:0]  special_result;
+
+  // Intermediate results for multiplication
+  reg         tmp_sign;
+  reg [9:0]   tmp_exponent; // Unrounded exponent result (includes bias adjustment)
+  reg [49:0]  product;      // 50-bit register for raw product of mantissas (the multiplication of 24x24 bits gives 48 bits,
+                           // but we allocate extra bits for the potential normalization shift)
+
+  // Normalized product (48 bits format)
+  reg [47:0]  norm;         // Will contain the normalized result (with hidden bit at bit [46])
+  reg [9:0]   norm_exponent;  // Adjusted exponent after normalization
+
+  // Rounding stage signals
+  reg [22:0]  fraction;       // 23-bit fraction (to be rounded)
+  reg         guard_bit, round_bit;
+  reg         sticky;         // Sticky bit, OR of all lower bits
+  reg [23:0]  fraction_rnd;   // fraction with rounding added (24 bits to detect overflow)
+  
+  // Temporary registers for extraction of exponent fields (8 bits from input)
+  wire [7:0] in_a_exp = a[30:23];
+  wire [7:0] in_b_exp = b[30:23];
+
+  // Pipeline: Using a simple counter-controlled FSM through several clock cycles.
+  always @(posedge clk) begin
+    if(rst) begin
+      counter        <= 3'd0;
+      z              <= 32'd0;
+      // Clear pipeline registers:
+      a_sign         <= 1'b0;
+      b_sign         <= 1'b0;
+      a_exponent     <= 10'd0;
+      b_exponent     <= 10'd0;
+      a_mantissa     <= 24'd0;
+      b_mantissa     <= 24'd0;
+      a_zero         <= 1'b0;
+      b_zero         <= 1'b0;
+      a_inf          <= 1'b0;
+      b_inf          <= 1'b0;
+      a_nan          <= 1'b0;
+      b_nan          <= 1'b0;
+      special        <= 1'b0;
+      special_result <= 32'd0;
+      tmp_sign       <= 1'b0;
+      tmp_exponent   <= 10'd0;
+      product        <= 50'd0;
+      norm           <= 48'd0;
+      norm_exponent  <= 10'd0;
+      fraction       <= 23'd0;
+      guard_bit      <= 1'b0;
+      round_bit      <= 1'b0;
+      sticky         <= 1'b0;
+      fraction_rnd   <= 24'd0;
+    end
+    else begin
+      case(counter)
+        3'd0: begin
+          // Stage 1: Input Processing and extraction.
+          // Extract sign:
+          a_sign <= a[31];
+          b_sign <= b[31];
+          // Extract exponent: extend input 8-bit exponent to 10 bits for computation.
+          a_exponent <= {2'b00, a[30:23]};
+          b_exponent <= {2'b00, b[30:23]};
+          // Determine if operand is zero:
+          a_zero <= (a[30:0] == 31'd0);
+          b_zero <= (b[30:0] == 31'd0);
+          // Determine if operand is infinity or NaN:
+          a_inf  <= (in_a_exp == 8'hFF) && (a[22:0] == 23'd0);
+          b_inf  <= (in_b_exp == 8'hFF) && (b[22:0] == 23'd0);
+          a_nan  <= (in_a_exp == 8'hFF) && (a[22:0] != 23'd0);
+          b_nan  <= (in_b_exp == 8'hFF) && (b[22:0] != 23'd0);
+          // Extract mantissa. For normalized numbers, implicit 1 is added.
+          // For zero or denormalized numbers, the implicit bit is 0.
+          if(in_a_exp == 8'd0)
+            a_mantissa <= {1'b0, a[22:0]};
+          else
+            a_mantissa <= {1'b1, a[22:0]};
+          if(in_b_exp == 8'd0)
+            b_mantissa <= {1'b0, b[22:0]};
+          else
+            b_mantissa <= {1'b1, b[22:0]};
+        end
+
+        3'd1: begin
+          // Stage 2: Special Case Handling and Multiplication Setup.
+          // Check for any special operand cases:
+          if(a_nan || b_nan) begin
+            // If any operand is NaN, result is NaN.
+            special <= 1'b1;
+            special_result <= {1'b0, 8'hFF, 23'b1}; // a canonical NaN: sign 0, exponent all ones, nonzero fraction
+          end
+          else if((a_inf && b_zero) || (b_inf && a_zero)) begin
+            // Infinity times zero is NaN.
+            special <= 1'b1;
+            special_result <= {1'b0, 8'hFF, 23'b1};
+          end
+          else if(a_inf || b_inf) begin
+            // Multiplication with infinity (and nonzero other operand) yields infinity.
+            special <= 1'b1;
+            special_result <= { (a_sign ^ b_sign), 8'hFF, 23'd0 };
+          end
+          else if(a_zero || b_zero) begin
+            // Any multiplication with zero (and not the invalid infinity*zero case) gives zero.
+            special <= 1'b1;
+            special_result <= { (a_sign ^ b_sign), 31'd0 };
+          end
+          else begin
+            special <= 1'b0;
+            // Proceed with standard multiplication.
+            tmp_sign <= a_sign ^ b_sign;
+            // Compute exponent: add exponents and subtract bias (127) 
+            tmp_exponent <= a_exponent + b_exponent - 10'd127;
+            // Multiply mantissas:
+            // a_mantissa and b_mantissa are 24 bits each.
+            // The product is 48 bits; we place the result in 'product' (50 bits) with extra room.
+            product <= {2'd0, a_mantissa} * {2'd0, b_mantissa};
+          end
+        end
+
+        3'd2: begin
+          // Stage 3: Normalization.
+          if(!special) begin
+            // 'product' is 50 bits but only the lower 48 bits hold significant result.
+            // Determine if the product needs shifting:
+            // Two normalized numbers (nonzero) multiply to yield a product in [1,4).
+            // If the product’s most significant bit (bit 47) is 1, then product is >= 2 and must be shifted right.
+            if(product[47] == 1'b1) begin
+              // Shift right by 1. We form 'norm' as 48 bits.
+              norm <= {1'b0, product[47:1]};
+              norm_exponent <= tmp_exponent + 10'd1;
+            end
+            else begin
+              // No shift needed. In correct multiplication of normalized numbers (with implicit ones)
+              // the result should have bit 46 as 1.
+              norm <= product[47:0];
+              norm_exponent <= tmp_exponent;
+            end
+          end
+        end
+
+        3'd3: begin
+          // Stage 4: Rounding and Adjustment.
+          if(!special) begin
+            // We now extract the fraction and rounding bits.
+            // In our normalized product 'norm', bit [46] is the implicit one.
+            // We will extract 23 fraction bits from bits [45:23].
+            fraction <= norm[45:23];
+            // The rounding bits: guard (bit 22), round (bit 21) and sticky (OR of bits [20:0]).
+            guard_bit <= norm[22];
+            round_bit <= norm[21];
+            sticky <= (|norm[20:0]);
+            
+            // Perform round to nearest even.
+            // If guard is 1 and (any one of round, sticky is 1 or LSB of fraction is 1) then add 1.
+            if(guard_bit && (round_bit || sticky || fraction[0])) begin
+              fraction_rnd <= {1'b0, fraction} + 24'd1;
+              // If rounding causes a carry out (i.e. the fraction becomes 24'b1_0000...),
+              // adjust the exponent and shift fraction right.
+              if(fraction_rnd[23] == 1'b1) begin
+                norm_exponent <= norm_exponent + 10'd1;
+                // After carry, drop the extra bit.
+                fraction <= fraction_rnd[22:0];
+              end
+              else begin
+                fraction <= fraction_rnd[22:0];
+              end
+            end
+            else begin
+              fraction_rnd <= {1'b0, fraction};
+              fraction <= fraction; // Unchanged
+            end
+          end
+        end
+        
+        3'd4: begin
+          // Stage 5: Output Generation.
+          if(special) begin
+            z <= special_result;
+          end
+          else begin
+            // Check for exponent overflow (result too big) -> Infinity.
+            if(norm_exponent[9:0] >= 10'd255) begin
+              z <= {tmp_sign, 8'hFF, 23'd0};
+            end
+            // Check for exponent underflow (result too small) -> Zero.
+            else if(norm_exponent[9:0] <= 10'd0) begin
+              z <= {tmp_sign, 8'd0, 23'd0};
+            end
+            else begin
+              // Normal result.
+              // IEEE 754 single precision: sign (1 bit), exponent (8 bits), fraction (23 bits).
+              z <= {tmp_sign, norm_exponent[7:0], fraction};
+            end
+          end
+        end
+
+        3'd5: begin
+          // Final stage: (Optional) hold output stable. No further computation.
+          // The result 'z' remains available until next operation.
+          z <= z;
+        end
+
+        default: begin
+          // Default: do nothing.
+          z <= z;
+        end
+      endcase
+
+      // Increment cycle counter, wrapping around after stage 5.
+      if(counter == 3'd5)
+        counter <= 3'd0;
+      else
+        counter <= counter + 3'd1;
+    end
+  end
+
+endmodule

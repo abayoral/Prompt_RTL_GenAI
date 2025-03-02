@@ -1,0 +1,65 @@
+module top_module(
+    input clk,
+    input load,
+    input [255:0] data,
+    output reg [255:0] q
+);
+
+  // Internal state register to hold the current grid.
+  reg [255:0] state;
+  reg [255:0] next_state;
+  
+  integer i, j;
+  // The update process runs on the positive edge of the clock.
+  always @(posedge clk) begin
+    if (load) begin
+      // Load initial state into the grid.
+      state <= data;
+    end else begin
+      // Compute next state for each cell in the 16x16 grid.
+      for (i = 0; i < 16; i = i + 1) begin
+        for (j = 0; j < 16; j = j + 1) begin
+          integer i_up, i_down, j_left, j_right;
+          integer sum;
+          
+          // Wrap-around indices using toroidal behavior.
+          i_up    = (i + 15) % 16; // equivalent to (i - 1) mod 16
+          i_down  = (i + 1) % 16;
+          j_left  = (j + 15) % 16; // equivalent to (j - 1) mod 16
+          j_right = (j + 1) % 16;
+          
+          // Sum up the 8 neighbors.
+          sum = 0;
+          sum = sum + state[i_up*16 + j_left];
+          sum = sum + state[i_up*16 + j];
+          sum = sum + state[i_up*16 + j_right];
+          sum = sum + state[i*16 + j_left];
+          sum = sum + state[i*16 + j_right];
+          sum = sum + state[i_down*16 + j_left];
+          sum = sum + state[i_down*16 + j];
+          sum = sum + state[i_down*16 + j_right];
+          
+          // Apply Conway's Game of Life rules:
+          //   - Exactly 3 neighbors -> Alive.
+          //   - Exactly 2 neighbors -> Unchanged.
+          //   - Otherwise -> Dead.
+          if (sum == 3)
+            next_state[i*16 + j] = 1'b1;
+          else if (sum == 2)
+            next_state[i*16 + j] = state[i*16 + j];
+          else
+            next_state[i*16 + j] = 1'b0;
+        end
+      end
+      
+      // Update the state with the computed next state.
+      state <= next_state;
+    end
+  end
+  
+  // Continuous assignment of internal state to module output.
+  always @(*) begin
+    q = state;
+  end
+
+endmodule

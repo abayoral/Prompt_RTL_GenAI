@@ -1,0 +1,49 @@
+module multi_8bit(
+    input         clk,       // Clock signal
+    input         rst,       // Active-high synchronous reset
+    input  [7:0]  A,         // Multiplicand
+    input  [7:0]  B,         // Multiplier
+    output [15:0] product    // 16-bit product output
+);
+
+  // Internal registers for the shift-add multiplication process
+  reg [15:0] prod_reg;      // Accumulating product
+  reg [7:0]  multiplicand;  // Shifting multiplicand register
+  reg [7:0]  multiplier;    // Shifting multiplier register
+  reg [3:0]  count;         // Iteration counter (max 8 iterations)
+
+  // Assign internal product register to the output
+  assign product = prod_reg;
+  
+  // Sequential process: On reset, initialize registers, otherwise iterate
+  always @(posedge clk) begin
+    if (rst) begin
+      // On reset, load operands and initialize control registers
+      prod_reg    <= 16'd0;
+      multiplicand<= {8'd0, A}; // Zero-extend A into a 16-bit value placed in lower half of multiplicand
+      multiplier  <= B;
+      count       <= 4'd0;
+    end else begin
+      // If multiplication is not complete, perform a shift-and-add iteration
+      if(count < 4'd8) begin
+        // If the LSB of multiplier is high, add the current multiplicand to the product
+        if(multiplier[0])
+          prod_reg <= prod_reg + multiplicand;
+        else
+          prod_reg <= prod_reg;
+          
+        // Shift multiplicand left by 1 (equivalent to multiplying by 2)
+        multiplicand <= multiplicand << 1;
+        
+        // Shift multiplier right by 1 (to process the next bit in the next cycle)
+        multiplier <= multiplier >> 1;
+        
+        // Increment the iteration count
+        count <= count + 1;
+      end
+      // Else: Once count reaches 8, the multiplication is complete.
+      // The product remains available on 'product'
+    end
+  end
+
+endmodule

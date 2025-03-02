@@ -1,0 +1,10 @@
+module top_module( 
+    input [2:0] in,
+    output [1:0] out
+);
+    
+    // The population count for a 3-bit input can be calculated by simply adding the bits.
+    // Since each 'in' bit is either 0 or 1, the sum represents the count of '1's.
+    assign out = in[0] + in[1] + in[2];
+    
+endmodule

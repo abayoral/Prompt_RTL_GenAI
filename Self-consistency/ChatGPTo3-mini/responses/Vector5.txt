@@ -1,0 +1,27 @@
+module top_module (
+    input a, b, c, d, e,
+    output [24:0] out
+);
+
+    // Create a left-hand vector that repeats each input five times.
+    // This arranges the data into five groups corresponding to the left operand of each comparison:
+    // First group: a repeated 5 times, for comparisons a=={a,b,c,d,e}
+    // Second group: b repeated 5 times, for comparisons b=={a,b,c,d,e}
+    // and so on.
+    wire [24:0] left = { {5{a}}, {5{b}}, {5{c}}, {5{d}}, {5{e}} };
+
+    // Create a right-hand vector that consists of five repetitions of the 5-bit group {a, b, c, d, e}.
+    // In each group, the corresponding elements will be compared to form
+    // the equality check, e.g., for the first group:
+    // a compared to a, a compared to b, ..., a compared to e, etc.
+    wire [24:0] right = { {a, b, c, d, e},
+                           {a, b, c, d, e},
+                           {a, b, c, d, e},
+                           {a, b, c, d, e},
+                           {a, b, c, d, e} };
+
+    // The XNOR operation (~^ in Verilog) produces 1 when both bits are equal.
+    // Thus, each bit in 'out' is 1 if the corresponding bits in 'left' and 'right' match.
+    assign out = left ~^ right;
+
+endmodule

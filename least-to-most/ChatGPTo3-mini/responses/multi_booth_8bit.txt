@@ -1,0 +1,70 @@
+module multi_booth_8bit(
+    input         clk,
+    input         reset,
+    input  [7:0]  a,
+    input  [7:0]  b,
+    output reg [15:0] p,
+    output reg  rdy
+);
+
+  // Internal registers
+  reg [15:0] multiplicand; // holds the (shifted) multiplicand
+  reg [15:0] multiplier;   // holds the (shifted) multiplier
+  reg [15:0] product;      // accumulator for the partial product
+  reg        booth_prev;   // extra bit for Booth recoding (initially 0)
+  reg [4:0]  ctr;          // 5‐bit counter for up to 16 cycles
+
+  // The multiplication process is synchronous.
+  // When reset is high, extend both 8‐bit inputs to 16 bits (with sign extension)
+  // and initialize the data path.
+  //
+  // Then, on every rising edge of clk (with reset low) we do one Booth cycle:
+  //   1. Look at the two–bit Booth “digit”: {multiplier[0], booth_prev}.
+  //      If it is 01, add the current multiplicand to product.
+  //      If it is 10, subtract the current multiplicand from product.
+  //      Otherwise, do nothing.
+  //   2. For proper weighting, shift the multiplicand left by one bit.
+  //   3. Rotate the multiplier to get the next Booth bits:
+  //      Capture the current LSB into booth_prev and shift multiplier right by one.
+  //   4. Increment the counter.
+  // When the counter reaches 16 (i.e. after 16 cycles) the multiplication is complete;
+  // the result is available at output p and the ready signal (rdy) is asserted.
+  always @(posedge clk) begin
+    if (reset) begin
+      // On reset, sign‐extend the inputs to 16‐bits.
+      multiplier    <= { {8{a[7]}}, a };
+      multiplicand  <= { {8{b[7]}}, b };
+      product       <= 16'd0;
+      booth_prev    <= 1'b0;
+      ctr           <= 5'd0;
+      rdy           <= 1'b0;
+      p             <= 16'd0;
+      
+    end else if (!rdy) begin
+      // Determine the current Booth digit from {multiplier[0], booth_prev}
+      case ({multiplier[0], booth_prev})
+        2'b01: product <= product + multiplicand;
+        2'b10: product <= product - multiplicand;
+        default: product <= product; // no operation needed
+      endcase
+      
+      // Shift the multiplicand left by one
+      multiplicand <= multiplicand << 1;
+      
+      // Prepare for next Booth evaluation:
+      // Capture current LSB of multiplier into booth_prev and shift multiplier right by one.
+      booth_prev  <= multiplier[0];
+      multiplier  <= { 1'b0, multiplier[15:1] }; // shifting in 0 (could be replaced by arithmetic shift if needed)
+      
+      // Increment the counter
+      ctr <= ctr + 1;
+      
+      // Once 16 cycles have elapsed, the product is ready.
+      if (ctr == 5'd15) begin
+        rdy <= 1'b1;
+        p   <= product; // Latch the final product into output p
+      end
+    end
+  end
+
+endmodule

@@ -1,0 +1,21 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // Based on the Karnaugh map, the function is '1' when:
+    // - The (a,b) pair has different bits and the (c,d) pair has the same bits, OR
+    // - The (a,b) pair has the same bits and the (c,d) pair has different bits.
+    //
+    // In other words, let X = a XOR b and Y = c XOR d.
+    // Then the output f is true when X and not Y are true OR when not X and Y are true.
+    // This is equivalent to f = X XOR Y.
+    //
+    // Using Verilog's '^' operator for XOR, we can write:
+    
+    assign out = (a ^ b) ^ (c ^ d);
+
+endmodule

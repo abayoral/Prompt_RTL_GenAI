@@ -1,86 +1,119 @@
-Below is one corrected version of the multiplier. In the original code the “start” signal was used throughout the “computation” always‐blocks so that if start were not continuously true the iterative accumulation would be reset. Also, the algorithm was “half‐implemented” without a dedicated state that lets the design latch inputs on a start pulse and then complete the iterative process even if start goes low. One proper fix is to introduce a busy flag (or FSM state) so that a new multiplication is initiated only when not busy and the computation continues over 16 iterations. (Note that this design multiplies using the identity
+Below is one corrected revision of the code. In our revised version we made the following changes and improvements:
 
-  product = Σ₍i=0₎¹⁵[ ain[i] ? (bin << i) : 0 ],
+1. We parameterize the multiplier width and iteration count so that “magic numbers” (like 16 and 17) are replaced with named constants. (This is good practice for readability and maintainability.)
 
-which is equivalent to the usual multiplication law.) 
+2. We note that the “start” signal is used as a level‐sensitive enable that resets internal registers if de‐asserted even mid‐calculation. (In many designs a one‐cycle pulse or a FSM is used instead so that intermediate “start==0” does not clear an in‐progress multiplication. If that is desired then additional logic is needed. Here we preserve the original scheme.)
 
-Below is one corrected and improved version that addresses these issues and uses best practices for synthesis:
+3. We ensure that the index used to select a bit from the multiplicand (areg) is used only when it is in the valid range (i.e. i from 1 to WIDTH). (The original code gated “if (i==0)” separately so that “areg[i-1]” never evaluates a negative index.)
 
-------------------------------------------------------------
-module multi_16bit (
-  input         clk,
-  input         rst_n,  // active-low reset
-  input         start,  // pulse to launch multiplication
-  input  [15:0] ain,    // multiplicand
-  input  [15:0] bin,    // multiplier
-  output [31:0] yout,   // product output
-  output        done    // one-cycle done pulse at the end
+4. We (optionally) change the output ports “yout” and “done” to be driven from registers (rather than using continuous assignments) so that all outputs come from sequential logic. (Either style is acceptable provided the signals have the proper timing; here we show one common style.)
+
+Below is the revised code:
+
+--------------------------------------------------
+module multi_16bit #(
+  parameter WIDTH    = 16,               // bit-width of operands
+  parameter CNT_MAX  = WIDTH + 1         // number of cycles (0..WIDTH)
+)(
+  input                clk,
+  input                rst_n,
+  input                start,
+  input      [WIDTH-1:0] ain,
+  input      [WIDTH-1:0] bin,
+  output reg [2*WIDTH-1:0] yout,
+  output reg           done
 );
 
-  // Internal registers and state
-  reg        busy;     // indicates multiplication is in progress
-  reg [4:0]  i;        // iteration counter (0 to 16)
-  reg [15:0] areg;     // holds multiplicand (ain)
-  reg [15:0] breg;     // holds multiplier (bin)
-  reg [31:0] prod;     // accumulated product
-  reg        done_r;   // internal done flag
+  // Internal registers
+  reg [$clog2(CNT_MAX):0] i;         // shift count register
+  reg [WIDTH-1:0]  areg;              // register to hold multiplicand
+  reg [WIDTH-1:0]  breg;              // register to hold multiplier
+  reg [2*WIDTH-1:0] yout_r;           // accumulator for the product result
 
-  // Sequential block with a proper state control.
-  // When not busy, a new multiplication is started on a pulse from 'start'.
-  // Then the computation runs for 16 iterations and asserts done for one cycle.
+  // 1. Counter for iteration cycles.
+  // When rst_n is low, initialize i to zero.
+  // When start is high, increment i until CNT_MAX; if start is low, reset i.
   always @(posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
-      busy    <= 1'b0;
-      i       <= 5'd0;
-      areg    <= 16'd0;
-      breg    <= 16'd0;
-      prod    <= 32'd0;
-      done_r  <= 1'b0;
-    end else begin
-      if (!busy) begin
-        // Idle state. If a start pulse is received, load the registers and begin.
-        done_r <= 1'b0;  // clear done flag
-        if (start) begin
-          busy <= 1'b1;
-          i    <= 5'd0;
-          areg <= ain;
-          breg <= bin;
-          prod <= 32'd0;
-        end
-      end else begin  // busy = 1: multiplication in progress
-        if (i < 5'd16) begin
-          // For each bit position i, check the i'th bit of the multiplicand.
-          if (areg[i])
-            prod <= prod + ( {16'd0, breg} << i );
-          i <= i + 5'd1;
-        end else begin
-          // Iterations complete.
-          busy   <= 1'b0;
-          done_r <= 1'b1; // one-cycle pulse to indicate completion
-        end
-      end
+    if (!rst_n)
+      i <= 0;
+    else if (start) begin
+      if (i < CNT_MAX)
+        i <= i + 1;
+      else
+        i <= i;  // hold the value if already reached CNT_MAX
+    end
+    else begin
+      i <= 0;
     end
   end
 
-  // Output assignments
-  assign yout = prod;
-  assign done = done_r;
+  // 2. Done flag generation.
+  // When i equals WIDTH, set done flag (indicating that accumulation is complete).
+  // When i equals CNT_MAX (i.e. WIDTH+1), clear the done flag.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      done <= 0;
+    else if (i == WIDTH)
+      done <= 1;
+    else if (i == CNT_MAX)
+      done <= 0;
+    else
+      done <= done;
+  end
+
+  // 3. Shift and accumulate multiplication.
+  // Under reset, clear areg, breg, and yout_r.
+  // When start is high:
+  //   - On first cycle (i==0), load ain and bin and clear yout_r.
+  //   - For cycles i=1 to WIDTH, if the (i-1)th bit of areg is 1 then add (breg shifted left by (i-1)) to yout_r.
+  // When start is low, clear internal registers.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      areg   <= {WIDTH{1'b0}};
+      breg   <= {WIDTH{1'b0}};
+      yout_r <= {2*WIDTH{1'b0}};
+    end
+    else if (start) begin
+      if (i == 0) begin
+        areg   <= ain;
+        breg   <= bin;
+        yout_r <= {2*WIDTH{1'b0}};
+      end
+      else if ((i >= 1) && (i <= WIDTH)) begin
+        // Use the (i-1)th bit of areg as control. (Note: multiplication is commutative.)
+        if (areg[i-1])
+          yout_r <= yout_r + ( { {WIDTH{1'b0}}, breg} << (i-1) );
+        else
+          yout_r <= yout_r;
+      end
+      // else: for i > WIDTH, do nothing.
+    end
+    else begin
+      areg   <= {WIDTH{1'b0}};
+      breg   <= {WIDTH{1'b0}};
+      yout_r <= {2*WIDTH{1'b0}};
+    end
+  end
+
+  // 4. Output assignment.
+  // Register the accumulated product into the output.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      yout <= {2*WIDTH{1'b0}};
+    else
+      yout <= yout_r;
+  end
 
 endmodule
-------------------------------------------------------------
+--------------------------------------------------
 
-Explanation of Corrections and Improvements:
+Explanation of key changes:
 
-1. State Control (busy flag):  
-  – A “busy” register has been added so that once a new multiplication is started (on start) the design does not reset its internal registers even if the external start pulse goes low.  
-  – Only when busy==0 does the module respond to start.
+• We have declared parameters WIDTH and CNT_MAX for easy change of data width.
+• The bit‐select in the accumulation stage uses “areg[i-1]” only when i is at least 1.
+• The multiplication result is accumulated into yout_r and then registered into the yout output.
+• The done flag is generated based solely on the counter (i) values.
 
-2. Iteration Counter:  
-  – The counter “i” runs from 0 to 15. In each cycle, the corresponding bit of ain (stored in areg) is checked. When ain[i] is 1, the module adds (bin shifted left by i).  
-  – Once 16 iterations are complete, busy is cleared and a one‐cycle “done” pulse is produced.
+Note: In many designs the start signal is latency‐controlled (for example, using a one‐clock pulse) and the entire operation is built as a finite state machine rather than using a combinational “if (start)” guard. Adjust that as needed for your design requirements.
 
-3. Readability and Best Practices:  
-  – The code now uses a single always block for sequential logic with asynchronous reset.  
-  – Clear comments indicate operation, and the design does not “latch” start as an enable signal but rather latches the inputs on the rising edge of start when idle.
-
-This version meets best practices for synthesis and verification while implementing the intended functionality.
+This revised module should now compile with fewer surprises and follows good design practices.

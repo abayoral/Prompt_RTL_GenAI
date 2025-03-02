@@ -1,0 +1,53 @@
+module div_16bit(
+    input  [15:0] A,      // 16-bit dividend
+    input  [7:0]  B,      // 8-bit divisor
+    output reg [15:0] result, // 16-bit quotient output
+    output reg [15:0] odd     // 16-bit remainder output
+);
+
+    // Internal registers to hold the inputs
+    reg [15:0] a_reg;
+    reg [7:0]  b_reg;
+
+    // First combinational block: register the inputs
+    always @(*) begin
+        a_reg = A;
+        b_reg = B;
+    end
+
+    // Second combinational block: perform the iterative division
+    // We use a shift-subtract algorithm that mimics the manual long division procedure.
+    always @(*) begin
+        // Use a temporary remainder that is one bit wider than the dividend,
+        // so that we can accommodate the shifted bits.
+        reg [16:0] rem;
+        reg [15:0] quot;
+        integer i;
+        // Initialize remainder and quotient
+        rem = 17'b0;
+        quot = 16'b0;
+        
+        // The algorithm processes the dividend starting at the most significant bit.
+        // For each bit position i from MSB to LSB, shift the current remainder left by 1,
+        // bring in the corresponding bit of the dividend, then if the remainder is greater than or 
+        // equal to the divisor, subtract the divisor from the remainder and set the quotient bit to 1.
+        for(i = 15; i >= 0; i = i - 1) begin
+            // Shift left by concatenating the current remainder (15 LSBs) with the next dividend bit.
+            rem = {rem[15:0], a_reg[i]};
+
+            // Extend the divisor to 17 bits for proper comparison.
+            if(rem >= {9'b0, b_reg}) begin
+                rem = rem - {9'b0, b_reg};
+                quot[i] = 1'b1;
+            end else begin
+                quot[i] = 1'b0;
+            end
+        end
+        
+        // Assign the results.
+        result = quot;
+        // The remainder is contained in the lower 16 bits of our 17-bit temporary remainder.
+        odd = rem[15:0];
+    end
+
+endmodule

@@ -1,0 +1,54 @@
+module top_module (
+    input clk,
+    input reset,   // Synchronous active‐high reset
+    output [3:1] ena,   // Enable signals for tens, hundreds, and thousands digits
+    output [15:0] q     // 4-digit BCD count: q[3:0] ones, q[7:4] tens, q[11:8] hundreds, q[15:12] thousands
+);
+
+    // Internal registers for each BCD digit
+    reg [3:0] ones, tens, hundreds, thousands;
+
+    // Synchronous update of the counter.
+    // The ones digit is always incremented.
+    // The tens digit increments when ones == 9,
+    // the hundreds when both ones & tens equal 9,
+    // and the thousands when ones, tens & hundreds are all 9.
+    always @(posedge clk) begin
+        if (reset) begin
+            ones      <= 4'd0;
+            tens      <= 4'd0;
+            hundreds  <= 4'd0;
+            thousands <= 4'd0;
+        end else begin
+            // ones digit always counts
+            ones <= (ones == 4'd9) ? 4'd0 : ones + 4'd1;
+            
+            // tens digit increments only when ones rolled over
+            tens <= (ones == 4'd9) ? ((tens == 4'd9) ? 4'd0 : tens + 4'd1) : tens;
+            
+            // hundreds digit increments only when both ones and tens rolled over
+            hundreds <= ((ones == 4'd9) && (tens == 4'd9)) ? 
+                         ((hundreds == 4'd9) ? 4'd0 : hundreds + 4'd1) : hundreds;
+            
+            // thousands digit increments when ones, tens, and hundreds all rolled over
+            thousands <= ((ones == 4'd9) && (tens == 4'd9) && (hundreds == 4'd9)) ?
+                          ((thousands == 4'd9) ? 4'd0 : thousands + 4'd1) : thousands;
+        end
+    end
+
+    // Combine individual BCD digits into a single 16-bit output:
+    // q[3:0]   -> ones digit
+    // q[7:4]   -> tens digit
+    // q[11:8]  -> hundreds digit
+    // q[15:12] -> thousands digit
+    assign q = {thousands, hundreds, tens, ones};
+
+    // Generate enable signals for the upper three digits.
+    // The enable for the tens digit (ena[1]) is asserted when ones digit == 9.
+    // Similarly, ena[2] for the hundreds digit is high when ones and tens digits are 9,
+    // and ena[3] for the thousands digit is high when ones, tens and hundreds are 9.
+    assign ena[1] = (ones == 4'd9);
+    assign ena[2] = (ones == 4'd9) && (tens == 4'd9);
+    assign ena[3] = (ones == 4'd9) && (tens == 4'd9) && (hundreds == 4'd9);
+
+endmodule

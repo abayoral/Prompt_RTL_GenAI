@@ -1,0 +1,1 @@
+Is the input vector "in" guaranteed to be synchronous to clk, or should the design include input synchronization to avoid metastability issues?

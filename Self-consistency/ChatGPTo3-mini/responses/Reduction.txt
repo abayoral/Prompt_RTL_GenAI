@@ -1,0 +1,10 @@
+module top_module (
+    input [7:0] in,
+    output parity
+);
+    // For even parity, we want the XOR (reduction) of all 8 bits.
+    // XOR of all bits will be 1 if the number of 1s in 'in' is odd,
+    // which, when appended, gives an even total.
+    assign parity = ^in;
+
+endmodule

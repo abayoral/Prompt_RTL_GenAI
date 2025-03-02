@@ -1,0 +1,43 @@
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output done
+);
+
+    // State encoding
+    localparam S0 = 2'd0, // Waiting for a byte with in[3]==1 (start-of-message)
+               S1 = 2'd1, // First byte received
+               S2 = 2'd2, // Second byte received
+               S3 = 2'd3; // Third byte received (assert done)
+
+    reg [1:0] state, next_state;
+
+    // Combinational logic: State transition logic
+    always @(*) begin
+        case (state)
+            S0: begin // Waiting for a start byte
+                if (in[3])
+                    next_state = S1;
+                else
+                    next_state = S0;
+            end
+            S1: next_state = S2; // Count second byte (regardless of in[3])
+            S2: next_state = S3; // Count third byte (regardless of in[3])
+            S3: next_state = S0; // After completion, go back to waiting for next start-of-message
+            default: next_state = S0;
+        endcase
+    end
+
+    // Sequential logic: State flip-flops with synchronous reset
+    always @(posedge clk) begin
+        if (reset)
+            state <= S0;
+        else
+            state <= next_state;
+    end
+
+    // Output logic: Assert done in state S3 for one cycle
+    assign done = (state == S3);
+
+endmodule

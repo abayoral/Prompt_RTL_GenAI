@@ -1,0 +1,22 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // Clarifying question:
+    // "Can we treat the don't-care cells as having values that minimize the logic implementation?"
+    // (The answer provided was yes.)
+
+    // Based on the Karnaugh map and by choosing the don't-care cells appropriately,
+    // one effective simplification is to cover the eight cells where a=1 and then
+    // cover the two remaining ones (in the (a,b) = (0,1) column for rows cd and cd').
+    // This yields the sum-of-products expression:
+    //     out = a + (b & c)
+    // Note that a + (~a & b & c) simplifies to a + (b & c).
+
+    assign out = a | (b & c);
+
+endmodule

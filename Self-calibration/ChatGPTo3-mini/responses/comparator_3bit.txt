@@ -1,37 +1,29 @@
-The provided Verilog module is functionally and syntactically correct. It implements a 3‑bit comparator that produces three outputs (A_greater, A_equal, and A_less) using combinational continuous assignments, and these are standard, synthesizable constructs.
+I reviewed the code and found no errors—logically, syntactically, or functionally. The module correctly compares two 3‐bit numbers and ensures that only one output (A_equal, A_greater, or A_less) is high at a time.
 
-That said, here are a few best‐practice suggestions you might consider:
+That said, here are a few suggestions to follow best practices:
 
-1. Include a timescale directive (often used in simulation).
-2. Add comments describing the module’s functionality.
-3. Optionally, you might group the outputs in a single bus or optimize the logic if needed, but that isn’t necessary here.
+1. Explicitly declare the ports as type “wire” (even though they default to wire for continuous assignments).
+2. Add comments for clarity.  
+3. Optionally, include a header comment for module documentation.
 
-Below is the "corrected" version that integrates these best practices:
+Below is the slightly revised version incorporating these suggestions:
 
-------------------------------------------------
-`timescale 1ns / 1ps
-
+------------------------------------------------------------
 module comparator_3bit(
-    input  [2:0] A,
-    input  [2:0] B,
-    output       A_greater,
-    output       A_equal,
-    output       A_less
+    input  wire [2:0] A,      // 3-bit input A
+    input  wire [2:0] B,      // 3-bit input B
+    output wire       A_greater,  // High if A > B
+    output wire       A_equal,    // High if A == B
+    output wire       A_less      // High if A < B
 );
-    //-------------------------------------------------------------------------
-    // Description:
-    //   Compares two 3-bit numbers A and B:
-    //     - A_greater is high if A is greater than B.
-    //     - A_equal   is high if A is equal to B.
-    //     - A_less    is high if A is less than B.
-    //-------------------------------------------------------------------------
-    
-    // Combinational logic for comparison
-    assign A_greater = (A > B);
+
+    // Combinational logic to determine the relationship between A and B.
+    // Exactly one of the outputs will be high.
     assign A_equal   = (A == B);
+    assign A_greater = (A > B);
     assign A_less    = (A < B);
 
 endmodule
-------------------------------------------------
+------------------------------------------------------------
 
-In summary, the original design is correct, and the above version simply enhances readability and simulation setup.
+This version adheres to best practices and retains the intended functionality.

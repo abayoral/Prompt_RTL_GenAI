@@ -1,0 +1,119 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg [7:0] out_byte,
+    output reg done
+);
+
+    // FSM state encoding
+    localparam IDLE   = 2'd0,
+               DATA   = 2'd1,
+               PARITY = 2'd2,
+               STOP   = 2'd3;
+
+    reg [1:0] state;
+    reg [2:0] bit_count;  // to count 8 data bits (0 to 7)
+    // This signal will be used to synchronously reset the parity module.
+    reg par_reset;
+
+    // Instantiate the parity module.
+    // This module toggles its output "odd" on every input "in" that is 1,
+    // but if its reset is high at a clock edge, it resets odd to 0.
+    wire odd_parity;
+    parity par_inst(
+        .clk(clk),
+        .reset(par_reset),
+        .in(in),
+        .odd(odd_parity)
+    );
+
+    // FSM and datapath
+    // The receiver obtains a serial byte with a start bit, 8 data bits,
+    // one parity bit (for odd parity over the 9 bits), and a stop bit.
+    // The received byte (LSB first) is stored in out_byte.
+    // The done signal is pulsed for one clock cycle only if the stop bit is 1
+    // and the parity check passes.
+    always @(posedge clk) begin
+        if (reset) begin
+            state      <= IDLE;
+            bit_count  <= 3'd0;
+            out_byte   <= 8'd0;
+            done       <= 1'b0;
+            par_reset  <= 1'b1;  // reset parity module initially
+        end else begin
+            // Default assignments for one-cycle pulses and one-shot signals.
+            done      <= 1'b0;
+            par_reset <= 1'b0;   // deassert parity reset unless explicitly set below
+
+            case (state)
+                IDLE: begin
+                    // Wait until we detect a start bit (logic 0).
+                    if (in == 1'b0) begin
+                        state     <= DATA;
+                        bit_count <= 3'd0;
+                        // Pulse the parity module reset to begin counting fresh for this byte.
+                        par_reset <= 1'b1;
+                    end
+                end
+
+                DATA: begin
+                    // Sample each of the 8 data bits.
+                    // The protocol sends the LSB first.
+                    out_byte[bit_count] <= in;
+                    if (bit_count < 3'd7) begin
+                        bit_count <= bit_count + 1;
+                        state     <= DATA;
+                    end else begin
+                        // After receiving the 8th data bit, move to sampling parity bit.
+                        state <= PARITY;
+                    end
+                end
+
+                PARITY: begin
+                    // In this state, the incoming bit is the parity bit.
+                    // The parity module, which has been counting all bits (data bits so far),
+                    // now sees the parity bit.  Its internal register "odd_parity" will be updated
+                    // (on this same clock edge) to reflect the total number of 1’s (data + parity).
+                    // In odd parity, a correctly received byte generates odd_parity == 1.
+                    state <= STOP;
+                end
+
+                STOP: begin
+                    // Wait here until a valid stop bit (logic 1) is detected.
+                    // Do not proceed until the stop bit synchronizes with the receiver.
+                    if (in == 1'b1) begin
+                        // Only if the parity check passes (odd_parity == 1) do we assert done.
+                        if (odd_parity == 1'b1)
+                            done <= 1'b1;
+                        // Regardless of parity outcome, return to IDLE and wait for the next byte.
+                        state <= IDLE;
+                    end
+                    // If the stop bit is not yet valid, remain in STOP.
+                end
+
+                default: begin
+                    state <= IDLE;
+                end
+            endcase
+        end
+    end
+
+endmodule
+
+// The provided parity module.
+// It counts the number of 1 bits seen on its 'in' input (toggles its "odd" output)
+// and is reset by its "reset" input.
+module parity (
+    input clk,
+    input reset,
+    input in,
+    output reg odd
+);
+
+    always @(posedge clk)
+        if (reset)
+            odd <= 1'b0;
+        else if (in)
+            odd <= ~odd;
+endmodule

@@ -1,0 +1,11 @@
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output cout,
+    output [99:0] sum 
+);
+    // Using behavioral Verilog to implement a purely combinational 100-bit adder
+    // The expression a + b + cin results in a 101-bit value where the MSB is the carry-out.
+    assign {cout, sum} = a + b + cin;
+
+endmodule

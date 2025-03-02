@@ -1,0 +1,74 @@
+module synchronizer(
+    input        clk_a,   // clock for data and enable in A-domain
+    input        clk_b,   // clock for synchronization and output in B-domain
+    input        arstn,   // asynchronous reset for A-domain (active low)
+    input        brstn,   // asynchronous reset for B-domain (active low)
+    input        data_en, // enable signal used to capture data_in in A-domain
+    input  [3:0] data_in, // multi‐bit input data
+    output reg [3:0] dataout  // synchronized output data in B-domain
+);
+
+  // A-domain registers:
+  // data_reg latches data_in when data_en is high.
+  // en_data_reg latches the enable to be transferred to clk_b domain.
+  reg [3:0] data_reg;
+  reg       en_data_reg;
+
+  // B-domain registers for synchronizing the enable signal.
+  // en_clap_one and en_clap_two constitute a two‐stage synchronizer.
+  reg en_clap_one;
+  reg en_clap_two;
+
+  //==============================================================
+  // A-domain process:
+  // On rising edge of clk_a (or asynchronous reset), if data_en is high,
+  // latch data_in into data_reg and enable into en_data_reg.
+  //==============================================================
+  always @(posedge clk_a or negedge arstn)
+  begin
+    if (!arstn) begin
+      data_reg    <= 4'b0;
+      en_data_reg <= 1'b0;
+    end
+    else begin
+      // Capture data only when data_en is asserted.
+      if (data_en) begin
+        data_reg    <= data_in;
+        en_data_reg <= data_en;
+      end
+    end
+  end
+
+  //==============================================================
+  // B-domain process for synchronizing the enable signal:
+  // Two cascading D flip-flops capture en_data_reg into en_clap_one and en_clap_two.
+  // This provides a delay (of two clk_b cycles) to safely transfer the enable.
+  //==============================================================
+  always @(posedge clk_b or negedge brstn)
+  begin
+    if (!brstn) begin
+      en_clap_one <= 1'b0;
+      en_clap_two <= 1'b0;
+    end
+    else begin
+      en_clap_one <= en_data_reg;
+      en_clap_two <= en_clap_one;
+    end
+  end
+
+  //==============================================================
+  // B-domain process to update dataout:
+  // When the delayed enable (en_clap_two) is high, data_reg is transferred 
+  // to dataout. Otherwise, dataout holds its previous value.
+  //==============================================================
+  always @(posedge clk_b or negedge brstn)
+  begin
+    if (!brstn)
+      dataout <= 4'b0;
+    else if (en_clap_two)
+      dataout <= data_reg;
+    else
+      dataout <= dataout;  // maintain the previous state when not enabled
+  end
+
+endmodule

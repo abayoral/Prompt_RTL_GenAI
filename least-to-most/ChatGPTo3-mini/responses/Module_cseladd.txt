@@ -1,0 +1,58 @@
+module mux16_2to1(
+    input  [15:0] in0,
+    input  [15:0] in1,
+    input         sel,
+    output [15:0] out
+);
+    // If sel is 0, choose in0; if sel is 1, choose in1.
+    assign out = sel ? in1 : in0;
+endmodule
+
+module top_module(
+    input  [31:0] a,
+    input  [31:0] b,
+    output [31:0] sum
+);
+
+    // Internal wires for lower block carry-out and for the upper block sum outputs.
+    wire carry_lower;
+    wire [15:0] upper_sum0, upper_sum1;
+    wire cout0, cout1;
+
+    // Lower 16-bit addition: actual carry-in is assumed 0.
+    add16 lower_add (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum[15:0]),
+        .cout(carry_lower)
+    );
+
+    // Upper 16-bit addition computed twice:
+    // One assuming carry-in is 0.
+    add16 upper_add0 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b0),
+        .sum(upper_sum0),
+        .cout(cout0)
+    );
+
+    // The other assuming carry-in is 1.
+    add16 upper_add1 (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(1'b1),
+        .sum(upper_sum1),
+        .cout(cout1)
+    );
+
+    // Select the correct upper sum based on the lower addition's carry-out.
+    mux16_2to1 upper_mux (
+        .in0(upper_sum0),
+        .in1(upper_sum1),
+        .sel(carry_lower),
+        .out(sum[31:16])
+    );
+
+endmodule

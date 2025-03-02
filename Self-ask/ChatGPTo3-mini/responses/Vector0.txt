@@ -1,0 +1,1 @@
+Is it correct that each output is directly and continuously assigned from the corresponding bit of the 3‐bit input (with o0 from vec[0], o1 from vec[1], and o2 from vec[2]), with no additional modifications or timing constraints?

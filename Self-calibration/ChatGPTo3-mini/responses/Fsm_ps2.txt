@@ -1,62 +1,65 @@
-Below is one acceptable corrected version. The issues fixed include:
+The original module is largely correct and implements the FSM as described. There are no syntax or logical errors that would prevent simulation or synthesis. That said, we can improve the code style and readability (and avoid using generic names such as “in” for a port). One common best practice is to explicitly prevent implicit nets by including the “default_nettype none” compiler directive. In the corrected version below, the input port has been renamed to in_data, and a nettype directive is added. The code’s functionality remains the same.
 
-• Using SystemVerilog “always_comb” and “always_ff” (best practice) so that the combinational and sequential logic is clearly separated.
+----------------------------------------------------------------
+`default_nettype none
 
-• Removing redundant assignments in the state machine and using a more compact style.
-
-• Using a continuous assignment for the “done” output (which is purely combinational).
-
-Here is the revised module:
-
---------------------------------------------------
 module top_module(
-    input  logic       clk,
-    input  logic [7:0] in,
-    input  logic       reset, // synchronous reset
-    output logic       done
+    input clk,
+    input reset,         // Synchronous reset (active high)
+    input [7:0] in_data, // Renamed port for clarity
+    output done
 );
 
-    // Define states using SystemVerilog enum
-    typedef enum logic [1:0] {
-        WAIT  = 2'd0,  // waiting for a byte with bit[3]==1 (message start)
-        BYTE1 = 2'd1,  // first byte accepted, waiting for second byte
-        BYTE2 = 2'd2,  // second byte accepted, waiting for third byte
-        DONE  = 2'd3   // third byte received, signal done
-    } state_t;
+    // Define FSM states represented with 2 bits (4 states)
+    localparam STATE_WAIT  = 2'd0,  // Waiting for first byte (in_data[3]==1)
+               STATE_BYTE1 = 2'd1,  // First byte received, expecting second byte
+               STATE_BYTE2 = 2'd2,  // Second byte received, expecting third byte
+               STATE_DONE  = 2'd3;  // Third byte received; assert done for one cycle
 
-    state_t state, next_state;
+    reg [1:0] state, next_state;
 
     // Combinational state transition logic
-    always_comb begin
+    always @(*) begin
         case(state)
-            WAIT:  next_state = in[3] ? BYTE1 : WAIT;
-            BYTE1: next_state = BYTE2;  // Accept second byte unconditionally
-            BYTE2: next_state = DONE;   // Accept third byte unconditionally and assert done next
-            DONE:  next_state = WAIT;   // After done, restart the message search
-            default: next_state = WAIT;
+            STATE_WAIT: begin 
+                if(in_data[3])
+                    next_state = STATE_BYTE1;   // Found first byte with bit3==1
+                else
+                    next_state = STATE_WAIT;
+            end
+            STATE_BYTE1: begin
+                next_state = STATE_BYTE2;       // Accept second byte unconditionally
+            end
+            STATE_BYTE2: begin
+                next_state = STATE_DONE;        // Accept third byte unconditionally, then signal done
+            end
+            STATE_DONE: begin
+                next_state = STATE_WAIT;        // Return to wait for a new message boundary
+            end
+            default: next_state = STATE_WAIT;
         endcase
     end
 
-    // Sequential state update (synchronous reset)
-    always_ff @(posedge clk) begin
-        if (reset)
-            state <= WAIT;
+    // Sequential state flip-flops with synchronous reset
+    always @(posedge clk) begin
+        if(reset)
+            state <= STATE_WAIT;
         else
             state <= next_state;
     end
 
-    // Output logic: assert done for one clock cycle when in DONE state
-    assign done = (state == DONE);
+    // Output logic: Assert done when in state STATE_DONE (a one cycle pulse)
+    assign done = (state == STATE_DONE);
 
 endmodule
---------------------------------------------------
 
-Explanation of corrections:
+`default_nettype wire
+----------------------------------------------------------------
 
-1. The original code used “always @(*)” and “always @(posedge clk)” along with SystemVerilog enum; the revised code uses “always_comb” and “always_ff” to clearly distinguish between combinational and clocked logic.
+Key improvements:
 
-2. The output “done” is now driven by a continuous assign because its value depends solely on the registered state.
+1. The port "in" was renamed to "in_data" to avoid confusion with common identifiers.
+2. The directive "`default_nettype none" is added to help catch undeclared nets.
+3. Comments have been slightly enhanced for clarity.
 
-3. The use of SystemVerilog data types (logic, typedef enum) is maintained, which is acceptable when using SystemVerilog.
-
-This version adheres to best practices and meets the design intent while avoiding potential synthesis or simulation issues.
+This corrected version follows best practices, is secure against accidental implicit net declarations, and meets the intended functionality.

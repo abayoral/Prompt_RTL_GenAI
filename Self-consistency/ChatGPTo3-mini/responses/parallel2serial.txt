@@ -1,0 +1,36 @@
+module parallel2serial(
+    input clk,
+    input rst_n,
+    input [3:0] d,
+    output reg valid_out,
+    output reg dout
+);
+
+  // 2-bit counter to track which bit is currently being output (values 0 to 3)
+  reg [1:0] cnt;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      cnt       <= 2'd0;
+      dout      <= 1'b0;
+      valid_out <= 1'b0;
+    end else begin
+      // Output the appropriate bit from 'd' starting with MSB (d[3]) and ending with LSB (d[0])
+      case (cnt)
+        2'd0: dout <= d[3];
+        2'd1: dout <= d[2];
+        2'd2: dout <= d[1];
+        2'd3: dout <= d[0];
+      endcase
+      // valid_out is high during the complete transmission of the current 4 bit sequence
+      valid_out <= 1'b1;
+      
+      // Update counter: if at the end of sequence, reset to 0; otherwise, increment
+      if (cnt == 2'd3)
+        cnt <= 2'd0;
+      else
+        cnt <= cnt + 2'd1;
+    end
+  end
+
+endmodule

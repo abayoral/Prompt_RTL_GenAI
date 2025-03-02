@@ -1,0 +1,115 @@
+module freq_divbyfrac (
+    input  clk,
+    input  rst_n,
+    output clk_div
+);
+
+  //--------------------------------------------------------------------------
+  // Overview:
+  // This module divides the input clock frequency by a fractional factor of
+  // 3.5 using a double‐edge clocking technique. In effect, the intended output
+  // clock has a period of 3.5 cycles of the input clock. That means that one
+  // half‐cycle of the output is generated after 4 input clock edges and the
+  // other half‐cycle after 3 input clock edges. To obtain a roughly balanced
+  // duty cycle versus a “naïve” uneven count, we derive two intermediate clocks:
+  // one updated on the rising edge and one on the falling edge of the input.
+  // Their timings are arranged so that one “half‐cycle” is advanced relative to
+  // the other. Finally, the two are OR–ed together to form a composite clock
+  // signal with an “average” toggle spacing corresponding to a division by 3.5.
+  //
+  // The rising–edge based process counts positive edges and toggles its signal 
+  // after 4 edges when it is low and after 3 edges when it is high.
+  // The falling–edge based process does the complementary counting:
+  // it toggles after 3 negative edges when it is high and after 4 when it is low.
+  // These two banks generate phase–shifted signals that are combined (using OR)
+  // to produce the divided clock.
+  //--------------------------------------------------------------------------
+
+  // Internal signals for the two “phased” clocks.
+  reg pos_div;            // generated on rising clk edges
+  reg [2:0] pos_count;    // counter for rising edge portion
+
+  reg neg_div;            // generated on falling clk edges
+  reg [2:0] neg_count;    // counter for falling edge portion
+
+  //-------------------------------------------------------------------------
+  // Combining the two intermediate clocks.
+  // The final divided clock is the logical OR of the rising–edge and falling–edge
+  // derived clocks. When one of them transitions mid–cycle the OR helps to “stitch”
+  // together an output that on average toggles with a period equivalent to 7 input
+  // clock cycles (i.e. half–period = 3.5 cycles).
+  //-------------------------------------------------------------------------
+  assign clk_div = pos_div | neg_div;
+
+
+  //-------------------------------------------------------------------------
+  // Process 1: Positive–edge clock division
+  //
+  // When pos_div is 0, the “low” half is made to last 4 rising edges. When
+  // pos_div is 1, we count 3 rising edges. Thus, over a full period from rising
+  // toggle to the next same toggle the cumulative count is 7 edges (4 + 3),
+  // corresponding to a half–cycle of the output clock.
+  //-------------------------------------------------------------------------
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      pos_div   <= 1'b0;
+      pos_count <= 3'd0;
+    end else begin
+      if (pos_div == 1'b0) begin
+        // For state '0': count 4 rising edges
+        if (pos_count == 3'd3) begin
+          pos_div   <= 1'b1;
+          pos_count <= 3'd0;
+        end
+        else
+          pos_count <= pos_count + 3'd1;
+      end else begin
+        // For state '1': count 3 rising edges
+        if (pos_count == 3'd2) begin
+          pos_div   <= 1'b0;
+          pos_count <= 3'd0;
+        end
+        else
+          pos_count <= pos_count + 3'd1;
+      end
+    end
+  end
+
+
+  //-------------------------------------------------------------------------
+  // Process 2: Negative–edge clock division (phase shifted)
+  //
+  // To “complement” the positive process an opposite counting is done.
+  // When neg_div is 1, a high state lasts 3 falling edges; when neg_div is 0,
+  // the low state lasts 4 falling edges. This leads to results in a phase–shifted
+  // version of the divided clock relative to the rising edge process.
+  //
+  // Note: The reset initializing neg_div to 1 produces the intended half‐cycle
+  // time shift relative to pos_div.
+  //-------------------------------------------------------------------------
+  always @(negedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      neg_div   <= 1'b1;
+      neg_count <= 3'd0;
+    end else begin
+      if (neg_div == 1'b1) begin
+        // For state '1': count 3 falling edges
+        if (neg_count == 3'd2) begin
+          neg_div   <= 1'b0;
+          neg_count <= 3'd0;
+        end
+        else
+          neg_count <= neg_count + 3'd1;
+      end else begin
+        // For state '0': count 4 falling edges
+        if (neg_count == 3'd3) begin
+          neg_div   <= 1'b1;
+          neg_count <= 3'd0;
+        end
+        else
+          neg_count <= neg_count + 3'd1;
+      end
+    end
+  end
+
+endmodule

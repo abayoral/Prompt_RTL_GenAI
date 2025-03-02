@@ -1,0 +1,14 @@
+module top_module (
+    input ring,
+    input vibrate_mode,
+    output ringer,  // Make sound
+    output motor    // Vibrate
+);
+
+    // The ringer is on only when ring is high and vibrate_mode is not asserted.
+    assign ringer = ring & ~vibrate_mode;
+    
+    // The motor is on only when both ring and vibrate_mode are asserted.
+    assign motor = ring & vibrate_mode;
+
+endmodule

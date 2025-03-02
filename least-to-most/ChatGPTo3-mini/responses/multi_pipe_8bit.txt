@@ -1,0 +1,143 @@
+module multi_pipe_8bit (
+    input         clk,
+    input         rst_n,
+    input         mul_en_in,
+    input  [7:0]  mul_a,
+    input  [7:0]  mul_b,
+    output        mul_en_out,
+    output [15:0] mul_out
+);
+
+  // Pipeline registers for the enable and operand data (Stage 0 holds the input operands)
+  reg         mul_en_stage0;
+  reg [7:0]   a_stage0;
+  reg [7:0]   b_stage0;
+  reg [15:0]  sum_stage0;
+  
+  // Pipeline registers for the partial sum accumulation (Stages 1 through 8)
+  reg         mul_en_stage1;
+  reg [15:0]  sum_stage1;
+  
+  reg         mul_en_stage2;
+  reg [15:0]  sum_stage2;
+  
+  reg         mul_en_stage3;
+  reg [15:0]  sum_stage3;
+  
+  reg         mul_en_stage4;
+  reg [15:0]  sum_stage4;
+  
+  reg         mul_en_stage5;
+  reg [15:0]  sum_stage5;
+  
+  reg         mul_en_stage6;
+  reg [15:0]  sum_stage6;
+  
+  reg         mul_en_stage7;
+  reg [15:0]  sum_stage7;
+  
+  reg         mul_en_stage8;
+  reg [15:0]  sum_stage8;
+  
+  // Final output registers
+  reg         mul_en_out_reg;
+  reg [15:0]  mul_out_reg;
+  
+
+  // Pipeline processing: The multiplication is split into 8 stages.
+  // Stage 0: Capture the inputs and initialize the partial sum.
+  // Stages 1-8: For each bit of the multiplier (b_stage0),
+  //   calculate the partial product and accumulate it in the sum.
+  //   The partial product is formed by shifting the multiplicand (a_stage0)
+  //   left by the bit index if the corresponding multiplier bit is 1.
+  
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      // Reset all pipeline registers and outputs.
+      mul_en_stage0 <= 1'b0;
+      a_stage0      <= 8'd0;
+      b_stage0      <= 8'd0;
+      sum_stage0    <= 16'd0;
+      
+      mul_en_stage1 <= 1'b0;
+      sum_stage1    <= 16'd0;
+      
+      mul_en_stage2 <= 1'b0;
+      sum_stage2    <= 16'd0;
+      
+      mul_en_stage3 <= 1'b0;
+      sum_stage3    <= 16'd0;
+      
+      mul_en_stage4 <= 1'b0;
+      sum_stage4    <= 16'd0;
+      
+      mul_en_stage5 <= 1'b0;
+      sum_stage5    <= 16'd0;
+      
+      mul_en_stage6 <= 1'b0;
+      sum_stage6    <= 16'd0;
+      
+      mul_en_stage7 <= 1'b0;
+      sum_stage7    <= 16'd0;
+      
+      mul_en_stage8 <= 1'b0;
+      sum_stage8    <= 16'd0;
+      
+      mul_en_out_reg <= 1'b0;
+      mul_out_reg    <= 16'd0;
+      
+    end else begin
+      // Stage 0: Latch the input signals when the multiplication enable is active.
+      mul_en_stage0 <= mul_en_in;
+      if (mul_en_in) begin
+        a_stage0   <= mul_a;
+        b_stage0   <= mul_b;
+        sum_stage0 <= 16'd0;  // Initialize the partial sum to 0.
+      end
+      
+      // Stage 1: Process bit 0 of b_stage0.
+      mul_en_stage1 <= mul_en_stage0;
+      // For bit0: if set then add a_stage0 (extended to 16 bits) shifted left 0; else add 0.
+      sum_stage1    <= sum_stage0 + (b_stage0[0] ? {8'd0, a_stage0} : 16'd0);
+
+      // Stage 2: Process bit 1.
+      mul_en_stage2 <= mul_en_stage1;
+      sum_stage2    <= sum_stage1 + (b_stage0[1] ? ({8'd0, a_stage0} << 1) : 16'd0);
+      
+      // Stage 3: Process bit 2.
+      mul_en_stage3 <= mul_en_stage2;
+      sum_stage3    <= sum_stage2 + (b_stage0[2] ? ({8'd0, a_stage0} << 2) : 16'd0);
+      
+      // Stage 4: Process bit 3.
+      mul_en_stage4 <= mul_en_stage3;
+      sum_stage4    <= sum_stage3 + (b_stage0[3] ? ({8'd0, a_stage0} << 3) : 16'd0);
+      
+      // Stage 5: Process bit 4.
+      mul_en_stage5 <= mul_en_stage4;
+      sum_stage5    <= sum_stage4 + (b_stage0[4] ? ({8'd0, a_stage0} << 4) : 16'd0);
+      
+      // Stage 6: Process bit 5.
+      mul_en_stage6 <= mul_en_stage5;
+      sum_stage6    <= sum_stage5 + (b_stage0[5] ? ({8'd0, a_stage0} << 5) : 16'd0);
+      
+      // Stage 7: Process bit 6.
+      mul_en_stage7 <= mul_en_stage6;
+      sum_stage7    <= sum_stage6 + (b_stage0[6] ? ({8'd0, a_stage0} << 6) : 16'd0);
+      
+      // Stage 8: Process bit 7.
+      mul_en_stage8 <= mul_en_stage7;
+      sum_stage8    <= sum_stage7 + (b_stage0[7] ? ({8'd0, a_stage0} << 7) : 16'd0);
+      
+      // Register the final pipeline stage into the output registers.
+      mul_en_out_reg <= mul_en_stage8;
+      mul_out_reg    <= sum_stage8;
+    end
+  end
+  
+  // Output assignments:
+  // The multiplication output is available only when the final enable (mul_en_out_reg)
+  // is high; otherwise the product output is zero.
+  assign mul_en_out = mul_en_out_reg;
+  assign mul_out    = (mul_en_out_reg) ? mul_out_reg : 16'd0;
+  
+endmodule

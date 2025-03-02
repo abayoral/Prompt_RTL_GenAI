@@ -1,0 +1,45 @@
+module top_module(
+    input clk,
+    input reset,    // Active‐high synchronous reset to 32'h1
+    output [31:0] q
+);
+
+    // We'll implement a 32‐bit Galois LFSR based on the polynomial
+    // x^32 + x^22 + x^2 + x + 1.
+    // In a Galois LFSR realized with a shift‐left architecture, the most
+    // significant bit drives the feedback. Converting the tap positions given
+    // in 1–based numbering (bits 32, 22, 2, and 1) to 0–based indices:
+    //    Bit 32 --> index 31 (feedback source; no feedback applied to itself)
+    //    Bit 22 --> index 21  (will be XORed with the MSB feedback)
+    //    Bit 2  --> index 1   (will be XORed with the MSB feedback)
+    //    Bit 1  --> index 0   (will be XORed with the MSB feedback)
+    //
+    // The update is defined as:
+    //   Let fb = lfsr[31]. Then, on each clock:
+    //     next_state[31] = lfsr[30];
+    //     next_state[30:22] = lfsr[29:21];
+    //     next_state[21] = lfsr[20] XOR fb;        // tap at reg bit22
+    //     next_state[20:2] = lfsr[19:1];
+    //     next_state[1] = lfsr[0] XOR fb;           // tap at reg bit2
+    //     next_state[0] = fb;                       // tap at reg bit1
+    //
+    // On reset, the register is set to 32'h1.
+
+    reg [31:0] lfsr;
+    
+    always @(posedge clk) begin
+        if (reset)
+            lfsr <= 32'h1;
+        else
+            lfsr <= { lfsr[30],         // New bit31 gets old bit30
+                      lfsr[29:21],      // Bits 30 downto 22 shift in directly
+                      lfsr[20] ^ lfsr[31],// Bit21 (reg bit22) XORed with fb
+                      lfsr[19:1],       // Bits 20 downto 2 shift in directly
+                      lfsr[0] ^ lfsr[31],// Bit1 (reg bit2) XORed with fb
+                      lfsr[31]          // Bit0 (reg bit1) becomes the feedback
+                    };
+    end
+
+    assign q = lfsr;
+
+endmodule

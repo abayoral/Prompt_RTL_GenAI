@@ -1,0 +1,178 @@
+module float_multi(
+    input         clk,
+    input         rst,
+    input  [31:0] a,
+    input  [31:0] b,
+    output reg [31:0] z
+);
+
+  // Internal registers for cycle control
+  reg [2:0] counter;
+
+  // Component extraction registers
+  reg [23:0] a_mantissa, b_mantissa;
+  reg [9:0]  a_exponent, b_exponent;  // storing exponent (extended to 10-bit)
+  reg        a_sign, b_sign;
+  reg        z_sign;
+
+  // Intermediate product and normalization registers
+  reg [49:0] product;
+  reg        guard_bit, round_bit, sticky;
+  reg [48:0] norm_val;      // normalized value (after possible shift)
+  reg [23:0] norm_mantissa; // holds 24 bits: [23] is the implicit "1" and [22:0] is fraction
+  reg [9:0]  new_exponent;  // computed exponent after bias adjustment
+
+  // Temporary variable for rounding result checking
+  // (We use norm_mantissa itself; careful with rounding carry)
+
+  // Main sequential process: multi‐cycle pipeline implementation
+  always @(posedge clk) begin
+    if (rst) begin
+      counter      <= 3'd0;
+      z            <= 32'd0;
+      a_mantissa   <= 24'd0;
+      b_mantissa   <= 24'd0;
+      a_exponent   <= 10'd0;
+      b_exponent   <= 10'd0;
+      a_sign       <= 1'b0;
+      b_sign       <= 1'b0;
+      z_sign       <= 1'b0;
+      product      <= 50'd0;
+      norm_val     <= 49'd0;
+      norm_mantissa<= 24'd0;
+      new_exponent <= 10'd0;
+      guard_bit    <= 1'b0;
+      round_bit    <= 1'b0;
+      sticky       <= 1'b0;
+    end else begin
+      case (counter)
+        // Cycle 0: Input Processing - extract fields from inputs a and b.
+        3'd0: begin
+          // Extract sign bits.
+          a_sign     <= a[31];
+          b_sign     <= b[31];
+          // Extend exponent to 10 bits (original is 8 bits). 
+          a_exponent <= {2'b00, a[30:23]};
+          b_exponent <= {2'b00, b[30:23]};
+          // For normalized numbers, the mantissa has an implicit 1.
+          if(a[30:23] != 8'h00)
+            a_mantissa <= {1'b1, a[22:0]};
+          else
+            a_mantissa <= {1'b0, a[22:0]};  // subnormal case
+          if(b[30:23] != 8'h00)
+            b_mantissa <= {1'b1, b[22:0]};
+          else
+            b_mantissa <= {1'b0, b[22:0]};
+          counter <= 3'd1;
+        end
+
+        // Cycle 1: Special Case Handling.
+        3'd1: begin
+          // Check for NaN or Infinity in either operand.
+          if ((a[30:23] == 8'hFF) || (b[30:23] == 8'hFF)) begin
+            // Check if either is NaN (exponent all ones & nonzero fraction)
+            if (((a[30:23] == 8'hFF) && (a[22:0] != 23'd0)) ||
+                ((b[30:23] == 8'hFF) && (b[22:0] != 23'd0))) begin
+              // Return canonical NaN: sign 0, exponent all ones, nonzero fraction.
+              z <= {1'b0, 8'hFF, 23'h400000}; // 0x7FC00000
+            end
+            // If one is infinity and the other is zero, then result is NaN.
+            else if (((a[30:23] == 8'hFF) && (a[22:0] == 23'd0) &&
+                      (b[30:23] == 8'h00) && (b[22:0] == 23'd0)) ||
+                     ((b[30:23] == 8'hFF) && (b[22:0] == 23'd0) &&
+                      (a[30:23] == 8'h00) && (a[22:0] == 23'd0))) begin
+              z <= {1'b0, 8'hFF, 23'h400000};
+            end else begin
+              // Otherwise, one operand is infinity so result is infinity with proper sign.
+              z <= { (a_sign ^ b_sign), 8'hFF, 23'd0 };
+            end;
+            counter <= 3'd0; // Special case handled: reset pipeline.
+          end
+          // If one operand is zero, result is zero.
+          else if (((a[30:23] == 8'h00) && (a[22:0] == 23'd0)) ||
+                   ((b[30:23] == 8'h00) && (b[22:0] == 23'd0))) begin
+            z <= { (a_sign ^ b_sign), 31'd0 };
+            counter <= 3'd0;
+          end else begin
+            counter <= 3'd2;
+          end
+        end
+
+        // Cycle 2: Multiplication Phase.
+        3'd2: begin
+          // Multiply the 24-bit mantissas.
+          // The product of two 24-bit numbers is up to 48 bits.
+          // To allow room for rounding bits, we append two zero bits at the LSB.
+          product <= { (a_mantissa * b_mantissa), 2'b00 };
+          // Compute the preliminary exponent: add exponents and subtract the bias (127).
+          new_exponent <= a_exponent + b_exponent - 10'd127;
+          // Determine the sign of the result.
+          z_sign <= a_sign ^ b_sign;
+          counter <= 3'd3;
+        end
+
+        // Cycle 3: Normalization Phase.
+        3'd3: begin
+          // Normalize the product.
+          // The product is 50 bits. For normalized results, we want the MSB (hidden bit) to be at bit position 48 of the 49-bit normalized value.
+          if (product[49] == 1'b1) begin
+            // If the MSB is 1, the product is of the form 10.xxx so we shift right by 1 and increment the exponent.
+            norm_val     <= product[49:1];  // 49-bit value after shifting right one.
+            new_exponent <= new_exponent + 10'd1;
+          end else begin
+            // Else, the product is of the form 1.xxx, and we keep it as is (taking bits [48:0]).
+            norm_val     <= product[48:0];
+          end
+          // Extract the provisional normalized mantissa.
+          // In the normalized value, bit 48 is the implicit 1.
+          // We take bits [48:25] (24 bits) as the full significand prior to rounding.
+          norm_mantissa <= norm_val[48:25];
+          // The rounding bits:
+          guard_bit <= norm_val[24];
+          round_bit <= norm_val[23];
+          // Sticky is the OR of the lower 23 bits.
+          sticky    <= |norm_val[22:0];
+          counter   <= 3'd4;
+        end
+
+        // Cycle 4: Rounding and Adjustment Phase.
+        3'd4: begin
+          // Implement round-to-nearest-even.
+          if (guard_bit && (round_bit || sticky || norm_mantissa[0])) begin
+            norm_mantissa <= norm_mantissa + 1'b1;
+            // Check for rounding overflow (carry out from the least significant bit).
+            if (norm_mantissa == 24'hFFFFFF) begin
+              new_exponent <= new_exponent + 10'd1;
+              // After overflow the significand becomes 1.000... in normalized form.
+              norm_mantissa <= 24'h800000;
+            end
+          end
+          counter <= 3'd5;
+        end
+
+        // Cycle 5: Output Generation Phase.
+        3'd5: begin
+          // Check for exponent overflow: if the exponent is too large, output infinity.
+          if (new_exponent >= 10'd255) begin
+            z <= { z_sign, 8'hFF, 23'd0 };
+          end
+          // For underflow, output zero (for simplicity; subnormals not handled).
+          else if (new_exponent <= 10'd0) begin
+            z <= { z_sign, 8'd0, 23'd0 };
+          end
+          else begin
+            // The fraction field in IEEE 754 is the lower 23 bits of the significand.
+            // norm_mantissa has 24 bits with an implicit bit in bit 23.
+            z <= { z_sign, new_exponent[7:0], norm_mantissa[22:0] };
+          end
+          counter <= 3'd0;
+        end
+
+        default: begin
+          counter <= 3'd0;
+        end
+      endcase
+    end
+  end
+
+endmodule

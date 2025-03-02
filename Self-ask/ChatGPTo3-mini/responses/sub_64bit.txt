@@ -1,0 +1,18 @@
+module sub_64bit(
+    input  wire [63:0] A,
+    input  wire [63:0] B,
+    output wire [63:0] result,
+    output wire        overflow
+);
+
+  // Perform the subtraction
+  assign result = A - B;
+
+  // Overflow detection:
+  // Positive overflow: when A is positive (A[63] == 0) and B is negative (B[63] == 1),
+  // but result comes out negative (result[63] == 1).
+  // Negative overflow: when A is negative (A[63] == 1) and B is positive (B[63] == 0),
+  // but result comes out positive (result[63] == 0).
+  assign overflow = ((~A[63] & B[63] & result[63]) | (A[63] & ~B[63] & ~result[63]));
+
+endmodule

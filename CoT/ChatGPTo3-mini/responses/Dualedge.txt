@@ -1,0 +1,26 @@
+module top_module (
+    input clk,
+    input d,
+    output q
+);
+
+    // Two internal registers to store the data on positive and negative clock edges
+    reg pos_reg;
+    reg neg_reg;
+    
+    // Positively edge triggered flip-flop: latch d on rising edge of clock
+    always @(posedge clk) begin
+        pos_reg <= d;
+    end
+
+    // Negatively edge triggered flip-flop: latch d on falling edge of clock
+    always @(negedge clk) begin
+        neg_reg <= d;
+    end
+
+    // Multiplex between the two registers based on the current level of clk
+    // When clk is high, the last rising edge captured value is output,
+    // and when clk is low, the last falling edge captured value is output.
+    assign q = clk ? pos_reg : neg_reg;
+
+endmodule

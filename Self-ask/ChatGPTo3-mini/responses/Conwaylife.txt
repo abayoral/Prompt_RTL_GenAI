@@ -1,0 +1,66 @@
+module top_module(
+    input clk,
+    input load,
+    input [255:0] data,
+    output [255:0] q
+);
+
+    reg [255:0] state, next_state;
+    integer i, j;
+
+    // Combinational block to compute next state from current state
+    always @(*) begin
+        for (i = 0; i < 16; i = i + 1) begin
+            for (j = 0; j < 16; j = j + 1) begin
+                // Calculate wrapped indices for neighbors
+                // For rows:
+                integer i_up, i_down;
+                i_up   = (i == 0)  ? 15 : i - 1;
+                i_down = (i == 15) ? 0  : i + 1;
+                // For columns:
+                integer j_left, j_right;
+                j_left  = (j == 0)  ? 15 : j - 1;
+                j_right = (j == 15) ? 0  : j + 1;
+
+                // Calculate the number of live neighbors.
+                // Each bit of "state" is either 1 or 0.
+                // Compute indices as: row*16 + column.
+                reg [3:0] count;
+                count = 0;
+                count = count +
+                        state[i_up*16 + j_left] +
+                        state[i_up*16 + j] +
+                        state[i_up*16 + j_right] +
+                        state[i*16 + j_left] +
+                        state[i*16 + j_right] +
+                        state[i_down*16 + j_left] +
+                        state[i_down*16 + j] +
+                        state[i_down*16 + j_right];
+
+                // Apply Game of Life rules:
+                // Exactly 3 neighbors -> cell becomes alive.
+                // Exactly 2 neighbors -> cell remains in the same state.
+                // All other values -> cell becomes dead.
+                if (count == 3)
+                    next_state[i*16 + j] = 1'b1;
+                else if (count == 2)
+                    next_state[i*16 + j] = state[i*16 + j];
+                else
+                    next_state[i*16 + j] = 1'b0;
+            end
+        end
+    end
+
+    // State update: on each rising clock edge, load new data if 'load' is high,
+    // otherwise update from computed next_state.
+    always @(posedge clk) begin
+        if (load)
+            state <= data;
+        else
+            state <= next_state;
+    end
+
+    // Output current state.
+    assign q = state;
+
+endmodule

@@ -1,0 +1,56 @@
+module multi_booth_8bit(
+    input clk,
+    input reset,
+    input  [7:0] a,
+    input  [7:0] b,
+    output reg [15:0] p,
+    output reg rdy
+);
+  // Internal registers for sign‐extended multiplier and multiplicand.
+  reg [15:0] multiplier;
+  reg [15:0] multiplicand;
+  reg [4:0] ctr;  // 5‐bit counter (0 to 16 cycles)
+
+  // This implementation follows the intent of using Booth encoding:
+  // In each cycle we examine the current least–significant bit of the multiplier.
+  // When multiplier[0] is 1 we add the (shifted) multiplicand into the product.
+  // Then the multiplicand is shifted left by one (i.e. multiplied by 2) and
+  // the multiplier is shifted right by one so that in subsequent cycles a new bit is examined.
+  // When the 16 cycles are complete (ctr reaches 16), the product 'p' is valid
+  // and the ready signal 'rdy' is asserted.
+  //
+  // Note: A true Radix-4 Booth multiplier uses a recoding that reduces
+  // the number of addition/subtraction operations. However, the specifications
+  // provided also call for a per–cycle left–shift of the multiplicand and a cycle counter of 16,
+  // so here we implement an iterative design that uses the Booth decision (based solely on a multiplier bit)
+  // to decide when to accumulate the shifted multiplicand. In effect, if the examined bit is 1, 
+  // the current multiplicand is added to the product.
+  
+  always @(posedge clk or posedge reset) begin
+    if (reset) begin
+      // On reset, sign–extend both inputs to 16 bits.
+      multiplier   <= { {8{a[7]}}, a };
+      multiplicand <= { {8{b[7]}}, b };
+      p            <= 16'b0;
+      ctr          <= 5'b0;
+      rdy          <= 1'b0;
+    end 
+    else if (ctr < 16) begin
+      // Booth encoding: if current LSB of multiplier is 1 then accumulate.
+      if (multiplier[0] == 1'b1)
+        p <= p + multiplicand;
+      else
+        p <= p;
+      // Shift the multiplicand left by one position.
+      multiplicand <= multiplicand << 1;
+      // Shift the multiplier right by one to bring the next bit for checking.
+      multiplier <= multiplier >> 1;
+      // Increment cycle counter.
+      ctr <= ctr + 1;
+      // When counter reaches 16 cycles, signal that the product is ready.
+      if (ctr == 15)
+        rdy <= 1'b1;
+    end
+  end
+  
+endmodule

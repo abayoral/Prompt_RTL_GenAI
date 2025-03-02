@@ -1,6 +1,10 @@
-Below is one acceptable “fixed‐up” version. Functionally your code was correct, but some improvements can be made to clarify intent and use best practices. For example, you can use a reduction OR (|) instead of comparing a 4‑bit vector to zero, and it is generally preferable to use a bitwise AND (&) in these bit-level comparisons rather than the logical && operator. One corrected version is:
+Below is an improved version of the module. Although the original code was mostly correct, one potential point of confusion is that the two 5‐bit concatenations ({1’b0, A} and {1’b0, B}) are unsigned. Even though their MSB is always 0, it’s best practice to explicitly cast them to signed values to ensure that the subtraction operates as intended in all synthesis and simulation environments. In addition, the formatting and comments have been slightly refined for clarity.
 
-------------------------------------------------
+Here’s the corrected version:
+
+-----------------------------------------------------------
+`timescale 1ns/1ps
+
 module comparator_4bit(
     input  [3:0] A,
     input  [3:0] B,
@@ -9,28 +13,29 @@ module comparator_4bit(
     output A_less
 );
 
-  // Extend A and B to 5 bits so that the subtraction 
-  // produces a borrow bit in diff[4] if A < B.
-  wire [4:0] diff;
-  assign diff = {1'b0, A} - {1'b0, B};
+    // Extend the inputs to 5 bits and cast them as signed so that we correctly capture
+    // the sign (borrow) from the subtraction. This ensures that the result of the subtraction
+    // is interpreted in two’s complement form.
+    wire signed [4:0] diff;
+    assign diff = $signed({1'b0, A}) - $signed({1'b0, B});
 
-  // If the lower 4 bits are zero, then A equals B.
-  assign A_equal = (diff[3:0] == 4'b0000);
-
-  // If a borrow occurred, diff[4] will be high, so A < B.
-  assign A_less  = diff[4];
-
-  // A is greater than B if there is no borrow and the difference is nonzero.
-  // (|diff[3:0]) is a reduction OR that is 1 when any bit is 1.
-  assign A_greater = (~diff[4]) & (|diff[3:0]);
+    // Determine the outputs:
+    // If diff is zero, then A and B are equal.
+    assign A_equal   = (diff == 0);
+    // If A and B are not equal and diff is negative (sign bit = 1), then A < B.
+    assign A_less    = (~A_equal) & diff[4];
+    // If A and B are not equal and diff is positive (sign bit = 0), then A > B.
+    assign A_greater = (~A_equal) & (~diff[4]);
 
 endmodule
-------------------------------------------------
+-----------------------------------------------------------
 
-Comments on the changes:
+Key improvements and best practices applied:
 
-1. Using (|diff[3:0]) replaces (diff[3:0] != 4'b0000) because it directly reduces the lower 4 bits to a 1 when any bit is high.
-2. Replacing the logical && with a bitwise & is advisable since both operands are single-bit signals in this context.
-3. The overall structure and subtraction method remain the same.
+1. Explicit signed casting using $signed ensures that the subtraction between {1’b0, A} and {1’b0, B} is carried out in two’s complement arithmetic.
 
-This version adheres to best practices and is functionally equivalent to your original code.
+2. Removing the literal “5’d0” in favor of “0” when checking for equality is acceptable because the numerical literal is correctly interpreted with the appropriate width.
+
+3. Added a timescale directive for simulation clarity.
+
+This version should work reliably in simulations and synthesis while remaining clear and maintainable.

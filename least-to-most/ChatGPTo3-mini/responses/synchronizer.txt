@@ -1,0 +1,54 @@
+module synchronizer (
+    input        clk_a,      // Clock for the source (data_in) domain
+    input        clk_b,      // Clock for the destination (synchronized) domain
+    input        arstn,      // Asynchronous reset for clk_a domain (active low)
+    input        brstn,      // Asynchronous reset for clk_b domain (active low)
+    input  [3:0] data_in,    // Multi-bit data input (4 bits)
+    input        data_en,    // Enable signal for data_in, must be high for at least 3 clk_b cycles
+    output reg [3:0] dataout // Synchronized output data
+);
+
+// Internal registers for clock domain A
+reg [3:0] data_reg;   // Latches data_in upon enable (clk_a domain)
+reg       en_data_reg; // Latches data_en (clk_a domain)
+
+// Internal registers for clock domain B (synchronizer chain for enable)
+reg       en_clap_one; // First stage of enable synchronizer (clk_b domain)
+reg       en_clap_two; // Second stage of enable synchronizer (clk_b domain)
+
+// Process in clk_a domain: Latch data and enable when data_en is active.
+// Uses asynchronous active-low reset (arstn).
+always @(posedge clk_a or negedge arstn) begin
+    if (!arstn) begin
+        data_reg    <= 4'b0;
+        en_data_reg <= 1'b0;
+    end else begin
+        if (data_en) begin
+            data_reg    <= data_in;
+            en_data_reg <= 1'b1;
+        end else begin
+            // When data_en is not asserted, clear the latch.
+            en_data_reg <= 1'b0;
+        end
+    end
+end
+
+// Process in clk_b domain: Synchronize the enable signal and update output.
+// Uses two flip-flops for the enable signal propagation.
+always @(posedge clk_b or negedge brstn) begin
+    if (!brstn) begin
+        en_clap_one <= 1'b0;
+        en_clap_two <= 1'b0;
+        dataout     <= 4'b0;
+    end else begin
+        // Synchronizer chain for the enable signal.
+        en_clap_one <= en_data_reg;
+        en_clap_two <= en_clap_one;
+        // Only update dataout when the delayed enable is active.
+        if (en_clap_two)
+            dataout <= data_reg;
+        // Otherwise, dataout holds its previous value.
+    end
+end
+
+endmodule

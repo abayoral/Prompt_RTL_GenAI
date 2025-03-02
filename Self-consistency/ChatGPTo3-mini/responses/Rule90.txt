@@ -1,0 +1,26 @@
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output reg [511:0] q
+);
+
+    integer i;
+    
+    always @(posedge clk) begin
+        if (load) begin
+            q <= data;
+        end else begin
+            // Using nonblocking assignments, the right-hand side is computed from the old q.
+            // For the first cell, left boundary is assumed 0.
+            q[0] <= 0 ^ q[1];  // which is q[1]
+            // For cells 1 to 510, the new state is the XOR of the left and right neighbors.
+            for (i = 1; i < 511; i = i + 1) begin
+                q[i] <= q[i-1] ^ q[i+1];
+            end
+            // For the last cell, right boundary is assumed 0.
+            q[511] <= q[510] ^ 0;  // which is q[510]
+        end
+    end
+
+endmodule

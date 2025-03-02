@@ -1,0 +1,25 @@
+module top_module (
+    input clk,
+    input d,
+    output q
+);
+
+    reg pos_reg;
+    reg neg_reg;
+    
+    // Capture data on the positive edge of clk
+    always @(posedge clk) begin
+        pos_reg <= d;
+    end
+
+    // Capture data on the negative edge of clk
+    always @(negedge clk) begin
+        neg_reg <= d;
+    end
+
+    // Multiplex the outputs from the two flip-flops.
+    // When clk is high, use the value latched on the positive edge.
+    // When clk is low, use the value latched on the negative edge.
+    assign q = clk ? pos_reg : neg_reg;
+
+endmodule

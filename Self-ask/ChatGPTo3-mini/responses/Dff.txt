@@ -1,0 +1,12 @@
+module top_module (
+    input clk,    // Clock input for sequential logic
+    input d,      // Data input for the flip-flop
+    output reg q  // Output storing the state of the flip-flop
+);
+
+    // On every positive edge of the clock, capture 'd' into 'q'
+    always @(posedge clk) begin
+        q <= d;
+    end
+
+endmodule

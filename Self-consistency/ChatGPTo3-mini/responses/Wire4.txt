@@ -1,0 +1,9 @@
+module top_module( 
+    input a, b, c,
+    output w, x, y, z );
+
+    // Using concatenation to map signals:
+    // a -> w, b -> x, b -> y, c -> z
+    assign {w, x, y, z} = {a, b, b, c};
+
+endmodule

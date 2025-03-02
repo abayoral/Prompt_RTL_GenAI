@@ -1,0 +1,32 @@
+module top_module (
+    input clk,
+    input [7:0] in,
+    output [7:0] anyedge
+);
+
+    // We use two registers: one to latch the previous values of "in" 
+    // and a pipeline register to delay the edge‐detection result by one cycle.
+    //
+    // For each bit, a rising edge (0 to 1) is detected when the previous 
+    // value is 0 and the current value is 1. The result is stored in a
+    // pipeline register, so that the output "anyedge" goes high one cycle 
+    // after the rising edge is observed.
+
+    reg [7:0] prev;
+    reg [7:0] rise_pipe;
+
+    always @(posedge clk) begin
+        // First, detect a rising edge on each bit. This detects a 0 to 1 transition
+        // by checking that the previous value of the bit was 0 and the current is 1.
+        // Note: The result is stored into the pipeline register so that it appears 
+        // as an output one clock cycle later.
+        rise_pipe <= (~prev) & in;
+        
+        // Update the previous input register for the next cycle.
+        prev <= in;
+    end
+
+    // Drive the output from the pipeline register.
+    assign anyedge = rise_pipe;
+
+endmodule

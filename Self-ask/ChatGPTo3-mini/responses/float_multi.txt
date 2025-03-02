@@ -1,0 +1,181 @@
+module float_multi(
+    input clk,
+    input rst,
+    input [31:0] a,
+    input [31:0] b,
+    output reg [31:0] z
+);
+
+  // Cycle counter (0 to 4)
+  reg [2:0] counter;
+
+  // Component extraction registers
+  reg a_sign, b_sign;
+  reg [9:0] a_exponent, b_exponent, z_exponent;
+  reg [23:0] a_mantissa, b_mantissa, z_mantissa; // 24 bits, including the hidden bit
+  reg z_sign;
+
+  // Intermediate calculation registers
+  reg [49:0] product;  // holds up to 50 bits from 24x24 multiplication
+  reg guard_bit, round_bit, sticky;
+
+  // Temporary register used during normalization and rounding
+  reg [49:0] norm_product;
+  reg [24:0] round_sum;  // one extra bit for rounding
+
+  // Internal signal to hold final exponent in rounding phase.
+  reg [9:0] z_exponent_rnd;
+
+  // Main sequential always block: multi-cycle pipeline implementation.
+  always @(posedge clk) begin
+    if(rst) begin
+      counter      <= 0;
+      z            <= 32'd0;
+      a_sign       <= 0;
+      b_sign       <= 0;
+      z_sign       <= 0;
+      a_exponent   <= 0;
+      b_exponent   <= 0;
+      z_exponent   <= 0;
+      a_mantissa   <= 0;
+      b_mantissa   <= 0;
+      z_mantissa   <= 0;
+      product      <= 0;
+      guard_bit    <= 0;
+      round_bit    <= 0;
+      sticky       <= 0;
+      norm_product <= 0;
+      round_sum    <= 0;
+      z_exponent_rnd <= 0;
+    end
+    else begin
+      case(counter)
+        // Cycle 0: Input Processing - extract component parts.
+        0: begin
+          // Extract sign bits.
+          a_sign <= a[31];
+          b_sign <= b[31];
+          
+          // Extract exponent bits.
+          // Extend 8-bit exponents to 10 bits for internal arithmetic.
+          a_exponent <= {2'b00, a[30:23]};
+          b_exponent <= {2'b00, b[30:23]};
+          
+          // Extract mantissas.
+          // For normal numbers (exponent != 0), the hidden bit is 1.
+          // For denormal numbers (exponent == 0), the hidden bit is 0.
+          if(a[30:23] != 8'd0)
+            a_mantissa <= {1'b1, a[22:0]};
+          else
+            a_mantissa <= {1'b0, a[22:0]};
+          
+          if(b[30:23] != 8'd0)
+            b_mantissa <= {1'b1, b[22:0]};
+          else
+            b_mantissa <= {1'b0, b[22:0]};
+          
+          counter <= 1;
+        end
+
+        // Cycle 1: Special Case Handling.
+        // Check for NaN or Infinity conditions in either operand.
+        1: begin
+          // If either operand has an exponent of 255 (all ones in IEEE754), then handle special.
+          if ((a[30:23] == 8'hFF) || (b[30:23] == 8'hFF)) begin
+            // If either is NaN (exponent all ones and non-zero mantissa), output a canonical NaN.
+            if (((a[30:23] == 8'hFF) && (a[22:0] != 23'd0)) ||
+                ((b[30:23] == 8'hFF) && (b[22:0] != 23'd0))) begin
+              // Canonical NaN: sign 0, exponent all ones, nonzero mantissa.
+              z <= {1'b0, 8'hFF, 23'b10000000000000000000000};
+              counter <= 0; // restart for next operation.
+            end
+            else begin
+              // Otherwise, one or both operands represent infinity.
+              // Infinity result: sign = XOR of inputs, exponent = all ones, zero fraction.
+              z_sign <= a_sign ^ b_sign;
+              z <= {a_sign ^ b_sign, 8'hFF, 23'd0};
+              counter <= 0; // complete operation.
+            end
+          end
+          else begin
+            counter <= 2;
+          end
+        end
+
+        // Cycle 2: Multiplication Phase.
+        // Multiply the mantissas and compute the preliminary exponent and sign.
+        2: begin
+          // 24-bit x 24-bit multiplication results in 48-bit product.
+          // Our register 'product' is 50 bits wide, so the upper 2 bits will be zero.
+          product <= a_mantissa * b_mantissa;
+          
+          // Compute the raw exponent: add the exponents and subtract the bias (127).
+          // a_exponent and b_exponent hold the actual exponent fields.
+          z_exponent <= a_exponent + b_exponent - 10'd127;
+          
+          // Determine the sign of the result.
+          z_sign <= a_sign ^ b_sign;
+          
+          counter <= 3;
+        end
+
+        // Cycle 3: Normalization Phase.
+        // Normalize the raw product and prepare the mantissa with rounding bits.
+        3: begin
+          // Check the most significant bit of the 48-bit product.
+          if (product[47] == 1'b1) begin
+            // Product is already normalized.
+            norm_product = product;
+          end
+          else begin
+            // Not normalized: shift left by 1 and decrement the exponent.
+            norm_product = product << 1;
+            z_exponent <= z_exponent - 1;
+          end
+          // Prepare z_mantissa by capturing the upper 24 bits (bits 46 downto 23).
+          z_mantissa <= norm_product[46:23];
+          
+          // Set up rounding bits.
+          guard_bit <= norm_product[22];
+          round_bit <= norm_product[21];
+          // sticky is 'OR' of all lower bits (bits 20 downto 0).
+          sticky <= |norm_product[20:0];
+          
+          counter <= 4;
+        end
+
+        // Cycle 4: Rounding and Output Generation Phase.
+        // Apply IEEE 754 rounding (round to nearest, ties to even) and format the final result.
+        4: begin
+          // Form a 25-bit value by prefixing a zero to the 24-bit mantissa.
+          // Then add 1 if rounding conditions are met.
+          // Rounding condition: if guard bit is 1 and (round bit is 1 or sticky is 1 or LSB is 1).
+          round_sum = {1'b0, z_mantissa} + 
+                      ((guard_bit && (round_bit || sticky || z_mantissa[0])) ? 25'd1 : 25'd0);
+          
+          // Check for mantissa overflow due to rounding.
+          if (round_sum[24] == 1'b1) begin
+            // Overflow: shift right by one (drop rounding bit) and increment exponent.
+            z_mantissa <= round_sum[24:1];
+            z_exponent_rnd <= z_exponent + 1;
+          end else begin
+            z_mantissa <= round_sum[23:0];
+            z_exponent_rnd <= z_exponent;
+          end
+
+          // Assemble the final IEEE 754 result:
+          // For normal numbers, the output is:
+          // sign (1 bit), exponent (8 bits), mantissa/fraction (23 bits, dropping the hidden bit).
+          z <= {z_sign, z_exponent_rnd[7:0], z_mantissa[22:0]};
+          
+          // Operation complete. Reset the counter for the next multiplication.
+          counter <= 0;
+        end
+
+        // Default: Should not occur.
+        default: counter <= 0;
+      endcase
+    end
+  end
+
+endmodule

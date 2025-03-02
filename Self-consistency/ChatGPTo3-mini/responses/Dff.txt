@@ -1,0 +1,12 @@
+module top_module (
+    input clk,
+    input d,
+    output reg q
+);
+
+    // Update q with the value of d at every positive edge of the clock
+    always @(posedge clk) begin
+        q <= d;
+    end
+
+endmodule

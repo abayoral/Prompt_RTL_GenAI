@@ -1,0 +1,26 @@
+module top_module(
+    input in,
+    input [3:0] state,
+    output [3:0] next_state,
+    output out
+);
+    // one-hot state encoding indices: A=0, B=1, C=2, D=3.
+    parameter A = 0, B = 1, C = 2, D = 3;
+
+    // Derive next state logic by examining in-edges:
+    // For state A: transitions come from A and C when in=0.
+    assign next_state[A] = (~in) & (state[A] | state[C]);
+
+    // For state B: transitions come from A, B, and D when in=1.
+    assign next_state[B] = in & (state[A] | state[B] | state[D]);
+
+    // For state C: transitions come from B and D when in=0.
+    assign next_state[C] = (~in) & (state[B] | state[D]);
+
+    // For state D: only transition comes from C when in=1.
+    assign next_state[D] = in & state[C];
+
+    // Moore machine output is high only in state D.
+    assign out = state[D];
+
+endmodule

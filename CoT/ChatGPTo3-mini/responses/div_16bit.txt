@@ -1,0 +1,47 @@
+module div_16bit(
+    input  [15:0] A,   // 16-bit dividend
+    input  [7:0]  B,   // 8-bit divisor
+    output reg [15:0] result, // 16-bit quotient output
+    output reg [15:0] odd     // 16-bit remainder output
+);
+
+    // Internal registers to hold a copy of the inputs
+    reg [15:0] a_reg;
+    reg [7:0]  b_reg;
+    
+    // First combinational always block: Capture input values
+    always @(*) begin
+        a_reg = A;
+        b_reg = B;
+    end
+
+    // Second combinational always block: Perform combinational long division
+    always @(*) begin
+        integer i;
+        reg [15:0] quotient;   // Temporary variable for quotient computation
+        reg [15:0] remainder;  // Temporary variable for remainder computation
+        
+        quotient  = 16'd0;
+        remainder = 16'd0;
+        
+        // Perform long division for 16-bit dividend
+        // We process bits from MSB to LSB.
+        for (i = 15; i >= 0; i = i - 1) begin
+            // Shift remainder left by 1 and append the current bit of the dividend.
+            remainder = {remainder[14:0], a_reg[i]};
+            
+            // If remainder is greater than or equal to the divisor, subtract divisor and set quotient bit.
+            if (remainder >= b_reg) begin
+                remainder = remainder - b_reg;
+                quotient[i] = 1'b1;
+            end
+            else begin
+                quotient[i] = 1'b0;
+            end
+        end
+        
+        result = quotient;
+        odd    = remainder;
+    end
+
+endmodule

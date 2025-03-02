@@ -1,0 +1,46 @@
+module top_module ( 
+    input [15:0] a, b,
+    input        cin,
+    output       cout,
+    output [15:0] sum );
+
+    // Internal wires for the carry outputs between each digit adder
+    wire c0, c1, c2;
+
+    // Least-significant digit: adding lower nibbles with the external carry-in
+    bcd_fadd adder0 (
+        .a(a[3:0]),
+        .b(b[3:0]),
+        .cin(cin),
+        .cout(c0),
+        .sum(sum[3:0])
+    );
+
+    // Second digit adder: chaining the carry from the previous stage
+    bcd_fadd adder1 (
+        .a(a[7:4]),
+        .b(b[7:4]),
+        .cin(c0),
+        .cout(c1),
+        .sum(sum[7:4])
+    );
+
+    // Third digit adder
+    bcd_fadd adder2 (
+        .a(a[11:8]),
+        .b(b[11:8]),
+        .cin(c1),
+        .cout(c2),
+        .sum(sum[11:8])
+    );
+
+    // Most-significant digit adder; its carry-out is the final carry-out
+    bcd_fadd adder3 (
+        .a(a[15:12]),
+        .b(b[15:12]),
+        .cin(c2),
+        .cout(cout),
+        .sum(sum[15:12])
+    );
+
+endmodule

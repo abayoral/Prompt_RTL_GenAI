@@ -1,0 +1,80 @@
+module decade_counter(
+    input clk,
+    input reset,
+    input enable,
+    output reg [3:0] q,
+    output reg carry
+);
+    always @(posedge clk) begin
+        if (reset) begin
+            q <= 4'd0;
+            carry <= 1'b0;
+        end else if (enable) begin
+            if (q == 4'd9) begin
+                q <= 4'd0;
+                carry <= 1'b1;
+            end else begin
+                q <= q + 4'd1;
+                carry <= 1'b0;
+            end
+        end else begin
+            carry <= 1'b0;
+        end
+    end
+endmodule
+
+module top_module (
+    input clk,
+    input reset,   // Synchronous active-high reset
+    output [3:1] ena,
+    output [15:0] q
+);
+    wire carry0, carry1, carry2;
+    wire [3:0] digit0, digit1, digit2, digit3;
+    
+    // Ones digit: always enabled
+    decade_counter ones (
+        .clk(clk),
+        .reset(reset),
+        .enable(1'b1),
+        .q(digit0),
+        .carry(carry0)
+    );
+    
+    // Tens digit: enabled when ones digit rolls over
+    decade_counter tens (
+        .clk(clk),
+        .reset(reset),
+        .enable(carry0),
+        .q(digit1),
+        .carry(carry1)
+    );
+    
+    // Hundreds digit: enabled when tens digit rolls over
+    decade_counter hundreds (
+        .clk(clk),
+        .reset(reset),
+        .enable(carry1),
+        .q(digit2),
+        .carry(carry2)
+    );
+    
+    // Thousands digit: enabled when hundreds digit rolls over
+    decade_counter thousands (
+        .clk(clk),
+        .reset(reset),
+        .enable(carry2),
+        .q(digit3),
+        .carry()  // Carry not used for a 4-digit counter
+    );
+    
+    // Combine individual BCD digits into the 16-bit output.
+    // Bit mapping: q[3:0] = ones, q[7:4] = tens,
+    //              q[11:8] = hundreds, q[15:12] = thousands.
+    assign q = {digit3, digit2, digit1, digit0};
+    
+    // The enable signals for digits 1 (tens), 2 (hundreds), and 3 (thousands)
+    assign ena[1] = carry0; // Enables tens digit
+    assign ena[2] = carry1; // Enables hundreds digit
+    assign ena[3] = carry2; // Enables thousands digit
+endmodule

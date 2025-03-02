@@ -1,0 +1,121 @@
+module traffic_light(
+    input         rst_n,         // active low reset
+    input         clk,           // clock signal
+    input         pass_request,  // pedestrian pass button
+    output reg [7:0] clock,      // exposes internal counter
+    output reg    red,           // vehicular red light: when on, pedestrian green is assumed
+    output reg    yellow,        // vehicular yellow light
+    output reg    green          // vehicular green light
+);
+
+  // state encoding: note the naming convention per specification
+  localparam IDLE      = 2'b00;
+  localparam S1_RED    = 2'b01; // Vehicular red (pedestrian green)
+  localparam S2_YELLOW = 2'b10; // Vehicular yellow
+  localparam S3_GREEN  = 2'b11; // Vehicular green (pedestrian red)
+
+  // durations for each phase
+  localparam [7:0] GREEN_DUR  = 8'd60;
+  localparam [7:0] YELLOW_DUR = 8'd5;
+  localparam [7:0] RED_DUR    = 8'd10;
+
+  reg [1:0] state;
+  reg [7:0] cnt;
+
+  // State transition and counter update logic
+  // The counter counts down each clock cycle.
+  // In S3_GREEN, if a pedestrian request occurs and more than 10 cycles remain,
+  // the green duration is shortened to 10 cycles.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      state <= IDLE;
+      cnt   <= 8'd0;
+    end 
+    else begin
+      case(state)
+        IDLE: begin
+          // Upon reset release, start the cycle with vehicle green.
+          state <= S3_GREEN;
+          cnt   <= GREEN_DUR;
+        end
+
+        S3_GREEN: begin
+          // When in green, check if we are at the end of cycle.
+          if (cnt == 8'd1) begin
+            // Transition from green to yellow phase.
+            state <= S2_YELLOW;
+            cnt   <= YELLOW_DUR;
+          end 
+          else begin
+            // Check the pedestrian button behavior:
+            // If pass_request is asserted and more than 10 counts remain,
+            // shorten the remaining green light duration to exactly 10.
+            if (pass_request && (cnt > 8'd10))
+              cnt <= 8'd10;
+            else
+              cnt <= cnt - 1;
+          end
+        end
+
+        S2_YELLOW: begin
+          // Yellow phase always lasts YELLOW_DUR cycles.
+          if (cnt == 8'd1) begin
+            // Transition from yellow to red phase.
+            state <= S1_RED;
+            cnt   <= RED_DUR;
+          end 
+          else begin
+            cnt <= cnt - 1;
+          end
+        end
+
+        S1_RED: begin
+          // Red phase, during which pedestrians may cross.
+          if (cnt == 8'd1) begin
+            // Once red expires, go back to green phase.
+            state <= S3_GREEN;
+            cnt   <= GREEN_DUR;
+          end 
+          else begin
+            cnt <= cnt - 1;
+          end
+        end
+
+        default: begin
+          state <= IDLE;
+          cnt   <= 8'd0;
+        end
+      endcase
+    end
+  end
+
+  // Output logic: assign vehicular light outputs and replicate counter value.
+  // Pedestrian operation is derived from vehicular red: when red is high,
+  // it is safe for pedestrians to cross (i.e. pedestrian light is green).
+  always @(*) begin
+    case(state)
+      S3_GREEN: begin
+        green = 1'b1;
+        yellow = 1'b0;
+        red = 1'b0;
+      end
+      S2_YELLOW: begin
+        green = 1'b0;
+        yellow = 1'b1;
+        red = 1'b0;
+      end
+      S1_RED: begin
+        green = 1'b0;
+        yellow = 1'b0;
+        red = 1'b1;
+      end
+      default: begin
+        green = 1'b0;
+        yellow = 1'b0;
+        red = 1'b0;
+      end
+    endcase
+    clock = cnt;
+  end
+
+endmodule

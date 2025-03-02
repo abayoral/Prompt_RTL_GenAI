@@ -1,0 +1,27 @@
+module comparator_4bit(
+    input  [3:0] A,
+    input  [3:0] B,
+    output A_greater,
+    output A_equal,
+    output A_less
+);
+
+  // Perform subtraction
+  wire [3:0] diff;
+  assign diff = A - B;
+
+  // Determine if a borrow occurred.
+  // Using the property of unsigned numbers in Verilog: when A<B the subtraction wraps around,
+  // so we can effectively compute a borrow flag by comparing A and B.
+  wire borrow;
+  assign borrow = (A < B);
+
+  // Determine the outputs:
+  // If the subtraction result is zero, then A and B are equal.
+  // If there is no borrow and diff is non-zero, then A is greater than B.
+  // If a borrow is detected, then A is less than B.
+  assign A_equal   = (diff == 4'b0000);
+  assign A_greater = (!borrow) && (diff != 4'b0000);
+  assign A_less    = borrow;
+
+endmodule

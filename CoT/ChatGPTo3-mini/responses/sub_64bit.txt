@@ -1,0 +1,20 @@
+module sub_64bit(
+    input  [63:0] A,
+    input  [63:0] B,
+    output [63:0] result,
+    output        overflow
+);
+
+    // Perform the subtraction
+    assign result = A - B;
+
+    // Check for overflow:
+    // Case 1: Positive A subtracting negative B should yield a positive result;
+    //         if the result is negative, overflow has occurred.
+    // Case 2: Negative A subtracting positive B should yield a negative result;
+    //         if the result is positive, overflow has occurred.
+    //
+    // A[63] is the sign bit of A, B[63] is the sign bit of B, and result[63] is the sign bit of the result.
+    assign overflow = ((~A[63] & B[63] & result[63]) | (A[63] & ~B[63] & ~result[63]));
+
+endmodule

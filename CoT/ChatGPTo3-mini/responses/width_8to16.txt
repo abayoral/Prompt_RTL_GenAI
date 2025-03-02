@@ -1,0 +1,61 @@
+module width_8to16 (
+  input         clk,
+  input         rst_n,
+  input         valid_in,
+  input  [7:0]  data_in,
+  output reg    valid_out,
+  output reg [15:0] data_out
+);
+
+  // State encoding
+  localparam IDLE          = 2'd0;
+  localparam WAIT_FOR_SECONDBYTE = 2'd1;
+  localparam OUTPUT_PIPE   = 2'd2;
+
+  reg [1:0] state, next_state;
+  reg [7:0] first_byte;  // register to hold the first valid data byte
+
+  // Next-state and output logic
+  // We intentionally pipeline the output: after receiving the second valid input,
+  // the concatenated output (first_byte, data_in) will be available in the next cycle.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      state      <= IDLE;
+      first_byte <= 8'd0;
+      data_out   <= 16'd0;
+      valid_out  <= 1'b0;
+    end else begin
+      // Default for valid_out is deasserted
+      valid_out <= 1'b0;
+      case (state)
+        IDLE: begin
+          if (valid_in) begin
+            // Capture the first 8-bit data input
+            first_byte <= data_in;
+            state <= WAIT_FOR_SECONDBYTE;
+          end
+        end
+
+        WAIT_FOR_SECONDBYTE: begin
+          if (valid_in) begin
+            // On receiving second valid data, form 16-bit output.
+            // The first_byte becomes the upper 8 bits and the current data_in the lower 8 bits.
+            data_out <= {first_byte, data_in};
+            // Transition to output pipeline state: valid signal will be asserted in next cycle
+            state <= OUTPUT_PIPE;
+          end
+        end
+
+        OUTPUT_PIPE: begin
+          // The output is now valid for one clock cycle.
+          valid_out <= 1'b1;
+          // After outputting the combined data, return to idle state.
+          state <= IDLE;
+        end
+
+        default: state <= IDLE;
+      endcase
+    end
+  end
+
+endmodule

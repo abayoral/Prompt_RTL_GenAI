@@ -1,0 +1,57 @@
+module freq_div(
+    input CLK_in,
+    input RST,
+    output reg CLK_50,
+    output reg CLK_10,
+    output reg CLK_1
+);
+
+    // Counter for generating CLK_10; need to count 5 cycles (0 to 4)
+    reg [2:0] cnt_10;
+    
+    // Counter for generating CLK_1; need to count 50 cycles (0 to 49)
+    reg [5:0] cnt_100;
+    
+    // Generate 50MHz clock (divide by 2)
+    // Toggle CLK_50 on each positive edge of CLK_in.
+    // Asynchronous reset clears the output.
+    always @(posedge CLK_in or posedge RST) begin
+        if (RST)
+            CLK_50 <= 1'b0;
+        else
+            CLK_50 <= ~CLK_50;
+    end
+    
+    // Generate 10MHz clock (divide by 10)
+    // Count 5 cycles, then toggle CLK_10 to achieve overall period of 10 cycles.
+    always @(posedge CLK_in or posedge RST) begin
+        if (RST) begin
+            cnt_10 <= 3'd0;
+            CLK_10 <= 1'b0;
+        end else begin
+            if (cnt_10 == 3'd4) begin
+                cnt_10 <= 3'd0;
+                CLK_10 <= ~CLK_10;
+            end else begin
+                cnt_10 <= cnt_10 + 3'd1;
+            end
+        end
+    end
+    
+    // Generate 1MHz clock (divide by 100)
+    // Count 50 cycles, then toggle CLK_1 to achieve overall period of 100 cycles.
+    always @(posedge CLK_in or posedge RST) begin
+        if (RST) begin
+            cnt_100 <= 6'd0;
+            CLK_1 <= 1'b0;
+        end else begin
+            if (cnt_100 == 6'd49) begin
+                cnt_100 <= 6'd0;
+                CLK_1 <= ~CLK_1;
+            end else begin
+                cnt_100 <= cnt_100 + 6'd1;
+            end
+        end
+    end
+
+endmodule

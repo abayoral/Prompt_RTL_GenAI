@@ -1,0 +1,76 @@
+module fixed_point_subtractor #(parameter integer N = 16,  // total number of bits
+                                 parameter integer Q = 8)   // number of fractional bits
+   (input  [N-1:0] a,       // first fixed‐point operand
+    input  [N-1:0] b,       // second fixed‐point operand
+    output [N-1:0] c);      // result fixed‐point subtraction
+
+  // Calculate absolute values for a and b.
+  // In our fixed‐point representation, the MSB is the sign bit.
+  wire [N-1:0] abs_a, abs_b;
+  assign abs_a = (a[N-1]) ? (~a + 1) : a;
+  assign abs_b = (b[N-1]) ? (~b + 1) : b;
+
+  reg [N-1:0] res;      // internal register to hold final result
+  reg         final_sign;  // computed sign bit for the result
+  reg [N-1:0] mag;         // intermediate magnitude (always positive)
+
+  // Combinational logic: perform fixed-point subtraction using the given rules.
+  always @(*) begin
+    // Default assignments
+    mag = 0;
+    final_sign = 1'b0;
+
+    // Case 1: Both operands have the same sign.
+    if (a[N-1] == b[N-1]) begin
+      // When both inputs are positive.
+      if (a[N-1] == 1'b0) begin
+        if (abs_a >= abs_b) begin
+          mag = abs_a - abs_b;
+          final_sign = 1'b0; // result positive
+        end else begin
+          mag = abs_b - abs_a;
+          final_sign = 1'b1; // result negative
+        end
+      end
+      // When both inputs are negative.
+      else begin
+        // Remember: a = -|a| and b = -|b| so a - b = -|a| + |b| = |b| - |a|.
+        if (abs_b >= abs_a) begin
+          mag = abs_b - abs_a;
+          final_sign = 1'b0; // result becomes positive
+        end else begin
+          mag = abs_a - abs_b;
+          final_sign = 1'b1; // result stays negative
+        end
+      end
+    end
+    // Case 2: Operands have different signs.
+    else begin
+      // a positive, b negative: a - (negative) = a + |b|
+      if ((a[N-1] == 1'b0) && (b[N-1] == 1'b1)) begin
+        mag = abs_a + abs_b;
+        final_sign = 1'b0;  // positive result
+      end
+      // a negative, b positive: (-|a|) - b = -( |a| + b )
+      else if ((a[N-1] == 1'b1) && (b[N-1] == 1'b0)) begin
+        mag = abs_a + abs_b;
+        final_sign = 1'b1;  // negative result
+      end
+    end
+
+    // If the magnitude is zero, ensure a positive sign.
+    if (mag == {N{1'b0}})
+      final_sign = 1'b0;
+
+    // Reconstruct the fixed-point result from sign and magnitude.
+    // For negative result, convert the magnitude to two's complement.
+    if (final_sign)
+      res = ~mag + 1;
+    else
+      res = mag;
+  end
+
+  // Connect the internal result register to the output.
+  assign c = res;
+
+endmodule

@@ -1,0 +1,1 @@
+One clarifying question is: "Can we assume that both the assign-based mux and the always @(*) mux must be purely combinational with identical functionality?"

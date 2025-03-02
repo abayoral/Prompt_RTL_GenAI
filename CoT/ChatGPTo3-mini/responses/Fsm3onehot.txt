@@ -1,0 +1,25 @@
+module top_module(
+    input in,
+    input [3:0] state,
+    output [3:0] next_state,
+    output out
+);
+
+    parameter A = 0, B = 1, C = 2, D = 3;
+
+    // Next state for A: from A (in=0) and from C (in=0).
+    assign next_state[A] = (~in) & (state[A] | state[C]);
+
+    // Next state for B: from A (in=1), from B (in=1), and from D (in=1).
+    assign next_state[B] = in & (state[A] | state[B] | state[D]);
+
+    // Next state for C: from B (in=0) and from D (in=0).
+    assign next_state[C] = (~in) & (state[B] | state[D]);
+
+    // Next state for D: from C (in=1) only.
+    assign next_state[D] = in & state[C];
+
+    // Output logic: Only state D outputs 1.
+    assign out = state[D];
+
+endmodule

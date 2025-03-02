@@ -1,0 +1,6 @@
+module top_module ( input [1:0] A, input [1:0] B, output z );
+
+    // Compare the two 2-bit inputs; set z to 1 if they are equal, otherwise 0.
+    assign z = (A == B);
+
+endmodule

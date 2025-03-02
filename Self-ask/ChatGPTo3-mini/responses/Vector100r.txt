@@ -1,0 +1,17 @@
+The one clarifying question is: "Just to confirm, is this module intended to perform a purely combinational reversal of the input (i.e. out[0] gets in[99], out[1] gets in[98], etc.) without any clock or reset signals?"
+
+Based on your confirmation, here is the complete Verilog module:
+
+module top_module( 
+    input [99:0] in,
+    output reg [99:0] out
+);
+    integer i;
+    
+    always @(*) begin
+        for (i = 0; i < 100; i = i + 1) begin
+            out[i] = in[99 - i];
+        end
+    end
+
+endmodule

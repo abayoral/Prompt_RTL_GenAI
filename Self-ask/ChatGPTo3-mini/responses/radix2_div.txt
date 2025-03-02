@@ -1,0 +1,160 @@
+module radix2_div(
+    input         clk,
+    input         rst,
+    input         sign,       // 1: signed operation, 0: unsigned
+    input  [7:0]  dividend,
+    input  [7:0]  divisor,
+    input         opn_valid,
+    output reg    res_valid,
+    output reg [15:0] result
+);
+
+  // State Declaration
+  localparam IDLE = 2'd0,
+             CALC = 2'd1,
+             DONE = 2'd2;
+             
+  reg [1:0] state, next_state;
+  
+  // Internal registers for absolute operands and sign flags
+  reg [7:0] abs_dividend;
+  reg [7:0] abs_divisor;
+  reg       quotient_negative;    // true if quotient should be negative (for signed op)
+  reg       remainder_negative;   // true if remainder should be negative (for signed op)
+  
+  // Registers for the restoration division algorithm
+  // We use a pair: A (the remainder) and Q (the quotient)
+  // A is 9 bits to accommodate potential subtraction borrow.
+  reg [8:0] A;
+  reg [7:0] Q;
+  reg [3:0] cnt;  // Counter for 8 iterations
+  
+  // Temporary subtraction result
+  reg [8:0] temp;
+  
+  // Combined register for shifting {A, Q} (17 bits)
+  reg [16:0] combined;
+  
+  // Sequential state machine and algorithm operations
+  always @(posedge clk or posedge rst) begin
+    if(rst) begin
+      state <= IDLE;
+      res_valid <= 1'b0;
+      result <= 16'd0;
+      A <= 9'd0;
+      Q <= 8'd0;
+      cnt <= 4'd0;
+      abs_dividend <= 8'd0;
+      abs_divisor <= 8'd0;
+      quotient_negative <= 1'b0;
+      remainder_negative <= 1'b0;
+    end else begin
+      state <= next_state;
+      
+      case(state)
+        IDLE: begin
+          res_valid <= 1'b0;
+          // Wait for a new valid operation
+          if(opn_valid) begin
+            // Compute absolute values if signed; otherwise use as is.
+            if(sign) begin
+              abs_dividend <= (dividend[7]) ? (~dividend + 1) : dividend;
+              abs_divisor  <= (divisor[7])  ? (~divisor  + 1) : divisor;
+              // For signed operation, determine the sign of the quotient and remainder.
+              quotient_negative  <= dividend[7] ^ divisor[7];
+              remainder_negative <= dividend[7]; // Remainder takes the sign of the dividend.
+            end else begin
+              abs_dividend <= dividend;
+              abs_divisor  <= divisor;
+              quotient_negative  <= 1'b0;
+              remainder_negative <= 1'b0;
+            end
+            // Initialize Q with the absolute dividend and A to 0.
+            Q   <= abs_dividend;
+            A   <= 9'd0;
+            cnt <= 4'd0;
+          end
+        end
+        
+        CALC: begin
+          // Perform one iteration of restoring division.
+          // Step 1: Shift {A, Q} left by 1.
+          combined = {A, Q};  // combined is 17 bits: [16:9] are from A and [8:1] from Q, LSB bit is dropped.
+          combined = combined << 1;
+          A <= combined[16:9];  // new A (9 bits)
+          Q <= combined[8:1];   // shifted Q; note that Q[0] will be set below.
+          
+          // Step 2: Try subtracting abs_divisor from A.
+          // Extend abs_divisor to 9 bits.
+          temp = A - {1'b0, abs_divisor};
+          
+          // Step 3: If subtraction did not borrow (i.e. temp is non-negative), accept subtraction.
+          if(temp[8] == 1'b0) begin
+            A <= temp;
+            Q[0] <= 1'b1;  // set the LSB of quotient to 1.
+          end else begin
+            // If negative, restore A and Q[0] remains 0.
+            Q[0] <= 1'b0;
+          end
+          
+          cnt <= cnt + 1;
+        end
+        
+        DONE: begin
+          // In DONE state, compute the final result with sign adjustments if needed.
+          // We'll compute the final quotient and remainder.
+          // For the quotient, Q holds the computed value (from absolute division).
+          // For the remainder, A[7:0] holds the computed absolute remainder.
+          // Adjust the signs accordingly.
+          if(quotient_negative)
+            // Two's complement negation for quotient.
+            result[7:0] <= ~Q + 1;
+          else
+            result[7:0] <= Q;
+          
+          if(remainder_negative)
+            result[15:8] <= ~A[7:0] + 1;
+          else
+            result[15:8] <= A[7:0];
+          
+          res_valid <= 1'b1;
+        end
+        
+        default: begin
+          // Default assignments (should not occur)
+          res_valid <= 1'b0;
+        end
+      endcase // case(state)
+    end
+  end
+  
+  // Next state logic
+  always @(*) begin
+    case(state)
+      IDLE: begin
+        if(opn_valid)
+          next_state = CALC;
+        else
+          next_state = IDLE;
+      end
+      
+      CALC: begin
+        if(cnt == 4'd8)
+          next_state = DONE;
+        else
+          next_state = CALC;
+      end
+      
+      DONE: begin
+        // Remain in DONE until opn_valid is deasserted.
+        if(!opn_valid)
+          next_state = IDLE;
+        else
+          next_state = DONE;
+      end
+      
+      default: next_state = IDLE;
+    endcase
+  end
+
+endmodule

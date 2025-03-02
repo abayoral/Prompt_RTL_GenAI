@@ -1,0 +1,75 @@
+module top_module(
+    input         clk,
+    input         load,
+    input  [255:0] data,
+    output [255:0] q
+);
+
+    // Internal representation of the grid as a 2D array
+    // Row index: 0 to 15, Column index: 0 to 15
+    reg grid [0:15][0:15];
+
+    // Generate block to flatten the 2D grid array into the 256-bit output vector.
+    genvar r, c;
+    generate
+        for (r = 0; r < 16; r = r + 1) begin: rowloop
+            for (c = 0; c < 16; c = c + 1) begin: colloop
+                // Each row occupies 16 consecutive bits.
+                // According to specification, q[15:0] is row 0, q[31:16] is row 1, etc.
+                assign q[r*16 + c] = grid[r][c];
+            end
+        end
+    endgenerate
+
+    // On every clock edge, either load new state or update the grid to next generation.
+    always @(posedge clk) begin
+        integer i, j;
+        if (load) begin
+            // Load the initial state from 'data'.
+            // data[15:0] is row 0, data[31:16] is row 1, etc.
+            for (i = 0; i < 16; i = i + 1) begin
+                for (j = 0; j < 16; j = j + 1) begin
+                    grid[i][j] <= data[i*16 + j];
+                end
+            end
+        end else begin
+            // Temporary array for next generation state.
+            reg newGrid [0:15][0:15];
+            integer up, down, left, right;
+            reg [3:0] neighbors; // Sum of 8 neighbor bits (0 to 8) requires 4 bits.
+            for (i = 0; i < 16; i = i + 1) begin
+                for (j = 0; j < 16; j = j + 1) begin
+                    // Determine neighbor indices with toroidal (wrap-around) addressing.
+                    up    = (i == 0)    ? 15 : i - 1;
+                    down  = (i == 15)   ? 0  : i + 1;
+                    left  = (j == 0)    ? 15 : j - 1;
+                    right = (j == 15)   ? 0  : j + 1;
+
+                    // Sum the states of the 8 neighbors.
+                    neighbors = grid[up][left]  + grid[up][j]     + grid[up][right] +
+                                grid[i][left]                     + grid[i][right] +
+                                grid[down][left] + grid[down][j]   + grid[down][right];
+
+                    // Apply Conway's Game of Life rules.
+                    //  - 3 neighbors: cell becomes alive.
+                    //  - 2 neighbors: cell retains its current state.
+                    //  - Otherwise: cell dies.
+                    if (neighbors == 3)
+                        newGrid[i][j] = 1'b1;
+                    else if (neighbors == 2)
+                        newGrid[i][j] = grid[i][j];
+                    else
+                        newGrid[i][j] = 1'b0;
+                end
+            end
+
+            // Update the grid state with the computed next generation.
+            for (i = 0; i < 16; i = i + 1) begin
+                for (j = 0; j < 16; j = j + 1) begin
+                    grid[i][j] <= newGrid[i][j];
+                end
+            end
+        end
+    end
+
+endmodule

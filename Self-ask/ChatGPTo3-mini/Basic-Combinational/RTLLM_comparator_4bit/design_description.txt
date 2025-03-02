@@ -1,0 +1,26 @@
+As a professional Verilog designer, you are tasked with creating a digital logic module to implement a 4-bit comparator, leveraging combinational logic in your design. Let's delve deeper into what this project entails:
+
+**Module Specification:**
+- The module you will design is to be named `comparator_4bit`.
+- **Input Ports:** 
+  - `A [3:0]`: This is the first input, consisting of 4 bits, which represents one of the binary numbers to be compared.
+  - `B [3:0]`: Similarly, this is a 4-bit input representing the second binary number.
+- **Output Ports:**
+  - `A_greater`: A single-bit output signal that becomes high (`1`) if the first 4-bit input `A` is determined to be greater than the second input `B`.
+  - `A_equal`: A single-bit output signal that becomes high (`1`) if the inputs `A` and `B` are identical, meaning they are exactly equal.
+  - `A_less`: A single-bit output signal that becomes high (`1`) if `A` is found to be less than `B`.
+
+**Implementation Strategy:**
+- **Combinational Logic Design:** Your implementation needs to employ combinational logic, which implies that the output of your module is determined purely by the present state of its inputs without reliance on any stored values or sequences.
+  
+- **Comparison Logic:**
+  - Use subtraction to compare the two input values. Specifically, perform the operation `A - B` to derive the comparative relationship between `A` and `B`.
+  - **Carry/Borrow Analysis:** In the context of binary subtraction:
+    - If a borrow is required at any point during this operation, it indicates that `A` is less than `B`, setting `A_less` to high.
+    - Conversely, if no borrow is necessary and the result of the subtraction is non-zero, it points to `A` being greater than `B`, therefore setting `A_greater` to high.
+    - If subtracting `B` from `A` results in zero, then `A` and `B` are equal, triggering `A_equal` to be high.
+
+**Output Logic:**
+- The outputs (`A_greater`, `A_equal`, `A_less`) should be crafted such that they are mutually exclusive. At any given moment, only one of these outputs should be high (`1`), clearly indicating which condition has been satisfied.
+
+With this comprehensive understanding in mind, please proceed to draft the complete Verilog code for this 4-bit comparator as per the specifications above, ensuring accurate implementation of the described logic and output behaviors.

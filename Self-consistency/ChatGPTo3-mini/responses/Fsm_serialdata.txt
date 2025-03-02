@@ -1,0 +1,85 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg [7:0] out_byte,
+    output reg done
+);
+
+    // State encoding
+    parameter IDLE      = 2'd0,
+              DATA      = 2'd1,
+              STOP      = 2'd2,
+              WAIT_STOP = 2'd3;
+              
+    reg [1:0] state;
+    reg [2:0] bit_count;  // counts 0 to 7 for 8 data bits
+    reg [7:0] data_reg;   // Latches the data bits (LSB first)
+
+    always @(posedge clk) begin
+        if (reset) begin
+            state     <= IDLE;
+            bit_count <= 3'b0;
+            data_reg  <= 8'd0;
+            out_byte  <= 8'd0;
+            done      <= 1'b0;
+        end 
+        else begin
+            case (state)
+                IDLE: begin
+                    done <= 1'b0; // done low by default
+                    // Wait for the start bit. Protocol: idle high, so start bit is 0.
+                    if (in == 1'b0) begin
+                        state     <= DATA;
+                        bit_count <= 3'b0;
+                    end 
+                    else begin
+                        state <= IDLE;
+                    end
+                end
+                
+                DATA: begin
+                    // Latch the incoming bit into the corresponding bit location.
+                    // Since LSB comes first, the first data bit is stored at index 0.
+                    data_reg[bit_count] <= in;
+                    
+                    // If we have received 7 bits already, this cycle is for the 8th bit.
+                    if (bit_count == 3'd7) begin
+                        state <= STOP;
+                    end 
+                    else begin
+                        bit_count <= bit_count + 1;
+                        state <= DATA;
+                    end
+                end
+                
+                STOP: begin
+                    // Check for a valid stop bit (which should be high).
+                    if (in == 1'b1) begin
+                        // Valid byte received: signal done and latch output.
+                        done     <= 1'b1;
+                        out_byte <= data_reg;
+                        state    <= IDLE; // Ready for next byte reception.
+                    end 
+                    else begin
+                        // Stop bit not valid; wait until a high level (stop bit) is found.
+                        state <= WAIT_STOP;
+                    end
+                end
+                
+                WAIT_STOP: begin
+                    // Remain here until a valid high level (stop bit) is received.
+                    if (in == 1'b1) begin
+                        state <= IDLE;
+                    end 
+                    else begin
+                        state <= WAIT_STOP;
+                    end
+                end
+                
+                default: state <= IDLE;
+            endcase
+        end
+    end
+
+endmodule

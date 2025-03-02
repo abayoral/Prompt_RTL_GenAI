@@ -1,0 +1,31 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out  );
+
+    // The K‐map (with rows ordered as c'd', c'd, cd, cd' and columns as a'b', a'b, ab, ab')
+    // corresponds to the minterms where the output is 1:
+    //   Row c'd' (c=0,d=0): a'b', a'b, ab' 
+    //   Row c'd  (c=0,d=1): a'b', ab'
+    //   Row cd   (c=1,d=1): a'b, ab, ab'
+    //   Row cd'  (c=1,d=0): a'b', a'b
+    //
+    // One way to simplify the function (choosing a sum‐of‐products form) is to note that
+    // one correct reduction is:
+    //    f = a'd' + a'b'c' + ab'c' + cd(a+b)
+    //
+    // Explanation:
+    //  • The term a'd' (i.e. ~a & ~d) covers those ones in the map that occur when a=0, d=0.
+    //  • The terms a'b'c' and ab'c' cover the remaining 1’s in the upper half (when c=0)
+    //    that are not already covered by a'd'.
+    //  • Finally, the term cd(a+b) (i.e. c&d&(a|b)) covers the ones in the lower half when c=1,d=1.
+    //
+    // One may verify by expanding and comparing with the K‐map that this function is equivalent.
+    //
+    // We now code the simplified function.
+    
+    assign out = ( (~a & ~d) | (~a & ~b & ~c) | (a & ~b & ~c) | (c & d & (a | b)) );
+    
+endmodule

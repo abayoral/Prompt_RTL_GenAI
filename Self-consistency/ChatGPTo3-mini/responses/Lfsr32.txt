@@ -1,0 +1,52 @@
+module top_module(
+    input clk,
+    input reset,    // Active‐high synchronous reset to 32'h1
+    output [31:0] q
+);
+
+    // 32‐bit Galois LFSR with taps at positions 32, 22, 2, and 1.
+    // We represent the LFSR as a 32‐bit register.
+    // Bit positions: q[31] is bit32, q[21] is bit22, q[1] is bit2, and q[0] is bit1.
+    // We implement a shift‐left Galois LFSR.
+    //
+    // The update rule is as follows. Let feedback = current_state[31] (the MSB).
+    // For each bit i (from 31 downto 0) the next state is:
+    //   if (i+1) is one of the tapped bit positions {32, 22, 2, 1} then:
+    //       next_state[i] = previous_state[i-1] XOR feedback
+    //   else (if not tapped):
+    //       next_state[i] = previous_state[i-1]
+    // For i = 0 (since there is no previous_state[-1]), we define:
+    //       next_state[0] = feedback   (since bit position 1 is tapped)
+    // Note that bit position numbers are one‐based.
+    //
+    // In our module, we therefore compute:
+    //   next[31] = q[30] XOR feedback        (because bit 32 is tapped)
+    //   next[30:22] = q[29:21]               (no tap at bits 31 downto 23)
+    //   next[21] = q[20] XOR feedback        (because bit 22 is tapped)
+    //   next[20:2]  = q[19:1]                (no taps in between)
+    //   next[1]  = q[0] XOR feedback         (because bit 2 is tapped)
+    //   next[0]  = feedback                  (because bit 1 is tapped)
+    //
+    // On reset, we initialize the LFSR to 32'h1.
+
+    reg [31:0] lfsr;
+
+    always @(posedge clk) begin
+        if (reset)
+            lfsr <= 32'h1;
+        else begin
+            // feedback is the MSB, corresponding to bit32.
+            // We perform a shift-left with XORs on the tapped positions.
+            lfsr <= { lfsr[30] ^ lfsr[31],  // next bit31: tap at bit32
+                      lfsr[29:21],         // bits 30 downto 22: no tap
+                      lfsr[20] ^ lfsr[31],  // bit21: tap at bit22
+                      lfsr[19:1],          // bits 20 downto 2: no tap
+                      lfsr[0] ^ lfsr[31],   // bit1: tap at bit2
+                      lfsr[31]             // bit0: tap at bit1 (input becomes feedback)
+                    };
+        end
+    end
+
+    assign q = lfsr;
+
+endmodule

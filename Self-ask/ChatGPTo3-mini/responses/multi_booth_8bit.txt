@@ -1,0 +1,52 @@
+module multi_booth_8bit(
+    input clk,
+    input reset,
+    input [7:0] a,
+    input [7:0] b,
+    output reg [15:0] p,
+    output reg rdy
+);
+
+  // Internal registers: 
+  // - "multiplier" holds the sign-extended version of input a.
+  // - "multiplicand" holds the sign-extended version of input b.
+  // - "ctr" is a 5‐bit cycle counter (0 to 16 cycles).
+  reg [15:0] multiplier;
+  reg [15:0] multiplicand;
+  reg [4:0] ctr;
+
+  // This always block implements a sequential multiplier that uses a 
+  // simplified Booth‐like algorithm. In each cycle the design checks a 
+  // bit in the multiplier (the Booth encoding in this implementation is 
+  // simply taken as whether the corresponding bit is 1) and if so accumulates 
+  // the current multiplicand into the product. Then the multiplicand 
+  // is shifted left by 1 to simulate the bit‐alignment adjustment.
+  always @(posedge clk) begin
+    if (reset) begin
+      // On reset, sign-extend both operands to 16 bits.
+      multiplier   <= { {8{a[7]}}, a };
+      multiplicand <= { {8{b[7]}}, b };
+      p            <= 16'd0;
+      ctr          <= 5'd0;
+      rdy          <= 1'b0;
+    end
+    else if (ctr < 16) begin
+      // Check the Booth encoding in the current cycle:
+      // Here, we use the bit indexed by the counter from the multiplier.
+      // If that bit is 1, then add the current multiplicand to the product.
+      if (multiplier[ctr])
+        p <= p + multiplicand;
+      // Shift the multiplicand left by one to adjust its alignment 
+      // for the next cycle.
+      multiplicand <= multiplicand << 1;
+      
+      // Increment cycle counter.
+      ctr <= ctr + 1;
+      
+      // When the last cycle is reached, declare the result ready.
+      if (ctr == 5'd15)
+        rdy <= 1'b1;
+    end
+  end
+
+endmodule

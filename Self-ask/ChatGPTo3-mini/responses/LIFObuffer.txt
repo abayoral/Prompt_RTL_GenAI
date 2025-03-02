@@ -1,0 +1,60 @@
+module LIFObuffer(
+    input         Clk,
+    input         Rst,    // Active-high reset
+    input         EN,     // Enable signal for buffer operations
+    input         RW,     // Read/Write control: 1 = pop (read), 0 = push (write)
+    input  [3:0]  dataIn, // 4-bit data input for push operation
+    output reg [3:0] dataOut, // 4-bit data output for pop operation
+    output        EMPTY,  // Flag: High when buffer is empty
+    output        FULL    // Flag: High when buffer is full
+);
+
+    // 4-entry stack memory where each entry is 4 bits wide.
+    reg [3:0] stack_mem [0:3];
+    
+    // Stack Pointer (SP)
+    // We use a 3-bit wide pointer that can range from 0 to 4.
+    // SP == 4 indicates an empty stack.
+    // When an item is pushed, SP is decremented, and when an item is popped, SP is incremented.
+    reg [2:0] sp;
+
+    integer i;
+
+    always @(posedge Clk) begin
+        // Synchronous reset: When Rst is high, clear everything
+        if (Rst) begin
+            sp       <= 3'd4;  // Set SP to 4 meaning the buffer is empty
+            dataOut  <= 4'b0;
+            // Clear all entries in the stack memory
+            for (i = 0; i < 4; i = i + 1) begin
+                stack_mem[i] <= 4'b0;
+            end
+        end
+        else if (EN) begin
+            // Write Operation: Push dataIn onto the stack when RW is 0 (push) and stack is not full.
+            if (RW == 1'b0) begin
+                // Check if the buffer is not full (sp > 0)
+                if (sp > 0) begin
+                    // Use the current value of sp to determine the target index,
+                    // then decrement sp to reflect the new top of the stack.
+                    stack_mem[sp - 1] <= dataIn;
+                    sp <= sp - 1;
+                end
+            end
+            // Read Operation: Pop data from the stack when RW is 1 (pop) and stack is not empty.
+            else begin
+                // Check if the buffer is not empty (sp < 4)
+                if (sp < 4) begin
+                    dataOut <= stack_mem[sp];
+                    stack_mem[sp] <= 4'b0;  // Clear the data location after popping
+                    sp <= sp + 1;
+                end
+            end
+        end
+    end
+
+    // Generate EMPTY and FULL flags based on the current value of the stack pointer.
+    assign EMPTY = (sp == 3'd4);
+    assign FULL  = (sp == 3'd0);
+
+endmodule

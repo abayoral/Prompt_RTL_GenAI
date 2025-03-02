@@ -1,0 +1,78 @@
+module add1 (
+    input a,
+    input b,
+    input cin,
+    output sum,
+    output cout
+);
+    // Compute the sum and carry out for a full adder
+    assign sum  = a ^ b ^ cin;
+    assign cout = (a & b) | (a & cin) | (b & cin);
+endmodule
+
+module add16 (
+    input [15:0] a,
+    input [15:0] b,
+    input cin,
+    output [15:0] sum,
+    output cout
+);
+    wire [15:0] carry;
+    
+    // Instantiate the first 1-bit adder with the module's carry-in
+    add1 a0 (
+        .a(a[0]),
+        .b(b[0]),
+        .cin(cin),
+        .sum(sum[0]),
+        .cout(carry[0])
+    );
+    
+    // Generate the remaining 15 adders, chaining the carries
+    genvar i;
+    generate
+        for(i = 1; i < 16; i = i + 1) begin: full_adder_chain
+            add1 adder (
+                .a(a[i]),
+                .b(b[i]),
+                .cin(carry[i-1]),
+                .sum(sum[i]),
+                .cout(carry[i])
+            );
+        end
+    endgenerate
+    
+    // The final carry out from the most significant bit
+    assign cout = carry[15];
+endmodule
+
+module top_module (
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] sum
+);
+    wire cout_lower;
+    wire [15:0] sum_lower;
+    wire [15:0] sum_upper;
+    
+    // Lower 16-bit adder: computes the lower 16 bits of the addition
+    add16 lower_adder (
+        .a(a[15:0]),
+        .b(b[15:0]),
+        .cin(1'b0),
+        .sum(sum_lower),
+        .cout(cout_lower)
+    );
+    
+    // Upper 16-bit adder: computes the upper 16 bits and uses the carry from the lower adder
+    add16 upper_adder (
+        .a(a[31:16]),
+        .b(b[31:16]),
+        .cin(cout_lower),
+        .sum(sum_upper),
+        .cout() // Carry out is ignored
+    );
+    
+    // Concatenate the upper and lower sums to produce the final 32-bit result
+    assign sum = { sum_upper, sum_lower };
+endmodule

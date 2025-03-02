@@ -1,0 +1,11 @@
+module top_module (
+    input sel,
+    input [7:0] a,
+    input [7:0] b,
+    output [7:0] out
+);
+
+    // Corrected: declare out as an 8-bit vector and use the conditional operator
+    assign out = sel ? b : a;
+
+endmodule

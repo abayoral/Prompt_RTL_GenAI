@@ -1,0 +1,42 @@
+module top_module(
+    input in,
+    input [3:0] state,
+    output [3:0] next_state,
+    output out
+);
+
+    // Using one-hot encoding: state[0] = A, state[1] = B, state[2] = C, state[3] = D.
+    // State transition table:
+    //
+    //  Current  :  in=0        in=1       Output
+    //     A    :  A           B          0
+    //     B    :  C           B          0
+    //     C    :  A           D          0
+    //     D    :  C           B          1
+    //
+    // Derive equations by examining in-edges:
+    //
+    // next_state[A] becomes active when:
+    //   - From A with in=0: state A and (~in)
+    //   - From C with in=0: state C and (~in)
+    assign next_state[0] = (~in) & (state[0] | state[2]); // A = index 0
+
+    // next_state[B] becomes active when:
+    //   - From A with in=1: state A and in
+    //   - From B with in=1: state B and in
+    //   - From D with in=1: state D and in
+    assign next_state[1] = in & (state[0] | state[1] | state[3]); // B = index 1
+
+    // next_state[C] becomes active when:
+    //   - From B with in=0: state B and (~in)
+    //   - From D with in=0: state D and (~in)
+    assign next_state[2] = (~in) & (state[1] | state[3]); // C = index 2
+
+    // next_state[D] becomes active when:
+    //   - From C with in=1: state C and in
+    assign next_state[3] = in & state[2]; // D = index 3
+
+    // Output logic: Only state D outputs 1.
+    assign out = state[3];
+
+endmodule

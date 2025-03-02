@@ -1,0 +1,25 @@
+module barrel_shifter(
+    input  [7:0] in,
+    input  [2:0] ctrl,
+    output [7:0] out
+);
+
+  // Stage 2: shift/rotate by 4 positions when ctrl[2] is asserted.
+  // Using a 2-to-1 mux functionality: if ctrl[2] is 1 choose rotated version, else pass input.
+  wire [7:0] stage2;
+  assign stage2 = ctrl[2] ? {in[3:0], in[7:4]} : in;
+  
+  // Stage 1: shift/rotate by 2 positions when ctrl[1] is asserted.
+  // Again, a mux selects the rotated-by-2 version or the previous stage result.
+  wire [7:0] stage1;
+  assign stage1 = ctrl[1] ? {stage2[5:0], stage2[7:6]} : stage2;
+  
+  // Stage 0: shift/rotate by 1 position when ctrl[0] is asserted.
+  // A final mux selects the rotated-by-1 version or passes the previous stage result.
+  wire [7:0] stage0;
+  assign stage0 = ctrl[0] ? {stage1[6:0], stage1[7]} : stage1;
+  
+  // The output is the result after the staged rotations.
+  assign out = stage0;
+
+endmodule

@@ -1,0 +1,62 @@
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output done
+);
+
+    // State encoding
+    // We require 4 states:
+    // S0_WAIT   : Waiting for a byte with in[3] == 1 (message start)
+    // S1_BYTE1  : First byte received (start of message)
+    // S2_BYTE2  : Second byte received
+    // S3_DONE   : Third byte received; assert done for one cycle then return to waiting
+    localparam S0_WAIT  = 2'd0;
+    localparam S1_BYTE1 = 2'd1;
+    localparam S2_BYTE2 = 2'd2;
+    localparam S3_DONE  = 2'd3;
+    
+    reg [1:0] state, next_state;
+    
+    // Next-state logic (combinational)
+    always @(*) begin
+        case(state)
+            S0_WAIT: begin
+                // Look for a byte whose bit[3] is 1, indicating the first byte of a valid message.
+                if(in[3])
+                    next_state = S1_BYTE1;
+                else
+                    next_state = S0_WAIT;
+            end
+            
+            S1_BYTE1: begin
+                // Regardless of in, accept the next byte as the second byte.
+                next_state = S2_BYTE2;
+            end
+            
+            S2_BYTE2: begin
+                // Regardless of in, accept the next byte as the third byte.
+                next_state = S3_DONE;
+            end
+            
+            S3_DONE: begin
+                // Assert done in this state for one cycle and go back to waiting.
+                next_state = S0_WAIT;
+            end
+            
+            default: next_state = S0_WAIT;
+        endcase
+    end
+
+    // Output logic: done is asserted only in S3_DONE.
+    assign done = (state == S3_DONE);
+    
+    // State flip-flops (sequential logic with synchronous reset)
+    always @(posedge clk) begin
+        if(reset)
+            state <= S0_WAIT;
+        else
+            state <= next_state;
+    end
+  
+endmodule

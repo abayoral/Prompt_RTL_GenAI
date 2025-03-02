@@ -1,0 +1,24 @@
+module square_wave(
+    input clk,
+    input [7:0] freq,
+    output reg wave_out
+);
+
+    // Internal register acting as a counter.
+    reg [7:0] count = 0;
+
+    // Always block triggered on the positive edge of the clock.
+    always @(posedge clk) begin
+        // Check if the counter has reached freq - 1.
+        if (count == (freq - 1)) begin
+            // Toggle the square wave output.
+            wave_out <= ~wave_out;
+            // Reset the counter for the next cycle.
+            count <= 0;
+        end else begin
+            // Otherwise, increment the counter.
+            count <= count + 1;
+        end
+    end
+
+endmodule

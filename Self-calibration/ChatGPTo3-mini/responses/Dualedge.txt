@@ -1,51 +1,53 @@
-Below is one corrected and improved version of the module. In your original code the functionality was essentially correct—but combining clock‐sampling flip–flops (one on posedge, one on negedge) with a multiplexer driven directly by the clock may lead to glitches (and might not map directly to FPGA DDR resources without special care). It’s generally best practice to avoid using the clock signal as a combinational mux selector because of potential timing hazards.
+Below is a corrected (and slightly improved) version of the module. In the original code there were no “syntax” errors in a simulation sense, but there are a few issues worth addressing:
 
-The revised version below makes the following changes:
-1. It declares all ports with an explicit type (wire/input/output).
-2. It wraps the combinational multiplexer in an always @(*) block (using an intermediate q_reg) for clarity.
-3. It adds comments to explain that this style is one way to achieve a double-data rate (DDR) like effect but that in real FPGA designs you might need to use dedicated DDR primitives for reliable operation.
+1. Using clk directly as the mux select in a continuous assignment can be problematic. Although the intent is to build a “double‐edge‐triggered flip–flop” by combining a posedge and a negedge process, using the clock signal in a combinational mux can lead to glitches and is generally bad practice. It is better to “isolate” clock signals from combinational logic (or, if you do use them, to at least document the intent).
 
-----------------------------------------------------------------
+2. Many FPGA flows do not support or recommend negative–edge triggered registers. (If targeting FPGA, consider using a dedicated DDR register or adjusting your design.) For simulation and ASIC flows the code may work as written, but it is still best practice to avoid unexpected behavior by not mixing asynchronous logic with a clock net.
+
+3. Although q was driven by a continuous assign, in a design like this it can be preferable to use a combinational always block to clearly capture the intended logic.
+
+In the corrected version below we:
+• Continue to capture d on both the positive and negative edges into separate registers.
+• Use an always_comb (or always @(*) in Verilog) block to drive q. 
+• Add comments noting the potential design issues when using both clock edges and using clk as a mux select signal.
+
+Here’s the corrected version:
+
+------------------------------------------------------------
 module top_module (
-    input  wire clk,
-    input  wire d,
-    output wire q
+    input  clk,
+    input  d,
+    output reg q  // declare q as reg since it is driven in an always block
 );
 
-    // Two registers: one sampling d at the rising edge and one sampling d at the falling edge.
-    reg pos_reg;
-    reg neg_reg;
+    // Internal registers to capture d on posedge and negedge of clk
+    reg pos_ff, neg_ff;
     
-    // Positive-edge triggered flip-flop: samples d at rising edge.
+    // Positive edge triggered flip-flop capturing d
     always @(posedge clk) begin
-        pos_reg <= d;
+        pos_ff <= d;
     end
-
-    // Negative-edge triggered flip-flop: samples d at falling edge.
+    
+    // Negative edge triggered flip-flop capturing d
     always @(negedge clk) begin
-        neg_reg <= d;
+        neg_ff <= d;
     end
-
-    // Combinational logic to select between the two registers.
-    // Note: using clk as the mux select can lead to glitches. In many designs,
-    // a registered output or dedicated DDR output primitives are preferred.
-    reg q_reg;
+    
+    // Combinational multiplexer:
+    // When clk is high, use the posedge FF value.
+    // When clk is low, use the negedge FF value.
+    // NOTE: Using the clock (clk) as a multiplexer select signal is not best practice
+    // because it is derived from the global clock. Review this design decision for your target technology.
     always @(*) begin
         if (clk)
-            q_reg = pos_reg;
+            q = pos_ff;
         else
-            q_reg = neg_reg;
+            q = neg_ff;
     end
 
-    assign q = q_reg;
-
 endmodule
-----------------------------------------------------------------
+------------------------------------------------------------
 
-A few notes:
-
-• Although the original code’s assignment “assign q = clk ? pos_reg : neg_reg;” is functionally similar, wrapping the combinational logic inside an always @(*) block (with an intermediate register like q_reg) may make the designer’s intent clearer—and helps avoid synthesis warnings in some tools.
-
-• Using clock as a mux select is generally discouraged because it can create glitches and timing issues in the combinational path; if your intent is to create a DDR output, review your target synthesis tool’s guidelines (or use dedicated DDR output primitives) to ensure reliable operation.
-
-This corrected version adheres to best practices while keeping the functionality you described.
+Additional Notes:
+• If your target technology does not support negative edge triggered logic (common in FPGAs), consider using a different approach (for example, using a DDR flip–flop or sampling d twice on the same clock edge and then interpolating the value).
+• This corrected code now clearly separates synchronous (flip–flop) and combinational (mux) logic, and it documents the potential design caveats.

@@ -1,0 +1,36 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // The given Karnaugh map represents the function:
+    // 
+    // |       | a'b' | a'b  | ab   | ab' |
+    // |-------|------|------|------|-----|
+    // | c'd'  | 1    | 1    | 0    | 1   |
+    // | c'd   | 1    | 0    | 0    | 1   |
+    // | cd    | 0    | 1    | 1    | 1   |
+    // | cd'   | 1    | 1    | 0    | 0   |
+    //
+    // Analyzing the K-map (with columns in the Gray‐code order:
+    //   a'b' (00), a'b (01), ab (11), ab' (10),
+    // and rows similarly with c,d: c'd' (00), c'd (01), cd (11), cd' (10))
+    // one good simplified sum‐of‐products result is:
+    //
+    //      F = a̅ d̅ + c̅ b̅ + c d (a + b)
+    //
+    // Explanation of the simplification:
+    // • The ones in the c'd' and c'd rows contribute to groups that eventually 
+    //   yield terms a̅ d̅ and c̅ b̅.
+    // • The block in row "cd" (when c=d=1) for columns where a or b is 1 yields cd(a+b).
+    //
+    // This reduced expression is equivalent to the original K-map.
+    //
+    // Therefore, the Verilog implementation is:
+
+    assign out = (~a & ~d) | ((~c) & (~b)) | (c & d & (a | b));
+
+endmodule

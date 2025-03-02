@@ -1,0 +1,33 @@
+module freq_diveven #(
+    parameter NUM_DIV = 4  // Must be an even number
+)(
+    input  clk,     // input clock signal
+    input  rst_n,   // active-low reset
+    output reg clk_div  // divided clock output
+);
+
+    // Local parameter to define half-cycle count
+    localparam HALF = NUM_DIV / 2;
+    
+    // 4-bit counter to count input clock cycles
+    reg [3:0] cnt;
+
+    // Clock division process. The divided clock toggles every HALF cycles
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt     <= 4'd0;
+            clk_div <= 1'b0;
+        end
+        else begin
+            // Increment counter until it reaches (HALF - 1)
+            if (cnt == (HALF - 1)) begin
+                cnt     <= 4'd0;
+                clk_div <= ~clk_div;
+            end
+            else begin
+                cnt <= cnt + 4'd1;
+            end
+        end
+    end
+
+endmodule

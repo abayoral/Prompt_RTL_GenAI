@@ -1,0 +1,15 @@
+module clkgenerator;
+  // Key parameter defining the total cycle time of the clock signal
+  parameter PERIOD = 10;
+  
+  // Output port for the clock signal
+  output reg clk;
+  
+  // Initial block to set the initial state and generate the periodic clock signal
+  initial begin
+    clk = 0;
+    forever begin
+      #(PERIOD/2) clk = ~clk;
+    end
+  end
+endmodule

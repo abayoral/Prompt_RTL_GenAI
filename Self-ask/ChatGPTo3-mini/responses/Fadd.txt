@@ -1,0 +1,1 @@
+Is it acceptable to use basic Verilog operators (like &, |, ^) for the continuous assignments to implement the gate-level logic, or are there any restrictions on which gate primitives/operators can be used?

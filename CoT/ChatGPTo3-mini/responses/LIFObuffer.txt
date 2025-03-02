@@ -1,0 +1,66 @@
+module LIFObuffer(
+    input  [3:0] dataIn,  // 4-bit input data bus for push
+    input        RW,      // Read/Write control: 1 = pop (read), 0 = push (write)
+    input        EN,      // Enable signal for operations
+    input        Rst,     // Active-high synchronous reset
+    input        Clk,     // Clock signal for synchronous operations
+    output [3:0] dataOut, // 4-bit output data bus for pop
+    output       EMPTY,   // Flag: high if buffer is empty
+    output       FULL     // Flag: high if buffer is full
+);
+
+  // Internal stack memory: 4 entries of 4-bit width
+  reg [3:0] stack_mem [0:3];
+  
+  // Stack pointer (SP):  
+  // When SP = 4, the buffer is empty.
+  // When SP = 0, the buffer is full.
+  reg [2:0] SP;
+
+  // Internal register for dataOut so that it can be updated synchronously.
+  reg [3:0] dataOut_reg;
+  assign dataOut = dataOut_reg;
+  
+  // Continuous assignments for status flags:
+  assign EMPTY = (SP == 3'd4);
+  assign FULL  = (SP == 3'd0);
+
+  // Synchronous operations on rising edge of the clock
+  integer i;
+  always @(posedge Clk) begin
+    if(EN) begin
+      if(Rst) begin
+        // synchronous reset: clear stack and set pointer to empty state
+        SP <= 3'd4;
+        dataOut_reg <= 4'b0;
+        for(i = 0; i < 4; i = i + 1) begin
+          stack_mem[i] <= 4'b0;
+        end
+      end 
+      else begin
+        // Check the RW signal to determine push or pop operation.
+        // When RW is 0: perform a push operation
+        if(RW == 1'b0) begin
+          // Push operation if the buffer is not full (i.e., SP != 0)
+          if(SP != 3'd0) begin
+            // Decrement the stack pointer then store the data in that location.
+            SP <= SP - 1;
+            stack_mem[SP - 1] <= dataIn;
+          end
+        end 
+        // When RW is 1: perform a pop operation
+        else begin
+          // Pop operation if the buffer is not empty (i.e., SP != 4)
+          if(SP != 3'd4) begin
+            // Read the top element, then clear that memory location and increment SP.
+            dataOut_reg <= stack_mem[SP];
+            stack_mem[SP] <= 4'b0;
+            SP <= SP + 1;
+          end
+        end
+      end
+    end 
+    // If Enable is low, no operation occurs on the rising edge.
+  end
+
+endmodule

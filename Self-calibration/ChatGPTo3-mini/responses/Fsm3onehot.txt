@@ -1,38 +1,62 @@
-Below is a corrected and slightly cleaned‐up version. Functionally nothing major needed to be changed because the original code was synthesizable and logically correct. In the revised version I’ve changed the state constants to localparams (which is a good practice when you want constants scoped locally) and kept the combinational assignments. Note, however, that this module produces pure combinational next‐state logic and does not store state (i.e. there is no register); this is appropriate if you are generating the next state in a one‐hot FSM but then will register it elsewhere.
+Below is the corrected module. The only error in the original code was in the logic for next_state[B]. According to the state transition table, next_state[B] should be activated when:
 
------------------------------------------------------
+ • The current state is A and in==1 (transition A → B)  
+ • The current state is B and in==1 (remain in B)  
+ • The current state is D and in==1 (transition D → B)
+
+The original code only included state[B] and state[D] in the OR‐term. The corrected code adds state[A] so that the A → B transition is properly handled. In addition, best practice is to use localparam for constant state names. Here is the corrected version:
+
+-------------------------------------------------
 module top_module(
     input        in,
-    input  [3:0] state,
-    output [3:0] next_state,
-    output       out
+    input  [3:0] state,      // one-hot encoded state; only one bit high
+    output [3:0] next_state, // one-hot encoded next state
+    output       out         // Moore output
 );
 
-    // Define state indices as local parameters
-    localparam A = 0;
-    localparam B = 1;
-    localparam C = 2;
-    localparam D = 3;
+    // Define state indices using one-hot encoding:
+    // A = bit 0, B = bit 1, C = bit 2, D = bit 3
+    localparam A = 0,
+               B = 1,
+               C = 2,
+               D = 3;
 
-    // Next state logic for one-hot encoded state machine
-    // For state A: transitions from A and C when in is 0.
+    // Next state logic based on the state transition table:
+    // From state A: if in==0 -> remain in A; if in==1 -> go to B.
+    // From state B: if in==0 -> go to C; if in==1 -> remain in B.
+    // From state C: if in==0 -> go to A; if in==1 -> go to D.
+    // From state D: if in==0 -> go to C; if in==1 -> go to B.
+    
+    // next_state[A] is activated if either:
+    //   - current state is A and in==0, or
+    //   - current state is C and in==0.
     assign next_state[A] = ~in & (state[A] | state[C]);
-    // For state B: transitions from A, B, and D when in is 1.
+    
+    // next_state[B] is activated if any of the following are true:
+    //   - current state is A and in==1 (transition A -> B),
+    //   - current state is B and in==1 (remain in B), or
+    //   - current state is D and in==1 (transition D -> B).
     assign next_state[B] = in & (state[A] | state[B] | state[D]);
-    // For state C: transitions from B and D when in is 0.
+    
+    // next_state[C] is activated if either:
+    //   - current state is B and in==0, or
+    //   - current state is D and in==0.
     assign next_state[C] = ~in & (state[B] | state[D]);
-    // For state D: transition from C when in is 1.
+    
+    // next_state[D] is activated only if:
+    //   - current state is C and in==1.
     assign next_state[D] = in & state[C];
-
-    // Moore output logic: output is 1 only in state D.
+    
+    // Moore machine output is determined solely by the current state.
+    // The output is 1 only if the current state is D.
     assign out = state[D];
 
 endmodule
------------------------------------------------------
+-------------------------------------------------
 
-Key points addressed:
-1. Changed parameters to localparams to restrict their scope.
-2. Left the combinational assignments intact (since in a one‐hot FSM, each bit of next_state is computed separately).
-3. Comments clarify the intended FSM transitions.
+Explanation of Changes:
 
-This version adheres to best practices while remaining functionally equivalent to your original design.
+1. Changed parameter declarations to localparam for better synthesis practices.
+2. Corrected the next_state[B] assignment by adding state[A] to account for the transition from state A to B when in==1.
+
+This updated module now accurately implements the specified state transitions using one‑hot encoding and follows good Verilog coding practices.

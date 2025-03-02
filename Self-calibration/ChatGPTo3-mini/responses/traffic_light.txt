@@ -1,172 +1,133 @@
-Below is a revised version of the module. In this version the following improvements were made:
+Below is one acceptable corrected version. Although the original code “worked,” there were a few stylistic and potential race‐condition issues that are best avoided. In our version we combine the state/counter and output updates into a single always block. This way the traffic light outputs are updated in the very same clock cycle as the state and counter logic. (Note that another acceptable fix is to use separate always blocks but then care must be taken to avoid reading stale state.) We have also added some comments and default assignments for clarity. One might also wish to rename the 8‐bit output “clock” to something less “clock‐like” (such as “count” or “cnt_disp”) to avoid confusion—but we keep the original name here.
 
-1. Although the original code worked correctly, the “IDLE” state was used only as a reset “placeholder”. In the revised version the reset directly loads the first active state (red light) so that the state machine “starts” immediately. This eliminates one extra cycle.
-2. The signal formerly named “clock” (which can be confused with the clock input) has been renamed to “timer_count” to improve readability.
-3. Minor cleanup and comments have been added so that each always‐block is fully self–contained with proper default assignments.
-4. The coding style has been improved by clearly separating the combinational “next state” logic and the sequential assignments.
-
-You can use the following corrected code:
-
---------------------------------------------------
-module traffic_light(
-  input         rst_n,         // active-low reset
-  input         clk,           // clock signal
-  input         pass_request,  // pedestrian button request
-  output reg [7:0] timer_count, // internal timer count output (renamed for clarity)
-  output reg   red,           // vehicle red light indicator
-  output reg   yellow,        // vehicle yellow light indicator
-  output reg   green          // vehicle green light indicator
+------------------------------------------------------------
+module traffic_light (
+    input           rst_n,
+    input           clk,
+    input           pass_request,
+    output reg [7:0] clock,      // exposes the current countdown value
+    output reg      red,         // vehicle red (pedestrians walk when this is ON)
+    output reg      yellow,      // vehicle yellow
+    output reg      green        // vehicle green (pedestrians stop when this is ON)
 );
 
-  // State encoding
-  localparam S1_RED    = 2'b00,  // red for vehicles (pedestrians go)
-             S3_GREEN  = 2'b01,  // green for vehicles
-             S2_YELLOW = 2'b10;  // yellow for vehicles
+  // State encoding:
+  // IDLE      : Initial state (transitions immediately to vehicular red)
+  // s1_red    : Vehicular red light active (10 clock cycles), pedestrian walk
+  // s3_green  : Vehicular green light active (60 clock cycles by default, but can be shortened)
+  // s2_yellow : Vehicular yellow light active (5 clock cycles)
+  parameter IDLE      = 2'b00,
+            s1_red    = 2'b01,
+            s2_yellow = 2'b10,
+            s3_green  = 2'b11;
+
+  reg [7:0] cnt;       // internal 8-bit counter for timing
+  reg [1:0] state;     // current state
   
-  // Duration parameters (in clock cycles)
-  localparam RED_TIME          = 8'd10;
-  localparam YELLOW_TIME       = 8'd5;
-  localparam GREEN_TIME        = 8'd60;
-  localparam MIN_GREEN_REMAIN  = 8'd10;  // minimum remaining cycles in green after a request
-
-  // State and counter registers
-  reg [1:0]  state, next_state;
-  reg [7:0]  cnt, next_cnt;
-  // This flag ensures that the pedestrian request only adjusts the green duration once.
-  reg        ped_serviced, next_ped_serviced;
-
-  // Internal signals for output generation
-  reg p_red, p_yellow, p_green;
-
-  //***************************************************************
-  // Combinational logic to determine next state, counter and flag
-  //***************************************************************
-  always @(*) begin
-    // Default assignments: hold current values
-    next_state         = state;
-    next_cnt           = cnt;
-    next_ped_serviced  = ped_serviced;
-    
-    case (state)
-      S1_RED: begin
-        if (cnt == 0) begin
-          // Transition to green state when red duration expires.
-          next_state        = S3_GREEN;
-          next_cnt          = GREEN_TIME - 1;
-          next_ped_serviced = 1'b0;  // clear request flag for new green cycle
-        end else begin
-          next_cnt = cnt - 1;
-        end
-      end
-
-      S3_GREEN: begin
-        // Check if a pedestrian request has occurred and not yet been serviced.
-        // If so, and if enough green time remains, shorten it.
-        if (!ped_serviced && pass_request && (cnt > MIN_GREEN_REMAIN)) begin
-          next_cnt          = MIN_GREEN_REMAIN - 1; 
-          next_ped_serviced = 1'b1;
-        end else if (cnt == 0) begin
-          // When green period expires, go to yellow.
-          next_state = S2_YELLOW;
-          next_cnt   = YELLOW_TIME - 1;
-        end else begin
-          next_cnt = cnt - 1;
-        end
-      end
-
-      S2_YELLOW: begin
-        if (cnt == 0) begin
-          // After yellow, go to red.
-          next_state = S1_RED;
-          next_cnt   = RED_TIME - 1;
-        end else begin
-          next_cnt = cnt - 1;
-        end
-      end
-
-      default: begin
-        // Should never occur. Default to S1_RED.
-        next_state         = S1_RED;
-        next_cnt           = RED_TIME - 1;
-        next_ped_serviced  = 1'b0;
-      end
-    endcase
-  end
-
-  //***************************************************************
-  // Sequential logic: Update state, counter and pedestrian-serviced flag
-  //***************************************************************
+  // Synchronous state machine, counter and outputs update.
+  // All outputs are updated in the same always block so they remain in sync with the state.
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-      // On reset, directly load the red state.
-      state         <= S1_RED;
-      cnt           <= RED_TIME - 1;
-      ped_serviced  <= 1'b0;
+      state   <= IDLE;
+      cnt     <= 8'd0;
+      clock   <= 8'd0;
+      red     <= 1'b0;
+      yellow  <= 1'b0;
+      green   <= 1'b0;
     end else begin
-      state         <= next_state;
-      cnt           <= next_cnt;
-      ped_serviced  <= next_ped_serviced;
+      // Default assignments (for outputs and clock) can be overridden in the state cases.
+      // Update the countdown output (will be the value after this clock cycle’s count update).
+      clock <= cnt;
+      
+      case (state)
+        IDLE: begin
+          // Immediately transit from IDLE to red phase:
+          state <= s1_red;
+          cnt   <= 8'd10;  // red is 10 clock cycles
+        end
+
+        s1_red: begin
+          if (cnt != 8'd0) begin
+            cnt   <= cnt - 1;
+          end else begin
+            // After red, go to green state with default 60 cycles.
+            state <= s3_green;
+            cnt   <= 8'd60;
+          end
+        end
+
+        s3_green: begin
+          // Pedestrian button handling:
+          // If pass_request is asserted during green and more than 10 cycles remain,
+          // truncate remaining green to 10 cycles.
+          if (pass_request && (cnt > 8'd10))
+            cnt <= 8'd10;
+          else if (cnt != 8'd0)
+            cnt <= cnt - 1;
+          else begin
+            // Transition: after green expires, go to yellow phase.
+            state <= s2_yellow;
+            cnt   <= 8'd5;  // yellow lasts 5 clock cycles
+          end
+        end
+
+        s2_yellow: begin
+          if (cnt != 8'd0) begin
+            cnt   <= cnt - 1;
+          end else begin
+            // Transition: yellow always goes to red.
+            state <= s1_red;
+            cnt   <= 8'd10;
+          end
+        end
+
+        default: begin
+          state <= IDLE;
+          cnt   <= 8'd0;
+        end
+      endcase
+
+      // Update the traffic light outputs according to the current state.
+      // Note: The vehicular red light is ON only during the s1_red 
+      //       green light is ON only during the s3_green
+      //       yellow light is ON only during the s2_yellow phase.
+      case (state)
+        s1_red: begin
+          red    <= 1'b1;
+          yellow <= 1'b0;
+          green  <= 1'b0;
+        end
+
+        s3_green: begin
+          red    <= 1'b0;
+          yellow <= 1'b0;
+          green  <= 1'b1;
+        end
+
+        s2_yellow: begin
+          red    <= 1'b0;
+          yellow <= 1'b1;
+          green  <= 1'b0;
+        end
+
+        default: begin
+          red    <= 1'b0;
+          yellow <= 1'b0;
+          green  <= 1'b0;
+        end
+      endcase
     end
-  end
-
-  //***************************************************************
-  // Output generation: Determine vehicle light outputs based on state
-  //***************************************************************
-  always @(*) begin
-    // Default assignments to avoid any inferred latches.
-    p_red    = 1'b0;
-    p_yellow = 1'b0;
-    p_green  = 1'b0;
-    
-    case (state)
-      S1_RED: begin
-        p_red    = 1'b1;
-      end
-
-      S3_GREEN: begin
-        p_green  = 1'b1;
-      end
-
-      S2_YELLOW: begin
-        p_yellow = 1'b1;
-      end
-
-      default: ; // Remains all OFF
-    endcase
-  end
-
-  // Sequential block to register the outputs
-  always @(posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
-      red    <= 1'b0;
-      yellow <= 1'b0;
-      green  <= 1'b0;
-    end else begin
-      red    <= p_red;
-      yellow <= p_yellow;
-      green  <= p_green;
-    end
-  end
-
-  //***************************************************************
-  // Update timer_count output with the current internal counter value.
-  //***************************************************************
-  always @(posedge clk or negedge rst_n) begin
-    if (!rst_n)
-      timer_count <= 8'd0;
-    else
-      timer_count <= cnt;
   end
 
 endmodule
---------------------------------------------------
+------------------------------------------------------------
 
-Notes on the changes:
+Explanation of the main changes:
 
-• Reset Behavior – In the revised design the synchronous reset immediately enters the S1_RED state (red light active) rather than going through an initial IDLE state.
-  
-• Naming – The output formerly called “clock” is renamed “timer_count” to avoid confusion with the clock input.
+1. Combined the state/counter update, the countdown output update, and the traffic light output update into one always block. This avoids any potential race conditions where separate clocked blocks might see “old” state values.
 
-• Coding Style – All combinational always blocks now have complete default assignments to avoid accidental latch inference and to better document intended functionality.
+2. Added explicit default branches in the state and output case statements so that synthesis tools have a complete view of all possibilities.
 
-This version adheres to best practices and should be more robust and easier to maintain.
+3. Used nonblocking assignments consistently and ensured that constant widths (e.g. 8'd0, 8'd10) are used when comparing or assigning to our 8‐bit signals.
+
+This version adheres to good Verilog coding practices and avoids the subtle pitfalls that sometimes come from having multiple always blocks sharing related state.

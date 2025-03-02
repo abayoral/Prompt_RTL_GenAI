@@ -1,0 +1,196 @@
+module alu(
+    input  [5:0] aluc,
+    input  [31:0] a,
+    input  [31:0] b,
+    output reg [31:0] r,
+    output reg zero,
+    output reg carry,
+    output reg negative,
+    output reg overflow,
+    output reg flag
+);
+
+  // Combinational logic implementing the various arithmetic and logical operations.
+  always @(*) begin
+    // Set defaults for all outputs.
+    r        = 32'h0;
+    carry    = 1'b0;
+    overflow = 1'b0;
+    flag     = 1'b0;
+    
+    case(aluc)
+      // ADD (6'b100000): 32‐bit signed addition.
+      6'b100000: begin
+          // Extend sign bit and perform addition.
+          // Using a 33‐bit temporary so that bit[32] represents the carry out.
+          reg [32:0] temp;
+          temp = {a[31], a} + {b[31], b};
+          r = temp[31:0];
+          carry = temp[32];
+          // Overflow occurs if inputs share the same sign but result has a different sign.
+          if ((a[31] == b[31]) && (r[31] != a[31]))
+            overflow = 1'b1;
+          else
+            overflow = 1'b0;
+      end
+
+      // ADDU (6'b100001): 32‐bit unsigned addition.
+      6'b100001: begin
+          reg [32:0] temp;
+          temp = {1'b0, a} + {1'b0, b};
+          r = temp[31:0];
+          carry = temp[32];
+          overflow = 1'b0; // Unsigned addition disregards overflow.
+      end
+
+      // SUB (6'b100010): 32‐bit signed subtraction (a - b).
+      6'b100010: begin
+          reg [32:0] temp_signed;
+          reg [32:0] temp_unsigned;
+          // For signed arithmetic, operate with sign extension.
+          temp_signed = {a[31], a} - {b[31], b};
+          r = temp_signed[31:0];
+          // For the carry flag in subtraction, compute unsigned subtraction.
+          temp_unsigned = {1'b0, a} - {1'b0, b};
+          carry = temp_unsigned[32];
+          // Signed overflow detection: if operands have different signs and sign of result differs from sign of a.
+          if ((a[31] != b[31]) && (r[31] != a[31]))
+            overflow = 1'b1;
+          else
+            overflow = 1'b0;
+      end
+
+      // SUBU (6'b100011): 32‐bit unsigned subtraction.
+      6'b100011: begin
+          reg [32:0] temp;
+          temp = {1'b0, a} - {1'b0, b};
+          r = temp[31:0];
+          carry = temp[32];
+          overflow = 1'b0;
+      end
+
+      // AND (6'b100100): Bitwise AND.
+      6'b100100: begin
+          r = a & b;
+          carry = 1'b0;
+          overflow = 1'b0;
+      end
+
+      // OR (6'b100101): Bitwise OR.
+      6'b100101: begin
+          r = a | b;
+          carry = 1'b0;
+          overflow = 1'b0;
+      end
+
+      // XOR (6'b100110): Bitwise XOR.
+      6'b100110: begin
+          r = a ^ b;
+          carry = 1'b0;
+          overflow = 1'b0;
+      end
+
+      // NOR (6'b100111): Bitwise NOR.
+      6'b100111: begin
+          r = ~(a | b);
+          carry = 1'b0;
+          overflow = 1'b0;
+      end
+
+      // SLT (6'b101010): Set on less than (signed).
+      // The flag output is 1 if a is less than b (when both are treated as signed), else 0.
+      6'b101010: begin
+          if ($signed(a) < $signed(b))
+            flag = 1'b1;
+          else
+            flag = 1'b0;
+          // Optionally, the result r is set with flag value in the least significant bit.
+          r = {31'b0, flag};
+          carry = 1'b0;
+          overflow = 1'b0;
+      end
+
+      // SLTU (6'b101011): Set on less than (unsigned).
+      6'b101011: begin
+          if (a < b)
+            flag = 1'b1;
+          else
+            flag = 1'b0;
+          r = {31'b0, flag};
+          carry = 1'b0;
+          overflow = 1'b0;
+      end
+
+      // SLL (6'b000000): Shift Left Logical.
+      // The shift amount is obtained from the low-order 5 bits of operand b.
+      6'b000000: begin
+          r = a << b[4:0];
+          carry = 1'b0;
+          overflow = 1'b0;
+      end
+
+      // SRL (6'b000010): Shift Right Logical.
+      6'b000010: begin
+          r = a >> b[4:0];
+          carry = 1'b0;
+          overflow = 1'b0;
+      end
+
+      // SRA (6'b000011): Shift Right Arithmetic.
+      6'b000011: begin
+          r = $signed(a) >>> b[4:0];
+          carry = 1'b0;
+          overflow = 1'b0;
+      end
+
+      // SLLV (6'b000100): Shift Left Logical Variable.
+      // Similarly, the shift amount is taken from b[4:0].
+      6'b000100: begin
+          r = a << b[4:0];
+          carry = 1'b0;
+          overflow = 1'b0;
+      end
+
+      // SRLV (6'b000110): Shift Right Logical Variable.
+      6'b000110: begin
+          r = a >> b[4:0];
+          carry = 1'b0;
+          overflow = 1'b0;
+      end
+
+      // SRAV (6'b000111): Shift Right Arithmetic Variable.
+      6'b000111: begin
+          r = $signed(a) >>> b[4:0];
+          carry = 1'b0;
+          overflow = 1'b0;
+      end
+
+      // LUI (6'b001111): Load Upper Immediate.
+      // The upper 16 bits of operand a are shifted into the upper half of the result.
+      6'b001111: begin
+          r = {a[15:0], 16'b0};
+          carry = 1'b0;
+          overflow = 1'b0;
+      end
+
+      // Default: For any unspecified opcode, outputs default to high impedance.
+      default: begin
+          r        = 32'bz;
+          carry    = 1'bz;
+          overflow = 1'bz;
+          flag     = 1'bz;
+      end
+    endcase
+
+    // Set the negative flag if r is defined (non-high-impedance).
+    if (r !== 32'bz) begin
+      negative = r[31];
+      zero = (r == 32'b0);
+    end
+    else begin
+      negative = 1'bz;
+      zero = 1'bz;
+    end
+  end
+
+endmodule

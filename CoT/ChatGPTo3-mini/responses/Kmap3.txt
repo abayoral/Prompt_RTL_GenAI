@@ -1,0 +1,39 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // The Karnaugh map given is:
+    //             a'b'   a'b    ab    ab'
+    // c'd'         d      0     1     1
+    // c'd          0      0     d     d
+    // cd           0      1     1     1
+    // cd'          0      1     1     1
+    //
+    // We are allowed to choose the output for the don't‐care (d) cells as convenient.
+    // By a careful review using grouping, one can choose the don't cares to simplify the design.
+    //
+    // One valid simplification chooses to set the don't care cells in row "c'd" (for columns ab and ab')
+    // to 1 so that the ones become:
+    //
+    //  Row c'd': cells for ab and ab' are 1.
+    //  Row c'd : if we set the don’t cares in columns ab and ab' to 1, then these cells become 1.
+    //  Row cd and cd': cells for a'b, ab, ab' are already 1.
+    //
+    // Then note that every cell in the columns ab and ab' (where a=1) is 1, independent of the row.
+    // This gives the term "a".
+    //
+    // The only remaining ones are in the column a'b in rows cd and cd' (where a=0, b=1 and c=1).
+    // These can be covered by the product term "b & c".
+    //
+    // Hence one possible minimal sum-of-products is:
+    //    F = a + (b & c)
+    //
+    // Translating to Verilog:
+    
+    assign out = a | (b & c);
+
+endmodule

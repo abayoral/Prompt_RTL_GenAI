@@ -1,0 +1,72 @@
+module freq_divbyfrac(
+    input  clk,    // main clock input
+    input  rst_n,  // active‐low reset
+    output clk_div // fractional divided clock output
+);
+
+  //--------------------------------------------------------------------------
+  // Overview:
+  // This module implements a fractional frequency divider that divides the
+  // input clock by 3.5 using a double‐edge clocking technique. In order to
+  // achieve a half‐integer division, we “sample” the clk on both its rising
+  // and falling edges. Two independent counters are used – one clocked on the
+  // positive edge and one on the negative edge. Because division by 3.5
+  // corresponds to a period of 7 half‐cycles (i.e. 7 “edge events”), each
+  // counter counts from 0 to 6 (parameter MUL2_DIV_CLK tells us the 7-phase
+  // cycle).
+  //
+  // One counter (count_a) is used to generate a version (clk_div_a) that stays
+  // high for 4 half–cycles and low for 3 half–cycles. The other counter (count_b)
+  // is used to generate a complementary (phase–shifted) version (clk_div_b) that
+  // stays high for 3 half–cycles and low for 4 half–cycles. By OR–ing these two
+  // phase–shifted clocks, the output clock (clk_div) has transitions that occur
+  // at nearly uniform intervals – effectively realizing a fractional division of
+  // the input clock (i.e. numerator 7 half–cycles per period, which is 3.5 full
+  // input clock cycles).
+  //
+  // Note: Although each branch by itself has an imbalanced duty cycle, the OR
+  // combination produces a final divided clock with a smoothly uniform period.
+  //--------------------------------------------------------------------------
+
+  // parameter: total half-cycle count per period (0 to 6 gives 7 half–cycles)
+  localparam MUL2_DIV_CLK = 7;  
+
+  // Two separate 3–bit counters, one updating on posedge and one on negedge.
+  reg [2:0] count_a;
+  reg [2:0] count_b;
+
+  // Positive–edge clocked counter.
+  // This counter resets from 6 back to 0 so that it cycles every 7 positive–edges.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      count_a <= 3'd0;
+    else if (count_a == MUL2_DIV_CLK-1)
+      count_a <= 3'd0;
+    else
+      count_a <= count_a + 3'd1;
+  end
+
+  // Negative–edge clocked counter.
+  // This counter is updated on the falling edge so that its count is offset by
+  // approximately half a clk period relative to count_a.
+  always @(negedge clk or negedge rst_n) begin
+    if (!rst_n)
+      count_b <= 3'd0;
+    else if (count_b == MUL2_DIV_CLK-1)
+      count_b <= 3'd0;
+    else
+      count_b <= count_b + 3'd1;
+  end
+
+  // Generate the two intermediate clock signals.
+  // clk_div_a: high for 4 half–cycles (i.e. when count_a is 0,1,2,3), low for 3 half–cycles.
+  // clk_div_b: high for 3 half–cycles (i.e. when count_b is 0,1,2), low for 4 half–cycles.
+  wire clk_div_a = (count_a < 4) ? 1'b1 : 1'b0;
+  wire clk_div_b = (count_b < 3) ? 1'b1 : 1'b0;
+
+  // Final clock division: by OR-ing the phase-adjusted signals we combine their
+  // transitions so that the overall output toggles at intervals corresponding to
+  // 7 half-cycles (i.e. a division factor of 3.5 with respect to the full-cycle clk).
+  assign clk_div = clk_div_a | clk_div_b;
+
+endmodule

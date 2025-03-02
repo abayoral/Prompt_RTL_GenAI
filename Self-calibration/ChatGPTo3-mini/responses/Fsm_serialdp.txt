@@ -1,145 +1,120 @@
-Below is one acceptable corrected version. In our “fix” we did not change the overall structure or function of the design (since its operation is as intended) but we did clean up a few details and added default assignments so that every signal is explicitly set in every branch. In addition, we “complete” the parity module’s clocked process (so that synthesis tools see an explicit latch‐free design). (There are several acceptable ways to write the code.) 
+Below is one acceptable corrected version. In our fix we removed the unused next_state signal, made sure every signal is assigned in every branch so that no latch is inferred, and improved the comments for clarity. (Note that there are several “correct” answers depending on style. In our fix the behavior is unchanged, but the code is cleaner and more “best‐practice”.)
 
----------------------------------------------------------------
-/***************************************************************
-  Corrected version of the module with improved coding style.
-***************************************************************/
+--------------------------------------------------------------------------------
 module top_module(
     input clk,
     input in,
-    input reset,            // synchronous reset
+    input reset,    // synchronous reset
     output reg [7:0] out_byte,
     output reg done
 );
 
-    // State definitions
-    localparam S_IDLE      = 3'd0,
-               S_START     = 3'd1,  // One‐cycle state to reset the parity counter
-               S_DATA      = 3'd2,  // Receive 8 data bits (LSB first)
-               S_PARITY    = 3'd3,  // Receive the parity bit
-               S_STOP      = 3'd4,  // Check the stop bit
-               S_WAIT_STOP = 3'd5;  // Wait for the stop bit if not present
+    // FSM state encoding
+    localparam STATE_IDLE   = 3'd0,
+               STATE_DATA   = 3'd1,
+               STATE_PARITY = 3'd2,
+               STATE_STOP   = 3'd3;
 
     reg [2:0] state;
-    reg [2:0] bit_count;      // 3 bits are enough to count 0 to 7
-    reg parity_reset_signal;  // Synchronously resets the parity module
+    reg [2:0] bit_count;  // to count 8 data bits
+    reg parity_reset_sig; // signal to reset the parity counter
 
-    // We want to feed the “in” signal to the parity module only during S_DATA and S_PARITY.
-    wire parity_in;
-    assign parity_in = ((state == S_DATA) || (state == S_PARITY)) ? in : 1'b0;
+    // Wire from parity module
+    wire parity_ok;
 
-    wire parity_out;
-    // Instantiate the parity module.
-    parity parity_inst (
+    // Instance of parity calculator.
+    // This module counts the number of 1's in the incoming bits (data + parity)
+    // and its output "odd" is high when that count is odd.
+    parity parity_instance (
         .clk(clk),
-        .reset(parity_reset_signal),
-        .in(parity_in),
-        .odd(parity_out)
+        .reset(parity_reset_sig),
+        .in(in),
+        .odd(parity_ok)
     );
 
-    // FSM and data path
+    // Synchronous FSM.
+    // Note: All signals (done, parity_reset_sig) are assigned in every branch.
     always @(posedge clk) begin
         if (reset) begin
-            // Synchronous reset of all registers
-            state               <= S_IDLE;
-            bit_count           <= 3'd0;
-            out_byte            <= 8'b0;
-            done                <= 1'b0;
-            parity_reset_signal <= 1'b0;
-        end else begin
-            // Default assignments. (Note: parity_reset_signal is deasserted
-            // unless we want to assert it in a given state.)
-            done                <= 1'b0;
-            parity_reset_signal <= 1'b0;
-
+            state             <= STATE_IDLE;
+            bit_count         <= 3'd0;
+            out_byte          <= 8'd0;
+            done              <= 1'b0;
+            parity_reset_sig  <= 1'b0;
+        end
+        else begin
+            // Default assignments for outputs
+            done             <= 1'b0;
+            
             case (state)
-                S_IDLE: begin
-                    // In idle we expect the bus to be high. A low signals the start bit.
-                    if (in == 1'b0)
-                        state <= S_START;
-                    else
-                        state <= S_IDLE;
+                STATE_IDLE: begin
+                    // In idle, wait for the start bit (logic 0).
+                    if (in == 1'b0) begin
+                        state            <= STATE_DATA;
+                        bit_count        <= 3'd0;
+                        // Assert reset for the parity module to clear its counter.
+                        parity_reset_sig <= 1'b1;
+                    end
+                    else begin
+                        state            <= STATE_IDLE;
+                        parity_reset_sig <= 1'b0;
+                    end
                 end
 
-                S_START: begin
-                    // Reset the parity module one clock cycle.
-                    parity_reset_signal <= 1'b1;
-                    bit_count           <= 3'd0;
-                    // Now move to sampling the data bits.
-                    state <= S_DATA;
-                end
-
-                S_DATA: begin
-                    // In S_DATA we sample each bit into the corresponding bit of out_byte.
-                    // The parity module is already enabled (parity_reset_signal was deasserted).
+                STATE_DATA: begin
+                    // After the start bit, deassert the parity reset.
+                    parity_reset_sig <= 1'b0;
+                    // Sample the data bit and store it in the corresponding bit of out_byte.
+                    // (Assumes LSB first.)
                     out_byte[bit_count] <= in;
-                    if (bit_count == 3'd7)
-                        state <= S_PARITY;
+                    if (bit_count == 3'd7) begin
+                        // Finished capturing 8 data bits. Next bit is the parity bit.
+                        state <= STATE_PARITY;
+                    end
                     else begin
                         bit_count <= bit_count + 3'd1;
-                        state     <= S_DATA;
+                        state     <= STATE_DATA;
                     end
                 end
 
-                S_PARITY: begin
-                    // The parity bit is clocked into the parity module, but not stored.
-                    state <= S_STOP;
+                STATE_PARITY: begin
+                    // In this cycle the parity module captures the parity bit.
+                    // No data is stored here.
+                    state <= STATE_STOP;
                 end
 
-                S_STOP: begin
-                    // Expect a stop bit of logic 1.
+                STATE_STOP: begin
+                    // The stop bit must be high.
                     if (in == 1'b1) begin
-                        // Only assert “done” if parity shows odd parity.
-                        if (parity_out == 1'b1)
+                        // If the stop bit is valid, we assert 'done'
+                        // only if the parity checker indicates odd parity.
+                        if (parity_ok)
                             done <= 1'b1;
-                        state <= S_IDLE;
-                    end else begin
-                        // If stop bit is not valid, wait until one is received.
-                        state <= S_WAIT_STOP;
+                        // Return to idle.
+                        state <= STATE_IDLE;
+                    end
+                    else begin
+                        // If the stop bit is still low, remain here.
+                        state <= STATE_STOP;
                     end
                 end
 
-                S_WAIT_STOP: begin
-                    // Wait until a valid stop bit (logic 1) is seen.
-                    if (in == 1'b1)
-                        state <= S_IDLE;
-                    else
-                        state <= S_WAIT_STOP;
+                default: begin
+                    state            <= STATE_IDLE;
+                    parity_reset_sig <= 1'b0;
                 end
-
-                default: state <= S_IDLE;
             endcase
         end
     end
 
 endmodule
+--------------------------------------------------------------------------------
 
-/***************************************************************
-  Corrected parity module.
-  This module toggles its output "odd" on every input "1".
-  A synchronous reset clears the parity value.
-***************************************************************/
-module parity (
-    input clk,
-    input reset,
-    input in,
-    output reg odd
-);
-    always @(posedge clk) begin
-        if (reset)
-            odd <= 1'b0;
-        else if (in)
-            odd <= ~odd;
-        else
-            odd <= odd;  // Explicitly hold value when in is 0.
-    end
-endmodule
+Explanation of the changes:
 
----------------------------------------------------------------
+1. Removed the unused next_state register.
+2. Made sure that parity_reset_sig is deasserted in all branches (especially after the start bit).
+3. Provided clear comments and default assignments for done.
+4. Retained the original FSM functionality while cleaning up the style and ensuring best practices.
 
-Explanation of the Improvements:
-1. Default assignments for done and parity_reset_signal are made at the beginning of the always block so that every branch of the case statement is well defined.
-2. In the parity module, an else clause was added so that synthesis tools clearly infer a clocked register without latches.
-3. The code comments were clarified to indicate that reset is synchronous and that the parity_reset_signal is used to clear the parity counter one clock cycle.
-
-This version should function identically to the original but follows best practices for clarity and synthesis robustness.
+This version should be error–free and is functionally equivalent to the originally generated code.

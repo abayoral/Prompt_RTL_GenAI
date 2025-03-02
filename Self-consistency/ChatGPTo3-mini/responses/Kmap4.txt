@@ -1,0 +1,43 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // After analyzing the given Karnaugh map we note that the 1’s are located at:
+    //   row c'd': columns a'b and ab'
+    //   row c'd : columns a'b' and ab
+    //   row cd  : columns a'b and ab'
+    //   row cd' : columns a'b' and ab
+    //
+    // Writing down the minterms we have:
+    //   (~a b ~c ~d) + (a b' ~c ~d) + (~a ~b ~c d) + (a b ~c d)
+    // + (~a b c d)   + (a b' c d)    + (~a ~b c ~d) + (a b c ~d)
+    //
+    // Grouping these terms appropriately we can factor:
+    //   ~c ~d ( ~a b + a b' ) + ~c d ( ~a ~b + a b )
+    // + c d    ( ~a b + a b' ) + c ~d ( ~a ~b + a b )
+    //
+    // Notice that:
+    //   ~a b + a b' equals a⊕b (XOR of a and b)
+    //   ~a ~b + a b equals (a⊕b)' (XNOR of a and b).
+    //
+    // Also, note that:
+    //   ~c ~d + c d equals c XNOR d, and ~c d + c ~d equals c XOR d.
+    //
+    // Thus the expression becomes:
+    //   (a ⊕ b) (c XNOR d) + (a XNOR b)(c XOR d)
+    //
+    // But this is exactly the definition of XOR between (a ⊕ b) and (c ⊕ d):
+    //   (a ⊕ b) ⊕ (c ⊕ d)
+    //
+    // Since XOR is associative, this simplifies nicely to:
+    //   a ⊕ b ⊕ c ⊕ d
+    //
+    // Therefore, the simplified implementation is:
+
+    assign out = a ^ b ^ c ^ d;
+
+endmodule

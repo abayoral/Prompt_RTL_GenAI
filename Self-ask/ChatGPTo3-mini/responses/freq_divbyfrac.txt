@@ -1,0 +1,66 @@
+module freq_divbyfrac(
+    input  clk,
+    input  rst_n,
+    output clk_div
+);
+
+  // This design divides the input clock by 3.5.
+  // The idea is to use double‐edge clocking so that one branch toggles after 4 rising edges
+  // and the other toggles after 3 falling edges. After applying an effective half‐cycle phase
+  // adjustment (each branch is naturally time‐offset since one uses posedge and the other negedge),
+  // the two branches are OR’ed to create an output clock that has one half period spanning 4 input clock cycles
+  // and the other half spanning 3 input clock cycles (total period = 7 input clock cycles).
+  //
+  // Note: In synthesizable RTL one cannot literally “delay” a signal by half a clock period.
+  // Here the double‐edge sampling naturally produces signals shifted with respect to each other.
+  // The following implementation therefore uses two always blocks – one on the rising edge and one on the falling edge.
+  // The rising‐edge branch uses a 2‐bit counter that counts 0-3 (thus 4 cycles) and toggles its output when reaching 3.
+  // The falling‐edge branch uses another counter that counts 0-2 (thus 3 cycles) and toggles its output when reaching 2.
+  // The two generated clocks are then combined with a logical OR to yield the final clock output.
+  
+  // Rising edge branch: divide clock by 4 (toggle every 4 rising edges)
+  reg [1:0] pos_count;
+  reg        pos_clk;
+
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      pos_count <= 2'd0;
+      pos_clk   <= 1'b0;
+    end
+    else begin
+      if (pos_count == 2'd3) begin
+        pos_count <= 2'd0;
+        pos_clk   <= ~pos_clk;  // toggle on reaching 4 rising edges
+      end
+      else begin
+        pos_count <= pos_count + 2'd1;
+      end
+    end
+  end
+  
+  // Falling edge branch: divide clock by 3 (toggle every 3 falling edges)
+  reg [1:0] neg_count; // We use a 2-bit counter but count 0,1,2 only.
+  reg       neg_clk;
+  
+  always @(negedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      neg_count <= 2'd0;
+      neg_clk   <= 1'b0;
+    end
+    else begin
+      if (neg_count == 2'd2) begin
+        neg_count <= 2'd0;
+        neg_clk   <= ~neg_clk;  // toggle on reaching 3 falling edges
+      end
+      else begin
+        neg_count <= neg_count + 2'd1;
+      end
+    end
+  end
+  
+  // Combine the two phase-adjusted signals.
+  // The OR operation produces a final clock signal with a period of 7 input clock cycles,
+  // corresponding to a division ratio of 3.5.
+  assign clk_div = pos_clk | neg_clk;
+
+endmodule

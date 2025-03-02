@@ -1,232 +1,212 @@
-Below is one acceptable corrected version. In our fix we address two issues that were present in the original code:
+Below is one corrected version. The main fixes are as follows:
 
-1. In the “Rounding and Adjustment Phase” (phase 4) the original code tried to add “1” to z_mantissa using nonblocking assignments and then immediately check for a carry‐out by testing z_mantissa. (Because nonblocking assignments update only at “end‐of–cycle” the test was using the “old” value.) In the corrected design we “compute” the rounded‐result in one clock cycle by calling a small function (which synthesizers accept when written carefully) so that the carry and exponent‐adjustment is computed combinationally and then stored into our pipeline registers.
+1. The 50‐bit “product” was built by multiplying two “extended” mantissas using {2’d0, …} so that a 26‐bit×26‐bit product would be produced. In fact, since the original IEEE–754 mantissas are 24 bits (with the implicit “1”), multiplying them directly produces a 48–bit result. (Extra bits for rounding are already “taken” from the lower bits of that 48–bit product.) Changing “product” to 48 bits and using the plain 24–bit values (rather than padding with two zeros) fixes the width mismatch and prevents inadvertent loss of the upper product bits.
 
-2. We made a few clarifications in comments and ensured that all registers are properly reset and the implied “implicit one” is only inserted on “normal” (nonzero–exponent) numbers. (A full implementation would also handle subnormals but here we assume normalized operands.) 
+2. For style and consistency we have changed a couple of assignments in the rounding phase to use nonblocking (<=) updates throughout the sequential always–block.
 
-Below is the corrected Verilog module:
+Below is the corrected module:
 
------------------------------------------------------------
+------------------------------------------------------------
 module float_multi(
-  input         clk,
-  input         rst,
-  input  [31:0] a,
-  input  [31:0] b,
-  output reg [31:0] z
+    input         clk,
+    input         rst,
+    input  [31:0] a,
+    input  [31:0] b,
+    output reg [31:0] z
 );
 
-  // Pipeline counter to sequence operations (6 stages: 0–5)
-  reg [2:0] counter;
+  // Internal cycle counter to sequence operations.
+  reg  [2:0] counter;
 
-  // Operand components (using extra bits for exponent arithmetic)
-  // For normalized operands in single‐precision we insert the implicit 1.
-  reg [23:0] a_mantissa, b_mantissa, z_mantissa;
-  // Exponents are 8‐bits normally but we use 10–bit registers for intermediate arithmetic.
-  reg [9:0] a_exponent, b_exponent, z_exponent;
-  reg       a_sign, b_sign, z_sign;
+  // Registers for extracted components (mantissa, exponent, sign).
+  reg [23:0] a_mantissa, b_mantissa, z_mantissa;  // 24 bits (implicit bit + 23 fraction bits)
+  reg [9:0]  a_exponent, b_exponent, z_exponent;    // 10 bits for exponent arithmetic
+  reg        a_sign, b_sign, z_sign;
 
-  // 24×24 multiplication produces a 48–bit product; we use 50 bits for extra room.
-  reg [49:0] product;
-  
-  // Rounding control bits computed from the product.
+  // To retain original exponent and fraction fields for special–case testing.
+  reg [7:0]  a_raw_exp, b_raw_exp;
+  reg [22:0] a_raw_frac, b_raw_frac;
+
+  // Intermediate multiplication result and rounding bits.
+  // Multiplication of two 24–bit values produces a 48–bit result.
+  reg [47:0] product;      
   reg guard_bit, round_bit, sticky;
-  
-  // Temporary exponent holding result (before final rounding adjustments)
-  reg [9:0] temp_exponent;
 
-  // Special case flag and special result register
-  reg special_case;
-  reg [31:0] special_result;
+  // Temporary register for rounded mantissa.
+  reg [23:0] rounded_mantissa;
 
-  //--------------------------------------------------
-  // Function to perform round-to-nearest, tie-to-even.
-  // It takes the 24-bit mantissa (with hidden bit already removed)
-  // and produces a 24-bit rounded mantissa and updated exponent.
-  // (We pack the new exponent in the upper 10 bits and the mantissa
-  // in the lower 24 bits of the returned 34–bit word.)
-  function [33:0] round_function;
-    input [23:0] mantissa_in;
-    input [9:0]  exponent_in;
-    input        guard;
-    input        roundB;
-    input        stick;
-    reg   [24:0] sum;
-    begin
-      // Round increment: add 1 if guard is 1 and (round or sticky or lsb is 1).
-      sum = {1'b0, mantissa_in} +
-            ((guard && (roundB || stick || mantissa_in[0])) ? 25'd1 : 25'd0);
-      if(sum[24]) begin
-        // Rounding caused a carry-out. The answer must be renormalized.
-        round_function = {exponent_in + 10'd1, sum[24:1]};
-      end
-      else begin
-        round_function = {exponent_in, sum[23:0]};
-      end
-    end
-  endfunction
-
-  //--------------------------------------------------
-  // The pipeline state machine operates on successive clock cycles.
-  // The stages are:
-  //   0: Extract fields from the inputs.
-  //   1: Check for special (NaN/Infinity) cases.
-  //   2: Multiply mantissas and add exponents.
-  //   3: Normalize the product.
-  //   4: Rounding and exponent adjustment.
-  //   5: Assemble and output the final result.
+  // State machine for pipelined operation:
+  // Cycle 0: Extraction of fields.
+  // Cycle 1: Special–case handling.
+  // Cycle 2: Multiplication of mantissas and preliminary exponent calculation.
+  // Cycle 3: Normalization.
+  // Cycle 4: Rounding.
+  // Cycle 5: Output generation.
   always @(posedge clk) begin
     if (rst) begin
       counter       <= 3'd0;
       z             <= 32'd0;
       a_mantissa    <= 24'd0;
       b_mantissa    <= 24'd0;
+      z_mantissa    <= 24'd0;
       a_exponent    <= 10'd0;
       b_exponent    <= 10'd0;
+      z_exponent    <= 10'd0;
       a_sign        <= 1'b0;
       b_sign        <= 1'b0;
-      z_mantissa    <= 24'd0;
-      z_exponent    <= 10'd0;
       z_sign        <= 1'b0;
-      product       <= 50'd0;
+      product       <= 48'd0;
       guard_bit     <= 1'b0;
       round_bit     <= 1'b0;
       sticky        <= 1'b0;
-      temp_exponent <= 10'd0;
-      special_case  <= 1'b0;
-      special_result<= 32'd0;
+      a_raw_exp     <= 8'd0;
+      b_raw_exp     <= 8'd0;
+      a_raw_frac    <= 23'd0;
+      b_raw_frac    <= 23'd0;
+      rounded_mantissa <= 24'd0;
     end else begin
       case (counter)
-        //--------------------------------------------------------------------------
-        3'd0: begin
-          // Stage 0: Input Processing.
-          // Extract sign, exponent and mantissa.
-          // (For this simple implementation we assume inputs are normalized.)
+        3'd0: begin  // Cycle 0: Extraction of input fields.
+          // Save raw exponent and fraction for special–case detection.
+          a_raw_exp  <= a[30:23];
+          b_raw_exp  <= b[30:23];
+          a_raw_frac <= a[22:0];
+          b_raw_frac <= b[22:0];
+
+          // Extract sign (1 for negative, 0 for positive).
           a_sign     <= a[31];
           b_sign     <= b[31];
-          // Extend the 8–bit IEEE754 exponents to 10 bits.
-          a_exponent <= {2'b00, a[30:23]};
-          b_exponent <= {2'b00, b[30:23]};
-          // Insert the implicit 1 to form a 24–bit mantissa.
+
+          // For normalized numbers the assumed leading bit is 1.
+          // (Special–case detection will handle zeros/denormalized numbers.)
           a_mantissa <= {1'b1, a[22:0]};
           b_mantissa <= {1'b1, b[22:0]};
-          counter    <= counter + 3'd1;
+
+          // Extend exponent to 10 bits.
+          a_exponent <= {2'b00, a[30:23]};
+          b_exponent <= {2'b00, b[30:23]};
+          
+          counter <= 3'd1;
         end
 
-        //--------------------------------------------------------------------------
-        3'd1: begin
-          // Stage 1: Special Case Handling.
-          // Check if either input has an exponent field of all ones (NaN/Infinity).
-          if (a[30:23] == 8'hFF || b[30:23] == 8'hFF) begin
-            special_case <= 1'b1;
-            // If one operand is NaN (nonzero mantissa), output a quiet NaN.
-            if ((a[30:23] == 8'hFF && a[22:0] != 23'd0) ||
-                (b[30:23] == 8'hFF && b[22:0] != 23'd0))
-              special_result <= {1'b0, 8'hFF, 1'b1, 22'd0}; // quiet NaN
-            else
-              // Otherwise, at least one is Infinity -- the sign is given by XOR.
-              special_result <= {a[31] ^ b[31], 8'hFF, 23'd0};  // Infinity
-          end else begin
-            special_case <= 1'b0;
+        3'd1: begin  // Cycle 1: Special–case handling.
+          // Check for NaN: if either operand has exponent all ones and non–zero fraction.
+          if ((a_raw_exp == 8'hFF && a_raw_frac != 23'd0) ||
+              (b_raw_exp == 8'hFF && b_raw_frac != 23'd0)) begin
+            // Canonical quiet NaN: sign = 0, exponent all ones, non–zero fraction.
+            z <= {1'b0, 8'hFF, 23'h400000};
+            counter <= 3'd0;
           end
-          counter <= counter + 3'd1;
+          // Check for infinity. If an operand is infinity (exp==FF) then the result is infinity
+          // unless the other operand is zero.
+          else if ((a_raw_exp == 8'hFF) || (b_raw_exp == 8'hFF)) begin
+            if (((a_raw_exp == 8'hFF) && (a_raw_frac == 23'd0) && (b_raw_exp == 8'd0) && (b_raw_frac == 23'd0)) ||
+                ((b_raw_exp == 8'hFF) && (b_raw_frac == 23'd0) && (a_raw_exp == 8'd0) && (a_raw_frac == 23'd0))) begin
+              z <= {1'b0, 8'hFF, 23'h400000};  // Return NaN.
+            end else begin
+              z_sign <= a_sign ^ b_sign;
+              z <= {a_sign ^ b_sign, 8'hFF, 23'd0};  // Infinity with proper sign.
+            end
+            counter <= 3'd0;
+          end
+          // Check for zero. If either operand is zero, the result is zero.
+          else if (((a_raw_exp == 8'd0) && (a_raw_frac == 23'd0)) ||
+                   ((b_raw_exp == 8'd0) && (b_raw_frac == 23'd0))) begin
+            z <= {a_sign ^ b_sign, 8'd0, 23'd0};
+            counter <= 3'd0;
+          end else begin
+            // Normal case: no special values detected, continue multiplication.
+            counter <= 3'd2;
+          end
         end
 
-        //--------------------------------------------------------------------------
-        3'd2: begin
-          // Stage 2: Multiplication.
-          // Multiply the two 24–bit mantissas.
-          product      <= a_mantissa * b_mantissa;
-          // Exponent arithmetic: add the two exponents then subtract the bias (127).
-          temp_exponent <= a_exponent[7:0] + b_exponent[7:0] - 8'd127;
-          // Determine the sign of the result (XOR of input sign bits).
-          z_sign <= a_sign ^ b_sign;
-          counter <= counter + 3'd1;
+        3'd2: begin  // Cycle 2: Multiplication Phase.
+          // Multiply the 24–bit mantissas.
+          // (Multiplying two 24–bit numbers gives a 48–bit product.)
+          product   <= a_mantissa * b_mantissa;  
+          // Calculate preliminary exponent: add exponents then subtract bias (127).
+          z_exponent <= a_exponent + b_exponent - 10'd127;
+          // Determine the sign of the result.
+          z_sign    <= a_sign ^ b_sign;
+          counter   <= 3'd3;
         end
 
-        //--------------------------------------------------------------------------
-        3'd3: begin
-          // Stage 3: Normalization.
-          // For a 24×24 multiplication the full product is 48 bits.
-          // If the most–significant bit (bit 47) is 1 the product is normalized.
-          // Otherwise shift left by one and decrement the exponent.
+        3'd3: begin  // Cycle 3: Normalization Phase.
+          // The product (48 bits wide) may have its leading 1 in bit position 47 or 46.
+          // If product[47]==1 then the multiplication produced a value >= 2.0. In that case,
+          // we perform a right–shift and increment the exponent.
           if (product[47] == 1'b1) begin
-            // Normalized: the hidden bit is the product bit 47,
-            // and bits [46:23] form the 24–bit mantissa.
-            z_mantissa <= product[46:23];
-            // Rounding bits:
+            // Normalized mantissa: take bits [46:24] as the 23–bit fraction (hidden bit is implicit).
+            z_mantissa <= product[46:24];
+            guard_bit  <= product[23];
+            round_bit  <= product[22];
+            sticky     <= |product[21:0]; // OR–reduction of bits 21 down to 0.
+            // Adjust exponent for the shift.
+            z_exponent <= z_exponent + 10'd1;
+          end else begin
+            // Otherwise, product is less than 2.0; left shift by one to normalize.
+            // Normalized mantissa becomes bits [45:23] and rounding bits come from bits [22:0].
+            z_mantissa <= product[45:23];
             guard_bit  <= product[22];
             round_bit  <= product[21];
             sticky     <= |product[20:0];
-          end else begin
-            // Not normalized: shift product left by one.
-            z_mantissa <= product[45:22];
-            guard_bit  <= product[21];
-            round_bit  <= product[20];
-            sticky     <= |product[19:0];
-            temp_exponent <= temp_exponent - 10'd1;
+            // Decrement exponent since a normalization left shift was required.
+            z_exponent <= z_exponent - 10'd1;
           end
-          counter <= counter + 3'd1;
+          counter <= 3'd4;
         end
 
-        //--------------------------------------------------------------------------
-        3'd4: begin
-          // Stage 4: Rounding and Adjustment.
-          // Use the function round_function to perform round-to-nearest, ties-to-even.
-          // The function returns a 34–bit word with new exponent (upper 10 bits)
-          // and new 24–bit mantissa.
-          // We use blocking assignments for the local intermediate variables.
-          reg [9:0] new_exp;
-          reg [23:0] new_man;
-          {new_exp, new_man} = round_function(z_mantissa, temp_exponent, 
-                                               guard_bit, round_bit, sticky);
-          temp_exponent <= new_exp;
-          z_mantissa    <= new_man;
-          // Save final exponent in z_exponent.
-          z_exponent    <= new_exp;
-          counter <= counter + 3'd1;
-        end
-
-        //--------------------------------------------------------------------------
-        3'd5: begin
-          // Stage 5: Output Generation.
-          if (special_case) begin
-            z <= special_result;
-          end
-          else begin
-            // Check for exponent overflow. (Note: for a properly rounded result,
-            // the max exponent (254) plus rounding may be detected here.)
-            if (temp_exponent[7:0] >= 8'd255) begin
-              z <= {z_sign, 8'hFF, 23'd0};  // Infinity
-            end 
-            // Check for underflow.
-            else if (temp_exponent[7:0] == 8'd0) begin
-              z <= {z_sign, 8'd0, 23'd0};    // Zero
-            end 
-            else begin
-              // Assemble the final IEEE754 single–precision result.
-              // (The mantissa stored is 24 bits with an implicit leading one; we output bits [22:0].)
-              z <= {z_sign, z_exponent[7:0], z_mantissa[22:0]};
+        3'd4: begin  // Cycle 4: Rounding Phase.
+          // Implement round–to–nearest even.
+          // Start with the currently normalized mantissa.
+          rounded_mantissa <= z_mantissa;
+          // Check if we need to round up.
+          if (guard_bit && (round_bit || sticky || z_mantissa[0])) begin
+            rounded_mantissa <= z_mantissa + 24'd1;
+            // Check for mantissa overflow (a carry–out from rounding).
+            if (rounded_mantissa[23] == 1'b1) begin
+              // An overflow requires a right shift (dropping the extra bit) and incrementing the exponent.
+              z_mantissa <= rounded_mantissa[23:1];
+              z_exponent <= z_exponent + 10'd1;
+            end else begin
+              z_mantissa <= rounded_mantissa;
             end
           end
-          counter <= counter + 3'd1;
+          counter <= 3'd5;
         end
 
-        //--------------------------------------------------------------------------
+        3'd5: begin  // Cycle 5: Output Generation Phase.
+          // Check for exponent overflow and underflow. In an overflow, return infinity;
+          // in an underflow, return zero.
+          if (z_exponent >= 10'd255) begin
+            z <= {z_sign, 8'hFF, 23'd0};
+          end else if (z_exponent <= 10'd0) begin
+            z <= {z_sign, 8'd0, 23'd0};
+          end else begin
+            // Assemble the final 32–bit IEEE–754 number:
+            // z_exponent[7:0] is the final 8–bit exponent and z_mantissa[22:0] are the fraction bits.
+            z <= {z_sign, z_exponent[7:0], z_mantissa[22:0]};
+          end
+          counter <= 3'd0; // Reset the state machine for the next operation.
+        end
+
         default: begin
-          // Restart the pipeline.
           counter <= 3'd0;
         end
       endcase
     end
   end
-  
+
 endmodule
------------------------------------------------------------
+------------------------------------------------------------
 
-Explanation of key corrections:
+Explanation of the fixes:
 
-• In stage 4 we now use a helper function (round_function) that computes the rounded mantissa (and any carry‐induced renormalization) in one combinational step. This avoids checking an updated value of z_mantissa within the same always block using nonblocking assignments.
+• Changed the declaration of “product” from 50 bits to 48 bits and replaced the multiplication
+  from using {2'd0, a_mantissa} * {2'd0, b_mantissa} to a simple a_mantissa * b_mantissa.
+  
+• In Cycle 4 (rounding), used nonblocking assignments (<=) consistently so that sequential updates
+  are predictable.
 
-• The comments have been updated for clarity and the “implicit 1” is only added for normalized (non–special) numbers.
-
-This corrected version is synthesizable (assuming the target tool supports functions in sequential blocks) and follows best–practices for pipelined floating–point multiplier implementations.
+This revised module should adhere to best practices and cover the basic IEEE–754 multiplication
+flow for normalized numbers (with the understanding that denormalized numbers are handled as a special case).

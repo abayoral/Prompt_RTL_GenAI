@@ -1,0 +1,10 @@
+module top_module( 
+    input [31:0] in,
+    output [31:0] out );
+
+    // Reverse the byte ordering: 
+    // in = {A, B, C, D} stored as in[31:24]=A, in[23:16]=B, in[15:8]=C, in[7:0]=D
+    // out will be {D, C, B, A}
+    assign out = {in[7:0], in[15:8], in[23:16], in[31:24]};
+
+endmodule

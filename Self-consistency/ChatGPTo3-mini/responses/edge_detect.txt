@@ -1,0 +1,28 @@
+module edge_detect(
+    input clk,
+    input rst_n,
+    input a,
+    output reg rise,
+    output reg down
+);
+
+reg prev_a;
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        prev_a <= 1'b0;
+        rise   <= 1'b0;
+        down   <= 1'b0;
+    end else begin
+        // Detect rising edge: previous was 0 and current is 1
+        rise <= (~prev_a) & a;
+        
+        // Detect falling edge: previous was 1 and current is 0
+        down <= prev_a & (~a);
+        
+        // Update previous state of 'a'
+        prev_a <= a;
+    end
+end
+
+endmodule

@@ -1,0 +1,78 @@
+module fixed_point_subtractor #(parameter N = 16, parameter Q = 8)
+(
+    input  [N-1:0] a, 
+    input  [N-1:0] b,
+    output [N-1:0] c
+);
+
+  // In our fixed‐point representation the MSB is the sign bit.
+  // The remaining bits (N-1 bits) represent the magnitude (integer part concatenated with Q fractional bits).
+  // To perform a “manual” subtraction that distinguishes cases according to the signs,
+  // we first extract the magnitude by computing the absolute value.
+  // Here we assume that a and b are in two’s complement.
+  
+  // Extract sign bits.
+  wire a_sign = a[N-1];
+  wire b_sign = b[N-1];
+  
+  // Extract the magnitude bits.
+  // For a negative number, the absolute value is computed as (~a + 1).
+  // Note that the magnitude is only N-1 bits (the lower bits).
+  wire [N-2:0] mag_a = a_sign ? ((~a) + 1)[N-2:0] : a[N-2:0];
+  wire [N-2:0] mag_b = b_sign ? ((~b) + 1)[N-2:0] : b[N-2:0];
+  
+  // Intermediate registers for result.
+  // We use a temporary magnitude register with one extra bit to accommodate possible carry in case of addition.
+  reg        result_sign;
+  reg [N-1:0] result_mag; // result magnitude (with potential extra bit from addition/subtraction) 
+                         // Note: final output will be sign+N-1 bits
+  
+  // Combinational logic: handle the different cases.
+  // Case 1: a and b have the same sign.
+  //   - We subtract their magnitudes.
+  //   - When the minuend’s magnitude is smaller than the subtrahend’s, the result sign is inverted.
+  // Case 2: a and b have different signs.
+  //   - We add their magnitudes.
+  //   - When a is positive and b negative, a - b = a + |b| is positive.
+  //   - When a is negative and b positive, a - b = -(|a| + b) is negative.
+  // Finally, if the computed magnitude is zero, enforce a positive (zero) sign.
+  always @(*) begin
+    if (a_sign == b_sign) begin
+      // Both operands have the same sign.
+      if (mag_a >= mag_b) begin
+        result_sign = a_sign;  // keep the same sign as inputs
+        // The subtraction is done on the magnitudes. We prepend a zero to extend to N bits.
+        result_mag = {1'b0, mag_a} - {1'b0, mag_b};
+      end 
+      else begin
+        // If the magnitude of b is larger than that of a,
+        // the result’s magnitude becomes (mag_b - mag_a) and the sign is the complement.
+        result_sign = ~a_sign;
+        result_mag = {1'b0, mag_b} - {1'b0, mag_a};
+      end
+    end 
+    else begin
+      // The signs are different.
+      // In the case where a is positive and b is negative, a - b = a + |b|
+      // In the case where a is negative and b is positive, a - b = -( |a| + b )
+      if (a_sign == 1'b0 && b_sign == 1'b1) begin
+        result_sign = 1'b0;
+        result_mag = {1'b0, mag_a} + {1'b0, mag_b};
+      end 
+      else begin // a_sign==1'b1 && b_sign==1'b0
+        result_sign = 1'b1;
+        result_mag = {1'b0, mag_a} + {1'b0, mag_b};
+      end
+    end
+    // If the computed magnitude is zero, force the sign bit to zero so that zero is represented as positive.
+    if (result_mag == 0)
+      result_sign = 1'b0;
+  end
+  
+  // Assemble the final result.
+  // The total output is an N-bit fixed‐point number (1 sign bit and N-1 magnitude bits).
+  // Note: In the addition case the full result magnitude is N bits;
+  // here we simply take the lower N-1 bits (which could lead to saturation/truncation if an overflow occurs).
+  assign c = {result_sign, result_mag[N-2:0]};
+
+endmodule

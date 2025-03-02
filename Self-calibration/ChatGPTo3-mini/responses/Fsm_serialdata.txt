@@ -1,94 +1,91 @@
-Below is one corrected and slightly improved version of the module. Key changes include:
+Below is a revised version of the module. In our review we found that although the overall functionality was acceptable, the code declared an unused next‐state variable and did not separate the combinational next–state logic from the sequential state update. (Also, a more “best practice” style is to write clear comments and use a consistent coding style even in simple FSMs.) The following version removes the unused variable and rewrites the FSM with clear, commented sections. Note that this simple design assumes that the incoming serial data is sampled at the proper time (e.g. mid–bit); in a complete design you would typically include baud rate generation and oversampling. 
 
-• Clarifying the bit counter width (using 3 bits since only 8 data bits need to be counted, 0–7) and updating the related condition.  
-• In the RECV state, the shift and counter update have been re‐organized so that the final bit is processed correctly before moving to the STOP state. This removes any potential confusion with nonblocking assignments.  
-• Minor comment and style improvements have been made.  
-
-Here is the revised code:
-
------------------------------------------------------------
+------------------------------------------------------------
 module top_module(
-    input clk,
-    input in,
-    input reset,    // Synchronous reset
-    output [7:0] out_byte,
-    output done
+    input             clk,
+    input             in,
+    input             reset,    // Synchronous reset
+    output reg [7:0]  out_byte,
+    output reg        done
 );
 
-    // State declaration
-    localparam IDLE  = 2'b00,
-               RECV  = 2'b01,
-               STOP  = 2'b10;
+    // State encoding
+    localparam IDLE      = 2'd0,
+               DATA      = 2'd1,
+               STOP      = 2'd2,
+               WAIT_STOP = 2'd3;
 
     reg [1:0] state;
-    reg [2:0] bit_counter; // 3-bit counter: counts 0 to 7 for 8 data bits
-    reg [7:0] shift_reg;   // register to store incoming bits
-    reg [7:0] out_reg;     // registered output byte
-    reg done_reg;
-
-    assign out_byte = out_reg;
-    assign done = done_reg;
-
+    reg [2:0] bit_cnt;    // Counts bits 0 to 7
+    reg [7:0] shift_reg;
+    
+    // State Machine and Data Path
     always @(posedge clk) begin
         if (reset) begin
-            state       <= IDLE;
-            bit_counter <= 3'd0;
-            shift_reg   <= 8'd0;
-            out_reg     <= 8'd0;
-            done_reg    <= 1'b0;
-        end else begin
-            // Default: Clear done signal except when explicitly set.
-            done_reg <= 1'b0;
+            // Synchronous reset: initialize all registers
+            state     <= IDLE;
+            bit_cnt   <= 3'd0;
+            shift_reg <= 8'd0;
+            out_byte  <= 8'd0;
+            done      <= 1'b0;
+        end 
+        else begin
+            // Default: done is only high for one cycle when a valid byte is received.
+            done <= 1'b0;
             case (state)
                 IDLE: begin
-                    // Waiting for a start bit. (Start bit should be 0.)
+                    // Wait for start bit: idle line is assumed high, so a 0 marks the start.
                     if (in == 1'b0) begin
-                        bit_counter <= 3'd0;
-                        // Optionally clear shift_reg if desired.
-                        shift_reg   <= 8'd0;
-                        state       <= RECV;
+                        state   <= DATA;
+                        bit_cnt <= 3'd0;
                     end
                 end
-
-                RECV: begin
-                    // Sample incoming bit and shift it into the correct position.
-                    // Protocol sends LSB first.
-                    shift_reg[bit_counter] <= in;
-                    if (bit_counter == 3'd7) begin
-                        // After receiving the 8th data bit, move to STOP state.
+                
+                DATA: begin
+                    // Sample each data bit (LSB first) and store into shift_reg.
+                    shift_reg[bit_cnt] <= in;
+                    if (bit_cnt == 3'd7) begin
                         state <= STOP;
-                    end else begin
-                        bit_counter <= bit_counter + 1'b1;
+                    end 
+                    else begin
+                        bit_cnt <= bit_cnt + 1;
                     end
                 end
-
+                
                 STOP: begin
-                    // Check for a valid stop bit (should be high).
+                    // Check the stop bit; it should be high.
                     if (in == 1'b1) begin
-                        out_reg  <= shift_reg; // Latch the received data.
-                        done_reg <= 1'b1;       // Signal that a complete byte is received.
+                        // Valid byte received. Latch output and assert done for one clock cycle.
+                        out_byte <= shift_reg;
+                        done     <= 1'b1;
                         state    <= IDLE;
+                    end 
+                    else begin
+                        // Stop bit error; enter a waiting state until a valid stop is detected.
+                        state <= WAIT_STOP;
                     end
-                    // If in is not high, the state machine remains in STOP until a valid stop bit is detected.
                 end
-
+                
+                WAIT_STOP: begin
+                    // Remain here until a valid high level (stop bit) is observed.
+                    if (in == 1'b1) begin
+                        state <= IDLE;
+                    end
+                end
+                
                 default: state <= IDLE;
-            endcase
+            endcase 
         end
     end
 
 endmodule
------------------------------------------------------------
+------------------------------------------------------------
 
-Explanation of Corrections and Improvements:
+Key changes and notes:
 
-1. Bit Counter Width:  
-   Since only 8 data bits are received (bits 0–7), using a 3‑bit counter is sufficient and avoids ambiguity in the comments.
+1. Removed the unused "next_state" register.
+2. Kept the reset synchronous (as noted) and ensured all registers are initialized on reset.
+3. Added comments for clarity.
+4. Retained the simple FSM structure; for more robust implementations (e.g., UART reception) you might include edge/baud–rate sampling and use a separate combinational block to compute next_state.
 
-2. RECV State Logic:  
-   The code now updates the counter only if the current data bit is not the last one. This ensures that the last data bit is stored correctly before transitioning to the STOP state.
-
-3. Comments and Style:  
-   Minor adjustments to comments clarify the operation of each state and the expected protocol (start bit = 0, stop bit = 1). The default assignment to done_reg ensures that the done pulse lasts only one clock cycle.
-
-This revised module follows standard best practices while maintaining the intended functionality of receiving a serial byte with start, data, and stop bits.
+This revised version adheres to a clearer coding style and better best practices while achieving the intended functionality.

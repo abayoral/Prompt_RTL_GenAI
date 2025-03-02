@@ -1,0 +1,46 @@
+module top_module (
+    input  p1a, p1b, p1c, p1d, p1e, p1f,
+    output p1y,
+    input  p2a, p2b, p2c, p2d,
+    output p2y
+);
+
+    // Option 1: Use assign statements (no intermediate wires)
+    // This implementation drives p1y as the OR of three ANDs (using all six p1 signals)
+    // and drives p2y as the OR of two ANDs (using all four p2 signals).
+    assign p1y = (p1a & p1b) | (p1c & p1d) | (p1e & p1f);
+    assign p2y = (p2a & p2b) | (p2c & p2d);
+    
+    // ---------------------------------------------------------------------
+    // Option 2: Use intermediate wires for extra practice.
+    // (Uncomment the following block to use this version instead of Option 1.)
+    /*
+    // For the 7458 chip there are four two‐input AND gates which then feed
+    // two OR gates. One common way to implement this is to use two AND gates
+    // for each OR–gate output. Hence, we partition the inputs as follows:
+    //
+    // p1y will be the OR of the outputs of:
+    //   AND gate 1: p1a & p1b
+    //   AND gate 2: p1c & p1d
+    //
+    // p2y will be the OR of the outputs of:
+    //   AND gate 3: p1e & p1f    // Note: In this version the sixth p1 input pair
+    //                             // is used for the second function.
+    //   AND gate 4: p2a & p2b
+    //
+    // (The remaining two inputs, p2c and p2d, are then ORed in-line.)
+    //
+    // This is one possible partitioning which uses exactly four intermediate signals.
+    
+    wire and1, and2, and3, and4;
+    
+    assign and1 = p1a & p1b;
+    assign and2 = p1c & p1d;
+    assign and3 = p1e & p1f;
+    assign and4 = p2a & p2b;
+    
+    assign p1y = and1 | and2;            // p1y from first two AND gates
+    assign p2y = and3 | (and4 | (p2c & p2d)); // p2y: combine both an intermediate wire and an extra AND
+    */
+      
+endmodule

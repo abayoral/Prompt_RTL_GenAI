@@ -1,0 +1,33 @@
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output [99:0] cout,
+    output [99:0] sum );
+
+    // Internal carry chain. carry[0] is the overall carry-in.
+    // Each full adder's carry-out is fed to the next full adder as carry-in.
+    // We use 101 wires to connect 100 full adders.
+    wire [100:0] carry;
+    assign carry[0] = cin;
+
+    // Generate 100 full adders.
+    genvar i;
+    generate
+        for(i = 0; i < 100; i = i + 1) begin : adder_gen
+            // Instantiate the full adder.
+            // It is assumed that a module "full_adder" exists with inputs "a", "b", "cin" 
+            // and outputs "sum" and "cout".
+            full_adder FA (
+                .a(a[i]),
+                .b(b[i]),
+                .cin(carry[i]),
+                .sum(sum[i]),
+                .cout(carry[i+1])
+            );
+            // Connect each full adder's carry-out to the corresponding bit in the output array.
+            // Note: cout[99] is the final carry-out from the last full adder.
+            assign cout[i] = carry[i+1];
+        end
+    endgenerate
+
+endmodule

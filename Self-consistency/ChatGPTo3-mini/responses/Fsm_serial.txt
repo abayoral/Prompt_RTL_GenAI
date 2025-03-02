@@ -1,0 +1,66 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg done
+);
+
+    // State definitions
+    localparam S_IDLE = 2'd0,
+               S_DATA = 2'd1,
+               S_STOP = 2'd2;
+
+    reg [1:0] state;
+    reg [3:0] bit_count;  // 4 bits to count 0-7 for the eight data bits
+
+    always @(posedge clk) begin
+        if (reset) begin
+            state     <= S_IDLE;
+            bit_count <= 0;
+            done      <= 0;
+        end else begin
+            case (state)
+                S_IDLE: begin
+                    done <= 0;  // No byte completed in idle
+                    // Idle line is 1; a transition to 0 begins a byte (start bit)
+                    if (in == 0) begin
+                        state     <= S_DATA;
+                        bit_count <= 0;  // Initialize counter for data bits
+                    end else begin
+                        state <= S_IDLE; // Remain in idle if no start bit detected
+                    end
+                end
+
+                S_DATA: begin
+                    done <= 0;
+                    // Sample each data bit over eight cycles.
+                    if (bit_count == 7) begin
+                        // After receiving 8 data bits, transition to stop-bit verification
+                        state <= S_STOP;
+                    end else begin
+                        bit_count <= bit_count + 1;
+                        state     <= S_DATA;
+                    end
+                end
+
+                S_STOP: begin
+                    // Verify the stop bit (should be a logic '1')
+                    if (in == 1) begin
+                        done  <= 1;     // Correctly received a byte
+                        state <= S_IDLE; // Return to idle for the next byte
+                    end else begin
+                        done  <= 0;
+                        state <= S_STOP; // Wait until a stop bit (logic '1') is seen
+                    end
+                end
+
+                default: begin
+                    state     <= S_IDLE;
+                    bit_count <= 0;
+                    done      <= 0;
+                end
+            endcase
+        end
+    end
+
+endmodule

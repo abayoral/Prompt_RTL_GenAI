@@ -1,0 +1,52 @@
+module top_module(
+    input      in,
+    input [3:0] state,
+    output [3:0] next_state,
+    output     out
+);
+
+    // One-hot state encoding: 
+    // A = 4'b0001  => state[0]
+    // B = 4'b0010  => state[1]
+    // C = 4'b0100  => state[2]
+    // D = 4'b1000  => state[3]
+    parameter A = 0, B = 1, C = 2, D = 3;
+
+    // The state transition table:
+    //    State         Next State (in=0)    Next State (in=1)    Output
+    //    A             A                    B                  0
+    //    B             C                    B                  0
+    //    C             A                    D                  0
+    //    D             C                    B                  1
+
+    // Derive state equations by inspection from the transition diagram:
+
+    // Next_state[A]:
+    // From A with in=0: A -> A
+    // From C with in=0: C -> A
+    // Thus, next_state[A] = (~in) AND (state[A] OR state[C])
+    assign next_state[A] = (~in) & (state[A] | state[C]);
+
+    // Next_state[B]:
+    // From A with in=1: A -> B
+    // From B with in=1: B -> B
+    // From D with in=1: D -> B
+    // Thus, next_state[B] = in AND (state[A] OR state[B] OR state[D])
+    assign next_state[B] = in & (state[A] | state[B] | state[D]);
+
+    // Next_state[C]:
+    // From B with in=0: B -> C
+    // From D with in=0: D -> C
+    // Thus, next_state[C] = (~in) AND (state[B] OR state[D])
+    assign next_state[C] = (~in) & (state[B] | state[D]);
+
+    // Next_state[D]:
+    // From C with in=1: C -> D
+    // Thus, next_state[D] = in AND state[C]
+    assign next_state[D] = in & state[C];
+
+    // Output Logic:
+    // The output is 1 only in state D. So, we simply assign out = state[D]
+    assign out = state[D];
+
+endmodule

@@ -1,0 +1,37 @@
+module multi_8bit(
+    input         clk,
+    input         rst,      // active high synchronous reset
+    input  [7:0]  A,        // Multiplicand
+    input  [7:0]  B,        // Multiplier
+    output reg [15:0] product  // 16-bit product output
+);
+
+  // Internal registers:
+  reg [15:0] multiplicand; // 16-bit extended multiplicand (will be shifted left each cycle)
+  reg [7:0]  multiplier;   // Copy of multiplier B (will be shifted right each cycle)
+  reg [3:0]  count;        // Counter for 8 iterations
+
+  // Sequential process implementing the shift-and-add multiplier.
+  // When rst is asserted (active high), the internal registers are loaded with the input values.
+  // Then over 8 clock cycles, for each bit of the multiplier, if the LSB is 1 it adds the current
+  // multiplicand to the accumulating product and shifts the multiplicand left. Simultaneously the
+  // multiplier is shifted right to bring the next bit into the LSB position.
+  always @(posedge clk) begin
+    if (rst) begin
+       product       <= 16'd0;
+       // Extend the 8-bit A into a 16-bit value (placed in lower bits) for proper shifting.
+       multiplicand  <= {8'd0, A};
+       multiplier    <= B;
+       count         <= 4'd0;
+    end else if (count < 8) begin
+       if (multiplier[0] == 1'b1)
+          product <= product + multiplicand;
+          
+       multiplicand <= multiplicand << 1;
+       multiplier   <= multiplier >> 1;
+       count        <= count + 1;
+    end
+    // When count reaches 8, the result remains latched on product.
+  end
+
+endmodule

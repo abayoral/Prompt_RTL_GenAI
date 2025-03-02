@@ -1,0 +1,169 @@
+module asyn_fifo #(
+    parameter WIDTH = 8,
+    parameter DEPTH = 16
+)(
+    input  wclk,     // Write clock
+    input  rclk,     // Read clock
+    input  wrstn,    // Active low write reset
+    input  rrstn,    // Active low read reset
+    input  winc,     // Write increment
+    input  rinc,     // Read increment
+    input  [WIDTH-1:0] wdata, // Data to be written
+    output wfull,    // FIFO full flag
+    output rempty,   // FIFO empty flag
+    output [WIDTH-1:0] rdata  // Data read from FIFO
+);
+
+  // Calculate address width using $clog2. 
+  // When DEPTH is not a power of 2, round up.
+  localparam ADDR_WIDTH = (DEPTH <= 1) ? 1 : $clog2(DEPTH);
+  // Pointer width is one more than address width to detect boundary conditions.
+  localparam PTR_WIDTH = ADDR_WIDTH + 1;
+  
+  // Write pointer registers (binary and gray-coded) in the write clock domain.
+  reg [PTR_WIDTH-1:0] wptr_bin;
+  reg [PTR_WIDTH-1:0] wptr_gray;
+  
+  // Read pointer registers (binary and gray-coded) in the read clock domain.
+  reg [PTR_WIDTH-1:0] rptr_bin;
+  reg [PTR_WIDTH-1:0] rptr_gray;
+  
+  // Pointer synchronizers:
+  // Synchronize the read pointer (gray coded) into the write clock domain.
+  reg [PTR_WIDTH-1:0] rptr_sync_w0, rptr_sync_w1;
+  
+  // Synchronize the write pointer (gray coded) into the read clock domain.
+  reg [PTR_WIDTH-1:0] wptr_sync_r0, wptr_sync_r1;
+  
+  //----------------------------------------------------------------------------
+  // Write Domain: Update write pointer and synchronize read pointer from read domain.
+  //----------------------------------------------------------------------------
+  always @(posedge wclk or negedge wrstn) begin
+    if (!wrstn) begin
+      wptr_bin      <= 0;
+      wptr_gray     <= 0;
+      rptr_sync_w0  <= 0;
+      rptr_sync_w1  <= 0;
+    end else begin
+      // Two-stage synchronization of the read pointer from the read clock domain.
+      rptr_sync_w0 <= rptr_gray;
+      rptr_sync_w1 <= rptr_sync_w0;
+      
+      // Only increment pointer when winc is asserted and FIFO is not full.
+      if (winc && !wfull) begin
+        wptr_bin  <= wptr_bin + 1;
+        // Binary-to-Gray conversion: gray = binary ^ (binary >> 1)
+        wptr_gray <= (wptr_bin + 1) ^ ((wptr_bin + 1) >> 1);
+      end
+    end
+  end
+  
+  //----------------------------------------------------------------------------
+  // Read Domain: Update read pointer and synchronize write pointer from write domain.
+  //----------------------------------------------------------------------------
+  always @(posedge rclk or negedge rrstn) begin
+    if (!rrstn) begin
+      rptr_bin      <= 0;
+      rptr_gray     <= 0;
+      wptr_sync_r0  <= 0;
+      wptr_sync_r1  <= 0;
+    end else begin
+      // Two-stage synchronization of the write pointer from the write clock domain.
+      wptr_sync_r0 <= wptr_gray;
+      wptr_sync_r1 <= wptr_sync_r0;
+      
+      // Only increment pointer when rinc is asserted and FIFO is not empty.
+      if (rinc && !rempty) begin
+        rptr_bin  <= rptr_bin + 1;
+        rptr_gray <= (rptr_bin + 1) ^ ((rptr_bin + 1) >> 1);
+      end
+    end
+  end
+  
+  //----------------------------------------------------------------------------
+  // FIFO Status Flags Calculations (using Gray code)
+  //----------------------------------------------------------------------------
+  // For determining the full condition in the write clock domain,
+  // calculate the next potential write pointer. This prediction helps ensure that 
+  // the FIFO does not accept a write when it is full.
+  wire [PTR_WIDTH-1:0] wptr_bin_next = (winc && !wfull) ? (wptr_bin + 1) : wptr_bin;
+  wire [PTR_WIDTH-1:0] wptr_gray_next = wptr_bin_next ^ (wptr_bin_next >> 1);
+  
+  // FIFO is considered full when the next write pointer, in Gray code, is equal to 
+  // the read pointer after inverting its most significant bit (MSB). This condition 
+  // implies that the FIFO has wrapped around and is full.
+  assign wfull = ( (wptr_gray_next[PTR_WIDTH-1] != rptr_sync_w1[PTR_WIDTH-1]) &&
+                   (wptr_gray_next[PTR_WIDTH-2:0] == rptr_sync_w1[PTR_WIDTH-2:0]) );
+  
+  // In the read clock domain, the FIFO is empty when the read pointer equals the 
+  // synchronized write pointer.
+  assign rempty = (rptr_gray == wptr_sync_r1);
+  
+  //----------------------------------------------------------------------------
+  // Memory Address Assignments
+  //----------------------------------------------------------------------------
+  // The lower ADDR_WIDTH bits of the binary pointers are used as addresses for the RAM.
+  wire [ADDR_WIDTH-1:0] waddr = wptr_bin[ADDR_WIDTH-1:0];
+  wire [ADDR_WIDTH-1:0] raddr = rptr_bin[ADDR_WIDTH-1:0];
+  
+  // Generate write and read enable signals for the memory.
+  wire write_enable = winc && !wfull;
+  wire read_enable  = rinc && !rempty;
+  
+  //----------------------------------------------------------------------------
+  // Instance of the dual-port RAM submodule.
+  //----------------------------------------------------------------------------
+  dual_port_ram #(
+      .WIDTH(WIDTH),
+      .ADDR_WIDTH(ADDR_WIDTH),
+      .DEPTH(DEPTH)
+  ) ram_inst (
+      .wclk  (wclk),
+      .wenc  (write_enable),
+      .waddr (waddr),
+      .wdata (wdata),
+      .rclk  (rclk),
+      .renc  (read_enable),
+      .raddr (raddr),
+      .rdata (rdata)
+  );
+  
+endmodule
+
+
+//------------------------------------------------------------------------------
+// Dual-Port RAM Module
+// This module implements a simple dual-port RAM with separate read and write 
+// clock domains. The read port output is registered.
+//------------------------------------------------------------------------------
+module dual_port_ram #(
+    parameter WIDTH = 8,
+    parameter ADDR_WIDTH = 4,
+    parameter DEPTH = 16
+)(
+    input                    wclk,   // Write clock
+    input                    wenc,   // Write enable
+    input  [ADDR_WIDTH-1:0]  waddr,  // Write address
+    input  [WIDTH-1:0]       wdata,  // Write data
+    input                    rclk,   // Read clock
+    input                    renc,   // Read enable
+    input  [ADDR_WIDTH-1:0]  raddr,  // Read address
+    output reg [WIDTH-1:0]   rdata   // Registered read data
+);
+
+  // Memory array declaration.
+  reg [WIDTH-1:0] mem [0:DEPTH-1];
+
+  // Write port operation (synchronous to wclk).
+  always @(posedge wclk) begin
+    if (wenc)
+      mem[waddr] <= wdata;
+  end
+
+  // Read port operation (synchronous to rclk) with a registered output.
+  always @(posedge rclk) begin
+    if (renc)
+      rdata <= mem[raddr];
+  end
+
+endmodule

@@ -1,0 +1,38 @@
+module signal_generator (
+    input clk,
+    input rst_n,
+    output reg [4:0] wave
+);
+
+    // state: 0 for increment mode, 1 for decrement mode
+    reg state;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            wave  <= 5'd0;
+            state <= 1'b0;
+        end else begin
+            case (state)
+                1'b0: begin
+                    // Increment mode
+                    if (wave == 5'd31) begin
+                        // Transition to decrement mode when maximum reached
+                        state <= 1'b1;
+                    end else begin
+                        wave <= wave + 5'd1;
+                    end
+                end
+                1'b1: begin
+                    // Decrement mode
+                    if (wave == 5'd0) begin
+                        // Transition back to increment mode when minimum reached
+                        state <= 1'b0;
+                    end else begin
+                        wave <= wave - 5'd1;
+                    end
+                end
+            endcase
+        end
+    end
+
+endmodule

@@ -1,0 +1,138 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg [7:0] out_byte,
+    output reg done
+);
+
+    // FSM state encoding
+    localparam STATE_IDLE      = 3'd0,
+               STATE_DATA      = 3'd1,
+               STATE_PARITY    = 3'd2,
+               STATE_STOP      = 3'd3,
+               STATE_WAIT_STOP = 3'd4;
+               
+    reg [2:0] state, next_state;
+    reg [3:0] bit_count; // To count the 8 data bits (0 to 7)
+    reg [7:0] data_reg;  // Shift register for received data
+
+    // We'll need to feed the parity module with the bits from the DATA and PARITY states.
+    // Because the parity module is a T flip‐flop style counter using a synchronous reset,
+    // we must pulse its reset input at the beginning of each reception.
+    // We'll generate a one–cycle pulse "p_reset" when we detect the start bit.
+    reg p_reset; 
+    // Also, in the DATA and PARITY states we want to feed the serial "in" to the parity module.
+    reg p_in;
+    
+    // Instance of the parity module.
+    wire odd_parity;
+    parity parity_inst (
+        .clk(clk),
+        .reset(p_reset),
+        .in(p_in),
+        .odd(odd_parity)
+    );
+    
+    // Combinational next state logic
+    always @(*) begin
+        case (state)
+            STATE_IDLE: begin
+                // Wait for a start bit (logic 0).
+                if (!in)
+                    next_state = STATE_DATA;
+                else
+                    next_state = STATE_IDLE;
+            end
+            STATE_DATA: begin
+                if (bit_count == 8)
+                    next_state = STATE_PARITY;
+                else
+                    next_state = STATE_DATA;
+            end
+            STATE_PARITY: begin
+                next_state = STATE_STOP;
+            end
+            STATE_STOP: begin
+                // We expect a stop bit (logic 1).
+                if (in)
+                    next_state = STATE_IDLE;
+                else
+                    next_state = STATE_WAIT_STOP;
+            end
+            STATE_WAIT_STOP: begin
+                // Remain here until a stop bit (logic 1) is observed.
+                if (in)
+                    next_state = STATE_IDLE;
+                else
+                    next_state = STATE_WAIT_STOP;
+            end
+            default: next_state = STATE_IDLE;
+        endcase
+    end
+
+    // Sequential logic: FSM, datapath registers, and parity reset generation.
+    always @(posedge clk) begin
+        if(reset) begin
+            state       <= STATE_IDLE;
+            bit_count   <= 0;
+            data_reg    <= 0;
+            out_byte    <= 0;
+            done        <= 0;
+            p_reset     <= 1;  // Assert parity module reset on global reset.
+            p_in        <= 0;
+        end 
+        else begin
+            state <= next_state;
+            // Default for done: only pulse when a valid byte is received.
+            done <= 0;
+            
+            case(state)
+                STATE_IDLE: begin
+                    bit_count <= 0;
+                    data_reg  <= 0;
+                    // When in idle and we see a start bit (in==0), we need to initialize parity.
+                    if(!in) 
+                        p_reset <= 1;  // one-cycle reset pulse for parity module
+                    else 
+                        p_reset <= 0;
+                    p_in <= 0; // Not feeding any bit in idle.
+                end
+                STATE_DATA: begin
+                    // After leaving idle, turn off the reset pulse.
+                    p_reset <= 0;
+                    // In DATA state, sample each bit and also feed it to the parity module.
+                    p_in <= in;
+                    // Since protocol sends LSB first, we store the bit in the corresponding position.
+                    data_reg[bit_count] <= in;
+                    bit_count <= bit_count + 1;
+                end
+                STATE_PARITY: begin
+                    // In PARITY state, sample the parity bit.
+                    p_in <= in;
+                    // No change to data_reg.
+                end
+                STATE_STOP: begin
+                    // Stop bit should be high.
+                    p_in <= 0;  // Do not feed stop bit to the parity module.
+                    // Only if the stop bit is valid and the odd parity flag is high (i.e. odd number of ones)
+                    // do we consider the received byte valid.
+                    if(in && odd_parity) begin
+                        done     <= 1;
+                        out_byte <= data_reg;
+                    end
+                end
+                STATE_WAIT_STOP: begin
+                    // In case the expected stop bit was not detected,
+                    // wait here until a valid stop bit (logic 1) appears.
+                    p_in <= 0;
+                end
+                default: begin
+                    p_reset <= 0;
+                    p_in    <= 0;
+                end
+            endcase
+        end
+    end
+
+endmodule

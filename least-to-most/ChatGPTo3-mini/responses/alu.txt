@@ -1,0 +1,132 @@
+module alu(
+    input  [31:0] a,
+    input  [31:0] b,
+    input  [5:0]  aluc,
+    output reg [31:0] r,
+    output reg zero,
+    output reg carry,
+    output reg negative,
+    output reg overflow,
+    output reg flag
+);
+
+  // Combinational ALU operation
+  always @(*) begin
+    // Default assignments
+    r        = 32'd0;
+    carry    = 1'b0;
+    overflow = 1'b0;
+    flag     = 1'b0;
+    
+    case(aluc)
+      // ADD (signed addition with overflow detection)
+      6'b100000: begin
+        // Extend to 33 bits for carry out extraction.
+        {carry, r} = {1'b0, a} + {1'b0, b};
+        // Signed overflow: if a and b have same sign but result differs.
+        overflow = ((~a[31] & ~b[31] & r[31]) | (a[31] & b[31] & ~r[31]));
+      end
+
+      // ADDU (unsigned addition; no overflow detection)
+      6'b100001: begin
+        {carry, r} = {1'b0, a} + {1'b0, b};
+        overflow = 1'b0;
+      end
+
+      // SUB (signed subtraction with overflow detection)
+      6'b100010: begin
+        {carry, r} = {1'b0, a} - {1'b0, b};
+        // Signed overflow in subtraction occurs when sign of a differs from b and sign of result differs from a.
+        overflow = ((a[31] & ~b[31] & ~r[31]) | (~a[31] & b[31] & r[31]));
+      end
+
+      // SUBU (unsigned subtraction; no overflow detection)
+      6'b100011: begin
+        {carry, r} = {1'b0, a} - {1'b0, b};
+        overflow = 1'b0;
+      end
+
+      // AND
+      6'b100100: begin
+        r = a & b;
+      end
+
+      // OR
+      6'b100101: begin
+        r = a | b;
+      end
+
+      // XOR
+      6'b100110: begin
+        r = a ^ b;
+      end
+
+      // NOR
+      6'b100111: begin
+        r = ~(a | b);
+      end
+
+      // SLT (Set on Less Than, signed comparison)
+      6'b101010: begin
+        flag = ($signed(a) < $signed(b)) ? 1'b1 : 1'b0;
+        // The 32-bit result r is set to the boolean outcome.
+        r = {31'd0, flag};
+      end
+
+      // SLTU (Set on Less Than Unsigned)
+      6'b101011: begin
+        flag = (a < b) ? 1'b1 : 1'b0;
+        r = {31'd0, flag};
+      end
+
+      // SLL (Shift Left Logical by immediate; shift amount from b[4:0])
+      6'b000000: begin
+        r = a << b[4:0];
+      end
+
+      // SRL (Shift Right Logical by immediate; shift amount from b[4:0])
+      6'b000010: begin
+        r = a >> b[4:0];
+      end
+
+      // SRA (Shift Right Arithmetic by immediate; shift amount from b[4:0])
+      6'b000011: begin
+        r = $signed(a) >>> b[4:0];
+      end
+
+      // SLLV (Shift Left Logical Variable; shift amount from a[4:0], shift operand b)
+      6'b000100: begin
+        r = b << a[4:0];
+      end
+
+      // SRLV (Shift Right Logical Variable; shift amount from a[4:0], shift operand b)
+      6'b000110: begin
+        r = b >> a[4:0];
+      end
+
+      // SRAV (Shift Right Arithmetic Variable; shift amount from a[4:0], shift operand b)
+      6'b000111: begin
+        r = $signed(b) >>> a[4:0];
+      end
+
+      // LUI (Load Upper Immediate, shift the immediate in upper 16 bits of 'a' into upper half)
+      6'b001111: begin
+        r = {a[15:0], 16'b0};
+      end
+
+      // Default case--unhandled opcodes result in high-impedance outputs
+      default: begin
+        r        = 32'bz;
+        carry    = 1'bz;
+        overflow = 1'bz;
+        flag     = 1'bz;
+      end
+    endcase
+
+    // Compute the zero flag: result is zero?
+    zero = (r == 32'd0) ? 1'b1 : 1'b0;
+    // Negative flag set from the most significant bit of the result.
+    negative = r[31];
+  end
+
+endmodule

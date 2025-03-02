@@ -1,0 +1,18 @@
+module top_module (
+    input clk,
+    input [7:0] in,
+    output reg [7:0] anyedge
+);
+
+    // Register to store the previous cycle's input value
+    reg [7:0] in_prev;
+
+    // At every positive edge of the clock, compare the previous value with the current input.
+    // If a rising edge (transition from 0 to 1) is detected for a bit, then anyedge for
+    // that bit is set in the next cycle.
+    always @(posedge clk) begin
+        anyedge <= (~in_prev) & in;  // only bits changing from 0 to 1 result in a 1
+        in_prev <= in;               // update previous input value
+    end
+
+endmodule

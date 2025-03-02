@@ -1,0 +1,119 @@
+module top_module(
+    input clk,
+    input reset,
+    input ena,
+    output pm,
+    output [7:0] hh,
+    output [7:0] mm,
+    output [7:0] ss
+);
+
+    // Internal registers for seconds, minutes, hours, and pm indicator.
+    // sec_i and mm_i go from 0 to 59, hh_i goes from 1 to 12.
+    reg [5:0] sec_i, mm_i; 
+    reg [3:0] hh_i;
+    reg       pm_reg; // 0 for AM, 1 for PM
+
+    // Sequential block: update the clock counts on clk edge or asynchronous reset.
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            // Reset clock to 12:00:00 AM.
+            sec_i  <= 6'd0;
+            mm_i   <= 6'd0;
+            hh_i   <= 4'd12; // 12:xx, not 00:xx
+            pm_reg <= 1'b0;  // AM = 0
+        end else if (ena) begin
+            // Increment seconds.
+            if (sec_i == 6'd59) begin
+                sec_i <= 6'd0;
+                // Seconds rollover: increment minutes.
+                if (mm_i == 6'd59) begin
+                    mm_i <= 6'd0;
+                    // Minutes rollover: increment hours.
+                    // In a 12-hour clock, the hour update rules are:
+                    // - 11 -> 12 and toggle the AM/PM indicator.
+                    // - 12 -> 1 without toggling.
+                    // - Otherwise, just increment.
+                    if (hh_i == 4'd11) begin
+                        hh_i   <= 4'd12;
+                        pm_reg <= ~pm_reg;
+                    end else if (hh_i == 4'd12) begin
+                        hh_i <= 4'd1;
+                    end else begin
+                        hh_i <= hh_i + 4'd1;
+                    end
+                end else begin
+                    mm_i <= mm_i + 6'd1;
+                end
+            end else begin
+                sec_i <= sec_i + 6'd1;
+            end
+        end
+    end
+
+    // Combinational conversion to BCD digits.
+    // Each output (hh, mm, ss) is 8 bits: upper 4 bits for the tens digit and lower 4 for the ones digit.
+    reg [3:0] h_t, h_o;
+    reg [3:0] m_t, m_o;
+    reg [3:0] s_t, s_o;
+    
+    always @(*) begin
+        // Convert hours (hh_i is in the range 1 to 12).
+        if (hh_i >= 4'd10) begin
+            h_t = 4'd1;
+            h_o = hh_i - 4'd10;
+        end else begin
+            h_t = 4'd0;
+            h_o = hh_i;
+        end
+        
+        // Convert minutes (mm_i is 0 to 59).
+        if (mm_i >= 6'd50) begin
+            m_t = 4'd5;
+            m_o = mm_i - 6'd50;
+        end else if (mm_i >= 6'd40) begin
+            m_t = 4'd4;
+            m_o = mm_i - 6'd40;
+        end else if (mm_i >= 6'd30) begin
+            m_t = 4'd3;
+            m_o = mm_i - 6'd30;
+        end else if (mm_i >= 6'd20) begin
+            m_t = 4'd2;
+            m_o = mm_i - 6'd20;
+        end else if (mm_i >= 6'd10) begin
+            m_t = 4'd1;
+            m_o = mm_i - 6'd10;
+        end else begin
+            m_t = 4'd0;
+            m_o = mm_i;
+        end
+
+        // Convert seconds (sec_i is 0 to 59).
+        if (sec_i >= 6'd50) begin
+            s_t = 4'd5;
+            s_o = sec_i - 6'd50;
+        end else if (sec_i >= 6'd40) begin
+            s_t = 4'd4;
+            s_o = sec_i - 6'd40;
+        end else if (sec_i >= 6'd30) begin
+            s_t = 4'd3;
+            s_o = sec_i - 6'd30;
+        end else if (sec_i >= 6'd20) begin
+            s_t = 4'd2;
+            s_o = sec_i - 6'd20;
+        end else if (sec_i >= 6'd10) begin
+            s_t = 4'd1;
+            s_o = sec_i - 6'd10;
+        end else begin
+            s_t = 4'd0;
+            s_o = sec_i;
+        end
+    end
+
+    // Concatenate the tens and ones digits for the outputs.
+    assign hh = {h_t, h_o};
+    assign mm = {m_t, m_o};
+    assign ss = {s_t, s_o};
+    assign pm = pm_reg;
+
+endmodule

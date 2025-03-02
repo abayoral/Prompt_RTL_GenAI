@@ -1,0 +1,52 @@
+module pulse_detect(
+    input clk,
+    input rst_n,
+    input data_in,
+    output reg data_out
+);
+
+    // State encoding definition
+    localparam S_IDLE = 1'b0,  // Waiting for rising edge (0 -> 1)
+               S_WAIT = 1'b1;  // Rising detected, waiting for falling edge (1 -> 0)
+
+    reg state;
+
+    // Synchronous state machine with asynchronous active-low reset
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            state    <= S_IDLE;
+            data_out <= 1'b0;
+        end else begin
+            case (state)
+                S_IDLE: begin
+                    // In the initial state, output is low.
+                    data_out <= 1'b0;
+                    // Look for the rising edge (transition from 0->1) on data_in.
+                    if (data_in == 1'b1) begin
+                        state <= S_WAIT;
+                    end else begin
+                        state <= S_IDLE;
+                    end
+                end
+
+                S_WAIT: begin
+                    // Once in S_WAIT, confirm the falling edge (transition from 1->0).
+                    if (data_in == 1'b0) begin
+                        // When falling edge occurs, output a one-cycle pulse.
+                        data_out <= 1'b1;
+                        state    <= S_IDLE;
+                    end else begin
+                        data_out <= 1'b0;
+                        state    <= S_WAIT;
+                    end
+                end
+
+                default: begin
+                    state    <= S_IDLE;
+                    data_out <= 1'b0;
+                end
+            endcase
+        end
+    end
+
+endmodule

@@ -1,0 +1,78 @@
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output reg [23:0] out_bytes,
+    output reg done
+);
+
+    // state encoding
+    localparam WAIT_FOR_FIRST  = 2'd0,
+               WAIT_FOR_SECOND = 2'd1,
+               WAIT_FOR_THIRD  = 2'd2;
+
+    reg [1:0] state, next_state;
+    reg [7:0] byte1, byte2, byte3;
+
+    // Next state logic
+    always @(*) begin
+        // Default next state is the current state, and default done is 0.
+        next_state = state;
+        case (state)
+            WAIT_FOR_FIRST: begin
+                // Check if incoming byte has bit3 = 1.
+                if (in[3]) // in[3] == 1
+                    next_state = WAIT_FOR_SECOND;
+                else
+                    next_state = WAIT_FOR_FIRST;
+            end
+            WAIT_FOR_SECOND: begin
+                next_state = WAIT_FOR_THIRD;
+            end
+            WAIT_FOR_THIRD: begin
+                next_state = WAIT_FOR_FIRST;
+            end
+            default: next_state = WAIT_FOR_FIRST;
+        endcase
+    end
+
+
+    // FSM and datapath (register updates) sequential block
+    always @(posedge clk) begin
+        if (reset) begin
+            state <= WAIT_FOR_FIRST;
+            done <= 0;
+            out_bytes <= 24'd0;
+            byte1 <= 8'd0;
+            byte2 <= 8'd0;
+            byte3 <= 8'd0;
+        end else begin
+            state <= next_state;
+            
+            // default done to 0 unless we are at message completion.
+            done <= 0;
+            
+            case (state)
+                WAIT_FOR_FIRST: begin
+                    // Check for valid start byte.
+                    if (in[3]) begin
+                        // store first byte
+                        byte1 <= in;
+                    end
+                end
+                WAIT_FOR_SECOND: begin
+                    // store second byte
+                    byte2 <= in;
+                end
+                WAIT_FOR_THIRD: begin
+                    // store third byte and complete the packet
+                    byte3 <= in;
+                    // assemble out_bytes, ordering is: byte1 [23:16], byte2 [15:8], byte3 [7:0]
+                    out_bytes <= {byte1, byte2, in};
+                    done <= 1;
+                end
+            endcase
+        end
+    end
+
+endmodule

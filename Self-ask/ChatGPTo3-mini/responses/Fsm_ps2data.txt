@@ -1,0 +1,66 @@
+module top_module(
+    input clk,
+    input reset,    // Synchronous reset
+    input [7:0] in,
+    output reg [23:0] out_bytes,
+    output reg done
+);
+
+    // State encoding
+    parameter WAIT  = 2'b00,
+              BYTE1 = 2'b01,
+              BYTE2 = 2'b10;
+
+    reg [1:0] state;
+
+    // Registers for storing the three bytes
+    reg [7:0] byte1, byte2;
+
+    // FSM with datapath:
+    // - In the WAIT state, we wait for a byte where in[3]==1 to mark the start.
+    // - Then we store the first byte (byte1), move to BYTE1 state, and capture the next byte in byte2.
+    // - In the BYTE2 state, we capture the third byte, assemble the 24-bit message,
+    //   assert done for one clock cycle, and return to WAIT.
+    always @(posedge clk) begin
+        if (reset) begin
+            state     <= WAIT;
+            done      <= 1'b0;
+            byte1     <= 8'b0;
+            byte2     <= 8'b0;
+            out_bytes <= 24'b0;
+        end else begin
+            // Clear done pulse by default
+            done <= 1'b0;
+            case (state)
+                WAIT: begin
+                    // Look for a byte whose bit[3] is 1
+                    if (in[3]) begin
+                        // Capture first byte and move to next state
+                        byte1 <= in;
+                        state <= BYTE1;
+                    end
+                end
+
+                BYTE1: begin
+                    // Capture second byte and move to third-byte capture state
+                    byte2 <= in;
+                    state <= BYTE2;
+                end
+
+                BYTE2: begin
+                    // Capture third byte and output the 24-bit message:
+                    // out_bytes[23:16] gets byte1 (first), out_bytes[15:8] gets byte2 (second),
+                    // and out_bytes[7:0] gets the current byte (third)
+                    out_bytes <= {byte1, byte2, in};
+                    // Assert done for one clock cycle to flag message complete
+                    done <= 1'b1;
+                    // Return to WAIT state to search for the next packet.
+                    state <= WAIT;
+                end
+
+                default: state <= WAIT;
+            endcase
+        end
+    end
+
+endmodule

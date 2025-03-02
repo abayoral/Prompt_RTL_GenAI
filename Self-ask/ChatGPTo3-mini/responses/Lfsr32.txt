@@ -1,0 +1,60 @@
+module top_module(
+    input clk,
+    input reset,    // Active‐high synchronous reset to 32'h1
+    output [31:0] q
+);
+
+    // We'll implement the 32‐bit Galois LFSR as a right‐shift register.
+    // For a Galois LFSR, we use the LSB as the feedback bit.
+    // With the specified taps at bit positions 32, 22, 2, and 1 (1–indexed),
+    // these correspond to the following 0–indexed positions:
+    //    tap at bit 32 → index 31
+    //    tap at bit 22 → index 21
+    //    tap at bit 2  → index 1
+    //    tap at bit 1  → index 0
+    //
+    // In a right‐shift Galois LFSR, the update rule is:
+    //   Let feedback = state[0].
+    //   For bits 0 to 30:
+    //       next_state[i] = state[i+1] XOR (feedback if (i+1) is one of the tapped positions)
+    //   For the MSB (bit 31):
+    //       next_state[31] = state[31] XOR (feedback if bit 32 is tapped)
+    //
+    // Since the taps for positions 1, 2, 22, and 32 are active, the update becomes:
+    //   next_state[0] = state[1] XOR feedback;          // (because 0+1=1 is tapped)
+    //   next_state[1] = state[2] XOR feedback;          // (because 1+1=2 is tapped)
+    //   next_state[21] = state[22] XOR feedback;        // (because 21+1=22 is tapped)
+    //   next_state[31] = state[31] XOR feedback;        // (because bit 32 is tapped)
+    // All other bits (i = 2–20, 22–30) simply shift right: next_state[i] = state[i+1].
+    //
+    // A synchronous reset sets the register to 32'h1.
+
+    reg [31:0] lfsr;
+    wire feedback = lfsr[0];
+    reg [31:0] next_state;
+
+    integer i;
+    always @(*) begin
+        // For indices 0 to 30, compute next_state as either the shifted value XOR feedback (if tapped) or just the shifted value.
+        for(i = 0; i < 31; i = i + 1) begin
+            // (i+1) corresponds to the bit position being shifted into index i.
+            if ((i + 1 == 1) || (i + 1 == 2) || (i + 1 == 22))
+                next_state[i] = lfsr[i + 1] ^ feedback;
+            else
+                next_state[i] = lfsr[i + 1];
+        end
+        // For the MSB (bit 31), there is no lfsr[32] to shift in.
+        // Instead apply the tap for bit 32.
+        next_state[31] = lfsr[31] ^ feedback;
+    end
+
+    always @(posedge clk) begin
+        if (reset)
+            lfsr <= 32'h1;
+        else
+            lfsr <= next_state;
+    end
+
+    assign q = lfsr;
+
+endmodule

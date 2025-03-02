@@ -1,0 +1,1 @@
+Is it correct that the output vector is ordered such that for each input (a through e), the corresponding 5-bit group contains the comparisons in the order of comparing that input with a, b, c, d, then e (for example, out[24]=a==a, out[23]=a==b, out[22]=a==c, out[21]=a==d, out[20]=a==e, and similarly for b, c, d, and e)?

@@ -1,0 +1,21 @@
+module top_module (
+    input clk,
+    input [7:0] in,
+    output reg [7:0] pedge
+);
+
+    // Register to hold the previous value of 'in'
+    reg [7:0] prev_in;
+    // Register to capture the positive edge detection result in the current cycle
+    reg [7:0] detected;
+
+    always @(posedge clk) begin
+        // Compute rising edge detection: the bit transitioned from 0 to 1 from previous cycle to this cycle
+        detected <= (~prev_in) & in;
+        // Update stored input for the next cycle
+        prev_in <= in;
+        // Output the detected rising edge signal delayed by one clock cycle
+        pedge <= detected;
+    end
+
+endmodule

@@ -1,0 +1,36 @@
+module multi_8bit(
+    input         clk,
+    input         rst,      // active high reset signal
+    input  [7:0]  A,        // multiplicand
+    input  [7:0]  B,        // multiplier
+    output reg [15:0] product  // 16-bit product output
+);
+
+  // Internal registers:
+  reg [15:0] multiplicand;  // will hold A and will be shifted left each cycle
+  reg [7:0] multiplier;     // copy of B that will be shifted right
+  reg [2:0] count;          // 3-bit counter to iterate 8 times
+
+  // Sequential process performing shift-and-add multiplication
+  always @(posedge clk or posedge rst) begin
+    if (rst) begin
+      // On reset, initialize registers
+      product       <= 16'd0;
+      multiplicand  <= {8'd0, A}; // extend A to 16 bits; alternatively, pad with zeros on left
+      multiplier    <= B;
+      count         <= 3'd0;
+    end else if (count < 3'd8) begin
+      // For each bit in multiplier:
+      if(multiplier[0]) begin
+        product <= product + multiplicand;
+      end
+      // Shift multiplicand left by 1 for next bit weight
+      multiplicand <= multiplicand << 1;
+      // Shift multiplier right by 1 to process next bit in next cycle
+      multiplier <= multiplier >> 1;
+      count <= count + 1;
+    end
+    // When count reaches 8, product is complete; registers hold the final result.
+  end
+
+endmodule

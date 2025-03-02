@@ -1,0 +1,68 @@
+module LIFObuffer(
+    input      [3:0] dataIn,
+    input            RW,    // RW = 0: push (write), RW = 1: pop (read)
+    input            EN,
+    input            Rst,
+    input            Clk,
+    output reg       EMPTY,
+    output reg       FULL,
+    output reg [3:0] dataOut
+);
+
+    // Stack memory: 4 entries of 4-bit width
+    reg [3:0] stack_mem [0:3];
+    
+    // Stack pointer: valid range 0 to 4.
+    // When sp == 4, the stack is empty.
+    // When sp == 0, the stack is full.
+    reg [2:0] sp;
+    
+    // Used to compute the next value of our stack pointer
+    reg [2:0] next_sp;
+    
+    integer i;
+    
+    // Sequential logic: operations occur on the rising edge of Clk
+    always @(posedge Clk) begin
+        if (Rst) begin
+            // Asynchronous clear: reset the stack memory and set sp to empty condition
+            sp <= 3'd4;  // 4 indicates an empty stack (no valid entries)
+            for (i = 0; i < 4; i = i + 1) begin
+                stack_mem[i] <= 4'd0;
+            end
+            dataOut <= 4'd0;
+            EMPTY   <= 1'b1;
+            FULL    <= 1'b0;
+        end else if (EN) begin
+            // Default assignment: no change to sp unless a valid push or pop occurs.
+            next_sp = sp;
+            
+            // Push operation: RW = 0 and stack is not full (sp != 0)
+            if (!RW) begin
+                if (sp != 0) begin
+                    next_sp = sp - 1;
+                    // Write the incoming data into the computed location
+                    stack_mem[next_sp] <= dataIn;
+                end
+            end 
+            // Pop operation: RW = 1 and stack is not empty (sp != 4)
+            else begin
+                if (sp != 4) begin
+                    // Output data from the current top of the stack
+                    dataOut <= stack_mem[sp];
+                    // Clear the location after pop (optional in practice)
+                    stack_mem[sp] <= 4'd0;
+                    next_sp = sp + 1;
+                end
+            end
+            
+            // Update the stack pointer
+            sp <= next_sp;
+            
+            // Update flag signals based on the new value of the stack pointer
+            EMPTY <= (next_sp == 3'd4) ? 1'b1 : 1'b0;
+            FULL  <= (next_sp == 3'd0) ? 1'b1 : 1'b0;
+        end
+    end
+
+endmodule

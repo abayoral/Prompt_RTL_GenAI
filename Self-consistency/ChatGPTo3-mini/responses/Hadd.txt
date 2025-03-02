@@ -1,0 +1,9 @@
+module top_module( 
+    input a, b,
+    output cout, sum );
+
+    // A half adder: sum is the XOR of a and b, and cout is the AND of a and b.
+    assign sum = a ^ b;
+    assign cout = a & b;
+
+endmodule

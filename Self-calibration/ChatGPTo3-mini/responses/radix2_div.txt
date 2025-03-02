@@ -1,157 +1,139 @@
-Below is one acceptable corrected version. In our “fix” we noticed that although the code correctly takes the absolute value of the dividend and divisor, it never “restores” the sign of the quotient (and remainder) when a signed division is requested. (There was also a few minor clean‐up issues.) One acceptable fix is to compute the final quotient and remainder with sign–correction in the DONE state. One complete corrected version is given below:
+Below is one acceptable corrected solution. In our “fixed‐up” version we:
 
-------------------------------------------------------------
+• Compute the absolute values (and record the signs) using blocking assignments so that the computed values can immediately be used when initializing the shift register and NEG_DIVISOR. (Remember that with nonblocking assignments the right‐hand–side expressions are evaluated using “old” values.)  
+• Remove the declaration of local “temporary” regs from inside a branch of the always block (instead we compute the final quotient and remainder “in–line”).  
+• Remove a now–unused signal (start_cnt) so that the code is simpler and easier to synthesize.
+
+One correct answer is as follows:
+
+--------------------------------------------------
 module radix2_div(
-  input         clk,
-  input         rst,
-  input         sign,        // 1: perform signed division; 0: assume unsigned
-  input  [7:0]  dividend,
-  input  [7:0]  divisor,
-  input         opn_valid,
-  output reg    res_valid,
-  output reg [15:0] result     // {remainder, quotient}
+    input         clk,
+    input         rst,
+    input         sign,
+    input  [7:0]  dividend,
+    input  [7:0]  divisor,
+    input         opn_valid,
+    output reg        res_valid,
+    output reg [15:0] result
 );
 
-  // state definitions
-  localparam IDLE = 2'b00,
-             CALC = 2'b01,
-             DONE = 2'b10;
+  // Internal signals and registers.
+  reg         busy;
+  reg  [3:0]  cnt;         // Counts the 8 iterations.
+  reg  [16:0] SR;          // 17‐bit shift register: remainder and intermediate quotient bits.
+  
+  // Signals for absolute values and sign tracking.
+  reg  [7:0]  abs_dividend;
+  reg  [7:0]  abs_divisor;
+  reg         dividend_neg;
+  reg         divisor_neg;
 
-  reg [1:0] state;
-  reg [3:0] cnt;         // 4-bit counter (counts 0 to 7)
+  // NEG_DIVISOR: 9‐bit two’s complement of abs_divisor (i.e. –{0,abs_divisor}).
+  reg  [8:0]  NEG_DIVISOR;
 
-  // Internal shift register holds {Remainder, Quotient}.
-  // At any time, SR[15:8] is the current remainder and SR[7:0] is the quotient.
-  reg [15:0] SR;
+  // Temporary variables used inside the iterative calculation.
+  reg  [16:0] SR_next;
+  reg  [8:0]  trial;
+  reg         trial_carry;
 
-  // To support signed/unsigned division, we take the absolute values.
-  reg [7:0] dividend_abs, divisor_abs;
-  // Compute two’s complement (negated divisor) for subtraction:
-  wire [7:0] neg_divisor;
-  assign neg_divisor = ~divisor_abs + 1;
-
-  // Combinational absolute value computation for dividend.
-  always @(*) begin
-    if (sign && dividend[7])
-      dividend_abs = ~dividend + 1;
-    else
-      dividend_abs = dividend;
-  end
-
-  // Combinational absolute value computation for divisor.
-  always @(*) begin
-    if (sign && divisor[7])
-      divisor_abs = ~divisor + 1;
-    else
-      divisor_abs = divisor;
-  end
-
-  // ------------------------------------------------------------------------
-  // The division algorithm is based on the restoring (radix‐2) method.
-  // Procedure:
-  // 1. In IDLE: When opn_valid is high, capture the inputs and initialize SR.
-  //    SR <= {8'b0, dividend_abs};
-  // 2. In CALC: For 8 iterations:
-  //    a) Shift left the {R, Q} pair by 1 bit. (R_shift = {R[6:0], Q[7]})
-  //    b) Compute subtraction: sub = R_shift - divisor_abs.
-  //       If sub produces a carry-out (i.e. no borrow), then the subtraction is 
-  //       successful. In that case, update R to sub[7:0] and set Q's LSB to 1.
-  //    Formally:
-  //         next_R = (sub[8]==1) ? sub[7:0] : R_shift;
-  //         next_Q = { Q[6:0], sub[8] };
-  //         SR <= {next_R, next_Q};
-  // 3. In DONE: After 8 iterations, SR holds the final result. Then perform sign
-  //    correction (if required), and assert res_valid.
-  // ------------------------------------------------------------------------
-
-  // Split SR into R and Q.
-  wire [7:0] R = SR[15:8];
-  wire [7:0] Q = SR[7:0];
-
-  // Compute the shifted remainder.
-  wire [7:0] R_shift = { R[6:0], Q[7] };
-  // The quotient is shifted left by 1, with a 0 appended.
-  // (The new LSB will be replaced according to sub[8])
-  // [The intermediate Q_shift signal is not needed since we build next_Q directly.]
-
-  // Do subtraction on R_shift: R_shift - divisor_abs via two’s complement addition.
-  // The 9-bit addition produces a carry-out in sub[8] if R_shift >= divisor_abs.
-  wire [8:0] sub;
-  assign sub = {1'b0, R_shift} + {1'b0, neg_divisor};
-
-  // Determine next remainder and next quotient.
-  wire [7:0] next_R = sub[8] ? sub[7:0] : R_shift;
-  wire [7:0] next_Q = { Q[6:0], sub[8] };
-
-  //----------------------------------------------
-  // Synchronous state machine.
-  //----------------------------------------------
-  // We add sign-correction in DONE.
-  reg [7:0] quotient_corr, remainder_corr;
-  always @(posedge clk or posedge rst) begin
+  always @(posedge clk) begin
     if(rst) begin
-      state     <= IDLE;
-      SR        <= 16'b0;
-      cnt       <= 4'b0;
-      res_valid <= 1'b0;
-      result    <= 16'b0;
-    end else begin
-      case(state)
-        IDLE: begin
-          res_valid <= 1'b0;
-          if(opn_valid) begin
-            // Capture inputs and initialize the shift register.
-            // The remainder is set to 0 and the quotient to the absolute dividend.
-            SR  <= {8'b0, dividend_abs};
-            cnt <= 4'b0;
-            state <= CALC;
-          end
+      busy         <= 1'b0;
+      res_valid    <= 1'b0;
+      cnt          <= 4'd0;
+      SR           <= 17'd0;
+      abs_dividend <= 8'd0;
+      abs_divisor  <= 8'd0;
+      dividend_neg <= 1'b0;
+      divisor_neg  <= 1'b0;
+      NEG_DIVISOR  <= 9'd0;
+      result       <= 16'd0;
+    end
+    else begin
+      // When not busy, a new division operation starts.
+      if(!busy && opn_valid && !res_valid) begin
+        busy <= 1'b1;
+        // Compute the absolute value of the dividend and record its sign.
+        // (Using blocking assignments here so that these values are available immediately.)
+        if(sign && dividend[7]) begin
+          abs_dividend = ~dividend + 8'd1;
+          dividend_neg = 1'b1;
+        end 
+        else begin
+          abs_dividend = dividend;
+          dividend_neg = 1'b0;
         end
 
-        CALC: begin
-          // One iteration of the shift-subtract algorithm.
-          SR  <= { next_R, next_Q };
-          cnt <= cnt + 1;
-          if(cnt == 4'd7)
-            state <= DONE;
+        // Compute the absolute value of the divisor and record its sign.
+        if(sign && divisor[7]) begin
+          abs_divisor = ~divisor + 8'd1;
+          divisor_neg = 1'b1;
+        end 
+        else begin
+          abs_divisor = divisor;
+          divisor_neg = 1'b0;
         end
 
-        DONE: begin
-          // Perform sign-correction if needed.
-          if(sign) begin
-            // For the quotient, if dividend and divisor have opposite signs, negate.
-            if(dividend[7] ^ divisor[7])
-              quotient_corr <= ~SR[7:0] + 1;
-            else
-              quotient_corr <= SR[7:0];
-
-            // Remainder takes the sign of the dividend.
-            if(dividend[7])
-              remainder_corr <= ~SR[15:8] + 1;
-            else
-              remainder_corr <= SR[15:8];
-
-            result <= {remainder_corr, quotient_corr};
-          end
-          else begin
-            result <= SR;
-          end
+        // Initialize the shift register SR.
+        // We use a 17‐bit value with 9 zeros in the upper part and the absolute dividend in the lower 8 bits.
+        // Then we shift left by 1 for the algorithm.
+        SR <= ({9'd0, abs_dividend} << 1);
+        cnt <= 4'd1;
+        res_valid <= 1'b0;
+        // Compute NEG_DIVISOR = -({1’b0,abs_divisor}) in 9 bits.
+        NEG_DIVISOR <= ~({1'b0, abs_divisor}) + 9'd1;
+      end 
+      else if(busy) begin
+        // When 8 iterations are complete, finish the operation.
+        if(cnt == 4'd8) begin
+          busy <= 1'b0;
+          cnt  <= 4'd0;
+          // In our register SR:
+          //   The quotient is contained in the lower 8 bits.
+          //   The remainder is contained in bits [16:9].
+          // Perform sign correction if needed. (For signed operations, the quotient must get a sign
+          // correction based on (dividend_neg XOR divisor_neg) and the remainder must be negated if dividend_neg.)
+          result <= { (sign && dividend_neg ? (~SR[16:9] + 8'd1) : SR[16:9]),
+                      (sign && (dividend_neg ^ divisor_neg) ? (~SR[7:0] + 8'd1) : SR[7:0]) };
           res_valid <= 1'b1;
-          // Wait here until opn_valid goes low before returning to IDLE.
-          if(!opn_valid)
-            state <= IDLE;
+        end 
+        // Otherwise, perform one iteration of the radix‐2 division.
+        else begin
+          // Shift the entire shift register by 1 and try to subtract the (absolute) divisor.
+          SR_next = (SR << 1);
+          // The 9‐bit subtraction: SR_next[16:8] + NEG_DIVISOR.
+          {trial_carry, trial} = SR_next[16:8] + NEG_DIVISOR;
+          if(trial_carry) begin
+            // Subtraction succeeded: update the upper bits and set the current quotient bit.
+            SR_next[16:8] = trial;
+            SR_next[0]   = 1'b1;
+          end 
+          else begin
+            // Subtraction did not succeed: the quotient bit is 0.
+            SR_next[0]   = 1'b0;
+          end
+          // Update the shift register and increment the counter.
+          SR <= SR_next;
+          cnt <= cnt + 1;
         end
-
-        default: state <= IDLE;
-      endcase
+      end 
+      else begin
+        // When not busy, ensure res_valid is cleared.
+        res_valid <= 1'b0;
+      end
     end
   end
 
 endmodule
-------------------------------------------------------------
+--------------------------------------------------
 
-Explanation of the changes:
-1. Added a sign‐correction block in the DONE state. Now, if “sign” is asserted, the module checks whether the dividend and divisor have opposite signs (using XOR) and negates the quotient if so. The remainder is adjusted to have the same sign as the dividend.
-2. Minor clean–up comments and formatting (for example, replacing “4‐bit” with “4‐bit” and clarifying comments) have been applied.
+Explanation of the major fixes:
 
-This module now correctly implements the radix–2 division algorithm with signed/unsigned support according to best practices.
+1. When a new division begins (when opn_valid is high), we now use blocking assignments to compute abs_dividend/abs_divisor so that the freshly computed values are used immediately in the initialization of SR and NEG_DIVISOR.
+
+2. In the “finish” branch (when cnt==8) we do not declare temporary regs inside the branch; instead we simply compute the final remainder and quotient (with sign correction) “in–line” when assigning to the 16‐bit result.
+
+3. Unused signals (such as start_cnt) have been removed to simplify the design.
+
+This version follows good practices and should be synthesizable while being functionally equivalent to the original design with the noted corrections.

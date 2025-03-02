@@ -1,0 +1,45 @@
+module top_module(
+    input clk,
+    input [7:0] in,
+    input reset,    // Synchronous reset
+    output reg [23:0] out_bytes,
+    output reg done
+);
+
+    // state encoding: 0 = waiting for first byte, 1 = second byte, 2 = third byte
+    reg [1:0] state;
+    
+    // FSM with datapath to capture the three bytes
+    always @(posedge clk) begin
+        if (reset) begin
+            state <= 2'd0;
+            out_bytes <= 24'd0;
+            done <= 1'b0;
+        end else begin
+            // By default, done is deasserted unless we complete a packet
+            done <= 1'b0;
+            case (state)
+                2'd0: begin
+                    // Searching for the first byte: bit[3] must be 1
+                    if (in[3]) begin
+                        out_bytes[23:16] <= in; // first byte captured in MSB byte
+                        state <= 2'd1;
+                    end
+                end
+                2'd1: begin
+                    // Capture the second byte
+                    out_bytes[15:8] <= in;
+                    state <= 2'd2;
+                end
+                2'd2: begin
+                    // Capture the third byte
+                    out_bytes[7:0] <= in;
+                    done <= 1'b1; // Message complete: assert done for one clock cycle
+                    state <= 2'd0; // Go back to waiting for a new packet
+                end
+                default: state <= 2'd0;
+            endcase
+        end
+    end
+
+endmodule

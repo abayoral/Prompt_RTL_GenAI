@@ -1,0 +1,47 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // Karnaugh map analysis:
+    // We have the following K-map (with variables arranged in Gray-code order):
+    //
+    //            a'b'    a'b     ab     ab'
+    //        +-------------------------------
+    //  c'd'  |   d     |   0   |   1   |   1 
+    //  c'd   |   0     |   0   |   d   |   d 
+    //  cd    |   0     |   1   |   1   |   1 
+    //  cd'   |   0     |   1   |   1   |   1 
+    //
+    // For the purposes of minimization, we are free to choose the don't care (d) cells
+    // to be either 0 or 1. By appropriately selecting them, we can achieve a grouping that
+    // leads to a simplified expression.
+    //
+    // Notice that the groups formed by the cells with ones (including chosen don't care cells)
+    // can be summarized as follows:
+    //
+    // 1) The entire set of cells for which a = 1 (i.e. columns ab and ab') can be covered.
+    //    In those columns, regardless of b, c, or d, the output can be forced to 1.
+    //    This group covers 8 cells (all rows in these two columns when we choose don't care cells accordingly)
+    //    and gives the term: a.
+    //
+    // 2) The remaining ones are in the column a'b (where a = 0, b = 1), in the rows cd and cd'.
+    //    In these, c = 1 is common (while d can be either 1 or 0). Hence the group gives:
+    //    (~a) & b & c.
+    //
+    // Thus the sum-of-products expression for the output is:
+    //     out = a + (~a & b & c)
+    //
+    // But this expression can be simplified by observing that when a = 1, out is 1 regardless,
+    // and when a = 0, out = b & c. So it is equivalent to:
+    //     out = a + (b & c)
+    //
+    // This simplified function is equivalent to the original specification
+    // given the flexibility in assigning don't cares.
+    
+    assign out = a | (b & c);
+
+endmodule

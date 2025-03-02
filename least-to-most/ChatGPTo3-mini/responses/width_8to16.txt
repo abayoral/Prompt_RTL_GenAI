@@ -1,0 +1,65 @@
+module width_8to16 (
+    input         clk,
+    input         rst_n,
+    input         valid_in,
+    input  [7:0]  data_in,
+    output reg    valid_out,
+    output reg [15:0] data_out
+);
+
+  // State declaration for FSM: WAIT_FIRST (0) and WAIT_SECOND (1)
+  localparam WAIT_FIRST  = 1'b0;
+  localparam WAIT_SECOND = 1'b1;
+  
+  reg state;          // state of FSM
+  reg [7:0] first_byte;  // register to store first valid byte
+  // Pending registers to pipeline the result to the output in the cycle following the second valid input
+  reg pending_valid;
+  reg [15:0] pending_data;
+  
+  // Sequential block: synchronous reset and pipelined output generation.
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      // Reset internal state and outputs
+      state       <= WAIT_FIRST;
+      first_byte  <= 8'b0;
+      pending_valid <= 1'b0;
+      pending_data  <= 16'b0;
+      valid_out   <= 1'b0;
+      data_out    <= 16'b0;
+    end else begin
+      // Update the output with pending registers (result from previous pairing)
+      valid_out <= pending_valid;
+      data_out  <= pending_data;
+      // Clear pending registers by default each cycle
+      pending_valid <= 1'b0;
+      pending_data  <= 16'b0;
+      
+      // FSM to process incoming valid data lines
+      case (state)
+        WAIT_FIRST: begin
+          if (valid_in) begin
+            // Store the first incoming 8-bit data and move to WAIT_SECOND state
+            first_byte <= data_in;
+            state <= WAIT_SECOND;
+          end
+        end
+        WAIT_SECOND: begin
+          if (valid_in) begin
+            // Now a valid pair is available, form the 16-bit data with the previously stored byte in the upper half.
+            // Pipeline the result so that it appears at the outputs in the next clock cycle.
+            pending_data <= {first_byte, data_in};
+            pending_valid <= 1'b1;
+            // Return to WAIT_FIRST for the next pair
+            state <= WAIT_FIRST;
+          end
+          // If valid_in is not asserted, remain in WAIT_SECOND until second byte arrives.
+        end
+        default: begin
+          state <= WAIT_FIRST;
+        end
+      endcase
+    end
+  end
+
+endmodule

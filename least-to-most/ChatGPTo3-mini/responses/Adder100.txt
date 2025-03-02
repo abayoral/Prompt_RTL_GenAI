@@ -1,0 +1,12 @@
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output cout,
+    output [99:0] sum 
+);
+
+    // Perform the addition using behavioral code.
+    // We compute a 101-bit result to capture the carry out.
+    assign {cout, sum} = a + b + cin;
+
+endmodule

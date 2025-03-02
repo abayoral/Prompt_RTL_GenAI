@@ -1,0 +1,53 @@
+module full_adder(
+    input a,
+    input b,
+    input cin,
+    output sum,
+    output cout
+);
+    // Combinational full-adder: sum = a XOR b XOR cin, cout = (a & b) | (a & cin) | (b & cin)
+    assign sum = a ^ b ^ cin;
+    assign cout = (a & b) | (a & cin) | (b & cin);
+endmodule
+
+module top_module( 
+    input [2:0] a, b,
+    input cin,
+    output [2:0] cout,
+    output [2:0] sum 
+);
+
+    wire c0, c1;
+
+    // Instance for bit 0
+    full_adder FA0 (
+        .a(a[0]),
+        .b(b[0]),
+        .cin(cin),
+        .sum(sum[0]),
+        .cout(c0)
+    );
+
+    // Instance for bit 1
+    full_adder FA1 (
+        .a(a[1]),
+        .b(b[1]),
+        .cin(c0),
+        .sum(sum[1]),
+        .cout(c1)
+    );
+
+    // Instance for bit 2
+    full_adder FA2 (
+        .a(a[2]),
+        .b(b[2]),
+        .cin(c1),
+        .sum(sum[2]),
+        .cout(cout[2])
+    );
+    
+    // Output the intermediate carry-outs from the first and second full adders.
+    assign cout[0] = c0;
+    assign cout[1] = c1;
+
+endmodule

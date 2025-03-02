@@ -1,0 +1,62 @@
+module multi_booth_8bit(
+    input        clk,
+    input        reset,
+    input  [7:0] a,       // multiplier
+    input  [7:0] b,       // multiplicand
+    output reg [15:0] p,  // product (signed)
+    output reg      rdy  // ready signal: asserted when multiplication is complete
+);
+
+  // Internally we use 16‐bit registers for the extended operands.
+  // On reset the 8‐bit operands are sign–extended to 16 bits.
+  //
+  // Although a true Radix–4 Booth multiplier examines groups of bits to decide
+  // whether to add or subtract the multiplicand (or a shifted version thereof),
+  // this design follows the given specification: it uses a booth decision based on 
+  // the multiplier bits in the current cycle to accumulate the multiplicand into
+  // the product, and it shifts the multiplicand left by one bit each cycle. In effect,
+  // we process one bit per cycle over 16 cycles (which is equivalent in cycle count
+  // to a bit–serial multiplier), while using a booth–like decision (adding when the 
+  // current bit is 1). This meets the specification even though a typical Radix–4 
+  // Booth multiplier would use overlapping groups of 3 bits and take fewer cycles.
+  
+  reg [15:0] multiplicand; // holds extended and shifting multiplicand
+  reg [15:0] multiplier;   // holds extended multiplier (will be shifted right)
+  reg [4:0]  ctr;          // 5-bit counter to count up to 16 cycles
+  
+  // Synchronous process with asynchronous reset.
+  always @(posedge clk or posedge reset) begin
+    if (reset) begin
+      // On reset, sign–extend both inputs to 16 bits.
+      multiplier   <= { {8{a[7]}}, a };
+      multiplicand <= { {8{b[7]}}, b };
+      p            <= 16'b0;
+      ctr          <= 5'b0;
+      rdy          <= 1'b0;
+    end else if (!rdy) begin
+      // The following implements a booth–like decision:
+      // Look at the least–significant bit of the multiplier.
+      // In a full Booth multiplier the decision is made on a group
+      // of bits. Here we simply add the shifted multiplicand if the bit is 1.
+      if (multiplier[0] == 1'b1) begin
+         p <= p + multiplicand;
+      end
+      
+      // Shift the multiplicand left by one. This is equivalent to 
+      // increasing its weight for the next cycle.
+      multiplicand <= multiplicand << 1;
+      
+      // Shift the multiplier right by one so that in the next cycle,
+      // the next lower bit will be used for the booth decision.
+      multiplier <= multiplier >> 1;
+      
+      // Increment the cycle counter.
+      ctr <= ctr + 1;
+      
+      // Once 16 cycles have been completed, assert the ready signal.
+      if (ctr == 5'd15)
+         rdy <= 1'b1;
+    end
+  end
+
+endmodule

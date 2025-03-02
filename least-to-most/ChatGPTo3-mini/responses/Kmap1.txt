@@ -1,0 +1,14 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    output out
+);
+    // The given Karnaugh map has a '1' for every combination of a, b, and c.
+    // That is, regardless of the input values, the output is 1.
+    // Both the sum-of-products and product-of-sums simplifications yield out = 1.
+    // Therefore, we simply tie the output to logic high.
+    
+    assign out = 1'b1;
+    
+endmodule

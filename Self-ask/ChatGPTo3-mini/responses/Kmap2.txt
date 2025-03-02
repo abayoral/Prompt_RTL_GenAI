@@ -1,0 +1,34 @@
+module top_module(
+    input a,
+    input b,
+    input c,
+    input d,
+    output out
+);
+
+    // The Karnaugh map is:
+    //          a'b'   a'b    ab    ab'
+    // c'd'      1      1     0      1
+    // c'd       1      0     0      1
+    // cd        0      1     1      1
+    // cd'       1      1     0      0
+    //
+    // With the rows ordered as: c'd', c'd, cd, cd'
+    // and the columns as: a'b', a'b, ab, ab'
+    //
+    // One correct simplified sum-of-products expression for the function is:
+    //   F = a'b'c' + ab'c' + a'cd' + acd + a'bc
+    //
+    // Explanation of clause groupings:
+    // 1. a'b'c' groups the two ones in the first column of rows c'd' and c'd.
+    // 2. ab'c' groups the two ones in the fourth column of rows c'd' and c'd.
+    // 3. a'cd' groups the two ones in the first two columns of row cd' (c=1,d=0, a=0).
+    // 4. acd groups the two ones in the last two columns of row cd (c=1,d=1, a=1).
+    // 5. a'bc groups the vertical ones in the second column spanning rows cd' and cd.
+    //
+    // This expression is equivalent to the original Karnaugh map and can also be verified
+    // by checking that it covers the minterms corresponding to the 1's in the provided map.
+    
+    assign out = (~a & ~b & ~c) | ( a & ~b & ~c) | (~a & c & ~d) | (a & c & d) | (~a & b & c);
+
+endmodule

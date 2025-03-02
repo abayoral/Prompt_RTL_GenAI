@@ -1,0 +1,11 @@
+module top_module( 
+    input wire [15:0] in,
+    output wire [7:0] out_hi,
+    output wire [7:0] out_lo );
+
+    // Split the 16-bit input into two 8-bit segments:
+    // out_hi holds the upper byte and out_lo holds the lower byte.
+    assign out_hi = in[15:8];
+    assign out_lo = in[7:0];
+
+endmodule

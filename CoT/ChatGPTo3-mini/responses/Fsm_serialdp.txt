@@ -1,0 +1,122 @@
+module top_module(
+    input clk,
+    input in,
+    input reset,    // Synchronous reset
+    output reg [7:0] out_byte,
+    output reg done
+);
+
+    // State encoding
+    localparam STATE_IDLE   = 2'd0;
+    localparam STATE_DATA   = 2'd1;
+    localparam STATE_PARITY = 2'd2;
+    localparam STATE_STOP   = 2'd3;
+    
+    reg [1:0] state, next_state;
+    reg [3:0] bit_count;  // to count eight data bits
+    reg [7:0] shift_reg;
+    reg clr_parity;       // internal signal to clear the parity counter
+
+    // Wire for feeding valid bits to parity module.
+    // Only when receiving data (STATE_DATA) or parity bit (STATE_PARITY)
+    wire parity_in;
+    assign parity_in = ((state == STATE_DATA) || (state == STATE_PARITY)) ? in : 1'b0;
+    
+    // Combine global reset and our frame clear request to reset parity circuit.
+    wire parity_reset;
+    assign parity_reset = reset || clr_parity;
+    
+    // Wire from parity module output.
+    wire parity_odd;
+
+    // Instantiate the provided parity checker.
+    parity parity_inst (
+        .clk(clk),
+        .reset(parity_reset),
+        .in(parity_in),
+        .odd(parity_odd)
+    );
+    
+    // FSM: sequential block to update state, registers, and outputs.
+    always @(posedge clk) begin
+        if (reset) begin
+            state     <= STATE_IDLE;
+            bit_count <= 4'd0;
+            shift_reg <= 8'd0;
+            out_byte  <= 8'd0;
+            done      <= 1'b0;
+            clr_parity<= 1'b0;
+        end else begin
+            // Default output of done is only for one cycle.
+            done <= 1'b0;
+            case (state)
+                STATE_IDLE: begin
+                    clr_parity <= 1'b0; // default deassert clear
+                    if (in == 1'b0) begin
+                        // Start bit detected, prepare to receive data.
+                        state     <= STATE_DATA;
+                        bit_count <= 4'd0;
+                        // Assert clear for parity module so it starts counting fresh.
+                        clr_parity <= 1'b1;
+                    end else begin
+                        state <= STATE_IDLE;
+                    end
+                end
+                
+                STATE_DATA: begin
+                    // After first cycle in DATA, deassert parity clear.
+                    clr_parity <= 1'b0;
+                    // Sample a data bit; since protocol sends LSB first,
+                    // assign the incoming bit to the bit location indicated by bit_count.
+                    shift_reg[bit_count] <= in;
+                    bit_count <= bit_count + 1;
+                    if (bit_count == 4'd7)
+                        state <= STATE_PARITY;  // After 8 bits received, next is parity bit.
+                    else
+                        state <= STATE_DATA;
+                end
+                
+                STATE_PARITY: begin
+                    // In this state, the parity module is fed the parity bit.
+                    // We don't store it; the parity module has updated its odd count.
+                    state <= STATE_STOP;
+                end
+                
+                STATE_STOP: begin
+                    // Wait for a valid stop bit (logic 1).
+                    if (in == 1'b1) begin
+                        // Only if the overall count (data+parity) is odd (i.e. parity_odd==1)
+                        // then the received byte is correct.
+                        if (parity_odd) begin
+                            out_byte <= shift_reg;
+                            done <= 1'b1;
+                        end
+                        state <= STATE_IDLE;
+                    end else begin
+                        // Remain in stop state until a 1 appears.
+                        state <= STATE_STOP;
+                    end
+                end
+                
+                default: state <= STATE_IDLE;
+            endcase
+        end
+    end
+
+endmodule
+
+// Provided parity module.
+module parity (
+    input clk,
+    input reset,
+    input in,
+    output reg odd
+);
+
+    always @(posedge clk)
+        if (reset)
+            odd <= 1'b0;
+        else if (in)
+            odd <= ~odd;
+            
+endmodule

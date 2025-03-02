@@ -1,0 +1,21 @@
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output cout,
+    output [99:0] sum 
+);
+
+    // Create an extended wire to capture the 101-bit result including carry-out.
+    wire [100:0] result;
+
+    // Add two 100-bit numbers and the carry-in.
+    // By extending a and b with an extra MSB (0), we correctly handle the sum and capture the carry-out.
+    assign result = {1'b0, a} + {1'b0, b} + cin;
+
+    // The lower 100 bits form the sum
+    assign sum = result[99:0];
+
+    // The MSB is the carry-out.
+    assign cout = result[100];
+
+endmodule
