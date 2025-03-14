@@ -53,12 +53,19 @@ $ python stats.py <framework name> <model name>
 
 Different Frameoworks: 
 - Zero-shot
+- CoT
+- Generate Knowledge
+- Least-to-most
+- RaR 
+- RoEm
+- Self-ask
+- Self-calibration
+- Self-consistency
 
 Different Models:
 - GPT-4omini
 - GPT-4o
-- GPT-4
-- 
+- o3-mini
 
 ## References
 
