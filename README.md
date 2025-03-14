@@ -1,4 +1,4 @@
-# On LLM Prompt Engineering for Hardware Design
+# LLM Prompt Engineering for Hardware Design
 ## Overview
 
 We are conducting a comprehensive evaluation of state-of-the-art prompt engineering techniques in the context of hardware design, with a specific focus on generating functional Verilog. 
