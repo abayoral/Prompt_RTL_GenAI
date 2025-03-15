@@ -26,8 +26,8 @@ We combine **RTLLM** [2] and **HDL Bits** [1] datasets for our evaluation.
 
 1.  Clone the repository to your local machine:
 ```sh
-git clone
-cd 
+git clone https://github.com/abayoral/Prompt_RTL_GenAI.git
+cd Prompt_RTL_GenAI
 ```
 
 2.  Set up a virtual environment:
