@@ -64,9 +64,9 @@ Different Frameoworks:
 - Self-consistency
 
 Different Models:
-- GPT-4omini
-- GPT-4o
-- o3-mini
+- ChatGPT4o-mini
+- ChatGPT4o
+- ChatGPTo3-mini
 
 ## References
 
