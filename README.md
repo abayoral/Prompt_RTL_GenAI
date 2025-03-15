@@ -1,7 +1,7 @@
-# LLM Prompt Engineering for Hardware Design
+# PromptRTL: Evaluating Prompt Engineering for Hardware Design
 ## Overview
 
-We are conducting a comprehensive evaluation of state-of-the-art prompt engineering techniques in the context of hardware design, with a specific focus on generating functional Verilog. 
+Prompt RTL conducts a comprehensive evaluation of state-of-the-art prompt engineering techniques in the context of hardware design, with a specific focus on generating functional Verilog. 
 
 ## Problem Categorization
 
@@ -10,6 +10,7 @@ We categorize Verilog problems and investigate the performance of the prompting 
 - **Basic Combinational Logic**
 - **Arithmetic and Data Operations**
 - **Sequential Logic and Finite State Machines**
+- 
 ## Dataset
 
 We combine **RTLLM** [2] and **HDL Bits** [1] datasets for our evaluation.
